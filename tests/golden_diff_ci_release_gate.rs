@@ -2,7 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use promptfoo_rs::compatibility::diff::{DiffFinding, DiffClass};
+use promptfoo_rs::compatibility::diff::{DiffClass, DiffFinding};
 use promptfoo_rs::compatibility::matrix::{CapabilityMatrix, CapabilityRow};
 use promptfoo_rs::compatibility::release_gate::{
     assert_stable_allowed, run_full_compatibility_gate, write_release_gate_summary, GateConfig,
@@ -45,8 +45,8 @@ fn temp_dir(name: &str) -> PathBuf {
 #[test]
 fn test_12_3_1_release_workflow_runs_full_gate_before_stable_artifact_build() {
     /* TEST-12.3.1 */
-    let workflow = fs::read_to_string(".github/workflows/release.yml")
-        .expect("release workflow should exist");
+    let workflow =
+        fs::read_to_string(".github/workflows/release.yml").expect("release workflow should exist");
     let gate_index = workflow
         .find("Full compatibility release gate")
         .expect("release workflow should run full compatibility gate");
@@ -54,7 +54,10 @@ fn test_12_3_1_release_workflow_runs_full_gate_before_stable_artifact_build() {
         .find("Build release binary")
         .expect("release workflow should build release binary");
 
-    assert!(gate_index < build_index, "gate must run before release build");
+    assert!(
+        gate_index < build_index,
+        "gate must run before release build"
+    );
     assert!(workflow.contains("golden_diff_ci_release_gate"));
     assert!(workflow.contains("compatibility/artifacts/release-gate"));
 }
@@ -117,7 +120,9 @@ fn test_12_3_3_gate_summary_records_channel_decision_and_artifact_paths() {
     assert_eq!(summary.status, ReleaseGateStatus::Ready);
     assert!(summary.stable_allowed);
     assert_eq!(summary.release_channel, ReleaseChannel::Stable);
-    assert!(summary.artifact_paths.contains(&raw_artifact.display().to_string()));
+    assert!(summary
+        .artifact_paths
+        .contains(&raw_artifact.display().to_string()));
 
     let summary_path = root.join("summary.json");
     write_release_gate_summary(&summary, &summary_path).expect("summary should be written");
@@ -128,5 +133,11 @@ fn test_12_3_3_gate_summary_records_channel_decision_and_artifact_paths() {
 
     assert_eq!(json["release_channel"], "stable");
     assert_eq!(json["stable_allowed"], true);
-    assert_eq!(json["artifact_paths"].as_array().expect("paths array").len(), 2);
+    assert_eq!(
+        json["artifact_paths"]
+            .as_array()
+            .expect("paths array")
+            .len(),
+        2
+    );
 }

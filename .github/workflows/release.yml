@@ -17,8 +17,17 @@ jobs:
           source docs/s2v/scripts/lib/preflight.sh
           source docs/s2v/scripts/lib/verify.sh
           s2v_verify_full "install typecheck unit-test"
+      - name: Full compatibility release gate
+        run: |
+          mkdir -p compatibility/artifacts/release-gate
+          cargo test --test p0_fixture_corpus --test executable_upstream_rs_runner --test golden_diff_ci_release_gate
       - name: Build release binary
         run: cargo build --workspace --release
+      - name: Upload compatibility release gate artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: compatibility-release-gate
+          path: compatibility/artifacts/release-gate
       - name: Compatibility release gate reminder
         run: |
           echo "Stable publishing requires the compatibility release gate to be Ready."

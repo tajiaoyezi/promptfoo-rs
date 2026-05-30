@@ -1,7 +1,9 @@
 use std::fs;
 
 use promptfoo_rs::compatibility::diff::DiffFinding;
-use promptfoo_rs::compatibility::release_gate::{ReleaseGateStatus, ReleaseGateSummary};
+use promptfoo_rs::compatibility::release_gate::{
+    ReleaseChannel as GateReleaseChannel, ReleaseGateStatus, ReleaseGateSummary,
+};
 use promptfoo_rs::release::{
     default_release_checklist, evaluate_release_readiness, InstallChannel, ReleaseArtifactKind,
     ReleaseChannel,
@@ -10,7 +12,13 @@ use promptfoo_rs::release::{
 fn ready_gate_summary() -> ReleaseGateSummary {
     ReleaseGateSummary {
         status: ReleaseGateStatus::Ready,
+        release_channel: GateReleaseChannel::Stable,
+        stable_allowed: true,
         blocking_findings: Vec::new(),
+        required_p0_fixture_count: 50,
+        observed_p0_fixture_count: 50,
+        artifact_paths: vec!["compatibility/artifacts/release-gate/summary.json".to_string()],
+        missing_artifact_paths: Vec::new(),
         p1_snapshot_total: 4,
         p1_snapshot_covered: 4,
         p2_registration_total: 2,
@@ -26,6 +34,7 @@ fn ready_gate_summary() -> ReleaseGateSummary {
 fn blocked_gate_summary() -> ReleaseGateSummary {
     ReleaseGateSummary {
         status: ReleaseGateStatus::Blocked,
+        stable_allowed: false,
         blocking_findings: vec![DiffFinding::bug(
             "Eval runner",
             "$.summary.failed",

@@ -9,9 +9,18 @@ Stable releases require:
 - `docs/compatibility/baseline.lock.md` points to the frozen promptfoo 0.121.13 baseline.
 - `docs/compatibility/matrix.md` registers all P0/P1/P2 capability rows.
 - Task 6.2 golden diff release gate reports zero P0 bug or unclassified findings.
+- Task 12.3 full compatibility gate writes `compatibility/artifacts/release-gate/summary.json` or an equivalent CI artifact before stable build/upload.
 - Task specs for implemented release-surface work have Done status and completion notes.
 
 If the compatibility release gate is blocked, the release channel must be prerelease or nightly. Stable is disabled until the blocker is fixed or classified according to the compatibility policy.
+
+The machine-readable gate summary records:
+
+- requested release channel: stable, prerelease, or nightly.
+- stable decision: `stable_allowed=true|false`.
+- P0 fixture coverage count.
+- blocking P0 bug/unclassified findings.
+- persisted artifact paths and missing artifact paths.
 
 ## Channels
 
