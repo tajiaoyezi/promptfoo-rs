@@ -1,6 +1,6 @@
 # Phase 4: providers-assertions
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -30,9 +30,9 @@ provider-registry + assertion-engine + fixtures
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] Phase 4 所有 task spec 顶部 Status 已从 Draft 经本次授权 readiness pass 或用户审核推进到 Ready，再由实施 agent 完成到 Done。
-- [ ] Phase 4 涉及模块的 unit-test/typecheck 验证通过，且失败证据已进入对应 task §10。
-- [ ] Phase 4 的端到端 smoke 以 task §9 或本节记录的命令/手工证据完成。
+- [x] Phase 4 所有 task spec 顶部 Status 已从 Draft 经本次授权 readiness pass 或用户审核推进到 Ready，再由实施 agent 完成到 Done。
+- [x] Phase 4 涉及模块的 unit-test/typecheck 验证通过，且失败证据已进入对应 task §10。
+- [x] Phase 4 的端到端 smoke 以 task §9 或本节记录的命令/手工证据完成：2026-05-30 `s2v_preflight_phase docs/specs/phases/phase-4-providers-assertions.md && cargo test --workspace` 通过，30 integration tests passed / 0 failed。
 
 ## 7. Phase Risks
 
