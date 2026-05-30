@@ -1,6 +1,6 @@
 # Task 15.2: performance-security-observability-gates
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 15 — release-hardening-performance
