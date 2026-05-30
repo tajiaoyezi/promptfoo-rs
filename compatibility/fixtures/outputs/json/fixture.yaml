@@ -1,0 +1,9 @@
+id: p0-output-json
+test_id: TEST-12.1.2
+matrix_item_ids: ["output:json"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["json"]
+normalization_rules: ["time", "path", "object-order"]
+blocks_stable_release: true

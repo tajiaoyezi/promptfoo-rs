@@ -1,0 +1,9 @@
+id: p0-output-csv
+test_id: TEST-12.1.2
+matrix_item_ids: ["output:csv"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["csv"]
+normalization_rules: ["time", "path", "line-ending"]
+blocks_stable_release: true

@@ -1,0 +1,9 @@
+id: p0-cli-cache-command
+test_id: TEST-12.1.2
+matrix_item_ids: ["command:cache"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["stdout"]
+normalization_rules: ["time", "path"]
+blocks_stable_release: true

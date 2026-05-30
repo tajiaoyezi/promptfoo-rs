@@ -1,0 +1,9 @@
+id: p0-redteam-harmful-content
+test_id: TEST-12.1.2
+matrix_item_ids: ["command:redteam", "redteam-plugin:harmful-content"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["redteam-report"]
+normalization_rules: ["time", "path", "score-order"]
+blocks_stable_release: true

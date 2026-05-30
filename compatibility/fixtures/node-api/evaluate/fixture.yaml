@@ -1,0 +1,9 @@
+id: p0-node-wrapper-evaluate
+test_id: TEST-12.1.2
+matrix_item_ids: ["node-api:wrapper-contract", "command:eval"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["json"]
+normalization_rules: ["time", "path", "latency"]
+blocks_stable_release: true

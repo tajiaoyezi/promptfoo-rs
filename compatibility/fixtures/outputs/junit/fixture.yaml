@@ -1,0 +1,9 @@
+id: p0-output-junit
+test_id: TEST-12.1.2
+matrix_item_ids: ["output:junit"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["junit"]
+normalization_rules: ["time", "path"]
+blocks_stable_release: true

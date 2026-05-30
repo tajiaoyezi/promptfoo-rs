@@ -16,7 +16,10 @@ fn test_12_1_1_repository_tracks_at_least_50_p0_fixtures() {
         report.tracked_fixture_count >= 50,
         "tracked fixture count too low: {report:#?}"
     );
-    assert_eq!(fixture_count_by_priority(&report, Priority::P0), 50);
+    assert!(
+        fixture_count_by_priority(&report, Priority::P0) >= 50,
+        "{report:#?}"
+    );
 }
 
 #[test]

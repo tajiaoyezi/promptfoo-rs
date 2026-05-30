@@ -1,0 +1,9 @@
+id: p0-provider-ollama-chat
+test_id: TEST-12.1.3
+matrix_item_ids: ["provider:ollama"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["request-json", "response-json"]
+normalization_rules: ["time", "latency"]
+blocks_stable_release: true

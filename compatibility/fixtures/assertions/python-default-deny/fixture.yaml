@@ -1,0 +1,9 @@
+id: p0-assertion-python-default-deny
+test_id: TEST-12.1.3
+matrix_item_ids: ["assertion:python"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["security-error"]
+normalization_rules: ["path"]
+blocks_stable_release: true

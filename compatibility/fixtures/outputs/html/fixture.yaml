@@ -1,0 +1,9 @@
+id: p0-output-html
+test_id: TEST-12.1.2
+matrix_item_ids: ["viewer:local-web-viewer"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["html"]
+normalization_rules: ["time", "path"]
+blocks_stable_release: true

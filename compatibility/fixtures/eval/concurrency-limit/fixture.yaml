@@ -1,0 +1,9 @@
+id: p0-eval-concurrency-limit
+test_id: TEST-12.1.2
+matrix_item_ids: ["command:eval", "flag:max-concurrency"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["jsonl"]
+normalization_rules: ["time", "path", "latency", "order"]
+blocks_stable_release: true

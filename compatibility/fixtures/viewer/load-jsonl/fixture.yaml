@@ -1,0 +1,9 @@
+id: p0-viewer-load-jsonl
+test_id: TEST-12.1.2
+matrix_item_ids: ["viewer:local-web-viewer", "output:jsonl"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["html", "json"]
+normalization_rules: ["time", "path"]
+blocks_stable_release: true

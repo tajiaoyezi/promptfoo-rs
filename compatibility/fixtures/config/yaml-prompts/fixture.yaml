@@ -1,0 +1,9 @@
+id: p0-config-yaml-prompts
+test_id: TEST-12.1.2
+matrix_item_ids: ["config:promptfooconfig-yaml-json"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["normalized-config"]
+normalization_rules: ["path"]
+blocks_stable_release: true

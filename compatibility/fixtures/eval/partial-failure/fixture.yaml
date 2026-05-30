@@ -1,0 +1,9 @@
+id: p0-eval-partial-failure
+test_id: TEST-12.1.2
+matrix_item_ids: ["command:eval", "output:jsonl"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["jsonl", "stderr"]
+normalization_rules: ["time", "path", "latency"]
+blocks_stable_release: true

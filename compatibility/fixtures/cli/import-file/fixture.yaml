@@ -1,0 +1,9 @@
+id: p0-cli-import-file
+test_id: TEST-12.1.2
+matrix_item_ids: ["command:import-file"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["json"]
+normalization_rules: ["time", "path"]
+blocks_stable_release: true

@@ -1,0 +1,9 @@
+id: p0-config-env-file
+test_id: TEST-12.1.3
+matrix_item_ids: ["config:env"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["normalized-config"]
+normalization_rules: ["path", "env-order"]
+blocks_stable_release: true

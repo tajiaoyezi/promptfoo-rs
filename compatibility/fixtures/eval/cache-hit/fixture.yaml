@@ -1,0 +1,9 @@
+id: p0-eval-cache-hit
+test_id: TEST-12.1.2
+matrix_item_ids: ["command:eval", "command:cache"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["jsonl", "cache-state"]
+normalization_rules: ["time", "path", "latency"]
+blocks_stable_release: true

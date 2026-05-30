@@ -1,0 +1,9 @@
+id: p0-stable-release-gate-blocker
+test_id: TEST-12.1.2
+matrix_item_ids: ["release:github-releases", "command:eval"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["gate-summary", "json"]
+normalization_rules: ["time", "path", "checksum"]
+blocks_stable_release: true
