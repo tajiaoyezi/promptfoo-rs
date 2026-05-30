@@ -1,6 +1,6 @@
 # Task 15.1: viewer-node-packaging-release
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 15 — release-hardening-performance
@@ -66,17 +66,17 @@ Viewer and npm wrapper packages must have deterministic package metadata, lockfi
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Core Capabilities / §Release): `viewer/` has package metadata, lockfile, typecheck, test, build, and browser smoke scripts that run from adapter commands.
-- [ ] **AC2** (ADR-010): `npm/` has package metadata, lockfile, exported API contract, and Node smoke that exercises Rust core transport without duplicating business logic.
-- [ ] **AC3** (ADR-008): release dry-run records generated viewer/npm artifacts, expected package names, versions, checksums, and no-publish evidence.
+- [x] **AC1** (PRD §Core Capabilities / §Release): `viewer/` has package metadata, lockfile, typecheck, test, build, and browser smoke scripts that run from adapter commands.
+- [x] **AC2** (ADR-010): `npm/` has package metadata, lockfile, exported API contract, and Node smoke that exercises Rust core transport without duplicating business logic.
+- [x] **AC3** (ADR-008): release dry-run records generated viewer/npm artifacts, expected package names, versions, checksums, and no-publish evidence.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-15.1.1 | TEST-15.1.1 | tests/viewer_node_packaging_release.rs | install, typecheck, unit-test, build, manual | Not Started |
-| AC2 | SCEN-15.1.1 | TEST-15.1.2 | tests/viewer_node_packaging_release.rs | install, typecheck, unit-test, build, manual | Not Started |
-| AC3 | SCEN-15.1.1 | TEST-15.1.3 | tests/viewer_node_packaging_release.rs | install, typecheck, unit-test, build, manual | Not Started |
+| AC1 | SCEN-15.1.1 | TEST-15.1.1 | tests/viewer_node_packaging_release.rs | install, typecheck, unit-test, build, manual | Done |
+| AC2 | SCEN-15.1.1 | TEST-15.1.2 | tests/viewer_node_packaging_release.rs | install, typecheck, unit-test, build, manual | Done |
+| AC3 | SCEN-15.1.1 | TEST-15.1.3 | tests/viewer_node_packaging_release.rs | install, typecheck, unit-test, build, manual | Done |
 
 ## 8. Risks
 
@@ -94,9 +94,34 @@ Viewer and npm wrapper packages must have deterministic package metadata, lockfi
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-30
+- **改动文件**：
+  - `.github/workflows/release.yml`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/tasks/task-15.1-viewer-node-packaging-release.md`
+  - `src/release.rs`
+  - `tests/viewer_node_packaging_release.rs`
+  - `viewer/package.json`
+  - `viewer/pnpm-lock.yaml`
+  - `viewer/scripts/typecheck.mjs`
+  - `viewer/scripts/test.mjs`
+  - `viewer/scripts/build.mjs`
+  - `viewer/scripts/browser-smoke.mjs`
+  - `npm/package.json`
+  - `npm/pnpm-lock.yaml`
+  - `npm/scripts/typecheck.mjs`
+  - `npm/scripts/test.mjs`
+  - `npm/scripts/build.mjs`
+  - `npm/scripts/node-smoke.mjs`
+- **commit 列表**：
+  - `9e6c6d1` `docs(spec): task-15.1 进入实施 (Status: Ready → In Progress)`
+  - `b1d26c1` `test(release): 加 SCEN-15.1.1 的 3 个 RED 测试`
+  - `f8b026d` `feat(release): 补齐 viewer npm packaging smoke`
+- **§9 Verification 结果**：
+  - install: PASS — `s2v_verify_full "install typecheck unit-test build"` 的 install 分支通过；本地 `corepack` 缺失时 adapter fallback 使用已安装 `pnpm 10.33.0`，`viewer/` 与 `npm/` 均执行 `pnpm install --frozen-lockfile`。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、`viewer pnpm typecheck`、`npm pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、`viewer pnpm test`、`npm pnpm test` 通过；新增 `cargo test --test viewer_node_packaging_release` 覆盖 TEST-15.1.1 ~ TEST-15.1.3。
+  - build: PASS — helper 执行 `cargo build --workspace`、`viewer pnpm build`、`npm pnpm build` 通过；viewer build 串联 `smoke:browser`，npm build 串联 `smoke:node`。
+  - manual: PASS — dry-run artifacts 位于 `target/package-smoke/`，`viewer-dist.json` 与 `npm-wrapper-dist.json` 均记录 `publish:false`；package names 为 `@promptfoo-rs/viewer` / `@promptfoo-rs/node`；SHA256 分别为 `A5B84DD0B81E3D4B7C496747391EA7FE8A8DDD2F1F5EB515F85DAEF0D761B114` / `F250DA0AC60F034CCB621DD3F9F8F49E450BEDADE7877115ABFA932108693BA7`。非交互环境中 helper 的 manual `/dev/tty` 确认不可用，因此手工记录 dry-run 证据。
+- **剩余风险 / 未做项**：真实 npm/GitHub/Cargo/Homebrew 发布仍属 Out Of Scope，未使用真实发布凭据；viewer/browser smoke 为本地 deterministic smoke，不承诺像素级 UI parity；后续 task-15.2 继续收紧性能、安全与观测 gate。
+- **下游 task 影响**：task-15.2 可直接复用 viewer/npm package scripts 与 release dry-run report，把 release hardening gate 扩展到 adapter/CI 验证路径。
