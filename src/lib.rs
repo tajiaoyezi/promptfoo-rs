@@ -9,6 +9,7 @@ pub mod node_api;
 pub mod output;
 pub mod providers;
 pub mod redteam;
+pub mod release;
 pub mod results;
 pub mod scan;
 pub mod script_bridge;
