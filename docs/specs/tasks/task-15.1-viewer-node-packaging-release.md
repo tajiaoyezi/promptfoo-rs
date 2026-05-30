@@ -1,6 +1,6 @@
 # Task 15.1: viewer-node-packaging-release
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 15 — release-hardening-performance
