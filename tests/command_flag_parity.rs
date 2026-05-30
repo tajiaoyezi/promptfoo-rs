@@ -10,36 +10,30 @@ fn promptfoo_rs() -> Command {
 #[test]
 fn test_13_1_1_every_command_and_flag_inventory_item_has_status_mapping() {
     /* TEST-13.1.1 */
-    let matrix = CapabilityMatrix::from_json_file(std::path::Path::new(
-        "compatibility/matrix/items.json",
-    ))
-    .expect("item matrix should load");
+    let matrix =
+        CapabilityMatrix::from_json_file(std::path::Path::new("compatibility/matrix/items.json"))
+            .expect("item matrix should load");
     let inventory = CommandInventory::from_matrix(&matrix);
     let report = validate_cli_surface(&CliSurface::current(), &inventory);
 
     assert!(inventory.items.len() >= 12, "{inventory:#?}");
     assert!(report.unmapped_items.is_empty(), "{report:#?}");
-    assert!(
-        report
-            .status_by_item
-            .iter()
-            .any(|(item, status)| item == "command:view-directory" && status == "later")
-    );
-    assert!(
-        report
-            .status_by_item
-            .iter()
-            .any(|(item, status)| item == "command:eval" && status == "implemented")
-    );
+    assert!(report
+        .status_by_item
+        .iter()
+        .any(|(item, status)| item == "command:view-directory" && status == "later"));
+    assert!(report
+        .status_by_item
+        .iter()
+        .any(|(item, status)| item == "command:eval" && status == "implemented"));
 }
 
 #[test]
 fn test_13_1_2_user_visible_commands_do_not_return_empty_success_placeholders() {
     /* TEST-13.1.2 */
-    let matrix = CapabilityMatrix::from_json_file(std::path::Path::new(
-        "compatibility/matrix/items.json",
-    ))
-    .expect("item matrix should load");
+    let matrix =
+        CapabilityMatrix::from_json_file(std::path::Path::new("compatibility/matrix/items.json"))
+            .expect("item matrix should load");
     let inventory = CommandInventory::from_matrix(&matrix);
     let report = validate_cli_surface(&CliSurface::current(), &inventory);
 

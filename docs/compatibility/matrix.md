@@ -7,7 +7,7 @@ Readiness basis: PRD §Compatibility Matrix, PRD §Compatibility Harness Design,
 
 | Capability | Level | Target Status | Verification | Owner | Notes / Gap Reason |
 |---|---|---|---|---|---|
-| CLI command/flag inventory | P0 | native | golden diff stdout/stderr/exit code | leafiellune | eval/view/cache/redteam/mcp/code-scans/scan-model/import/export and common flags |
+| CLI command/flag inventory | P0 | native | golden diff stdout/stderr/exit code | leafiellune | task 13.1 maps eval/redteam/mcp/code-scans/scan-model as implemented; view/cache/import/export and output/concurrency flags are explicit later errors until task 13.2 behavior parity |
 | promptfooconfig.yaml/json | P0 | native | config normalization golden diff | leafiellune | vars, prompts, tests, providers, assertions |
 | redteam.yaml | P0 | native | redteam fixture golden diff | leafiellune | init/generate/eval/run/report core flow covered by task 7.1 |
 | .env and file prompts/tests | P0 | native | Linux/macOS/Windows path/env/newline fixtures | leafiellune | CSV/JSON/YAML tests included |

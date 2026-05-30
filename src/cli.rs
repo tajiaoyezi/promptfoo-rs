@@ -1,8 +1,10 @@
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Parser, Subcommand, ValueEnum};
 
+use crate::compatibility::matrix::CapabilityMatrix;
 use crate::config::{load_promptfoo_config, EnvOverlay};
 use crate::eval::{run_eval, EvalOptions};
 use crate::mcp::tool_listing;
@@ -38,9 +40,9 @@ pub enum Command {
     /// Run an eval from a promptfoo config file.
     Eval(EvalArgs),
     /// Open the local result viewer.
-    View,
+    View(ViewArgs),
     /// Manage local eval cache state.
-    Cache,
+    Cache(CacheArgs),
     /// Run redteam workflows.
     Redteam(RedteamArgs),
     /// Run MCP compatibility workflows.
@@ -52,16 +54,28 @@ pub enum Command {
     /// Run model audit workflows.
     ModelAudit(ScanArgs),
     /// Import promptfoo artifacts.
-    Import,
+    Import(ImportArgs),
     /// Export promptfoo artifacts.
-    Export,
+    Export(ExportArgs),
 }
 
 #[derive(Debug, Args)]
 pub struct EvalArgs {
     #[arg(short = 'c', long = "config", value_name = "FILE")]
     pub config: Option<PathBuf>,
+    #[arg(long = "output", value_name = "FILE")]
+    pub output: Option<PathBuf>,
+    #[arg(long = "max-concurrency", value_name = "N")]
+    pub max_concurrency: Option<usize>,
 }
+
+#[derive(Debug, Args)]
+pub struct ViewArgs {
+    pub directory: Option<PathBuf>,
+}
+
+#[derive(Debug, Args)]
+pub struct CacheArgs {}
 
 #[derive(Debug, Args)]
 pub struct RedteamArgs {
@@ -101,6 +115,17 @@ pub struct ScanArgs {
     pub format: ScanFormatArg,
 }
 
+#[derive(Debug, Args)]
+pub struct ImportArgs {
+    pub file: Option<PathBuf>,
+}
+
+#[derive(Debug, Args)]
+pub struct ExportArgs {
+    #[arg(long = "output", value_name = "FILE")]
+    pub output: Option<PathBuf>,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum ScanFormatArg {
     Json,
@@ -115,9 +140,26 @@ pub fn run_cli(cli: Cli) -> Result<ExitCode, CliError> {
         Some(Command::CodeScans(args)) => handle_scan_command("code-scans", args),
         Some(Command::ScanModel(args)) => handle_scan_command("scan-model", args),
         Some(Command::ModelAudit(args)) => handle_scan_command("model-audit", args),
-        Some(Command::View | Command::Cache | Command::Import | Command::Export) | None => {
-            Ok(ExitCode::SUCCESS)
-        }
+        Some(Command::View(_)) => Err(unsupported_command_error(
+            "view",
+            "not yet implemented; local viewer CLI launch is tracked as command:view-directory",
+        )),
+        Some(Command::Cache(_)) => Err(unsupported_command_error(
+            "cache",
+            "not yet implemented; cache subcommands are tracked for task 13.2",
+        )),
+        Some(Command::Import(_)) => Err(unsupported_command_error(
+            "import",
+            "not yet implemented; promptfoo artifact import is tracked as command:import-file",
+        )),
+        Some(Command::Export(_)) => Err(unsupported_command_error(
+            "export",
+            "not yet implemented; promptfoo artifact export is tracked as command:export",
+        )),
+        None => Err(unsupported_command_error(
+            "promptfoo-rs",
+            "command is required; run promptfoo-rs --help",
+        )),
     }
 }
 
@@ -168,6 +210,18 @@ pub fn handle_scan_command(command: &'static str, args: ScanArgs) -> Result<Exit
 }
 
 pub fn handle_eval_command(args: EvalArgs) -> Result<ExitCode, CliError> {
+    if args.output.is_some() {
+        return Err(unsupported_command_error(
+            "eval --output",
+            "not yet implemented; output file parity is tracked for task 13.2",
+        ));
+    }
+    if args.max_concurrency.is_some() {
+        return Err(unsupported_command_error(
+            "eval --max-concurrency",
+            "not yet implemented; scheduler parity is tracked for task 13.2",
+        ));
+    }
     let config_path = args
         .config
         .ok_or_else(|| CliError::new("config path is required for eval (-c, --config)"))?;
@@ -235,5 +289,158 @@ impl CliError {
         Self {
             message: message.into(),
         }
+    }
+}
+
+pub fn unsupported_command_error(command: &str, reason: &str) -> CliError {
+    CliError::new(format!("{command}: {reason}"))
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CommandInventory {
+    pub items: Vec<CommandInventoryItem>,
+}
+
+impl CommandInventory {
+    pub fn from_matrix(matrix: &CapabilityMatrix) -> Self {
+        let mut items = matrix
+            .rows
+            .iter()
+            .filter(|row| {
+                row.capability.starts_with("command:") || row.capability.starts_with("flag:")
+            })
+            .map(|row| CommandInventoryItem {
+                stable_id: row.capability.clone(),
+                level: row.level.clone(),
+            })
+            .collect::<Vec<_>>();
+        items.sort_by(|left, right| left.stable_id.cmp(&right.stable_id));
+        Self { items }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CommandInventoryItem {
+    pub stable_id: String,
+    pub level: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CliSurface {
+    pub items: Vec<CliSurfaceItem>,
+}
+
+impl CliSurface {
+    pub fn current() -> Self {
+        Self {
+            items: vec![
+                CliSurfaceItem::implemented("command:eval"),
+                CliSurfaceItem::later("command:view-directory"),
+                CliSurfaceItem::later("command:cache"),
+                CliSurfaceItem::implemented("command:redteam"),
+                CliSurfaceItem::implemented("command:mcp"),
+                CliSurfaceItem::implemented("command:code-scans"),
+                CliSurfaceItem::implemented("command:scan-model"),
+                CliSurfaceItem::later("command:import-file"),
+                CliSurfaceItem::later("command:export"),
+                CliSurfaceItem::implemented("flag:config"),
+                CliSurfaceItem::later("flag:output"),
+                CliSurfaceItem::later("flag:max-concurrency"),
+            ],
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CliSurfaceItem {
+    pub stable_id: String,
+    pub status: CliItemStatus,
+    pub empty_success: bool,
+}
+
+impl CliSurfaceItem {
+    fn implemented(stable_id: &str) -> Self {
+        Self::new(stable_id, CliItemStatus::Implemented)
+    }
+
+    fn later(stable_id: &str) -> Self {
+        Self::new(stable_id, CliItemStatus::Later)
+    }
+
+    fn new(stable_id: &str, status: CliItemStatus) -> Self {
+        Self {
+            stable_id: stable_id.to_string(),
+            status,
+            empty_success: false,
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum CliItemStatus {
+    Implemented,
+    Unsupported,
+    Later,
+    Blocked,
+}
+
+impl CliItemStatus {
+    fn as_str(&self) -> &'static str {
+        match self {
+            Self::Implemented => "implemented",
+            Self::Unsupported => "unsupported",
+            Self::Later => "later",
+            Self::Blocked => "blocked",
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CliParityReport {
+    pub unmapped_items: Vec<String>,
+    pub empty_success_commands: Vec<String>,
+    pub status_by_item: Vec<(String, String)>,
+}
+
+pub fn validate_cli_surface(cli: &CliSurface, inventory: &CommandInventory) -> CliParityReport {
+    let surface_by_id = cli
+        .items
+        .iter()
+        .map(|item| (item.stable_id.as_str(), item))
+        .collect::<BTreeMap<_, _>>();
+    let inventory_ids = inventory
+        .items
+        .iter()
+        .map(|item| item.stable_id.as_str())
+        .collect::<BTreeSet<_>>();
+
+    let mut unmapped_items = Vec::new();
+    let mut status_by_item = Vec::new();
+    for item in &inventory.items {
+        if let Some(surface_item) = surface_by_id.get(item.stable_id.as_str()) {
+            status_by_item.push((
+                item.stable_id.clone(),
+                surface_item.status.as_str().to_string(),
+            ));
+        } else {
+            unmapped_items.push(item.stable_id.clone());
+        }
+    }
+
+    let empty_success_commands = cli
+        .items
+        .iter()
+        .filter(|item| {
+            item.stable_id.starts_with("command:")
+                && inventory_ids.contains(item.stable_id.as_str())
+                && item.empty_success
+        })
+        .map(|item| item.stable_id.clone())
+        .collect();
+
+    CliParityReport {
+        unmapped_items,
+        empty_success_commands,
+        status_by_item,
     }
 }
