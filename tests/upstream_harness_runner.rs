@@ -1,16 +1,13 @@
 use promptfoo_rs::compatibility::harness::{
     reject_floating_baseline, ArtifactEngine, BaselineReference, FixtureSpec, HarnessRunner,
 };
-use promptfoo_rs::compatibility::normalize::{
-    normalize_artifact, NormalizationRules,
-};
+use promptfoo_rs::compatibility::normalize::{normalize_artifact, NormalizationRules};
 use serde_json::json;
 
 #[test]
 fn test_6_1_1_harness_locks_baseline_and_rejects_latest() {
     let pinned_npm = BaselineReference::npm("promptfoo@0.121.13");
-    let pinned_git =
-        BaselineReference::git_commit("4860e990c7e9a2f8f677173fb92cf9867b34d03f");
+    let pinned_git = BaselineReference::git_commit("4860e990c7e9a2f8f677173fb92cf9867b34d03f");
 
     reject_floating_baseline(&pinned_npm).expect("pinned npm baseline is accepted");
     reject_floating_baseline(&pinned_git).expect("pinned git commit is accepted");
