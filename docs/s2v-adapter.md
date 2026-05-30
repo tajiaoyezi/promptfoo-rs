@@ -172,7 +172,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 10.1 | web-viewer | docs/specs/tasks/task-10.1-web-viewer.md | Done | Phase 10 AUTO order | N/A (solo) |
 | 10.2 | release | docs/specs/tasks/task-10.2-release-docs-packaging.md | Done | Phase 10 AUTO order | N/A (solo) |
 | 11.1 | compatibility | docs/specs/tasks/task-11.1-current-upstream-target-policy.md | Done | Phase 11 order 1 | N/A (solo) |
-| 11.2 | compatibility-inventory | docs/specs/tasks/task-11.2-item-level-capability-inventory.md | Ready | Phase 11 order 2 | N/A (solo) |
+| 11.2 | compatibility-inventory | docs/specs/tasks/task-11.2-item-level-capability-inventory.md | Done | Phase 11 order 2 | N/A (solo) |
 | 11.3 | compatibility-matrix | docs/specs/tasks/task-11.3-compatibility-matrix-expansion.md | Ready | Phase 11 order 3 | N/A (solo) |
 | 12.1 | compatibility-fixtures | docs/specs/tasks/task-12.1-p0-fixture-corpus.md | Ready | Phase 12 order 1 | N/A (solo) |
 | 12.2 | compatibility-harness | docs/specs/tasks/task-12.2-executable-upstream-rs-runner.md | Ready | Phase 12 order 2 | N/A (solo) |
