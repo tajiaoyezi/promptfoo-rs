@@ -1,6 +1,6 @@
 # Task 12.2: executable-upstream-rs-runner
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 12 — compatibility-fixtures-golden-diff
@@ -59,17 +59,17 @@ For each fixture, runner must create isolated work dirs, set deterministic env, 
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Compatibility Harness Design): runner executes upstream promptfoo and promptfoo-rs commands for the same fixture.
-- [ ] **AC2** (ADR-007): runner persists upstream/rs/raw/normalized/diff artifacts with run metadata.
-- [ ] **AC3** (docs/audits/S2V parity): command timeout, env isolation, update-disable, and no-secret behavior are enforced.
+- [x] **AC1** (PRD §Compatibility Harness Design): runner executes upstream promptfoo and promptfoo-rs commands for the same fixture.
+- [x] **AC2** (ADR-007): runner persists upstream/rs/raw/normalized/diff artifacts with run metadata.
+- [x] **AC3** (docs/audits/S2V parity): command timeout, env isolation, update-disable, and no-secret behavior are enforced.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-12.2.1 | TEST-12.2.1 | tests/executable_upstream_rs_runner.rs | install, typecheck, unit-test, build, manual | Not Started |
-| AC2 | SCEN-12.2.1 | TEST-12.2.2 | tests/executable_upstream_rs_runner.rs | install, typecheck, unit-test, build, manual | Not Started |
-| AC3 | SCEN-12.2.1 | TEST-12.2.3 | tests/executable_upstream_rs_runner.rs | install, typecheck, unit-test, build, manual | Not Started |
+| AC1 | SCEN-12.2.1 | TEST-12.2.1 | tests/executable_upstream_rs_runner.rs | install, typecheck, unit-test, build, manual | Done |
+| AC2 | SCEN-12.2.1 | TEST-12.2.2 | tests/executable_upstream_rs_runner.rs | install, typecheck, unit-test, build, manual | Done |
+| AC3 | SCEN-12.2.1 | TEST-12.2.3 | tests/executable_upstream_rs_runner.rs | install, typecheck, unit-test, build, manual | Done |
 
 ## 8. Risks
 
@@ -86,9 +86,23 @@ For each fixture, runner must create isolated work dirs, set deterministic env, 
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-30
+- **改动文件**：
+  - `src/compatibility/executor.rs`
+  - `src/compatibility/harness.rs`
+  - `src/compatibility/mod.rs`
+  - `tests/executable_upstream_rs_runner.rs`
+  - `docs/compatibility/harness.md`
+  - `docs/specs/tasks/task-12.2-executable-upstream-rs-runner.md`
+- **commit 列表**：
+  - `7ec06be` `docs(spec): task-12.2 进入实施 (Status: Ready → In Progress)`
+  - `85ca640` `test(compatibility-harness): 加 SCEN-12.2.1 的 3 个 RED 测试`
+  - `eae648a` `feat(compatibility-harness): 实现 executable upstream-rs runner`
+- **§9 Verification 结果**：
+  - install: PASS — `s2v_verify_full "install typecheck unit-test build"` 中 `cargo fetch` 通过。
+  - typecheck: PASS — `cargo check --workspace` 通过。
+  - unit-test: PASS — `cargo test --workspace` 通过，包含 `tests/executable_upstream_rs_runner.rs` 的 TEST-12.2.1~TEST-12.2.3。
+  - build: PASS — `cargo build --workspace` 通过。
+  - manual: PASS — 已检查 persisted artifact tree：`metadata.json`、`raw/upstream.json`、`raw/rs.json`、`normalized/upstream.json`、`normalized/rs.json`、`diff/findings.json`、`work/{upstream,rs}/fixture.{json,yaml}` 均生成；样例 run `TEST-12.2.2` baseline=`promptfoo@0.121.13`，upstream/rs exit_code=0，`PROMPTFOO_DISABLE_UPDATE=true`。非交互 helper 的 full run 仅因 `/dev/tty` manual 确认失败，机械 keys 已单独全绿。
+- **剩余风险 / 未做项**：当前测试用本地 test binary 证明无 shell 执行、artifact 持久化和策略约束；真实 npm `promptfoo@0.121.13` 在 CI/发布机上的安装缓存、网络可用性和长耗时 fixture 仍需 task 12.3/Phase 15 gate 继续覆盖。
+- **下游 task 影响**：task 12.3 可复用 `PersistedRunArtifacts`、`diff/findings.json` 与 `docs/compatibility/harness.md` 的 artifact contract 接入 stable release gate。
