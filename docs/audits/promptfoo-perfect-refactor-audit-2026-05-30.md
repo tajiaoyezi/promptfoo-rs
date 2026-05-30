@@ -7,6 +7,7 @@
 **Runtime attachment**: `docs/audits/promptfoo-runtime-verification-audit-2026-05-30.md`.
 **S2V parity-claim attachment**: `docs/audits/promptfoo-s2v-parity-claim-audit-2026-05-30.md`.
 **Release/distribution attachment**: `docs/audits/promptfoo-release-distribution-audit-2026-05-30.md`.
+**Requirements traceability attachment**: `docs/audits/promptfoo-requirements-traceability-audit-2026-05-30.md`.
 
 ## Executive Conclusion
 
@@ -64,6 +65,10 @@ Relevant local sources:
 | App/viewer TS/JS/CSS files | 694 |
 | Example files | 1222 |
 | Test/spec files | 1040 |
+
+### Later Current-State Refresh
+
+A later refresh during the requirements traceability audit found `origin/main` at `945fda5d965ed27abb302fe0f0910b7dddea5dde` while `package.json` still reported `0.121.13`. See `docs/audits/promptfoo-requirements-traceability-audit-2026-05-30.md`.
 
 ## Findings
 
@@ -145,3 +150,5 @@ See `docs/audits/promptfoo-runtime-verification-audit-2026-05-30.md` for local S
 See `docs/audits/promptfoo-s2v-parity-claim-audit-2026-05-30.md` for why Phase 6 `Done` does not prove full upstream compatibility harness or golden diff release-gate execution.
 
 See `docs/audits/promptfoo-release-distribution-audit-2026-05-30.md` for release, viewer, npm wrapper, and distribution-channel evidence gaps.
+
+See `docs/audits/promptfoo-requirements-traceability-audit-2026-05-30.md` for a PRD requirement-by-requirement verdict matrix.
