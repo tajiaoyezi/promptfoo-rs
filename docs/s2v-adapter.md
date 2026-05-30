@@ -143,7 +143,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 12 | compatibility-fixtures-golden-diff | docs/specs/phases/phase-12-compatibility-fixtures-golden-diff.md | Done | 3 | N/A (solo) |
 | 13 | cli-output-eval-parity | docs/specs/phases/phase-13-cli-output-eval-parity.md | Done | 2 | N/A (solo) |
 | 14 | provider-assertion-redteam-parity | docs/specs/phases/phase-14-provider-assertion-redteam-parity.md | Done | 2 | N/A (solo) |
-| 15 | release-hardening-performance | docs/specs/phases/phase-15-release-hardening-performance.md | Ready | 2 | N/A (solo) |
+| 15 | release-hardening-performance | docs/specs/phases/phase-15-release-hardening-performance.md | Done | 2 | N/A (solo) |
 
 ## Task 总索引
 
