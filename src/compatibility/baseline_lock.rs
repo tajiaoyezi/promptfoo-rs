@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::Path;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
 
@@ -81,7 +82,11 @@ pub struct CompatibilityTargetPolicy {
 
 impl CompatibilityTargetPolicy {
     pub fn load(_path: &Path) -> Result<CompatibilityTargetPolicy, TargetPolicyError> {
-        unimplemented!("task-11.1 RED skeleton: target policy loader is not implemented")
+        let markdown = fs::read_to_string(_path).map_err(TargetPolicyError::Read)?;
+        let json = extract_json_fence(&markdown).ok_or_else(|| {
+            TargetPolicyError::Parse("target policy must contain a fenced json block".to_string())
+        })?;
+        serde_json::from_str(json).map_err(|error| TargetPolicyError::Parse(error.to_string()))
     }
 }
 
@@ -134,14 +139,66 @@ pub enum TargetPolicyError {
 }
 
 pub fn validate_single_stable_target(_policy: &CompatibilityTargetPolicy) -> TargetPolicyReport {
-    unimplemented!("task-11.1 RED skeleton: target policy validator is not implemented")
+    let mut rejected_reasons = Vec::new();
+    let stable_target_count = _policy.stable_targets.len();
+
+    if stable_target_count != 1 {
+        rejected_reasons.push(format!(
+            "multiple stable targets are not allowed: found {stable_target_count}"
+        ));
+    }
+
+    for target in &_policy.stable_targets {
+        if target.kind == StableTargetKind::Floating
+            || contains_floating_reference(&target.id)
+            || contains_floating_reference(&target.package_version)
+            || contains_floating_reference(&target.git_ref)
+            || contains_floating_reference(&target.git_commit)
+            || contains_floating_reference(&target.container_digest)
+        {
+            rejected_reasons.push(format!("floating stable target: {}", target.id));
+        }
+        if target.git_commit.len() != 40 || !target.git_commit.chars().all(|c| c.is_ascii_hexdigit())
+        {
+            rejected_reasons.push(format!("stable target commit is not immutable: {}", target.id));
+        }
+        if target.npm_integrity.trim().is_empty() || target.container_digest.trim().is_empty() {
+            rejected_reasons.push(format!("stable target lacks artifact evidence: {}", target.id));
+        }
+    }
+
+    let moving_upstream_is_tracking_only = !_policy.moving_upstream_observations.is_empty()
+        && _policy
+            .moving_upstream_observations
+            .iter()
+            .all(|observation| !observation.modifies_frozen_baseline);
+
+    if !moving_upstream_is_tracking_only {
+        rejected_reasons.push("moving upstream observations must be tracking-only".to_string());
+    }
+
+    TargetPolicyReport {
+        stable_target_count,
+        rejected_reasons,
+        moving_upstream_is_tracking_only,
+    }
 }
 
 pub fn record_moving_upstream_observation(
-    _head: &str,
-    _package_version: &str,
+    head: &str,
+    package_version: &str,
 ) -> UpstreamObservation {
-    unimplemented!("task-11.1 RED skeleton: upstream observation recorder is not implemented")
+    let seconds = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|duration| duration.as_secs())
+        .unwrap_or_default();
+    UpstreamObservation {
+        head: head.to_string(),
+        package_version: package_version.to_string(),
+        collected_at: format!("unix:{seconds}"),
+        source: "upstream origin/main tracking".to_string(),
+        modifies_frozen_baseline: false,
+    }
 }
 
 pub fn validate_baseline_lock(lock: &BaselineLock) -> BaselineLockReport {
@@ -302,6 +359,15 @@ fn extract_sha256(text: &str) -> String {
         .find(|part| part.starts_with("sha256:") && part.len() == 71)
         .unwrap_or_default()
         .to_string()
+}
+
+fn extract_json_fence(markdown: &str) -> Option<&str> {
+    let marker = "```json";
+    let (_, rest) = markdown.split_once(marker)?;
+    let rest = rest.strip_prefix('\r').or_else(|| rest.strip_prefix('\n')).unwrap_or(rest);
+    let rest = rest.strip_prefix('\n').unwrap_or(rest);
+    let (json, _) = rest.split_once("```")?;
+    Some(json.trim())
 }
 
 fn contains_floating_reference(value: &str) -> bool {
