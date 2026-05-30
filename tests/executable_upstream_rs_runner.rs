@@ -102,7 +102,12 @@ fn test_12_2_2_runner_persists_raw_normalized_diff_and_metadata_tree() {
     assert_eq!(metadata["fixture_id"], "TEST-12.2-fixture");
     assert_eq!(metadata["run_id"], "TEST-12.2.2");
     assert_eq!(metadata["baseline"]["reference"], "promptfoo@0.121.13");
-    assert!(diff.as_array().expect("diff artifact should be an array").len() >= 1);
+    assert!(
+        diff.as_array()
+            .expect("diff artifact should be an array")
+            .len()
+            >= 1
+    );
 }
 
 #[test]
@@ -114,8 +119,14 @@ fn test_12_2_3_command_policy_enforces_timeout_env_update_disable_and_no_secrets
 
     assert!(upstream.env_clear);
     assert!(rs.env_clear);
-    assert_eq!(upstream.env.get("PROMPTFOO_DISABLE_UPDATE"), Some(&"true".to_string()));
-    assert_eq!(rs.env.get("PROMPTFOO_DISABLE_UPDATE"), Some(&"true".to_string()));
+    assert_eq!(
+        upstream.env.get("PROMPTFOO_DISABLE_UPDATE"),
+        Some(&"true".to_string())
+    );
+    assert_eq!(
+        rs.env.get("PROMPTFOO_DISABLE_UPDATE"),
+        Some(&"true".to_string())
+    );
     assert!(upstream.timeout_ms > 0 && upstream.timeout_ms <= 120_000);
     assert!(rs.timeout_ms > 0 && rs.timeout_ms <= 120_000);
     assert!(upstream
