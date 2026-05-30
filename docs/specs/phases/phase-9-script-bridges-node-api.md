@@ -20,7 +20,7 @@ script-bridge + node-api-wrapper + bridge fixtures
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 9.1 | script-bridge-sandbox | ../tasks/task-9.1-script-bridge-sandbox.md | Ready | 实现 JS/TS、Python、Shell/Ruby bridge 的显式授权、env、stdio、timeout 和 redaction |
+| 9.1 | script-bridge-sandbox | ../tasks/task-9.1-script-bridge-sandbox.md | Done | 实现 JS/TS、Python、Shell/Ruby bridge 的显式授权、env、stdio、timeout 和 redaction |
 | 9.2 | node-api-wrapper | ../tasks/task-9.2-node-api-wrapper.md | Ready | 实现 npm wrapper 与 Node API contract，避免 wrapper 与 Rust core 漂移 |
 
 ## 5. Dependencies

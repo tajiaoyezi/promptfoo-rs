@@ -1,8 +1,8 @@
 # Task 9.1: script-bridge-sandbox
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — script bridge 默认拒绝、授权 subprocess I/O/timeout、env allowlist 与 redaction 已实现并通过 §9 验证。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 9 — script-bridges-node-api
@@ -63,17 +63,17 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): 未启用 allow-scripts 时拒绝执行并返回稳定错误
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 启用后子进程输入输出和超时有 fixture
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): env allowlist 与 secret redaction 有 tests
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): 未启用 allow-scripts 时拒绝执行并返回稳定错误
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 启用后子进程输入输出和超时有 fixture
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): env allowlist 与 secret redaction 有 tests
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-9.1.1 | TEST-9.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-9.1.2 | TEST-9.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-9.1.3 | TEST-9.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-9.1.1 | TEST-9.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-9.1.2 | TEST-9.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-9.1.3 | TEST-9.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -90,15 +90,24 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - src/script_bridge/mod.rs
+  - src/script_bridge/sandbox.rs
+  - src/script_bridge/redaction.rs
+  - tests/script_bridge_sandbox.rs
+  - docs/specs/tasks/task-9.1-script-bridge-sandbox.md
+  - docs/specs/phases/phase-9-script-bridges-node-api.md
+  - docs/s2v-adapter.md
+  - docs/compatibility/matrix.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - cba444e test(script-bridge): add task-9.1 sandbox RED tests
+  - c5a0b7d feat(script-bridge): add sandbox execution contract
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-9.1 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: PASS — `s2v_verify_full "install typecheck unit-test"` / `cargo fetch`
+  - typecheck: PASS — `cargo check --workspace`
+  - unit-test: PASS — `cargo test --workspace`，含 `tests/script_bridge_sandbox.rs` 的 TEST-9.1.1 ~ TEST-9.1.3（57 个 integration tests 全绿）
+  - manual: PASS — 已核对 AC、SCEN/TEST、BDD feature、compatibility matrix 中 JS/TS、Python、Shell/Ruby script bridge 行与实现一致。
+- **剩余风险 / 未做项**：本 task 固定 shared sandbox contract；具体 JS/TS、Python、Ruby runtime discovery / adapter wiring 仍需在后续 bridge 扩展中按 compatibility matrix 分语言补 fixture。
+- **下游 task 影响**：task 9.2 Node API wrapper 可复用 `ScriptBridgeError` 稳定错误、redaction policy 与显式授权语义；Phase 10 文档需说明 `--allow-scripts` 默认拒绝和 env allowlist 行为。
