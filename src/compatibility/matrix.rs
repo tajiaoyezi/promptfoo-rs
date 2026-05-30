@@ -1,7 +1,11 @@
 use std::fs;
 use std::path::Path;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+use serde::{Deserialize, Serialize};
+
+use super::inventory::CapabilityInventory;
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CapabilityMatrix {
     pub rows: Vec<CapabilityRow>,
 }
@@ -10,6 +14,11 @@ impl CapabilityMatrix {
     pub fn from_markdown(path: &Path) -> Result<Self, MatrixError> {
         let markdown = fs::read_to_string(path).map_err(MatrixError::Read)?;
         Ok(parse_matrix(&markdown))
+    }
+
+    pub fn from_json_file(path: &Path) -> Result<Self, MatrixError> {
+        let json = fs::read_to_string(path).map_err(MatrixError::Read)?;
+        serde_json::from_str(&json).map_err(|error| MatrixError::Parse(error.to_string()))
     }
 
     pub fn covers_domain(&self, domain: &str) -> bool {
@@ -33,7 +42,7 @@ impl CapabilityMatrix {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CapabilityRow {
     pub capability: String,
     pub level: String,
@@ -56,6 +65,60 @@ pub struct MatrixReport {
 #[derive(Debug)]
 pub enum MatrixError {
     Read(std::io::Error),
+    Parse(String),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MatrixPolicy {
+    pub p0_verification_prefix: String,
+    pub p1_verification_prefix: String,
+    pub p2_target_status: String,
+}
+
+impl Default for MatrixPolicy {
+    fn default() -> Self {
+        Self {
+            p0_verification_prefix: "fixture:".to_string(),
+            p1_verification_prefix: "snapshot:".to_string(),
+            p2_target_status: "later".to_string(),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct MatrixCompletenessReport {
+    pub missing_matrix_rows: Vec<String>,
+    pub rows_missing_level: Vec<String>,
+    pub rows_missing_status: Vec<String>,
+    pub rows_missing_verification: Vec<String>,
+    pub rows_missing_owner: Vec<String>,
+    pub p0_rows_missing_fixture_or_blocker: Vec<String>,
+    pub p1_rows_missing_snapshot_plan: Vec<String>,
+    pub p2_rows_missing_reason_or_target: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct MatrixBlocker {
+    pub item_id: String,
+    pub reason: String,
+}
+
+pub fn expand_matrix_from_inventory(
+    _inventory: &CapabilityInventory,
+    _policy: &MatrixPolicy,
+) -> CapabilityMatrix {
+    unimplemented!("task-11.3 RED skeleton: matrix expansion is not implemented")
+}
+
+pub fn validate_no_silent_omissions(
+    _inventory: &CapabilityInventory,
+    _matrix: &CapabilityMatrix,
+) -> MatrixCompletenessReport {
+    unimplemented!("task-11.3 RED skeleton: matrix completeness validator is not implemented")
+}
+
+pub fn matrix_release_blockers(_report: &MatrixCompletenessReport) -> Vec<MatrixBlocker> {
+    unimplemented!("task-11.3 RED skeleton: matrix blocker conversion is not implemented")
 }
 
 pub fn validate_matrix_completeness(matrix: &CapabilityMatrix) -> MatrixReport {
