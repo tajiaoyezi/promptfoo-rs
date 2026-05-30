@@ -1,6 +1,6 @@
 # Task 13.2: eval-output-cache-parity
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 13 — cli-output-eval-parity
@@ -60,17 +60,17 @@ For P0 eval fixtures, promptfoo-rs must produce upstream-matching or classified 
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §User Flow): `eval -c` supports output targets used by JSONL/JUnit/CSV/SARIF/HTML P0/P1 fixtures.
-- [ ] **AC2** (PRD §Compatibility Matrix): cache/resume/retry/concurrency/delay fixture artifacts match upstream or are classified.
-- [ ] **AC3** (ADR-004): stdout/stderr/exit code are stable and golden diffed for success, assertion failure, provider failure, invalid config.
+- [x] **AC1** (PRD §User Flow): `eval -c` supports output targets used by JSONL/JUnit/CSV/SARIF/HTML P0/P1 fixtures.
+- [x] **AC2** (PRD §Compatibility Matrix): cache/resume/retry/concurrency/delay fixture artifacts match upstream or are classified.
+- [x] **AC3** (ADR-004): stdout/stderr/exit code are stable and golden diffed for success, assertion failure, provider failure, invalid config.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-13.2.1 | TEST-13.2.1 | tests/eval_output_cache_parity.rs | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-13.2.1 | TEST-13.2.2 | tests/eval_output_cache_parity.rs | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-13.2.1 | TEST-13.2.3 | tests/eval_output_cache_parity.rs | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-13.2.1 | TEST-13.2.1 | tests/eval_output_cache_parity.rs | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-13.2.1 | TEST-13.2.2 | tests/eval_output_cache_parity.rs | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-13.2.1 | TEST-13.2.3 | tests/eval_output_cache_parity.rs | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -86,9 +86,25 @@ For P0 eval fixtures, promptfoo-rs must produce upstream-matching or classified 
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-30
+- **改动文件**：
+  - `src/cli.rs`
+  - `src/eval/mod.rs`
+  - `src/cache/mod.rs`
+  - `tests/eval_output_cache_parity.rs`
+  - `docs/compatibility/matrix.md`
+  - `docs/specs/tasks/task-13.2-eval-output-cache-parity.md`
+- **commit 列表**：
+  - `d2c0fca` `docs(spec): task-13.2 进入实施 (Status: Ready → In Progress)`
+  - `95fc90c` `test(eval): 加 SCEN-13.2.1 的 3 个 RED 测试`
+  - `8e8e746` `feat(eval): 实现输出与 cache resume parity`
+- **§9 Verification 结果**：
+  - install: PASS（`s2v_verify_full` 抽取 §9 keys 后执行）
+  - typecheck: PASS（`s2v_verify_full` 抽取 §9 keys 后执行）
+  - unit-test: PASS（`s2v_verify_full` 抽取 §9 keys 后执行；目标测试 `cargo test --test eval_output_cache_parity` 也单独通过）
+  - manual: PASS（检查 Phase 12 runner 产物集：`C:\Users\15783\AppData\Local\Temp\promptfoo-rs-manual-13-2-1780159826112`，包含 `results.jsonl`、`junit.xml`、`results.csv`、`findings.sarif`、`report.html`、`stdout.txt`；非交互 helper 的 `/dev/tty` manual prompt 不可用，真实证据以 artifact inspection 留痕）
+- **剩余风险 / 未做项**：
+  - long-tail provider/assertion 和 upstream semantic diff 仍由 Phase 14/15 扩展覆盖。
+  - 大规模 eval 性能与并发稳定性仍由 task-15.1 继续验证。
+- **下游 task 影响**：
+  - Phase 13 可以进入 phase smoke 收尾；Phase 14 provider/assertion/redteam parity 可复用 `EvalEnvelope`、`EvalOptions`、`CacheStore` 与 CLI output artifact 写入路径。
