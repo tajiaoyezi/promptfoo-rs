@@ -1,8 +1,8 @@
 # Task 10.2: release-docs-packaging
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — release checklist、multi-channel docs、workflow/Dockerfile 示例与 stable/prerelease/nightly 决策 contract 已实现并通过 §9 验证。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 10 — web-viewer-release
@@ -62,17 +62,17 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): release checklist 包含 compatibility gate 证据
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): README、架构文档、兼容矩阵、贡献指南齐全
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 稳定版发布失败时只能发 prerelease 或 nightly
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): release checklist 包含 compatibility gate 证据
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): README、架构文档、兼容矩阵、贡献指南齐全
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 稳定版发布失败时只能发 prerelease 或 nightly
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-10.2.1 | TEST-10.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-10.2.2 | TEST-10.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-10.2.3 | TEST-10.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-10.2.1 | TEST-10.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-10.2.2 | TEST-10.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-10.2.3 | TEST-10.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -89,15 +89,29 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - src/lib.rs
+  - src/release.rs
+  - tests/release_docs_packaging.rs
+  - README.md
+  - docs/architecture.md
+  - docs/release.md
+  - docs/contributing.md
+  - .github/workflows/release.yml
+  - Dockerfile
+  - docs/specs/tasks/task-10.2-release-docs-packaging.md
+  - docs/specs/phases/phase-10-web-viewer-release.md
+  - docs/s2v-adapter.md
+  - docs/compatibility/matrix.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - fd24b30 test(release): add task-10.2 release RED tests
+  - 1994cf5 feat(release): add release readiness contract and docs
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-10.2 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: PASS — `CARGO_INCREMENTAL=0 s2v_verify_full "install typecheck unit-test"` / `cargo fetch`
+  - typecheck: PASS — `cargo check --workspace`
+  - unit-test: PASS — `cargo test --workspace`，含 `tests/release_docs_packaging.rs` 的 TEST-10.2.1 ~ TEST-10.2.3（66 个 integration tests 全绿）
+  - manual: PASS — 已核对 AC、SCEN/TEST、BDD feature、README、architecture/release/contributing docs、GitHub Action 示例、Dockerfile、compatibility matrix 与 ADR-008 一致。
+- **剩余风险 / 未做项**：当前环境缺 `corepack`，未新增 `npm/package.json` 以免 S2V helper 的 npm 分支失效；release workflow 是示例，不含真实发布密钥、Homebrew tap 权限、crate owner、container registry token 或 npm publish 权限。
+- **下游 task 影响**：Phase 10 可收尾；后续真实发布需要在具备发布凭据和 Corepack 的环境补齐 npm package metadata / lockfile，并把实际 tag、checksums、container digest 与 release gate summary 写入发布记录。
