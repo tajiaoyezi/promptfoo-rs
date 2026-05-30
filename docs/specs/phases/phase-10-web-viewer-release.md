@@ -1,6 +1,6 @@
 # Phase 10: web-viewer-release
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -29,9 +29,9 @@ web-viewer + release scripts + README + docs + GitHub Actions
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] Phase 10 所有 task spec 顶部 Status 已从 Draft 经本次授权 readiness pass 或用户审核推进到 Ready，再由实施 agent 完成到 Done。
-- [ ] Phase 10 涉及模块的 unit-test/typecheck 验证通过，且失败证据已进入对应 task §10。
-- [ ] Phase 10 的端到端 smoke 以 task §9 或本节记录的命令/手工证据完成。
+- [x] Phase 10 所有 task spec 顶部 Status 已从 Draft 经本次授权 readiness pass 或用户审核推进到 Ready，再由实施 agent 完成到 Done。
+- [x] Phase 10 涉及模块的 unit-test/typecheck 验证通过，且失败证据已进入对应 task §10。
+- [x] Phase 10 的端到端 smoke 以 task §9 或本节记录的命令/手工证据完成。
 
 ## 7. Phase Risks
 
