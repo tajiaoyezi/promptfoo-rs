@@ -83,7 +83,10 @@ fn test_5_1_1_jsonl_append_schema_covers_result_error_metadata_and_latency() {
     assert!(parsed[0]["result"]["output"].is_string());
     assert_eq!(parsed[0]["metadata"]["promptfooVersion"], "0.121.13");
     assert_eq!(parsed[0]["latency_ms"], 42);
-    assert_eq!(parsed[0]["assertion_results"][0]["assertion_type"], "equals");
+    assert_eq!(
+        parsed[0]["assertion_results"][0]["assertion_type"],
+        "equals"
+    );
 
     assert_eq!(parsed[1]["status"], "error");
     assert_eq!(parsed[1]["error"], "provider timeout");
