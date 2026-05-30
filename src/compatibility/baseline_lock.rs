@@ -158,12 +158,19 @@ pub fn validate_single_stable_target(_policy: &CompatibilityTargetPolicy) -> Tar
         {
             rejected_reasons.push(format!("floating stable target: {}", target.id));
         }
-        if target.git_commit.len() != 40 || !target.git_commit.chars().all(|c| c.is_ascii_hexdigit())
+        if target.git_commit.len() != 40
+            || !target.git_commit.chars().all(|c| c.is_ascii_hexdigit())
         {
-            rejected_reasons.push(format!("stable target commit is not immutable: {}", target.id));
+            rejected_reasons.push(format!(
+                "stable target commit is not immutable: {}",
+                target.id
+            ));
         }
         if target.npm_integrity.trim().is_empty() || target.container_digest.trim().is_empty() {
-            rejected_reasons.push(format!("stable target lacks artifact evidence: {}", target.id));
+            rejected_reasons.push(format!(
+                "stable target lacks artifact evidence: {}",
+                target.id
+            ));
         }
     }
 
@@ -364,7 +371,10 @@ fn extract_sha256(text: &str) -> String {
 fn extract_json_fence(markdown: &str) -> Option<&str> {
     let marker = "```json";
     let (_, rest) = markdown.split_once(marker)?;
-    let rest = rest.strip_prefix('\r').or_else(|| rest.strip_prefix('\n')).unwrap_or(rest);
+    let rest = rest
+        .strip_prefix('\r')
+        .or_else(|| rest.strip_prefix('\n'))
+        .unwrap_or(rest);
     let rest = rest.strip_prefix('\n').unwrap_or(rest);
     let (json, _) = rest.split_once("```")?;
     Some(json.trim())

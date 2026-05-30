@@ -8,9 +8,8 @@ use promptfoo_rs::compatibility::baseline_lock::{
 #[test]
 fn test_11_1_1_stable_policy_separates_frozen_target_from_moving_upstream() {
     /* TEST-11.1.1 */
-    let policy =
-        CompatibilityTargetPolicy::load(Path::new("docs/compatibility/target-policy.md"))
-            .expect("target policy should parse");
+    let policy = CompatibilityTargetPolicy::load(Path::new("docs/compatibility/target-policy.md"))
+        .expect("target policy should parse");
 
     let report = validate_single_stable_target(&policy);
 
@@ -77,15 +76,10 @@ fn test_11_1_2_validator_rejects_floating_or_multiple_stable_targets() {
 #[test]
 fn test_11_1_3_moving_upstream_observation_is_append_only_tracking() {
     /* TEST-11.1.3 */
-    let observation = record_moving_upstream_observation(
-        "945fda5d965ed27abb302fe0f0910b7dddea5dde",
-        "0.121.13",
-    );
+    let observation =
+        record_moving_upstream_observation("945fda5d965ed27abb302fe0f0910b7dddea5dde", "0.121.13");
 
-    assert_eq!(
-        observation.head,
-        "945fda5d965ed27abb302fe0f0910b7dddea5dde"
-    );
+    assert_eq!(observation.head, "945fda5d965ed27abb302fe0f0910b7dddea5dde");
     assert_eq!(observation.package_version, "0.121.13");
     assert_eq!(observation.source, "upstream origin/main tracking");
     assert!(!observation.collected_at.trim().is_empty());

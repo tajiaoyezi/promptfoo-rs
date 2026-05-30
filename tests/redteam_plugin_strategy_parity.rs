@@ -14,7 +14,8 @@ fn test_14_2_1_redteam_inventory_items_have_matrix_and_registry_coverage_status(
     let inventory = load_inventory();
     let matrix = load_matrix();
     let fixtures = load_fixtures(&matrix);
-    let coverage = RedteamInventoryCoverage::from_registry(&RedteamRegistry::core_defaults(), &inventory);
+    let coverage =
+        RedteamInventoryCoverage::from_registry(&RedteamRegistry::core_defaults(), &inventory);
     let report = validate_redteam_parity(&coverage, &fixtures);
 
     assert_eq!(coverage.plugin_items().len(), 3, "{coverage:#?}");
@@ -39,11 +40,18 @@ fn test_14_2_2_p0_redteam_fixtures_are_mocked_release_blocking_artifacts() {
     let inventory = load_inventory();
     let matrix = load_matrix();
     let fixtures = load_fixtures(&matrix);
-    let coverage = RedteamInventoryCoverage::from_registry(&RedteamRegistry::core_defaults(), &inventory);
+    let coverage =
+        RedteamInventoryCoverage::from_registry(&RedteamRegistry::core_defaults(), &inventory);
     let report = validate_redteam_parity(&coverage, &fixtures);
 
-    assert!(report.p0_missing_fixture_or_blocker.is_empty(), "{report:#?}");
-    assert!(report.p0_fixtures_requiring_real_secrets.is_empty(), "{report:#?}");
+    assert!(
+        report.p0_missing_fixture_or_blocker.is_empty(),
+        "{report:#?}"
+    );
+    assert!(
+        report.p0_fixtures_requiring_real_secrets.is_empty(),
+        "{report:#?}"
+    );
     assert!(report.unsafe_fixture_content.is_empty(), "{report:#?}");
     assert_eq!(report.p0_redteam_fixture_count, 4, "{report:#?}");
 
@@ -66,7 +74,8 @@ fn test_14_2_3_redteam_later_rows_have_reasons_and_user_visible_messages() {
     let inventory = load_inventory();
     let matrix = load_matrix();
     let fixtures = load_fixtures(&matrix);
-    let coverage = RedteamInventoryCoverage::from_registry(&RedteamRegistry::core_defaults(), &inventory);
+    let coverage =
+        RedteamInventoryCoverage::from_registry(&RedteamRegistry::core_defaults(), &inventory);
     let report = validate_redteam_parity(&coverage, &fixtures);
 
     assert!(report.p2_or_later_missing_reason.is_empty(), "{report:#?}");

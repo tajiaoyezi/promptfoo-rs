@@ -47,7 +47,7 @@ fn normalize_value(
     rules: &NormalizationRules,
     applied: &mut BTreeSet<String>,
 ) -> Value {
-    if rules.latency && key.map_or(false, is_latency_key) {
+    if rules.latency && key.is_some_and(is_latency_key) {
         applied.insert("latency".to_string());
         return Value::String("<normalized-latency>".to_string());
     }
@@ -80,15 +80,15 @@ fn normalize_string(
     rules: &NormalizationRules,
     applied: &mut BTreeSet<String>,
 ) -> Value {
-    if rules.timestamp && (key.map_or(false, is_timestamp_key) || looks_like_timestamp(text)) {
+    if rules.timestamp && (key.is_some_and(is_timestamp_key) || looks_like_timestamp(text)) {
         applied.insert("timestamp".to_string());
         return Value::String("<normalized-timestamp>".to_string());
     }
-    if rules.path && (key.map_or(false, is_path_key) || looks_like_path(text)) {
+    if rules.path && (key.is_some_and(is_path_key) || looks_like_path(text)) {
         applied.insert("path".to_string());
         return Value::String("<normalized-path>".to_string());
     }
-    if rules.random_id && key.map_or(false, is_random_id_key) && looks_like_random_id(text) {
+    if rules.random_id && key.is_some_and(is_random_id_key) && looks_like_random_id(text) {
         applied.insert("random-id".to_string());
         return Value::String("<normalized-random-id>".to_string());
     }

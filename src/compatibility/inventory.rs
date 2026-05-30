@@ -151,13 +151,7 @@ fn slug(value: &str) -> String {
         .trim()
         .to_ascii_lowercase()
         .chars()
-        .map(|ch| {
-            if ch.is_ascii_alphanumeric() {
-                ch
-            } else {
-                '-'
-            }
-        })
+        .map(|ch| if ch.is_ascii_alphanumeric() { ch } else { '-' })
         .collect::<String>()
         .split('-')
         .filter(|part| !part.is_empty())

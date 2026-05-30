@@ -24,7 +24,10 @@ impl CapabilityMatrix {
             return serde_json::from_value(value)
                 .map_err(|error| MatrixError::Parse(error.to_string()));
         }
-        if let Some(source) = value.get("source_inventory").and_then(serde_json::Value::as_str) {
+        if let Some(source) = value
+            .get("source_inventory")
+            .and_then(serde_json::Value::as_str)
+        {
             let inventory =
                 super::inventory::CapabilityInventory::from_json_file(Path::new(source))
                     .map_err(|error| MatrixError::Parse(format!("{error:?}")))?;
@@ -201,7 +204,9 @@ pub fn validate_no_silent_omissions(
             report.rows_missing_status.push(row.capability.clone());
         }
         if row.verification.trim().is_empty() {
-            report.rows_missing_verification.push(row.capability.clone());
+            report
+                .rows_missing_verification
+                .push(row.capability.clone());
         }
         if row.owner.trim().is_empty() {
             report.rows_missing_owner.push(row.capability.clone());

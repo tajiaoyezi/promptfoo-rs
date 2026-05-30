@@ -58,24 +58,21 @@ impl ViewerFilter {
     fn matches(&self, record: &ResultRecord) -> bool {
         self.status
             .as_ref()
-            .map_or(true, |status| status == &record.status)
+            .is_none_or(|status| status == &record.status)
             && self
                 .provider_id
                 .as_deref()
-                .map_or(true, |provider_id| provider_id == record.provider_id)
+                .is_none_or(|provider_id| provider_id == record.provider_id)
             && self
                 .case_id
                 .as_deref()
-                .map_or(true, |case_id| case_id == record.case_id)
-            && self
-                .assertion_type
-                .as_deref()
-                .map_or(true, |assertion_type| {
-                    record
-                        .assertion_results
-                        .iter()
-                        .any(|assertion| assertion.assertion_type == assertion_type)
-                })
+                .is_none_or(|case_id| case_id == record.case_id)
+            && self.assertion_type.as_deref().is_none_or(|assertion_type| {
+                record
+                    .assertion_results
+                    .iter()
+                    .any(|assertion| assertion.assertion_type == assertion_type)
+            })
     }
 }
 

@@ -66,7 +66,11 @@ fn test_11_2_2_every_item_has_stable_id_source_level_status_and_owner() {
             item.stable_id,
             item.level_hint
         );
-        assert!(!item.status.trim().is_empty(), "{} lacks status", item.stable_id);
+        assert!(
+            !item.status.trim().is_empty(),
+            "{} lacks status",
+            item.stable_id
+        );
         assert!(
             !item.owner_hint.trim().is_empty(),
             "{} lacks owner",

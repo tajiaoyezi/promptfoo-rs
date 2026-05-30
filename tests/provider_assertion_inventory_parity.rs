@@ -55,12 +55,10 @@ fn test_14_1_1_provider_and_assertion_inventory_rows_have_classified_matrix_evid
         .item("provider:dynamic-registry")
         .expect("P2 dynamic provider registry must stay visible");
     assert_eq!(dynamic.level, "P2");
-    assert!(
-        dynamic
-            .gap_reason()
-            .expect("P2 provider needs gap reason")
-            .contains("dynamic provider registry")
-    );
+    assert!(dynamic
+        .gap_reason()
+        .expect("P2 provider needs gap reason")
+        .contains("dynamic provider registry"));
 }
 
 #[test]

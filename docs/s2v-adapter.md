@@ -90,18 +90,18 @@
 > 这些命令使用 POSIX shell 语法。Windows 上用 Git for Windows Bash 执行 S2V helper/adapter commands。
 
 - **Install**: cargo fetch && if [ -f viewer/package.json ]; then (cd viewer && (command -v corepack >/dev/null 2>&1 && corepack enable || true) && pnpm install --frozen-lockfile); fi && if [ -f npm/package.json ]; then (cd npm && (command -v corepack >/dev/null 2>&1 && corepack enable || true) && pnpm install --frozen-lockfile); fi
-- **Lint**: N/A: lint 工具链待 Phase 10 release hardening 固化
+- **Lint**: bash scripts/release/lint.sh
 - **Typecheck**: cargo check --workspace && if [ -f viewer/package.json ]; then (cd viewer && pnpm typecheck); fi && if [ -f npm/package.json ]; then (cd npm && pnpm typecheck); fi
 - **Unit Test**: cargo test --workspace && if [ -f viewer/package.json ]; then (cd viewer && pnpm test); fi && if [ -f npm/package.json ]; then (cd npm && pnpm test); fi
-- **Integration tests**: N/A: integration 测试入口按 task/phase spec 逐步固化
-- **E2E tests**: N/A: e2e 测试入口待 CLI/viewer 可运行后固化
+- **Integration tests**: bash scripts/release/integration.sh
+- **E2E tests**: bash scripts/release/e2e.sh
 - **Build**: cargo build --workspace && if [ -f viewer/package.json ]; then (cd viewer && pnpm build); fi && if [ -f npm/package.json ]; then (cd npm && pnpm build); fi
-- **Coverage**: N/A: coverage 工具链待 Rust core 与 viewer 测试框架稳定后补充
-- **Runtime smoke**: N/A: runtime smoke 由 phase spec §6 和 task spec §9 手工/命令化细化
+- **Coverage**: bash scripts/release/coverage.sh
+- **Runtime smoke**: bash scripts/release/runtime-smoke.sh
 
 ### Coverage 判读规则（Default Profile，可覆盖）
 
-Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，必须先在本 adapter 填实 Coverage 命令与判读列。
+Coverage 命令当前执行 release-critical S2V traceability coverage gate：task-15.2 的 lint / integration / e2e / runtime smoke / security / performance 追踪测试必须存在且为绿，并输出 `target/release-gates/coverage.json`。本项目暂不引入 line coverage 外部工具；如后续声明 line coverage 阈值，须先补 ADR 并把本命令升级为真实阈值 gate。依据 PRD §Success Metrics 与 task-15.2 AC1。
 
 ---
 

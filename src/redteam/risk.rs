@@ -2,9 +2,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::redteam::flow::RedteamFinding;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Severity {
+    #[default]
     None,
     Low,
     Medium,
@@ -21,12 +22,6 @@ pub struct RiskSummary {
     pub unknown: usize,
     pub max_severity: Severity,
     pub weighted_score: u32,
-}
-
-impl Default for Severity {
-    fn default() -> Self {
-        Self::None
-    }
 }
 
 pub fn score_risk(findings: &[RedteamFinding]) -> RiskSummary {

@@ -43,24 +43,21 @@ impl ResultQuery {
     fn matches(&self, record: &ResultRecord) -> bool {
         self.eval_id
             .as_deref()
-            .map_or(true, |eval_id| eval_id == record.eval_id)
+            .is_none_or(|eval_id| eval_id == record.eval_id)
             && self
                 .case_id
                 .as_deref()
-                .map_or(true, |case_id| case_id == record.case_id)
+                .is_none_or(|case_id| case_id == record.case_id)
             && self
                 .provider_id
                 .as_deref()
-                .map_or(true, |provider_id| provider_id == record.provider_id)
-            && self
-                .assertion_type
-                .as_deref()
-                .map_or(true, |assertion_type| {
-                    record
-                        .assertion_results
-                        .iter()
-                        .any(|assertion| assertion.assertion_type == assertion_type)
-                })
+                .is_none_or(|provider_id| provider_id == record.provider_id)
+            && self.assertion_type.as_deref().is_none_or(|assertion_type| {
+                record
+                    .assertion_results
+                    .iter()
+                    .any(|assertion| assertion.assertion_type == assertion_type)
+            })
     }
 }
 

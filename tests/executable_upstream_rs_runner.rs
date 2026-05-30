@@ -102,12 +102,10 @@ fn test_12_2_2_runner_persists_raw_normalized_diff_and_metadata_tree() {
     assert_eq!(metadata["fixture_id"], "TEST-12.2-fixture");
     assert_eq!(metadata["run_id"], "TEST-12.2.2");
     assert_eq!(metadata["baseline"]["reference"], "promptfoo@0.121.13");
-    assert!(
-        diff.as_array()
-            .expect("diff artifact should be an array")
-            .len()
-            >= 1
-    );
+    assert!(!diff
+        .as_array()
+        .expect("diff artifact should be an array")
+        .is_empty());
 }
 
 #[test]

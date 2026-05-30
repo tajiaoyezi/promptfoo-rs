@@ -88,7 +88,7 @@ pub struct ReleaseDecision {
     pub reasons: Vec<String>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ReleaseChannel {
     Stable,
     Prerelease,
@@ -258,6 +258,200 @@ pub struct PackagingArtifact {
     pub path: String,
     pub version: String,
     pub checksum_sha256: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PerformanceRun {
+    pub cli_cold_start_ms: u64,
+    pub mock_eval_cases: usize,
+    pub mock_eval_duration_ms: u64,
+    pub memory_baseline_mb: u64,
+    pub host: PerformanceHost,
+    pub artifact_path: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PerformanceHost {
+    pub os: String,
+    pub arch: String,
+    pub cpu: String,
+    pub rustc: String,
+    pub profile: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PerformanceThresholds {
+    pub cli_cold_start_ms: u64,
+    pub mock_eval_duration_ms: u64,
+    pub memory_baseline_mb: u64,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PerformanceGateSummary {
+    pub status: ReleaseGateStatus,
+    pub run: PerformanceRun,
+    pub thresholds: PerformanceThresholds,
+    pub blocking_evidence: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SecurityRun {
+    pub custom_scripts_default_denied: bool,
+    pub unauthorized_error_code: String,
+    pub log_sample: String,
+    pub artifact_sample: String,
+    pub known_secret_values: Vec<String>,
+    pub upload_attempts: usize,
+    pub no_upload_evidence: Vec<String>,
+    pub artifact_path: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct SecurityGateSummary {
+    pub status: ReleaseGateStatus,
+    pub default_deny_passed: bool,
+    pub redaction_passed: bool,
+    pub no_upload_passed: bool,
+    pub blocking_evidence: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReleaseCandidateGateConfig {
+    pub trace_id: String,
+    pub adapter_commands: BTreeMap<String, String>,
+    pub compatibility: ReleaseGateSummary,
+    pub performance: PerformanceRun,
+    pub security: SecurityRun,
+    pub packaging: PackagingSmokeReport,
+    pub artifact_paths: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReleaseCandidateGateSummary {
+    pub trace_id: String,
+    pub gate_statuses: BTreeMap<String, ReleaseGateStatus>,
+    pub artifact_paths: Vec<String>,
+    pub performance: PerformanceGateSummary,
+    pub security: SecurityGateSummary,
+    pub stable_allowed: bool,
+    pub decision: ReleaseChannel,
+    pub notes: Vec<String>,
+}
+
+pub fn evaluate_performance_baseline(report: &PerformanceRun) -> PerformanceGateSummary {
+    let thresholds = PerformanceThresholds {
+        cli_cold_start_ms: 300,
+        mock_eval_duration_ms: 5_000,
+        memory_baseline_mb: 100,
+    };
+    let mut blocking_evidence = Vec::new();
+
+    if report.cli_cold_start_ms >= thresholds.cli_cold_start_ms {
+        blocking_evidence.push(format!(
+            "CLI cold start {}ms exceeds < {}ms",
+            report.cli_cold_start_ms, thresholds.cli_cold_start_ms
+        ));
+    }
+    if report.mock_eval_cases < 1_000
+        || report.mock_eval_duration_ms >= thresholds.mock_eval_duration_ms
+    {
+        blocking_evidence.push(format!(
+            "1000 mock eval cases must finish in < {}ms; observed {} cases in {}ms",
+            thresholds.mock_eval_duration_ms, report.mock_eval_cases, report.mock_eval_duration_ms
+        ));
+    }
+    if report.memory_baseline_mb >= thresholds.memory_baseline_mb {
+        blocking_evidence.push(format!(
+            "memory baseline {}MB exceeds < {}MB",
+            report.memory_baseline_mb, thresholds.memory_baseline_mb
+        ));
+    }
+    if host_metadata_missing(&report.host) {
+        blocking_evidence.push("performance host metadata is incomplete".to_string());
+    }
+
+    PerformanceGateSummary {
+        status: status_from_blockers(&blocking_evidence),
+        run: report.clone(),
+        thresholds,
+        blocking_evidence,
+    }
+}
+
+pub fn evaluate_security_defaults(report: &SecurityRun) -> SecurityGateSummary {
+    let default_deny_passed = report.custom_scripts_default_denied
+        && report.unauthorized_error_code == "script_not_authorized";
+    let redaction_passed = secrets_are_redacted(report);
+    let no_upload_passed = report.upload_attempts == 0 && !report.no_upload_evidence.is_empty();
+    let mut blocking_evidence = Vec::new();
+
+    if !default_deny_passed {
+        blocking_evidence.push(
+            "default deny failed: custom scripts must require explicit authorization".to_string(),
+        );
+    }
+    if !redaction_passed {
+        blocking_evidence
+            .push("redaction failed: logs or artifacts contain known secret values".to_string());
+    }
+    if !no_upload_passed {
+        blocking_evidence.push(
+            "upload policy failed: release smoke must record local-only no-upload evidence"
+                .to_string(),
+        );
+    }
+
+    SecurityGateSummary {
+        status: status_from_blockers(&blocking_evidence),
+        default_deny_passed,
+        redaction_passed,
+        no_upload_passed,
+        blocking_evidence,
+    }
+}
+
+pub fn release_candidate_gate(config: &ReleaseCandidateGateConfig) -> ReleaseCandidateGateSummary {
+    let performance = evaluate_performance_baseline(&config.performance);
+    let security = evaluate_security_defaults(&config.security);
+    let mut gate_statuses = BTreeMap::new();
+
+    gate_statuses.insert(
+        "adapter".to_string(),
+        adapter_status(&config.adapter_commands),
+    );
+    gate_statuses.insert(
+        "compatibility".to_string(),
+        compatibility_status(&config.compatibility),
+    );
+    gate_statuses.insert("performance".to_string(), performance.status);
+    gate_statuses.insert("security".to_string(), security.status);
+    gate_statuses.insert("packaging".to_string(), packaging_status(&config.packaging));
+    gate_statuses.insert(
+        "observability".to_string(),
+        observability_status(config, &performance, &security),
+    );
+
+    let stable_allowed = gate_statuses
+        .values()
+        .all(|status| *status == ReleaseGateStatus::Ready);
+    let decision = if stable_allowed {
+        ReleaseChannel::Stable
+    } else {
+        ReleaseChannel::Prerelease
+    };
+
+    ReleaseCandidateGateSummary {
+        trace_id: config.trace_id.clone(),
+        artifact_paths: release_candidate_artifact_paths(config),
+        performance,
+        security,
+        gate_statuses,
+        stable_allowed,
+        decision,
+        notes: vec![format!(
+            "stable_allowed={stable_allowed}; decision={decision:?}"
+        )],
+    }
 }
 
 #[derive(Debug)]
@@ -475,4 +669,115 @@ fn write_smoke_artifact(
 fn sha256_hex(bytes: &[u8]) -> String {
     let digest = Sha256::digest(bytes);
     digest.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+fn status_from_blockers(blocking_evidence: &[String]) -> ReleaseGateStatus {
+    if blocking_evidence.is_empty() {
+        ReleaseGateStatus::Ready
+    } else {
+        ReleaseGateStatus::Blocked
+    }
+}
+
+fn host_metadata_missing(host: &PerformanceHost) -> bool {
+    [
+        host.os.as_str(),
+        host.arch.as_str(),
+        host.cpu.as_str(),
+        host.rustc.as_str(),
+        host.profile.as_str(),
+    ]
+    .iter()
+    .any(|value| value.trim().is_empty())
+}
+
+fn secrets_are_redacted(report: &SecurityRun) -> bool {
+    let combined = format!("{}\n{}", report.log_sample, report.artifact_sample);
+    !report
+        .known_secret_values
+        .iter()
+        .any(|secret| !secret.trim().is_empty() && combined.contains(secret))
+        && combined.contains("[REDACTED]")
+}
+
+fn adapter_status(commands: &BTreeMap<String, String>) -> ReleaseGateStatus {
+    let required = ["lint", "integration", "e2e", "coverage", "runtime-smoke"];
+    let missing_or_na = required.iter().any(|key| {
+        commands
+            .get(*key)
+            .map(|command| command.trim().is_empty() || command.trim_start().starts_with("N/A"))
+            .unwrap_or(true)
+    });
+    if missing_or_na {
+        ReleaseGateStatus::Blocked
+    } else {
+        ReleaseGateStatus::Ready
+    }
+}
+
+fn compatibility_status(summary: &ReleaseGateSummary) -> ReleaseGateStatus {
+    if summary.status == ReleaseGateStatus::Ready
+        && summary.stable_allowed
+        && summary.missing_artifact_paths.is_empty()
+    {
+        ReleaseGateStatus::Ready
+    } else {
+        ReleaseGateStatus::Blocked
+    }
+}
+
+fn packaging_status(report: &PackagingSmokeReport) -> ReleaseGateStatus {
+    if report.dry_run
+        && !report.published
+        && report.no_publish_evidence.contains("publish=false")
+        && !report.artifacts.is_empty()
+        && report
+            .artifacts
+            .iter()
+            .all(|artifact| !artifact.checksum_sha256.trim().is_empty())
+    {
+        ReleaseGateStatus::Ready
+    } else {
+        ReleaseGateStatus::Blocked
+    }
+}
+
+fn observability_status(
+    config: &ReleaseCandidateGateConfig,
+    performance: &PerformanceGateSummary,
+    _security: &SecurityGateSummary,
+) -> ReleaseGateStatus {
+    if config.trace_id.trim().is_empty()
+        || config.artifact_paths.is_empty()
+        || performance.run.artifact_path.trim().is_empty()
+        || config.security.artifact_path.trim().is_empty()
+        || host_metadata_missing(&performance.run.host)
+    {
+        ReleaseGateStatus::Blocked
+    } else {
+        ReleaseGateStatus::Ready
+    }
+}
+
+fn release_candidate_artifact_paths(config: &ReleaseCandidateGateConfig) -> Vec<String> {
+    let mut paths = Vec::new();
+    for path in &config.artifact_paths {
+        push_unique_path(&mut paths, path);
+    }
+    push_unique_path(&mut paths, &config.performance.artifact_path);
+    push_unique_path(&mut paths, &config.security.artifact_path);
+    for path in &config.compatibility.artifact_paths {
+        push_unique_path(&mut paths, path);
+    }
+    for artifact in &config.packaging.artifacts {
+        push_unique_path(&mut paths, &artifact.path);
+    }
+    paths
+}
+
+fn push_unique_path(paths: &mut Vec<String>, path: &str) {
+    let trimmed = path.trim();
+    if !trimmed.is_empty() && !paths.iter().any(|existing| existing == trimmed) {
+        paths.push(trimmed.to_string());
+    }
 }

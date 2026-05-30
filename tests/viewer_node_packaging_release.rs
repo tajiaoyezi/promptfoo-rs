@@ -40,7 +40,9 @@ fn test_15_1_2_npm_wrapper_package_is_thin_node_api_transport() {
     assert!(check.thin_wrapper, "{check:#?}");
     assert_eq!(check.transport.as_deref(), Some("json-rpc-stdio"));
     assert!(check.exported_api.contains(&"evaluate".to_string()));
-    assert!(check.exported_api.contains(&"createPromptfooClient".to_string()));
+    assert!(check
+        .exported_api
+        .contains(&"createPromptfooClient".to_string()));
 }
 
 #[test]
@@ -65,7 +67,10 @@ fn test_15_1_3_release_packaging_smoke_records_dry_run_artifacts_without_publish
             .find(|candidate| candidate.name == artifact)
             .unwrap_or_else(|| panic!("missing artifact {artifact}: {report:#?}"));
         assert!(!record.checksum_sha256.is_empty(), "{record:#?}");
-        assert!(record.path.starts_with("target/package-smoke"), "{record:#?}");
+        assert!(
+            record.path.starts_with("target/package-smoke"),
+            "{record:#?}"
+        );
     }
 
     let workflow = std::fs::read_to_string(".github/workflows/release.yml")

@@ -10,7 +10,7 @@ fn test_4_2_1_deterministic_assertions_have_stable_result_snapshots() {
         "answer": "Hello Ada",
         "score": 5
     }));
-    let assertions = vec![
+    let assertions = [
         Assertion::equals(json!({"answer": "Hello Ada", "score": 5})),
         Assertion::contains("Ada"),
         Assertion::regex(r"Hello\s+Ada"),

@@ -44,7 +44,10 @@ fn test_11_3_2_level_specific_rules_require_fixture_snapshot_or_reason() {
         report.p0_rows_missing_fixture_or_blocker.is_empty(),
         "{report:#?}"
     );
-    assert!(report.p1_rows_missing_snapshot_plan.is_empty(), "{report:#?}");
+    assert!(
+        report.p1_rows_missing_snapshot_plan.is_empty(),
+        "{report:#?}"
+    );
     assert!(
         report.p2_rows_missing_reason_or_target.is_empty(),
         "{report:#?}"

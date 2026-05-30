@@ -19,7 +19,7 @@ jobs:
         run: |
           source docs/s2v/scripts/lib/preflight.sh
           source docs/s2v/scripts/lib/verify.sh
-          s2v_verify_full "install typecheck unit-test build"
+          s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"
       - name: Viewer package smoke
         run: |
           corepack enable
@@ -47,6 +47,11 @@ jobs:
         with:
           name: compatibility-release-gate
           path: compatibility/artifacts/release-gate
+      - name: Upload release hardening artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-hardening-gates
+          path: target/release-gates
       - name: Compatibility release gate reminder
         run: |
           echo "Stable publishing requires the compatibility release gate to be Ready."
