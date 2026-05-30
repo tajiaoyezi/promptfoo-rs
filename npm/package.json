@@ -1,0 +1,25 @@
+{
+  "name": "@promptfoo-rs/node",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "packageManager": "pnpm@10.33.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "typecheck": "node scripts/typecheck.mjs",
+    "test": "node scripts/test.mjs",
+    "build": "node scripts/build.mjs && pnpm run smoke:node",
+    "smoke:node": "node scripts/node-smoke.mjs"
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
+}

@@ -89,7 +89,7 @@
 
 > 这些命令使用 POSIX shell 语法。Windows 上用 Git for Windows Bash 执行 S2V helper/adapter commands。
 
-- **Install**: cargo fetch && if [ -f viewer/package.json ]; then (cd viewer && corepack enable && pnpm install --frozen-lockfile); fi && if [ -f npm/package.json ]; then (cd npm && corepack enable && pnpm install --frozen-lockfile); fi
+- **Install**: cargo fetch && if [ -f viewer/package.json ]; then (cd viewer && (command -v corepack >/dev/null 2>&1 && corepack enable || true) && pnpm install --frozen-lockfile); fi && if [ -f npm/package.json ]; then (cd npm && (command -v corepack >/dev/null 2>&1 && corepack enable || true) && pnpm install --frozen-lockfile); fi
 - **Lint**: N/A: lint 工具链待 Phase 10 release hardening 固化
 - **Typecheck**: cargo check --workspace && if [ -f viewer/package.json ]; then (cd viewer && pnpm typecheck); fi && if [ -f npm/package.json ]; then (cd npm && pnpm typecheck); fi
 - **Unit Test**: cargo test --workspace && if [ -f viewer/package.json ]; then (cd viewer && pnpm test); fi && if [ -f npm/package.json ]; then (cd npm && pnpm test); fi

@@ -12,11 +12,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - name: S2V verification
         run: |
           source docs/s2v/scripts/lib/preflight.sh
           source docs/s2v/scripts/lib/verify.sh
-          s2v_verify_full "install typecheck unit-test"
+          s2v_verify_full "install typecheck unit-test build"
+      - name: Viewer package smoke
+        run: |
+          corepack enable
+          cd viewer
+          pnpm install --frozen-lockfile
+          pnpm typecheck
+          pnpm test
+          pnpm build
+      - name: npm wrapper package smoke
+        run: |
+          corepack enable
+          cd npm
+          pnpm install --frozen-lockfile
+          pnpm typecheck
+          pnpm test
+          pnpm build
       - name: Full compatibility release gate
         run: |
           mkdir -p compatibility/artifacts/release-gate

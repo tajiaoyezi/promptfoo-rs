@@ -1,0 +1,17 @@
+{
+  "name": "@promptfoo-rs/viewer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "scripts": {
+    "typecheck": "node scripts/typecheck.mjs",
+    "test": "node scripts/test.mjs",
+    "build": "node scripts/build.mjs && pnpm run smoke:browser",
+    "smoke:browser": "node scripts/browser-smoke.mjs"
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
+}
