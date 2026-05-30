@@ -67,7 +67,10 @@ pub fn write_output(
         OutputFormat::Csv => csv::write_csv(summary, writer),
         OutputFormat::Yaml => json::write_yaml(summary, writer),
         OutputFormat::Junit => junit::write_junit(summary, writer),
-        OutputFormat::Sarif => sarif::write_sarif(&[], writer),
+        OutputFormat::Sarif => {
+            let findings: [sarif::Finding; 0] = [];
+            sarif::write_sarif(&findings, writer)
+        }
         OutputFormat::Html => html::write_html(summary, writer),
     }
 }

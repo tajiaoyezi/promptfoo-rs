@@ -9,4 +9,5 @@ pub mod output;
 pub mod providers;
 pub mod redteam;
 pub mod results;
+pub mod scan;
 pub mod script_bridge;

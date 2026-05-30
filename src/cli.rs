@@ -6,9 +6,11 @@ use clap::{Args, Parser, Subcommand, ValueEnum};
 use crate::config::{load_promptfoo_config, EnvOverlay};
 use crate::eval::{run_eval, EvalOptions};
 use crate::mcp::tool_listing;
+use crate::output::write_sarif;
 use crate::redteam::{
     load_redteam_config, run_redteam_flow, write_redteam_report_file, MockTarget,
 };
+use crate::scan::{known_limitations, run_scan, ScanInput};
 
 #[derive(Debug, Parser)]
 #[command(
@@ -44,9 +46,11 @@ pub enum Command {
     /// Run MCP compatibility workflows.
     Mcp(McpArgs),
     /// Run code scan workflows.
-    CodeScans,
+    CodeScans(ScanArgs),
     /// Run model scan workflows.
-    ScanModel,
+    ScanModel(ScanArgs),
+    /// Run model audit workflows.
+    ModelAudit(ScanArgs),
     /// Import promptfoo artifacts.
     Import,
     /// Export promptfoo artifacts.
@@ -89,20 +93,31 @@ pub enum McpModeArg {
     ListTools,
 }
 
+#[derive(Debug, Args)]
+pub struct ScanArgs {
+    #[arg(long = "input", value_name = "FILE")]
+    pub input: PathBuf,
+    #[arg(long = "format", value_enum, default_value_t = ScanFormatArg::Json)]
+    pub format: ScanFormatArg,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
+pub enum ScanFormatArg {
+    Json,
+    Sarif,
+}
+
 pub fn run_cli(cli: Cli) -> Result<ExitCode, CliError> {
     match cli.command {
         Some(Command::Eval(args)) => handle_eval_command(args),
         Some(Command::Redteam(args)) => handle_redteam_command(args),
         Some(Command::Mcp(args)) => handle_mcp_command(args),
-        Some(
-            Command::View
-            | Command::Cache
-            | Command::CodeScans
-            | Command::ScanModel
-            | Command::Import
-            | Command::Export,
-        )
-        | None => Ok(ExitCode::SUCCESS),
+        Some(Command::CodeScans(args)) => handle_scan_command("code-scans", args),
+        Some(Command::ScanModel(args)) => handle_scan_command("scan-model", args),
+        Some(Command::ModelAudit(args)) => handle_scan_command("model-audit", args),
+        Some(Command::View | Command::Cache | Command::Import | Command::Export) | None => {
+            Ok(ExitCode::SUCCESS)
+        }
     }
 }
 
@@ -116,6 +131,40 @@ pub fn handle_mcp_command(args: McpArgs) -> Result<ExitCode, CliError> {
             Ok(ExitCode::SUCCESS)
         }
     }
+}
+
+pub fn handle_scan_command(command: &'static str, args: ScanArgs) -> Result<ExitCode, CliError> {
+    let input = ScanInput::from_path(&args.input, command)
+        .map_err(|err| CliError::new(format!("scan input {}: {err}", args.input.display())))?;
+    let findings = run_scan(input).map_err(|err| CliError::new(err.to_string()))?;
+    match args.format {
+        ScanFormatArg::Json => {
+            let json = serde_json::json!({
+                "schema_version": "promptfoo-rs.scan.v1",
+                "command": command,
+                "findings": findings,
+                "known_limitations": known_limitations(),
+            });
+            println!(
+                "{}",
+                serde_json::to_string(&json).map_err(|err| {
+                    CliError::new(format!("scan result serialization failed: {err}"))
+                })?
+            );
+        }
+        ScanFormatArg::Sarif => {
+            let mut output = Vec::new();
+            write_sarif(&findings, &mut output)
+                .map_err(|err| CliError::new(format!("SARIF serialization failed: {err}")))?;
+            println!(
+                "{}",
+                String::from_utf8(output).map_err(|err| {
+                    CliError::new(format!("SARIF output was not valid UTF-8: {err}"))
+                })?
+            );
+        }
+    }
+    Ok(ExitCode::SUCCESS)
 }
 
 pub fn handle_eval_command(args: EvalArgs) -> Result<ExitCode, CliError> {

@@ -57,17 +57,14 @@ fn test_8_2_2_sarif_writer_accepts_scan_findings_schema_fixture() {
     write_sarif(&findings, &mut sarif_output).expect("SARIF writes");
     let sarif: Value = serde_json::from_slice(&sarif_output).expect("SARIF is json");
     assert_eq!(sarif["version"], "2.1.0");
-    assert_eq!(
-        sarif["runs"][0]["tool"]["driver"]["name"],
-        "promptfoo-rs"
-    );
+    assert_eq!(sarif["runs"][0]["tool"]["driver"]["name"], "promptfoo-rs");
     assert_eq!(
         sarif["runs"][0]["results"][0]["ruleId"],
         "promptfoo.scan.eval"
     );
     assert_eq!(
-        sarif["runs"][0]["results"][0]["locations"][0]["physicalLocation"]
-            ["artifactLocation"]["uri"],
+        sarif["runs"][0]["results"][0]["locations"][0]["physicalLocation"]["artifactLocation"]
+            ["uri"],
         "src/unsafe.js"
     );
     assert_eq!(
