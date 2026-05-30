@@ -100,7 +100,7 @@ async fn test_3_2_3_retry_errors_and_backoff_failure_path_is_reproducible() {
             let attempts = attempts.clone();
             async move {
                 attempts.lock().unwrap().push(attempt);
-                Err("rate limit: 429".to_string())
+                Err::<(), _>("rate limit: 429".to_string())
             }
         }
     })

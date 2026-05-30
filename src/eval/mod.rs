@@ -1,3 +1,4 @@
+pub mod retry;
 pub mod scheduler;
 
 use serde::Serialize;
