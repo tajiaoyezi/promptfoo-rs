@@ -23,7 +23,7 @@ Readiness basis: PRD §Compatibility Matrix, PRD §Compatibility Harness Design,
 | JS/TS custom provider/assertion | P0 | bridge | allow-scripts fixture, stdio/env/timeout/error snapshot | leafiellune | default disabled behavior is P0 |
 | Python custom provider/assertion | P0 | bridge | subprocess fixture, stdio/env/timeout/error snapshot | leafiellune | default disabled behavior is P0 |
 | Shell/Ruby custom scripts | P1 | bridge | subprocess snapshot + security gate | leafiellune | Ruby support depends on upstream 0.121.13 documentation inventory |
-| JSON/JSONL/CSV/YAML output | P0 | native | schema + golden diff | leafiellune | JSONL must stream |
+| JSON/JSONL/CSV/YAML output | P0 | native | schema + golden diff | leafiellune | JSONL result store streaming and SQLite query schema covered by task 5.1; CSV/YAML formatter contract remains task 5.2 |
 | HTML/JUnit XML/SARIF output | P0/P1 | native | JUnit/SARIF schema snapshot; HTML data contract snapshot | leafiellune | SARIF tied to scan phase |
 | Local Web viewer | P1 | native web | result schema read/filter/export smoke | leafiellune | P1 because pixel-level upstream UI parity is out of scope |
 | Redteam plugins/strategies | P0/P1/P2 | native/later | full registry; core P0 golden diff; P1/P2 annotated | leafiellune | P2 reason required for long-tail plugins deferred after inventory |

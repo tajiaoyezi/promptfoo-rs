@@ -20,7 +20,7 @@ output-writers + cli + schema snapshots
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 5.1 | result-store-schema | ../tasks/task-5.1-result-store-schema.md | Ready | 定义 JSONL/SQLite result schema 与大结果流式写入策略 |
+| 5.1 | result-store-schema | ../tasks/task-5.1-result-store-schema.md | Done | 定义 JSONL/SQLite result schema 与大结果流式写入策略 |
 | 5.2 | output-ci-contracts | ../tasks/task-5.2-output-ci-contracts.md | Ready | 实现 JSON/JSONL/CSV/YAML/JUnit/SARIF/HTML 输出与 exit code/stdout/stderr 合约 |
 
 ## 5. Dependencies

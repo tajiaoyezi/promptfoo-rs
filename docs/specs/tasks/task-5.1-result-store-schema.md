@@ -1,8 +1,8 @@
 # Task 5.1: result-store-schema
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-5.1 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 5 — output-ci
@@ -64,17 +64,17 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): JSONL append schema 覆盖 result、error、metadata、latency shape
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): SQLite/libSQL schema 支持按 eval、case、provider、assertion 查询
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 10k case 写入不需要完整结果集常驻内存
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): JSONL append schema 覆盖 result、error、metadata、latency shape
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): SQLite/libSQL schema 支持按 eval、case、provider、assertion 查询
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 10k case 写入不需要完整结果集常驻内存
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-5.1.1 | TEST-5.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-5.1.2 | TEST-5.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-5.1.3 | TEST-5.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-5.1.1 | TEST-5.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-5.1.2 | TEST-5.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-5.1.3 | TEST-5.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -91,15 +91,26 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - src/lib.rs
+  - src/results/mod.rs
+  - src/results/schema.rs
+  - src/results/jsonl.rs
+  - src/results/sqlite.rs
+  - tests/result_store_schema.rs
+  - docs/specs/tasks/task-5.1-result-store-schema.md
+  - docs/specs/phases/phase-5-output-ci.md
+  - docs/s2v-adapter.md
+  - docs/compatibility/matrix.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - 3bd5393 test(output-writers): add task-5.1 result store RED tests
+  - 0ca2c6f feat(output-writers): add streaming result store schema
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-5.1 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: passed — `cargo fetch` 通过；viewer/npm install 按 adapter N/A 跳过。
+  - typecheck: passed — `cargo check --workspace` 通过。
+  - unit-test: passed — `cargo test --workspace` 通过，TEST-5.1.1~TEST-5.1.3 加入后 33 个 integration tests 全部通过。
+  - manual: passed — 已核对 AC1/AC2/AC3、SCEN-5.1.1~5.1.3、TEST-5.1.1~TEST-5.1.3、compatibility matrix 的 JSON/JSONL/CSV/YAML output 行与本实现/测试一致；Codex 非交互环境无 `/dev/tty`，manual key 以人工审查记录留证。
+- **剩余风险 / 未做项**：本 task 只定义 JSONL streaming writer、SQLite result/assertion schema 与查询 API；CSV/YAML/JUnit/SARIF/HTML 输出格式和 CLI exit code/stdout/stderr 合约留给 task 5.2。
+- **下游 task 影响**：task 5.2 可复用 `ResultRecord`、`AssertionResultRecord`、`ResultStatus`、`JsonlResultWriter` 与 `SqliteResultStore` 作为 output formatter 和 CI artifact 的稳定输入模型。
