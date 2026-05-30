@@ -137,7 +137,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 6 | compatibility-harness | docs/specs/phases/phase-6-compatibility-harness.md | Done | 2 | N/A (solo) |
 | 7 | redteam-core | docs/specs/phases/phase-7-redteam-core.md | Done | 2 | N/A (solo) |
 | 8 | mcp-scan-audit | docs/specs/phases/phase-8-mcp-scan-audit.md | Done | 2 | N/A (solo) |
-| 9 | script-bridges-node-api | docs/specs/phases/phase-9-script-bridges-node-api.md | Ready | 2 | N/A (solo) |
+| 9 | script-bridges-node-api | docs/specs/phases/phase-9-script-bridges-node-api.md | Done | 2 | N/A (solo) |
 | 10 | web-viewer-release | docs/specs/phases/phase-10-web-viewer-release.md | Ready | 2 | N/A (solo) |
 
 ## Task 总索引
