@@ -1,6 +1,6 @@
 # Task 11.2: item-level-capability-inventory
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 11 — upstream-inventory-baseline
