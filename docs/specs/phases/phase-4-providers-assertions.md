@@ -21,7 +21,7 @@ provider-registry + assertion-engine + fixtures
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
 | 4.1 | p0-provider-registry | ../tasks/task-4.1-p0-provider-registry.md | Done | 实现 OpenAI-compatible、HTTP、Ollama、Anthropic P0 provider registry |
-| 4.2 | assertion-engine | ../tasks/task-4.2-assertion-engine.md | Ready | 实现 deterministic assertions 与 model-graded assertion 协议骨架 |
+| 4.2 | assertion-engine | ../tasks/task-4.2-assertion-engine.md | Done | 实现 deterministic assertions 与 model-graded assertion 协议骨架 |
 | 4.3 | custom-assertion-contracts | ../tasks/task-4.3-custom-assertion-contracts.md | Ready | 登记 custom provider/assertion contract 并连接后续 script bridge 验证 |
 
 ## 5. Dependencies

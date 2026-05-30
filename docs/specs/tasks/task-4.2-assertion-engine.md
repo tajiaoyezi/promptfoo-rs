@@ -1,8 +1,8 @@
 # Task 4.2: assertion-engine
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-4.2 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 4 — providers-assertions
@@ -71,9 +71,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-4.2.1 | TEST-4.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-4.2.2 | TEST-4.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-4.2.3 | TEST-4.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-4.2.1 | TEST-4.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-4.2.2 | TEST-4.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-4.2.3 | TEST-4.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -90,15 +90,24 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - Cargo.toml
+  - Cargo.lock
+  - src/lib.rs
+  - src/assertions/mod.rs
+  - src/assertions/deterministic.rs
+  - src/assertions/model_graded.rs
+  - tests/assertion_engine.rs
+  - docs/specs/tasks/task-4.2-assertion-engine.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - ffc20c0 test(assertion-engine): add task-4.2 assertion RED tests
+  - f7c533c feat(assertion-engine): implement deterministic and model graded assertions
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-4.2 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: passed — `cargo fetch` 通过；viewer/npm install 按 adapter N/A 跳过。
+  - typecheck: passed — `cargo check --workspace` 通过。
+  - unit-test: passed — `cargo test --workspace` 通过，TEST-4.2.1~TEST-4.2.3 加入后 27 个 integration tests 全部通过。
+  - manual: passed — 已核对 AC1/AC2/AC3、SCEN-4.2.1~4.2.3、TEST-4.2.1~TEST-4.2.3、compatibility matrix 的 Deterministic assertions 与 Model-graded assertions 行与本实现/测试一致；Codex 非交互环境无 `/dev/tty`，manual key 以人工审查记录留证。
+- **剩余风险 / 未做项**：deterministic assertions 已固定 pass/fail/error shape；model-graded 仅固定 prompt、threshold、score parsing 与 metadata schema，不执行真实 LLM grader，后续 compatibility harness 需与 upstream/recorded grader fixture 做 golden diff。
+- **下游 task 影响**：task-4.3 可基于 `AssertionResult` / `AssertionSummary` 增加 custom assertion contract；Phase 5 output writers 可复用稳定 aggregation shape。
