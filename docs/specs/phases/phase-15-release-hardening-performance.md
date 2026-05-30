@@ -1,6 +1,6 @@
 # Phase 15: release-hardening-performance
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,8 +20,8 @@ viewer/package.json、viewer/、npm/package.json、npm/、.github/workflows/rele
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 15.1 | viewer-node-packaging-release | ../tasks/task-15.1-viewer-node-packaging-release.md | Ready | 补齐 viewer/npm package、browser smoke 和 release packaging |
-| 15.2 | performance-security-observability-gates | ../tasks/task-15.2-performance-security-observability-gates.md | Ready | 固化性能、安全、lint/integration/e2e/coverage/runtime gates |
+| 15.1 | viewer-node-packaging-release | ../tasks/task-15.1-viewer-node-packaging-release.md | Done | 补齐 viewer/npm package、browser smoke 和 release packaging |
+| 15.2 | performance-security-observability-gates | ../tasks/task-15.2-performance-security-observability-gates.md | Done | 固化性能、安全、lint/integration/e2e/coverage/runtime gates |
 
 ## 5. Dependencies
 
@@ -29,9 +29,9 @@ viewer/package.json、viewer/、npm/package.json、npm/、.github/workflows/rele
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] viewer 与 npm wrapper 有 package metadata、lockfile、typecheck/test/build/browser or node smoke。
-- [ ] release workflow 能执行 full compatibility release gate，并产生 checksums/container digest/npm/cargo/Homebrew dry-run evidence。
-- [ ] adapter 中 lint/integration/e2e/coverage/runtime smoke 不再为 N/A，且性能/安全默认值有自动化门禁。
+- [x] viewer 与 npm wrapper 有 package metadata、lockfile、typecheck/test/build/browser or node smoke。
+- [x] release workflow 能执行 full compatibility release gate，并产生 checksums/container digest/npm/cargo/Homebrew dry-run evidence。
+- [x] adapter 中 lint/integration/e2e/coverage/runtime smoke 不再为 N/A，且性能/安全默认值有自动化门禁。
 
 ## 7. Phase Risks
 
