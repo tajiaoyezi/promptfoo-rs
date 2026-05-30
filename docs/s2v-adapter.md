@@ -178,7 +178,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 12.2 | compatibility-harness | docs/specs/tasks/task-12.2-executable-upstream-rs-runner.md | Done | Phase 12 order 2 | N/A (solo) |
 | 12.3 | release-gate | docs/specs/tasks/task-12.3-golden-diff-ci-release-gate.md | Done | Phase 12 order 3 | N/A (solo) |
 | 13.1 | cli | docs/specs/tasks/task-13.1-command-flag-parity.md | Done | Phase 13 order 1 | N/A (solo) |
-| 13.2 | eval-output-cache | docs/specs/tasks/task-13.2-eval-output-cache-parity.md | Ready | Phase 13 order 2 | N/A (solo) |
+| 13.2 | eval-output-cache | docs/specs/tasks/task-13.2-eval-output-cache-parity.md | Done | Phase 13 order 2 | N/A (solo) |
 | 14.1 | provider-assertion | docs/specs/tasks/task-14.1-provider-assertion-inventory-parity.md | Ready | Phase 14 order 1 | N/A (solo) |
 | 14.2 | redteam-engine | docs/specs/tasks/task-14.2-redteam-plugin-strategy-parity.md | Ready | Phase 14 order 2 | N/A (solo) |
 | 15.1 | release-viewer-node | docs/specs/tasks/task-15.1-viewer-node-packaging-release.md | Ready | Phase 15 order 1 | N/A (solo) |
