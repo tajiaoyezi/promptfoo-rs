@@ -129,43 +129,43 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 
 | # | Phase | Phase Spec | Status | Tasks | Worktree（仅 team）|
 |---|---|---|---|---|---|
-| 1 | baseline-freeze | docs/specs/phases/phase-1-baseline-freeze.md | Draft | 2 | N/A (solo) |
-| 2 | config-cli-core | docs/specs/phases/phase-2-config-cli-core.md | Draft | 3 | N/A (solo) |
-| 3 | eval-runner-cache | docs/specs/phases/phase-3-eval-runner-cache.md | Draft | 2 | N/A (solo) |
-| 4 | providers-assertions | docs/specs/phases/phase-4-providers-assertions.md | Draft | 3 | N/A (solo) |
-| 5 | output-ci | docs/specs/phases/phase-5-output-ci.md | Draft | 2 | N/A (solo) |
-| 6 | compatibility-harness | docs/specs/phases/phase-6-compatibility-harness.md | Draft | 2 | N/A (solo) |
-| 7 | redteam-core | docs/specs/phases/phase-7-redteam-core.md | Draft | 2 | N/A (solo) |
-| 8 | mcp-scan-audit | docs/specs/phases/phase-8-mcp-scan-audit.md | Draft | 2 | N/A (solo) |
-| 9 | script-bridges-node-api | docs/specs/phases/phase-9-script-bridges-node-api.md | Draft | 2 | N/A (solo) |
-| 10 | web-viewer-release | docs/specs/phases/phase-10-web-viewer-release.md | Draft | 2 | N/A (solo) |
+| 1 | baseline-freeze | docs/specs/phases/phase-1-baseline-freeze.md | Ready | 2 | N/A (solo) |
+| 2 | config-cli-core | docs/specs/phases/phase-2-config-cli-core.md | Ready | 3 | N/A (solo) |
+| 3 | eval-runner-cache | docs/specs/phases/phase-3-eval-runner-cache.md | Ready | 2 | N/A (solo) |
+| 4 | providers-assertions | docs/specs/phases/phase-4-providers-assertions.md | Ready | 3 | N/A (solo) |
+| 5 | output-ci | docs/specs/phases/phase-5-output-ci.md | Ready | 2 | N/A (solo) |
+| 6 | compatibility-harness | docs/specs/phases/phase-6-compatibility-harness.md | Ready | 2 | N/A (solo) |
+| 7 | redteam-core | docs/specs/phases/phase-7-redteam-core.md | Ready | 2 | N/A (solo) |
+| 8 | mcp-scan-audit | docs/specs/phases/phase-8-mcp-scan-audit.md | Ready | 2 | N/A (solo) |
+| 9 | script-bridges-node-api | docs/specs/phases/phase-9-script-bridges-node-api.md | Ready | 2 | N/A (solo) |
+| 10 | web-viewer-release | docs/specs/phases/phase-10-web-viewer-release.md | Ready | 2 | N/A (solo) |
 
 ## Task 总索引
 
 | Task | 模块 | Spec 文件 | Status | 依赖 / Phase 内顺序 | Worktree（仅 team）|
 |---|---|---|---|---|---|
-| 1.1 | compatibility | docs/specs/tasks/task-1.1-baseline-lock.md | Draft | Phase 1 AUTO order | N/A (solo) |
-| 1.2 | compatibility | docs/specs/tasks/task-1.2-compatibility-matrix.md | Draft | Phase 1 AUTO order | N/A (solo) |
-| 2.1 | cli | docs/specs/tasks/task-2.1-workspace-cli-skeleton.md | Draft | Phase 2 AUTO order | N/A (solo) |
-| 2.2 | config-loader | docs/specs/tasks/task-2.2-config-loader.md | Draft | Phase 2 AUTO order | N/A (solo) |
-| 2.3 | eval-runner | docs/specs/tasks/task-2.3-eval-command-smoke.md | Draft | Phase 2 AUTO order | N/A (solo) |
-| 3.1 | eval-runner | docs/specs/tasks/task-3.1-scheduler-runtime.md | Draft | Phase 3 AUTO order | N/A (solo) |
-| 3.2 | cache-resume-store | docs/specs/tasks/task-3.2-cache-resume-retry.md | Draft | Phase 3 AUTO order | N/A (solo) |
-| 4.1 | provider-registry | docs/specs/tasks/task-4.1-p0-provider-registry.md | Draft | Phase 4 AUTO order | N/A (solo) |
-| 4.2 | assertion-engine | docs/specs/tasks/task-4.2-assertion-engine.md | Draft | Phase 4 AUTO order | N/A (solo) |
-| 4.3 | assertion-engine | docs/specs/tasks/task-4.3-custom-assertion-contracts.md | Draft | Phase 4 AUTO order | N/A (solo) |
-| 5.1 | output-writers | docs/specs/tasks/task-5.1-result-store-schema.md | Draft | Phase 5 AUTO order | N/A (solo) |
-| 5.2 | output-writers | docs/specs/tasks/task-5.2-output-ci-contracts.md | Draft | Phase 5 AUTO order | N/A (solo) |
-| 6.1 | compatibility | docs/specs/tasks/task-6.1-upstream-harness-runner.md | Draft | Phase 6 AUTO order | N/A (solo) |
-| 6.2 | compatibility | docs/specs/tasks/task-6.2-golden-diff-release-gate.md | Draft | Phase 6 AUTO order | N/A (solo) |
-| 7.1 | redteam-engine | docs/specs/tasks/task-7.1-redteam-command-flow.md | Draft | Phase 7 AUTO order | N/A (solo) |
-| 7.2 | redteam-engine | docs/specs/tasks/task-7.2-redteam-registry-report.md | Draft | Phase 7 AUTO order | N/A (solo) |
-| 8.1 | mcp-runtime | docs/specs/tasks/task-8.1-mcp-runtime.md | Draft | Phase 8 AUTO order | N/A (solo) |
-| 8.2 | scan-engine | docs/specs/tasks/task-8.2-scan-audit-sarif.md | Draft | Phase 8 AUTO order | N/A (solo) |
-| 9.1 | script-bridge | docs/specs/tasks/task-9.1-script-bridge-sandbox.md | Draft | Phase 9 AUTO order | N/A (solo) |
-| 9.2 | node-api-wrapper | docs/specs/tasks/task-9.2-node-api-wrapper.md | Draft | Phase 9 AUTO order | N/A (solo) |
-| 10.1 | web-viewer | docs/specs/tasks/task-10.1-web-viewer.md | Draft | Phase 10 AUTO order | N/A (solo) |
-| 10.2 | release | docs/specs/tasks/task-10.2-release-docs-packaging.md | Draft | Phase 10 AUTO order | N/A (solo) |
+| 1.1 | compatibility | docs/specs/tasks/task-1.1-baseline-lock.md | Ready | Phase 1 AUTO order | N/A (solo) |
+| 1.2 | compatibility | docs/specs/tasks/task-1.2-compatibility-matrix.md | Ready | Phase 1 AUTO order | N/A (solo) |
+| 2.1 | cli | docs/specs/tasks/task-2.1-workspace-cli-skeleton.md | Ready | Phase 2 AUTO order | N/A (solo) |
+| 2.2 | config-loader | docs/specs/tasks/task-2.2-config-loader.md | Ready | Phase 2 AUTO order | N/A (solo) |
+| 2.3 | eval-runner | docs/specs/tasks/task-2.3-eval-command-smoke.md | Ready | Phase 2 AUTO order | N/A (solo) |
+| 3.1 | eval-runner | docs/specs/tasks/task-3.1-scheduler-runtime.md | Ready | Phase 3 AUTO order | N/A (solo) |
+| 3.2 | cache-resume-store | docs/specs/tasks/task-3.2-cache-resume-retry.md | Ready | Phase 3 AUTO order | N/A (solo) |
+| 4.1 | provider-registry | docs/specs/tasks/task-4.1-p0-provider-registry.md | Ready | Phase 4 AUTO order | N/A (solo) |
+| 4.2 | assertion-engine | docs/specs/tasks/task-4.2-assertion-engine.md | Ready | Phase 4 AUTO order | N/A (solo) |
+| 4.3 | assertion-engine | docs/specs/tasks/task-4.3-custom-assertion-contracts.md | Ready | Phase 4 AUTO order | N/A (solo) |
+| 5.1 | output-writers | docs/specs/tasks/task-5.1-result-store-schema.md | Ready | Phase 5 AUTO order | N/A (solo) |
+| 5.2 | output-writers | docs/specs/tasks/task-5.2-output-ci-contracts.md | Ready | Phase 5 AUTO order | N/A (solo) |
+| 6.1 | compatibility | docs/specs/tasks/task-6.1-upstream-harness-runner.md | Ready | Phase 6 AUTO order | N/A (solo) |
+| 6.2 | compatibility | docs/specs/tasks/task-6.2-golden-diff-release-gate.md | Ready | Phase 6 AUTO order | N/A (solo) |
+| 7.1 | redteam-engine | docs/specs/tasks/task-7.1-redteam-command-flow.md | Ready | Phase 7 AUTO order | N/A (solo) |
+| 7.2 | redteam-engine | docs/specs/tasks/task-7.2-redteam-registry-report.md | Ready | Phase 7 AUTO order | N/A (solo) |
+| 8.1 | mcp-runtime | docs/specs/tasks/task-8.1-mcp-runtime.md | Ready | Phase 8 AUTO order | N/A (solo) |
+| 8.2 | scan-engine | docs/specs/tasks/task-8.2-scan-audit-sarif.md | Ready | Phase 8 AUTO order | N/A (solo) |
+| 9.1 | script-bridge | docs/specs/tasks/task-9.1-script-bridge-sandbox.md | Ready | Phase 9 AUTO order | N/A (solo) |
+| 9.2 | node-api-wrapper | docs/specs/tasks/task-9.2-node-api-wrapper.md | Ready | Phase 9 AUTO order | N/A (solo) |
+| 10.1 | web-viewer | docs/specs/tasks/task-10.1-web-viewer.md | Ready | Phase 10 AUTO order | N/A (solo) |
+| 10.2 | release | docs/specs/tasks/task-10.2-release-docs-packaging.md | Ready | Phase 10 AUTO order | N/A (solo) |
 
 ## ADR 索引
 

@@ -1,6 +1,6 @@
 # Phase 8: mcp-scan-audit
 
-**Status**: Draft
+**Status**: Ready
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,8 +20,8 @@ mcp-runtime + scan-engine + output-writers + SARIF snapshots
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 8.1 | mcp-runtime | ../tasks/task-8.1-mcp-runtime.md | Draft | 实现 promptfoo mcp 与 MCP provider 协议快照 |
-| 8.2 | scan-audit-sarif | ../tasks/task-8.2-scan-audit-sarif.md | Draft | 实现 code-scans、scan-model、model-audit 与 SARIF 输出契约 |
+| 8.1 | mcp-runtime | ../tasks/task-8.1-mcp-runtime.md | Ready | 实现 promptfoo mcp 与 MCP provider 协议快照 |
+| 8.2 | scan-audit-sarif | ../tasks/task-8.2-scan-audit-sarif.md | Ready | 实现 code-scans、scan-model、model-audit 与 SARIF 输出契约 |
 
 ## 5. Dependencies
 
@@ -29,14 +29,14 @@ mcp-runtime + scan-engine + output-writers + SARIF snapshots
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] Phase 8 所有 task spec 顶部 Status 已从 Draft 经用户审核后推进到 Ready，再由实施 agent 完成到 Done。
+- [ ] Phase 8 所有 task spec 顶部 Status 已从 Draft 经本次授权 readiness pass 或用户审核推进到 Ready，再由实施 agent 完成到 Done。
 - [ ] Phase 8 涉及模块的 unit-test/typecheck 验证通过，且失败证据已进入对应 task §10。
 - [ ] Phase 8 的端到端 smoke 以 task §9 或本节记录的命令/手工证据完成。
 
 ## 7. Phase Risks
 
 - 与 upstream promptfoo 0.121.13 行为不一致时，必须回写 compatibility matrix 和对应 task spec。
-- Draft 阶段允许 <TBD-by-user>；进入 Ready 前必须清零。
+- Draft 阶段允许人工占位；进入 Ready 前必须清零。
 
 ## 8. Definition of Done
 

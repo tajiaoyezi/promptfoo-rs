@@ -1,8 +1,8 @@
 # Task 1.1: baseline-lock
 
-> ⚠️ **Status: Draft** — 此 spec 含 <TBD-by-user> 字段，禁止进入 /s2v-implement。实施前请填完 §3/§4/§5 的业务字段并把 Status 改为 Ready。
+> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
 
-**Status**: Draft
+**Status**: Ready
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 1 — baseline-freeze
@@ -22,7 +22,7 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 - compatibility 模块中与 baseline-lock 直接相关的源码、测试、fixture 和文档。
 - 与本 task AC 对应的 compatibility matrix 或 release gate 记录。
-- <TBD-by-user>：Ready 前补充具体文件清单。
+- 具体文件清单：docs/compatibility/baseline.lock.md、src/compatibility/baseline_lock.rs、tests/baseline_lock.rs；必要 fixture 放在 compatibility/fixtures/baseline/。依据 PRD §Upstream Baseline Freeze Strategy 与 ADR-007。
 
 ### Out Of Scope
 
@@ -35,7 +35,7 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 - **AI 应用开发者**：通过 CLI、配置、输出和本地 viewer 感知兼容性。
 - **AI infra / 平台工程团队**：在 CI 中依赖 exit code、JUnit/SARIF、golden diff 和 release gate。
 - **安全红队团队**：依赖 redteam/MCP/scan/script bridge 的本地可审计执行边界。
-- <TBD-by-user>：Ready 前确认本 task 是否还有额外 actor。
+- 本 task 无额外 actor；沿用 adapter §Project 中的 AI 应用开发者、AI infra / 平台工程团队、安全红队团队与开源 maintainer。依据 docs/s2v-adapter.md §Project。
 
 ## 5. Behavior Contract
 
@@ -53,11 +53,14 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ### 5.2 Imports
 
-- <TBD-by-user>：Ready 前列出本 task 需要引入的 Rust crate、内部 module、Node/Python bridge 或 fixture helper。
+- Rust crate / module：`serde`、`thiserror`、内部模块 `compatibility::baseline_lock`、fixture helper `compatibility/fixtures/baseline`。依据 PRD §Compatibility Harness Design / ADR-006 / ADR-007。
 
 ### 5.3 函数签名
 
-- <TBD-by-user>：Ready 前列出本 task 新增/修改的关键函数、trait、CLI handler 或 schema type。
+- `BaselineLock::from_markdown(path: &Path) -> Result<BaselineLock, BaselineLockError>`
+- `validate_baseline_lock(lock: &BaselineLock) -> BaselineLockReport`
+- `baseline_lock_release_status(report: &BaselineLockReport) -> ReleaseGateStatus`
+- 以上接口只验证冻结证据与浮动引用，不拉入真实 provider/runtime；依据 PRD §Upstream Baseline Freeze Strategy。
 
 ## 6. Acceptance Criteria
 

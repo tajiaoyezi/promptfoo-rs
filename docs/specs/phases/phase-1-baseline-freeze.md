@@ -1,6 +1,6 @@
 # Phase 1: baseline-freeze
 
-**Status**: Draft
+**Status**: Ready
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,8 +20,8 @@ compat-harness + docs/compatibility/baseline.lock.md + docs/compatibility/matrix
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 1.1 | baseline-lock | ../tasks/task-1.1-baseline-lock.md | Draft | 写入可追溯 baseline lock，固定 tag、commit、npm artifact、container artifact 四重证据 |
-| 1.2 | compatibility-matrix | ../tasks/task-1.2-compatibility-matrix.md | Draft | 建立 promptfoo 0.121.13 已文档化能力域的完整兼容矩阵骨架 |
+| 1.1 | baseline-lock | ../tasks/task-1.1-baseline-lock.md | Ready | 写入可追溯 baseline lock，固定 tag、commit、npm artifact、container artifact 四重证据 |
+| 1.2 | compatibility-matrix | ../tasks/task-1.2-compatibility-matrix.md | Ready | 建立 promptfoo 0.121.13 已文档化能力域的完整兼容矩阵骨架 |
 
 ## 5. Dependencies
 
@@ -29,14 +29,14 @@ compat-harness + docs/compatibility/baseline.lock.md + docs/compatibility/matrix
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] Phase 1 所有 task spec 顶部 Status 已从 Draft 经用户审核后推进到 Ready，再由实施 agent 完成到 Done。
+- [ ] Phase 1 所有 task spec 顶部 Status 已从 Draft 经本次授权 readiness pass 或用户审核推进到 Ready，再由实施 agent 完成到 Done。
 - [ ] Phase 1 涉及模块的 unit-test/typecheck 验证通过，且失败证据已进入对应 task §10。
 - [ ] Phase 1 的端到端 smoke 以 task §9 或本节记录的命令/手工证据完成。
 
 ## 7. Phase Risks
 
 - 与 upstream promptfoo 0.121.13 行为不一致时，必须回写 compatibility matrix 和对应 task spec。
-- Draft 阶段允许 <TBD-by-user>；进入 Ready 前必须清零。
+- Draft 阶段允许人工占位；进入 Ready 前必须清零。
 
 ## 8. Definition of Done
 

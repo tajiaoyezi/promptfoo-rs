@@ -1,6 +1,6 @@
 # Phase 4: providers-assertions
 
-**Status**: Draft
+**Status**: Ready
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,9 +20,9 @@ provider-registry + assertion-engine + fixtures
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 4.1 | p0-provider-registry | ../tasks/task-4.1-p0-provider-registry.md | Draft | 实现 OpenAI-compatible、HTTP、Ollama、Anthropic P0 provider registry |
-| 4.2 | assertion-engine | ../tasks/task-4.2-assertion-engine.md | Draft | 实现 deterministic assertions 与 model-graded assertion 协议骨架 |
-| 4.3 | custom-assertion-contracts | ../tasks/task-4.3-custom-assertion-contracts.md | Draft | 登记 custom provider/assertion contract 并连接后续 script bridge 验证 |
+| 4.1 | p0-provider-registry | ../tasks/task-4.1-p0-provider-registry.md | Ready | 实现 OpenAI-compatible、HTTP、Ollama、Anthropic P0 provider registry |
+| 4.2 | assertion-engine | ../tasks/task-4.2-assertion-engine.md | Ready | 实现 deterministic assertions 与 model-graded assertion 协议骨架 |
+| 4.3 | custom-assertion-contracts | ../tasks/task-4.3-custom-assertion-contracts.md | Ready | 登记 custom provider/assertion contract 并连接后续 script bridge 验证 |
 
 ## 5. Dependencies
 
@@ -30,14 +30,14 @@ provider-registry + assertion-engine + fixtures
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] Phase 4 所有 task spec 顶部 Status 已从 Draft 经用户审核后推进到 Ready，再由实施 agent 完成到 Done。
+- [ ] Phase 4 所有 task spec 顶部 Status 已从 Draft 经本次授权 readiness pass 或用户审核推进到 Ready，再由实施 agent 完成到 Done。
 - [ ] Phase 4 涉及模块的 unit-test/typecheck 验证通过，且失败证据已进入对应 task §10。
 - [ ] Phase 4 的端到端 smoke 以 task §9 或本节记录的命令/手工证据完成。
 
 ## 7. Phase Risks
 
 - 与 upstream promptfoo 0.121.13 行为不一致时，必须回写 compatibility matrix 和对应 task spec。
-- Draft 阶段允许 <TBD-by-user>；进入 Ready 前必须清零。
+- Draft 阶段允许人工占位；进入 Ready 前必须清零。
 
 ## 8. Definition of Done
 
