@@ -1,6 +1,6 @@
 # Task 12.2: executable-upstream-rs-runner
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 12 — compatibility-fixtures-golden-diff
