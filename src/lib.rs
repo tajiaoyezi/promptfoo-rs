@@ -5,6 +5,7 @@ pub mod compatibility;
 pub mod config;
 pub mod eval;
 pub mod mcp;
+pub mod node_api;
 pub mod output;
 pub mod providers;
 pub mod redteam;

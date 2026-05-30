@@ -38,11 +38,17 @@ fn test_9_2_2_node_rpc_params_errors_and_result_schema_are_snapshotted() {
     let response = handle_node_rpc(request).expect("evaluate RPC succeeds");
     assert_eq!(response.jsonrpc, "2.0");
     assert_eq!(response.id, "req-9.2");
-    assert_eq!(response.result["schema_version"], "promptfoo-rs.node-api.v1");
+    assert_eq!(
+        response.result["schema_version"],
+        "promptfoo-rs.node-api.v1"
+    );
     assert_eq!(response.result["method"], "evaluate");
     assert_eq!(response.result["result"]["status"], "ok");
     assert_eq!(response.result["result"]["summary"]["total_cases"], 1);
-    assert_eq!(response.result["result"]["results"][0]["output"], "Hello Ada");
+    assert_eq!(
+        response.result["result"]["results"][0]["output"],
+        "Hello Ada"
+    );
 
     let error = handle_node_rpc(NodeRpcRequest::new("req-bad", "unknown.method", json!({})))
         .expect_err("unknown methods are stable errors");
