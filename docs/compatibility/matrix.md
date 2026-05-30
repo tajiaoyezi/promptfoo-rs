@@ -13,14 +13,14 @@ Readiness basis: PRD §Compatibility Matrix, PRD §Compatibility Harness Design,
 | .env and file prompts/tests | P0 | native | Linux/macOS/Windows path/env/newline fixtures | leafiellune | CSV/JSON/YAML tests included |
 | Eval runner | P0 | native | mock provider result/error/metadata golden diff | leafiellune | task 13.2 covers output targets, assertion/provider failure exit codes, and resume metadata; latency normalized |
 | Cache/resume/retry/concurrency/delay | P0 | native | cache key, resume cursor, partial result, retry fixtures | leafiellune | task 13.2 covers resume-from-cache for remaining cases; Azure/assistant special keys tracked as matrix children |
-| OpenAI-compatible provider | P0 | native | request/response snapshot + golden diff | leafiellune | env/header/model/options coverage |
+| OpenAI-compatible provider | P0 | native | request/response snapshot + golden diff | leafiellune | env/header/model/options coverage; task 14.1 verifies P0 fixture coverage through provider/assertion parity report |
 | HTTP provider | P0 | native | request template/header/body/transform snapshot | leafiellune | common auth/header cases |
 | Ollama provider | P0 | native | local mock server snapshot + golden diff | leafiellune | no real model download required |
 | Anthropic provider | P0 | native | request/response snapshot + golden diff | leafiellune | network calls mocked |
-| Other documented providers | P1/P2 | native/bridge/later | P1 request/output snapshot; P2 known gap row | leafiellune | P2 reason: long-tail provider scope requires Phase 1 inventory before implementation commitment |
-| Deterministic assertions | P0 | native | assertion result golden diff | leafiellune | equals/contains/regex/json/schema core assertions |
+| Other documented providers | P1/P2 | native/bridge/later | P1 request/output snapshot; P2 known gap row | leafiellune | task 14.1 keeps dynamic provider registry visible as P2/later with reason; no silent provider omission is allowed |
+| Deterministic assertions | P0 | native | assertion result golden diff | leafiellune | equals/contains/regex/json/schema core assertions; task 14.1 verifies P0 assertion fixture coverage |
 | Model-graded assertions | P1 | native/bridge | prompt, threshold, score parsing, metadata snapshot | leafiellune | P1 because true LLM output is non-deterministic; mock/recorded grader required |
-| JS/TS custom provider/assertion | P0 | bridge | allow-scripts fixture, stdio/env/timeout/error snapshot | leafiellune | Shared sandbox default-deny, stdio, timeout, env allowlist, and redaction covered by task 9.1; language adapter fixtures remain per runtime |
+| JS/TS custom provider/assertion | P0 | bridge | allow-scripts fixture, stdio/env/timeout/error snapshot | leafiellune | Shared sandbox default-deny, stdio, timeout, env allowlist, and redaction covered by task 9.1; task 14.1 records JS/TS boundary policy evidence |
 | Python custom provider/assertion | P0 | bridge | subprocess fixture, stdio/env/timeout/error snapshot | leafiellune | Shared sandbox default-deny, stdio, timeout, env allowlist, and redaction covered by task 9.1; Python runtime discovery fixture remains follow-up |
 | Shell/Ruby custom scripts | P1 | bridge | subprocess snapshot + security gate | leafiellune | Shell sandbox fixture covered by task 9.1; Ruby support depends on upstream 0.121.13 documentation inventory |
 | JSON/JSONL/CSV/YAML output | P0 | native | schema + golden diff | leafiellune | JSONL result store streaming and SQLite query schema covered by task 5.1; JSON/JSONL/CSV/YAML formatter contract covered by task 5.2 |
@@ -36,3 +36,5 @@ Readiness basis: PRD §Compatibility Matrix, PRD §Compatibility Harness Design,
 ## Item-Level Matrix Artifact
 
 Task 11.3 adds the machine-readable item-level matrix manifest at `compatibility/matrix/items.json`. The manifest expands from `compatibility/inventory/upstream-items.json` through `expand_matrix_from_inventory`, so every inventory item receives a row with level, target status, verification, owner, and fixture/snapshot/gap reference. Aggregate markdown rows remain human summaries only and cannot satisfy `validate_no_silent_omissions`.
+
+Task 14.1 adds `validate_provider_assertion_parity` over the item-level matrix and fixture corpus. Current provider/assertion manual review: P0 provider count = 4, P0 assertion count = 6, P0 missing fixture/blocker count = 0, and P2 provider/assertion missing reason count = 0.
