@@ -1,8 +1,8 @@
 # Task 1.1: baseline-lock
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-1.1 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 1 — baseline-freeze
@@ -72,9 +72,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-1.1.1 | TEST-1.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-1.1.2 | TEST-1.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-1.1.3 | TEST-1.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-1.1.1 | TEST-1.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-1.1.2 | TEST-1.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-1.1.3 | TEST-1.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -91,15 +91,24 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - Cargo.toml
+  - Cargo.lock
+  - src/lib.rs
+  - src/compatibility/mod.rs
+  - src/compatibility/baseline_lock.rs
+  - tests/baseline_lock.rs
+  - docs/compatibility/baseline.lock.md
+  - docs/specs/tasks/task-1.1-baseline-lock.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - 56b004c test(compatibility): add task-1.1 baseline lock RED tests
+  - 4bfd093 feat(compatibility): validate promptfoo baseline lock
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-1.1 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: 通过；`s2v_verify_full` 自动项执行 `cargo fetch` 成功（viewer/npm package.json 不存在，按 adapter 条件跳过）。
+  - typecheck: 通过；`cargo check --workspace` 成功。
+  - unit-test: 通过；`cargo test --workspace` 成功，TEST-1.1.1~TEST-1.1.3 共 3 passed / 0 failed。
+  - manual: 通过；已核对 AC、BDD SCEN-1.1.1~1.1.3、TEST-1.1.1~1.1.3、docs/compatibility/baseline.lock.md 证据与无 floating reference。注：当前非交互 shell 无 `/dev/tty`，`s2v_run manual` 无法读取确认输入，人工核验结果记录于本条。
+- **剩余风险 / 未做项**：无；完整 upstream harness 与 golden diff 仍按 task-6.1/task-6.2 实施。
+- **下游 task 影响**：task-1.2 可复用 `ReleaseGateStatus` 与 baseline lock 证据；task-6.1/task-6.2 可复用 baseline lock parser/validator。

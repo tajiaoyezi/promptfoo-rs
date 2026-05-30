@@ -144,7 +144,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 
 | Task | 模块 | Spec 文件 | Status | 依赖 / Phase 内顺序 | Worktree（仅 team）|
 |---|---|---|---|---|---|
-| 1.1 | compatibility | docs/specs/tasks/task-1.1-baseline-lock.md | Ready | Phase 1 AUTO order | N/A (solo) |
+| 1.1 | compatibility | docs/specs/tasks/task-1.1-baseline-lock.md | Done | Phase 1 AUTO order | N/A (solo) |
 | 1.2 | compatibility | docs/specs/tasks/task-1.2-compatibility-matrix.md | Ready | Phase 1 AUTO order | N/A (solo) |
 | 2.1 | cli | docs/specs/tasks/task-2.1-workspace-cli-skeleton.md | Ready | Phase 2 AUTO order | N/A (solo) |
 | 2.2 | config-loader | docs/specs/tasks/task-2.2-config-loader.md | Ready | Phase 2 AUTO order | N/A (solo) |

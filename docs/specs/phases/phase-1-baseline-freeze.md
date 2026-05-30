@@ -20,7 +20,7 @@ compat-harness + docs/compatibility/baseline.lock.md + docs/compatibility/matrix
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 1.1 | baseline-lock | ../tasks/task-1.1-baseline-lock.md | Ready | 写入可追溯 baseline lock，固定 tag、commit、npm artifact、container artifact 四重证据 |
+| 1.1 | baseline-lock | ../tasks/task-1.1-baseline-lock.md | Done | 写入可追溯 baseline lock，固定 tag、commit、npm artifact、container artifact 四重证据 |
 | 1.2 | compatibility-matrix | ../tasks/task-1.2-compatibility-matrix.md | Ready | 建立 promptfoo 0.121.13 已文档化能力域的完整兼容矩阵骨架 |
 
 ## 5. Dependencies
