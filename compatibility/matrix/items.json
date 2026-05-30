@@ -1,0 +1,9 @@
+{
+  "source_inventory": "compatibility/inventory/upstream-items.json",
+  "policy": "expand-from-inventory-v1",
+  "basis": [
+    "PRD §Compatibility Matrix",
+    "ADR-009",
+    "docs/specs/tasks/task-11.2-item-level-capability-inventory.md"
+  ]
+}

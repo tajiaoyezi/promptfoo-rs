@@ -32,3 +32,7 @@ Readiness basis: PRD §Compatibility Matrix, PRD §Compatibility Harness Design,
 | code-scans / scan-model / model-audit | P1 | native | CLI protocol, SARIF, finding schema snapshot | leafiellune | Task 8.2 covers `promptfoo-rs.scan.v1`, SARIF finding metadata, and `scan.false-positive-rate` as a known limitation; false positive rate is not a 1.0 gate |
 | Node API wrapper | P1 | bridge | JS API contract snapshot and wrapper/core drift test | leafiellune | Task 9.2 covers thin TypeScript wrapper source, Rust JSON-RPC evaluate contract, `promptfoo-rs.node-api.v1`, and release-blocking `node-api-wrapper-drift`; npm package scaffold waits for Corepack-enabled packaging environment |
 | promptfoo cloud/share | P2 | unsupported/later | capability registration, no-upload test, user-visible error | leafiellune | P2 reason: 1.0 explicitly does not provide SaaS or default upload behavior; brand/legal copy needs review before public release |
+
+## Item-Level Matrix Artifact
+
+Task 11.3 adds the machine-readable item-level matrix manifest at `compatibility/matrix/items.json`. The manifest expands from `compatibility/inventory/upstream-items.json` through `expand_matrix_from_inventory`, so every inventory item receives a row with level, target status, verification, owner, and fixture/snapshot/gap reference. Aggregate markdown rows remain human summaries only and cannot satisfy `validate_no_silent_omissions`.

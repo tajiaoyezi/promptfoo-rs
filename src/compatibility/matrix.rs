@@ -18,7 +18,24 @@ impl CapabilityMatrix {
 
     pub fn from_json_file(path: &Path) -> Result<Self, MatrixError> {
         let json = fs::read_to_string(path).map_err(MatrixError::Read)?;
-        serde_json::from_str(&json).map_err(|error| MatrixError::Parse(error.to_string()))
+        let value: serde_json::Value =
+            serde_json::from_str(&json).map_err(|error| MatrixError::Parse(error.to_string()))?;
+        if value.get("rows").is_some() {
+            return serde_json::from_value(value)
+                .map_err(|error| MatrixError::Parse(error.to_string()));
+        }
+        if let Some(source) = value.get("source_inventory").and_then(serde_json::Value::as_str) {
+            let inventory =
+                super::inventory::CapabilityInventory::from_json_file(Path::new(source))
+                    .map_err(|error| MatrixError::Parse(format!("{error:?}")))?;
+            return Ok(expand_matrix_from_inventory(
+                &inventory,
+                &MatrixPolicy::default(),
+            ));
+        }
+        Err(MatrixError::Parse(
+            "matrix json must contain rows or source_inventory".to_string(),
+        ))
     }
 
     pub fn covers_domain(&self, domain: &str) -> bool {
@@ -104,21 +121,165 @@ pub struct MatrixBlocker {
 }
 
 pub fn expand_matrix_from_inventory(
-    _inventory: &CapabilityInventory,
-    _policy: &MatrixPolicy,
+    inventory: &CapabilityInventory,
+    policy: &MatrixPolicy,
 ) -> CapabilityMatrix {
-    unimplemented!("task-11.3 RED skeleton: matrix expansion is not implemented")
+    let rows = inventory
+        .items
+        .iter()
+        .map(|item| {
+            let target_status = if item.status == "unresolved" {
+                policy.p2_target_status.clone()
+            } else if item.owner_hint == "script-bridge"
+                || item.owner_hint == "node-api-wrapper"
+                || item.name.contains("npm")
+            {
+                "bridge".to_string()
+            } else if item.level_hint == "P2" {
+                "later".to_string()
+            } else {
+                "native".to_string()
+            };
+
+            let verification = match item.level_hint.as_str() {
+                "P0" if item.status == "unresolved" => {
+                    format!("blocker:{}", item.stable_id)
+                }
+                "P0" => format!("{}{}", policy.p0_verification_prefix, item.stable_id),
+                "P1" => format!("{}{}", policy.p1_verification_prefix, item.stable_id),
+                "P2" => format!("registration:{}", item.stable_id),
+                _ => "blocked:invalid-level".to_string(),
+            };
+
+            let notes = if item.level_hint == "P2" || item.status == "unresolved" {
+                format!(
+                    "reason: {}; later: {} classification task; source: {}",
+                    item.unresolved_reason
+                        .as_deref()
+                        .unwrap_or("P2 item requires known-gap registration"),
+                    item.owner_hint,
+                    item.source_reference
+                )
+            } else {
+                format!("source: {}", item.source_reference)
+            };
+
+            CapabilityRow {
+                capability: item.stable_id.clone(),
+                level: item.level_hint.clone(),
+                target_status,
+                verification,
+                owner: item.owner_hint.clone(),
+                notes,
+            }
+        })
+        .collect();
+    CapabilityMatrix { rows }
 }
 
 pub fn validate_no_silent_omissions(
-    _inventory: &CapabilityInventory,
-    _matrix: &CapabilityMatrix,
+    inventory: &CapabilityInventory,
+    matrix: &CapabilityMatrix,
 ) -> MatrixCompletenessReport {
-    unimplemented!("task-11.3 RED skeleton: matrix completeness validator is not implemented")
+    let mut report = MatrixCompletenessReport::default();
+
+    for item in &inventory.items {
+        if !matrix
+            .rows
+            .iter()
+            .any(|row| row.capability == item.stable_id)
+        {
+            report.missing_matrix_rows.push(item.stable_id.clone());
+        }
+    }
+
+    for row in &matrix.rows {
+        if !has_compatibility_level(&row.level) {
+            report.rows_missing_level.push(row.capability.clone());
+        }
+        if !has_target_status(&row.target_status) {
+            report.rows_missing_status.push(row.capability.clone());
+        }
+        if row.verification.trim().is_empty() {
+            report.rows_missing_verification.push(row.capability.clone());
+        }
+        if row.owner.trim().is_empty() {
+            report.rows_missing_owner.push(row.capability.clone());
+        }
+
+        if row.level == "P0"
+            && !row.verification.contains("fixture:")
+            && !row.verification.contains("blocker:")
+        {
+            report
+                .p0_rows_missing_fixture_or_blocker
+                .push(row.capability.clone());
+        }
+        if row.level == "P1" && !row.verification.contains("snapshot:") {
+            report
+                .p1_rows_missing_snapshot_plan
+                .push(row.capability.clone());
+        }
+        if row.level == "P2" {
+            let notes = normalize(&row.notes);
+            let status = normalize(&row.target_status);
+            if !notes.contains("reason:")
+                || !(notes.contains("later:") || notes.contains("unsupported:"))
+                || !(status.contains("later") || status.contains("unsupported"))
+            {
+                report
+                    .p2_rows_missing_reason_or_target
+                    .push(row.capability.clone());
+            }
+        }
+    }
+
+    report
 }
 
-pub fn matrix_release_blockers(_report: &MatrixCompletenessReport) -> Vec<MatrixBlocker> {
-    unimplemented!("task-11.3 RED skeleton: matrix blocker conversion is not implemented")
+pub fn matrix_release_blockers(report: &MatrixCompletenessReport) -> Vec<MatrixBlocker> {
+    let mut blockers = Vec::new();
+    push_blockers(
+        &mut blockers,
+        &report.missing_matrix_rows,
+        "silent omission: inventory item has no item-level matrix row",
+    );
+    push_blockers(
+        &mut blockers,
+        &report.rows_missing_level,
+        "matrix row missing P0/P1/P2 level",
+    );
+    push_blockers(
+        &mut blockers,
+        &report.rows_missing_status,
+        "matrix row missing target status",
+    );
+    push_blockers(
+        &mut blockers,
+        &report.rows_missing_verification,
+        "matrix row missing verification",
+    );
+    push_blockers(
+        &mut blockers,
+        &report.rows_missing_owner,
+        "matrix row missing owner",
+    );
+    push_blockers(
+        &mut blockers,
+        &report.p0_rows_missing_fixture_or_blocker,
+        "P0 row missing fixture or blocker reference",
+    );
+    push_blockers(
+        &mut blockers,
+        &report.p1_rows_missing_snapshot_plan,
+        "P1 row missing snapshot plan",
+    );
+    push_blockers(
+        &mut blockers,
+        &report.p2_rows_missing_reason_or_target,
+        "P2 row missing reason or later/unsupported target",
+    );
+    blockers
 }
 
 pub fn validate_matrix_completeness(matrix: &CapabilityMatrix) -> MatrixReport {
@@ -210,6 +371,13 @@ fn has_target_status(status: &str) -> bool {
     ["native", "bridge", "unsupported", "later"]
         .iter()
         .any(|allowed| normalized.contains(allowed))
+}
+
+fn push_blockers(blockers: &mut Vec<MatrixBlocker>, item_ids: &[String], reason: &str) {
+    blockers.extend(item_ids.iter().map(|item_id| MatrixBlocker {
+        item_id: item_id.clone(),
+        reason: reason.to_string(),
+    }));
 }
 
 fn normalize(value: &str) -> String {
