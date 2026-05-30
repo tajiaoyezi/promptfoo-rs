@@ -9,7 +9,7 @@ Readiness basis: PRD §Compatibility Matrix, PRD §Compatibility Harness Design,
 |---|---|---|---|---|---|
 | CLI command/flag inventory | P0 | native | golden diff stdout/stderr/exit code | leafiellune | eval/view/cache/redteam/mcp/code-scans/scan-model/import/export and common flags |
 | promptfooconfig.yaml/json | P0 | native | config normalization golden diff | leafiellune | vars, prompts, tests, providers, assertions |
-| redteam.yaml | P0 | native | redteam fixture golden diff | leafiellune | init/generate/eval/run/report core flow |
+| redteam.yaml | P0 | native | redteam fixture golden diff | leafiellune | init/generate/eval/run/report core flow covered by task 7.1 |
 | .env and file prompts/tests | P0 | native | Linux/macOS/Windows path/env/newline fixtures | leafiellune | CSV/JSON/YAML tests included |
 | Eval runner | P0 | native | mock provider result/error/metadata golden diff | leafiellune | latency normalized |
 | Cache/resume/retry/concurrency/delay | P0 | native | cache key, resume cursor, partial result, retry fixtures | leafiellune | Azure/assistant special keys tracked as matrix children |

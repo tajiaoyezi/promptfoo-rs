@@ -20,7 +20,7 @@ redteam-engine + config-loader + output-writers + redteam fixtures
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 7.1 | redteam-command-flow | ../tasks/task-7.1-redteam-command-flow.md | Ready | 实现 redteam init/generate/eval/run/report 最小兼容闭环 |
+| 7.1 | redteam-command-flow | ../tasks/task-7.1-redteam-command-flow.md | Done | 实现 redteam init/generate/eval/run/report 最小兼容闭环 |
 | 7.2 | redteam-registry-report | ../tasks/task-7.2-redteam-registry-report.md | Ready | 实现核心插件/strategy registry、风险评分和 report 输出 |
 
 ## 5. Dependencies
