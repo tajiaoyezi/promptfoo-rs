@@ -1,6 +1,6 @@
 # Task 13.1: command-flag-parity
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 13 — cli-output-eval-parity
