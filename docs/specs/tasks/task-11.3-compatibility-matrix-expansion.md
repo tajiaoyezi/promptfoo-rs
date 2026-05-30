@@ -1,6 +1,6 @@
 # Task 11.3: compatibility-matrix-expansion
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 11 — upstream-inventory-baseline
