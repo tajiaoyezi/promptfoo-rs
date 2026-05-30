@@ -92,7 +92,10 @@ fn test_10_1_1_viewer_reads_stable_result_schema_from_jsonl_and_sqlite() {
     assert_eq!(sqlite_records, records);
     assert_eq!(jsonl_records[0].eval_id, "eval-viewer");
     assert_eq!(jsonl_records[0].metadata["promptfooVersion"], "0.121.13");
-    assert_eq!(jsonl_records[1].assertion_results[0].assertion_type, "contains");
+    assert_eq!(
+        jsonl_records[1].assertion_results[0].assertion_type,
+        "contains"
+    );
 }
 
 #[test]

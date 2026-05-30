@@ -12,3 +12,4 @@ pub mod redteam;
 pub mod results;
 pub mod scan;
 pub mod script_bridge;
+pub mod viewer_server;
