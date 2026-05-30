@@ -1,6 +1,6 @@
 # Phase 12: compatibility-fixtures-golden-diff
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,9 +20,9 @@ compatibility/fixtures/、compatibility/artifacts/、src/compatibility/harness.r
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 12.1 | p0-fixture-corpus | ../tasks/task-12.1-p0-fixture-corpus.md | Ready | 建立 50+ P0 fixtures 与 metadata schema |
-| 12.2 | executable-upstream-rs-runner | ../tasks/task-12.2-executable-upstream-rs-runner.md | Ready | 真实执行 upstream promptfoo 与 promptfoo-rs 并产生 artifacts |
-| 12.3 | golden-diff-ci-release-gate | ../tasks/task-12.3-golden-diff-ci-release-gate.md | Ready | 将 golden diff artifact 接入 CI/release gate |
+| 12.1 | p0-fixture-corpus | ../tasks/task-12.1-p0-fixture-corpus.md | Done | 建立 50+ P0 fixtures 与 metadata schema |
+| 12.2 | executable-upstream-rs-runner | ../tasks/task-12.2-executable-upstream-rs-runner.md | Done | 真实执行 upstream promptfoo 与 promptfoo-rs 并产生 artifacts |
+| 12.3 | golden-diff-ci-release-gate | ../tasks/task-12.3-golden-diff-ci-release-gate.md | Done | 将 golden diff artifact 接入 CI/release gate |
 
 ## 5. Dependencies
 
@@ -30,9 +30,9 @@ compatibility/fixtures/、compatibility/artifacts/、src/compatibility/harness.r
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] 至少 50 个 P0 fixtures 进入版本控制，覆盖 CLI/config/eval/cache/output/P0 providers/core assertions/redteam core/script default-deny。
-- [ ] 每个 fixture 生成 upstream、rs、normalized、diff、gate summary artifact。
-- [ ] P0 bug 或 unclassified diff 会使 stable release gate 失败。
+- [x] 至少 50 个 P0 fixtures 进入版本控制，覆盖 CLI/config/eval/cache/output/P0 providers/core assertions/redteam core/script default-deny。
+- [x] 每个 fixture 生成 upstream、rs、normalized、diff、gate summary artifact。
+- [x] P0 bug 或 unclassified diff 会使 stable release gate 失败。
 
 ## 7. Phase Risks
 
