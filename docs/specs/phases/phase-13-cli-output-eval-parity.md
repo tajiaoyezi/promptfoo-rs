@@ -1,6 +1,6 @@
 # Phase 13: cli-output-eval-parity
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,8 +20,8 @@ src/cli.rs、src/eval/、src/cache/、src/output/、src/config/、tests/cli_pari
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 13.1 | command-flag-parity | ../tasks/task-13.1-command-flag-parity.md | Ready | 实现 upstream command/flag inventory 的 CLI 行为边界 |
-| 13.2 | eval-output-cache-parity | ../tasks/task-13.2-eval-output-cache-parity.md | Ready | 补齐 eval/output/cache/resume/retry 的 P0 golden diff 行为 |
+| 13.1 | command-flag-parity | ../tasks/task-13.1-command-flag-parity.md | Done | 实现 upstream command/flag inventory 的 CLI 行为边界 |
+| 13.2 | eval-output-cache-parity | ../tasks/task-13.2-eval-output-cache-parity.md | Done | 补齐 eval/output/cache/resume/retry 的 P0 golden diff 行为 |
 
 ## 5. Dependencies
 
@@ -29,9 +29,9 @@ src/cli.rs、src/eval/、src/cache/、src/output/、src/config/、tests/cli_pari
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `view/cache/import/export` 不再是空成功占位；每个命令有兼容行为或明确 unsupported/later 错误。
-- [ ] `eval` 支持 PRD happy path 中的 output flags、cache/resume/retry 和 CI exit code。
-- [ ] CLI stdout/stderr/exit code 进入 golden diff fixture artifact。
+- [x] `view/cache/import/export` 不再是空成功占位；每个命令有兼容行为或明确 unsupported/later 错误。
+- [x] `eval` 支持 PRD happy path 中的 output flags、cache/resume/retry 和 CI exit code。
+- [x] CLI stdout/stderr/exit code 进入 golden diff fixture artifact。
 
 ## 7. Phase Risks
 

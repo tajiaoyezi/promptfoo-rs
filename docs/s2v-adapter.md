@@ -141,7 +141,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 10 | web-viewer-release | docs/specs/phases/phase-10-web-viewer-release.md | Done | 2 | N/A (solo) |
 | 11 | upstream-inventory-baseline | docs/specs/phases/phase-11-upstream-inventory-baseline.md | Done | 3 | N/A (solo) |
 | 12 | compatibility-fixtures-golden-diff | docs/specs/phases/phase-12-compatibility-fixtures-golden-diff.md | Done | 3 | N/A (solo) |
-| 13 | cli-output-eval-parity | docs/specs/phases/phase-13-cli-output-eval-parity.md | Ready | 2 | N/A (solo) |
+| 13 | cli-output-eval-parity | docs/specs/phases/phase-13-cli-output-eval-parity.md | Done | 2 | N/A (solo) |
 | 14 | provider-assertion-redteam-parity | docs/specs/phases/phase-14-provider-assertion-redteam-parity.md | Ready | 2 | N/A (solo) |
 | 15 | release-hardening-performance | docs/specs/phases/phase-15-release-hardening-performance.md | Ready | 2 | N/A (solo) |
 
