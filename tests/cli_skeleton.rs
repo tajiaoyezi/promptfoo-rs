@@ -36,7 +36,10 @@ fn test_2_1_2_cli_exposes_promptfoo_command_skeletons() {
         "import",
         "export",
     ] {
-        assert!(stdout.contains(command), "missing {command} in help:\n{stdout}");
+        assert!(
+            stdout.contains(command),
+            "missing {command} in help:\n{stdout}"
+        );
     }
 }
 
