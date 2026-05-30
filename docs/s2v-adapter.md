@@ -139,6 +139,11 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 8 | mcp-scan-audit | docs/specs/phases/phase-8-mcp-scan-audit.md | Done | 2 | N/A (solo) |
 | 9 | script-bridges-node-api | docs/specs/phases/phase-9-script-bridges-node-api.md | Done | 2 | N/A (solo) |
 | 10 | web-viewer-release | docs/specs/phases/phase-10-web-viewer-release.md | Done | 2 | N/A (solo) |
+| 11 | upstream-inventory-baseline | docs/specs/phases/phase-11-upstream-inventory-baseline.md | Ready | 3 | N/A (solo) |
+| 12 | compatibility-fixtures-golden-diff | docs/specs/phases/phase-12-compatibility-fixtures-golden-diff.md | Ready | 3 | N/A (solo) |
+| 13 | cli-output-eval-parity | docs/specs/phases/phase-13-cli-output-eval-parity.md | Ready | 2 | N/A (solo) |
+| 14 | provider-assertion-redteam-parity | docs/specs/phases/phase-14-provider-assertion-redteam-parity.md | Ready | 2 | N/A (solo) |
+| 15 | release-hardening-performance | docs/specs/phases/phase-15-release-hardening-performance.md | Ready | 2 | N/A (solo) |
 
 ## Task 总索引
 
@@ -166,6 +171,18 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 9.2 | node-api-wrapper | docs/specs/tasks/task-9.2-node-api-wrapper.md | Done | Phase 9 AUTO order | N/A (solo) |
 | 10.1 | web-viewer | docs/specs/tasks/task-10.1-web-viewer.md | Done | Phase 10 AUTO order | N/A (solo) |
 | 10.2 | release | docs/specs/tasks/task-10.2-release-docs-packaging.md | Done | Phase 10 AUTO order | N/A (solo) |
+| 11.1 | compatibility | docs/specs/tasks/task-11.1-current-upstream-target-policy.md | Ready | Phase 11 order 1 | N/A (solo) |
+| 11.2 | compatibility-inventory | docs/specs/tasks/task-11.2-item-level-capability-inventory.md | Ready | Phase 11 order 2 | N/A (solo) |
+| 11.3 | compatibility-matrix | docs/specs/tasks/task-11.3-compatibility-matrix-expansion.md | Ready | Phase 11 order 3 | N/A (solo) |
+| 12.1 | compatibility-fixtures | docs/specs/tasks/task-12.1-p0-fixture-corpus.md | Ready | Phase 12 order 1 | N/A (solo) |
+| 12.2 | compatibility-harness | docs/specs/tasks/task-12.2-executable-upstream-rs-runner.md | Ready | Phase 12 order 2 | N/A (solo) |
+| 12.3 | release-gate | docs/specs/tasks/task-12.3-golden-diff-ci-release-gate.md | Ready | Phase 12 order 3 | N/A (solo) |
+| 13.1 | cli | docs/specs/tasks/task-13.1-command-flag-parity.md | Ready | Phase 13 order 1 | N/A (solo) |
+| 13.2 | eval-output-cache | docs/specs/tasks/task-13.2-eval-output-cache-parity.md | Ready | Phase 13 order 2 | N/A (solo) |
+| 14.1 | provider-assertion | docs/specs/tasks/task-14.1-provider-assertion-inventory-parity.md | Ready | Phase 14 order 1 | N/A (solo) |
+| 14.2 | redteam-engine | docs/specs/tasks/task-14.2-redteam-plugin-strategy-parity.md | Ready | Phase 14 order 2 | N/A (solo) |
+| 15.1 | release-viewer-node | docs/specs/tasks/task-15.1-viewer-node-packaging-release.md | Ready | Phase 15 order 1 | N/A (solo) |
+| 15.2 | release-gates | docs/specs/tasks/task-15.2-performance-security-observability-gates.md | Ready | Phase 15 order 2 | N/A (solo) |
 
 ## ADR 索引
 
@@ -201,3 +218,4 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 8.2 | test/features/scan-engine.feature |
 | 9.1 | test/features/script-bridge.feature |
 | 10.1 | test/features/web-viewer.feature |
+| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2 | test/features/perfect-refactor-parity.feature |

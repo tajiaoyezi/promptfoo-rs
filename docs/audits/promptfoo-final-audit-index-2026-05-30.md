@@ -69,16 +69,16 @@ The current upstream `main` and the local frozen baseline are different equivale
 
 ## Required Next S2V Work
 
-Do not self-create task specs ad hoc. Per `AGENTS.md` R5, the next implementation work should be introduced with `/s2v-add` before implementation.
+Do not self-create implementation work ad hoc. Per `AGENTS.md` R5, implementation must start from the S2V phase/task specs below and follow RED -> GREEN -> REFACTOR -> §9 verification -> §10 completion notes.
 
-Recommended next S2V additions:
+The audit recommendations have been materialized as Ready S2V specs:
 
-1. `/s2v-add task upstream-item-level-inventory`
-2. `/s2v-add task compatibility-fixture-corpus-p0`
-3. `/s2v-add task executable-upstream-rs-golden-diff`
-4. `/s2v-add task cli-command-flag-parity`
-5. `/s2v-add task provider-assertion-redteam-inventory-parity`
-6. `/s2v-add task release-distribution-hardening`
+1. Phase 11: `docs/specs/phases/phase-11-upstream-inventory-baseline.md`
+2. Phase 12: `docs/specs/phases/phase-12-compatibility-fixtures-golden-diff.md`
+3. Phase 13: `docs/specs/phases/phase-13-cli-output-eval-parity.md`
+4. Phase 14: `docs/specs/phases/phase-14-provider-assertion-redteam-parity.md`
+5. Phase 15: `docs/specs/phases/phase-15-release-hardening-performance.md`
+6. BDD feature: `test/features/perfect-refactor-parity.feature`
 
 ## Final Audit Decision
 

@@ -223,6 +223,13 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 8 | mcp-scan-audit | `promptfoo mcp`、MCP provider、code-scans、scan-model、model-audit 和 SARIF 输出形成兼容闭环 | `mcp-runtime` + `scan-engine` + `output-writers` + SARIF snapshots | 4, 5, 6 | 是（可与 phase 7 和 9 并行）|
 | 9 | script-bridges-node-api | JS/TS、Python、Shell/Ruby custom provider/assertion bridge 与 npm Node API wrapper 可运行并有 drift 测试 | `script-bridge` + `node-api-wrapper` + bridge fixtures | 4, 5, 6 | 是（可与 phase 7 和 8 并行）|
 | 10 | web-viewer-release | 本地 viewer 可读取结果并完成跨平台发布、安装、文档和 release gate 汇总 | `web-viewer` + release scripts + README + docs + GitHub Actions | 6, 7, 8, 9 | 否 |
+| 11 | upstream-inventory-baseline | 审计后的当前 upstream 目标政策、能力项 inventory、兼容矩阵扩展可追溯，避免“完美重构”目标停留在旧 baseline 或粗粒度矩阵 | `docs/compatibility/` + `compatibility/inventory/` + `docs/audits/` + matrix tests | 10 | 否 |
+| 12 | compatibility-fixtures-golden-diff | P0 fixture corpus、upstream/rs 可执行 runner、golden diff CI release gate 覆盖审计发现的缺口 | `compatibility/fixtures/` + `compatibility/harness/` + `tests/` + release gate scripts | 11 | 否 |
+| 13 | cli-output-eval-parity | CLI commands/flags、eval outputs、cache/resume/retry 行为达到 item-level parity 或有明确分类证据 | `src/cli` + `src/output` + `src/cache` + `tests/` + compatibility fixtures | 12 | 否 |
+| 14 | provider-assertion-redteam-parity | provider/assertion/redteam plugin/strategy inventory 对齐 upstream，P0 有 fixture，P2/later 有原因和用户可见行为 | `src/providers` + `src/assertions` + `src/redteam` + `docs/compatibility/` | 13 | 否 |
+| 15 | release-hardening-performance | viewer/npm packaging、lint/integration/e2e/coverage/runtime-smoke、性能、安全、观测 release gates 均可执行 | `viewer/` + `npm/` + `scripts/release/` + `.github/workflows/` + adapter commands | 14 | 否 |
+
+> Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
 
 ---
 
