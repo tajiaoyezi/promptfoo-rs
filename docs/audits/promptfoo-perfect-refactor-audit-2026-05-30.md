@@ -6,6 +6,7 @@
 **Inventory attachment**: `docs/audits/promptfoo-upstream-inventory-gap-2026-05-30.md`.
 **Runtime attachment**: `docs/audits/promptfoo-runtime-verification-audit-2026-05-30.md`.
 **S2V parity-claim attachment**: `docs/audits/promptfoo-s2v-parity-claim-audit-2026-05-30.md`.
+**Release/distribution attachment**: `docs/audits/promptfoo-release-distribution-audit-2026-05-30.md`.
 
 ## Executive Conclusion
 
@@ -142,3 +143,5 @@ See `docs/audits/promptfoo-upstream-inventory-gap-2026-05-30.md` for the command
 See `docs/audits/promptfoo-runtime-verification-audit-2026-05-30.md` for local S2V verification and CLI runtime smoke evidence.
 
 See `docs/audits/promptfoo-s2v-parity-claim-audit-2026-05-30.md` for why Phase 6 `Done` does not prove full upstream compatibility harness or golden diff release-gate execution.
+
+See `docs/audits/promptfoo-release-distribution-audit-2026-05-30.md` for release, viewer, npm wrapper, and distribution-channel evidence gaps.
