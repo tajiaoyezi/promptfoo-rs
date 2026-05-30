@@ -1,10 +1,13 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use clap::{Args, Parser, Subcommand};
+use clap::{Args, Parser, Subcommand, ValueEnum};
 
 use crate::config::{load_promptfoo_config, EnvOverlay};
 use crate::eval::{run_eval, EvalOptions};
+use crate::redteam::{
+    load_redteam_config, run_redteam_flow, write_redteam_report_file, MockTarget,
+};
 
 #[derive(Debug, Parser)]
 #[command(
@@ -36,7 +39,7 @@ pub enum Command {
     /// Manage local eval cache state.
     Cache,
     /// Run redteam workflows.
-    Redteam,
+    Redteam(RedteamArgs),
     /// Run MCP compatibility workflows.
     Mcp,
     /// Run code scan workflows.
@@ -55,13 +58,32 @@ pub struct EvalArgs {
     pub config: Option<PathBuf>,
 }
 
+#[derive(Debug, Args)]
+pub struct RedteamArgs {
+    #[arg(short = 'c', long = "config", value_name = "FILE")]
+    pub config: Option<PathBuf>,
+    #[arg(long = "stage", value_enum, default_value_t = RedteamStageArg::Run)]
+    pub stage: RedteamStageArg,
+    #[arg(long = "report", value_name = "FILE")]
+    pub report: Option<PathBuf>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
+pub enum RedteamStageArg {
+    Init,
+    Generate,
+    Eval,
+    Run,
+    Report,
+}
+
 pub fn run_cli(cli: Cli) -> Result<ExitCode, CliError> {
     match cli.command {
         Some(Command::Eval(args)) => handle_eval_command(args),
+        Some(Command::Redteam(args)) => handle_redteam_command(args),
         Some(
             Command::View
             | Command::Cache
-            | Command::Redteam
             | Command::Mcp
             | Command::CodeScans
             | Command::ScanModel
@@ -82,6 +104,33 @@ pub fn handle_eval_command(args: EvalArgs) -> Result<ExitCode, CliError> {
     let json = serde_json::to_string(&envelope)
         .map_err(|err| CliError::new(format!("result envelope serialization failed: {err}")))?;
     println!("{json}");
+    Ok(ExitCode::SUCCESS)
+}
+
+pub fn handle_redteam_command(args: RedteamArgs) -> Result<ExitCode, CliError> {
+    let Some(config_path) = args.config else {
+        return Ok(ExitCode::SUCCESS);
+    };
+    let config = load_redteam_config(&config_path)
+        .map_err(|err| CliError::new(format!("redteam config {}: {err}", config_path.display())))?;
+    let target = MockTarget::new(config.target.id.clone()).with_blocked_keyword("secret");
+    let report =
+        run_redteam_flow(config.clone(), target).map_err(|err| CliError::new(err.to_string()))?;
+
+    let report_path = args.report.or_else(|| {
+        config
+            .report
+            .as_ref()
+            .map(|report| PathBuf::from(&report.path))
+    });
+    if let Some(report_path) = report_path {
+        write_redteam_report_file(&report, &report_path)
+            .map_err(|err| CliError::new(err.to_string()))?;
+    } else {
+        let json = serde_json::to_string(&report)
+            .map_err(|err| CliError::new(format!("redteam report serialization failed: {err}")))?;
+        println!("{json}");
+    }
     Ok(ExitCode::SUCCESS)
 }
 

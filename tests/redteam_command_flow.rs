@@ -3,9 +3,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use promptfoo_rs::redteam::{
-    load_redteam_config, run_redteam_flow, MockTarget, RedteamStage,
-};
+use promptfoo_rs::redteam::{load_redteam_config, run_redteam_flow, MockTarget, RedteamStage};
 use serde_json::Value;
 
 fn promptfoo_rs() -> Command {

@@ -6,5 +6,6 @@ pub mod config;
 pub mod eval;
 pub mod output;
 pub mod providers;
+pub mod redteam;
 pub mod results;
 pub mod script_bridge;
