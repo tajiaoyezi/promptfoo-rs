@@ -5,3 +5,4 @@ pub mod compatibility;
 pub mod config;
 pub mod eval;
 pub mod providers;
+pub mod script_bridge;

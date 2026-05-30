@@ -62,17 +62,22 @@ fn test_4_3_2_allow_scripts_disabled_returns_stable_rejection_error() {
 fn test_4_3_3_custom_assertion_request_response_schema_has_snapshot() {
     let snapshot = custom_assertion_schema_snapshot();
 
-    assert_eq!(snapshot["request"]["required"], json!([
-        "script_kind",
-        "script_path",
-        "input",
-        "timeout_ms"
-    ]));
-    assert_eq!(snapshot["response"]["required"], json!(["pass", "score", "reason"]));
+    assert_eq!(
+        snapshot["request"]["required"],
+        json!(["script_kind", "script_path", "input", "timeout_ms"])
+    );
+    assert_eq!(
+        snapshot["response"]["required"],
+        json!(["pass", "score", "reason"])
+    );
 
-    let response = CustomAssertionResponse::passed(0.91, "matches policy", json!({
-        "script_kind": "javascript"
-    }));
+    let response = CustomAssertionResponse::passed(
+        0.91,
+        "matches policy",
+        json!({
+            "script_kind": "javascript"
+        }),
+    );
     assert_eq!(
         serde_json::to_value(response).expect("response should serialize"),
         json!({

@@ -1,3 +1,4 @@
+pub mod custom;
 pub mod deterministic;
 pub mod model_graded;
 
