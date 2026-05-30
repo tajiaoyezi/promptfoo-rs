@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::Path;
 
+use serde::{Deserialize, Serialize};
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BaselineLock {
     pub git_tag: GitTagArtifact,
@@ -69,6 +71,77 @@ pub enum ReleaseGateStatus {
 pub enum BaselineLockError {
     Read(std::io::Error),
     MissingRow(&'static str),
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CompatibilityTargetPolicy {
+    pub stable_targets: Vec<StableTarget>,
+    pub moving_upstream_observations: Vec<UpstreamObservation>,
+}
+
+impl CompatibilityTargetPolicy {
+    pub fn load(_path: &Path) -> Result<CompatibilityTargetPolicy, TargetPolicyError> {
+        unimplemented!("task-11.1 RED skeleton: target policy loader is not implemented")
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct StableTarget {
+    pub id: String,
+    pub kind: StableTargetKind,
+    pub package_version: String,
+    pub git_ref: String,
+    pub git_commit: String,
+    pub npm_integrity: String,
+    pub container_digest: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum StableTargetKind {
+    FrozenBaseline,
+    Rebaselined,
+    Floating,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct UpstreamObservation {
+    pub head: String,
+    pub package_version: String,
+    pub collected_at: String,
+    pub source: String,
+    pub modifies_frozen_baseline: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TargetPolicyReport {
+    pub stable_target_count: usize,
+    pub rejected_reasons: Vec<String>,
+    pub moving_upstream_is_tracking_only: bool,
+}
+
+impl TargetPolicyReport {
+    pub fn is_release_ready(&self) -> bool {
+        self.rejected_reasons.is_empty()
+            && self.stable_target_count == 1
+            && self.moving_upstream_is_tracking_only
+    }
+}
+
+#[derive(Debug)]
+pub enum TargetPolicyError {
+    Read(std::io::Error),
+    Parse(String),
+}
+
+pub fn validate_single_stable_target(_policy: &CompatibilityTargetPolicy) -> TargetPolicyReport {
+    unimplemented!("task-11.1 RED skeleton: target policy validator is not implemented")
+}
+
+pub fn record_moving_upstream_observation(
+    _head: &str,
+    _package_version: &str,
+) -> UpstreamObservation {
+    unimplemented!("task-11.1 RED skeleton: upstream observation recorder is not implemented")
 }
 
 pub fn validate_baseline_lock(lock: &BaselineLock) -> BaselineLockReport {
