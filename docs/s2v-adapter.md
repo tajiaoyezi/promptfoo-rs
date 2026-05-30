@@ -139,7 +139,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 8 | mcp-scan-audit | docs/specs/phases/phase-8-mcp-scan-audit.md | Done | 2 | N/A (solo) |
 | 9 | script-bridges-node-api | docs/specs/phases/phase-9-script-bridges-node-api.md | Done | 2 | N/A (solo) |
 | 10 | web-viewer-release | docs/specs/phases/phase-10-web-viewer-release.md | Done | 2 | N/A (solo) |
-| 11 | upstream-inventory-baseline | docs/specs/phases/phase-11-upstream-inventory-baseline.md | Ready | 3 | N/A (solo) |
+| 11 | upstream-inventory-baseline | docs/specs/phases/phase-11-upstream-inventory-baseline.md | Done | 3 | N/A (solo) |
 | 12 | compatibility-fixtures-golden-diff | docs/specs/phases/phase-12-compatibility-fixtures-golden-diff.md | Ready | 3 | N/A (solo) |
 | 13 | cli-output-eval-parity | docs/specs/phases/phase-13-cli-output-eval-parity.md | Ready | 2 | N/A (solo) |
 | 14 | provider-assertion-redteam-parity | docs/specs/phases/phase-14-provider-assertion-redteam-parity.md | Ready | 2 | N/A (solo) |
