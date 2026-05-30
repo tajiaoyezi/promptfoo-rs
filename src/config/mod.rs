@@ -102,6 +102,20 @@ pub enum ConfigError {
     UnsupportedPrompt(Value),
 }
 
+impl std::fmt::Display for ConfigError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Read(err) => write!(formatter, "read error: {err}"),
+            Self::Parse(err) => write!(formatter, "parse error: {err}"),
+            Self::UnsupportedPrompt(value) => {
+                write!(formatter, "unsupported prompt value: {value}")
+            }
+        }
+    }
+}
+
+impl std::error::Error for ConfigError {}
+
 pub fn load_promptfoo_config(
     path: &Path,
     env: &EnvOverlay,

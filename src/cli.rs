@@ -3,6 +3,9 @@ use std::process::ExitCode;
 
 use clap::{Args, Parser, Subcommand};
 
+use crate::config::{load_promptfoo_config, EnvOverlay};
+use crate::eval::{run_eval, EvalOptions};
+
 #[derive(Debug, Parser)]
 #[command(
     name = "promptfoo-rs",
@@ -52,7 +55,33 @@ pub struct EvalArgs {
     pub config: Option<PathBuf>,
 }
 
-pub fn run_cli(_cli: Cli) -> Result<ExitCode, CliError> {
+pub fn run_cli(cli: Cli) -> Result<ExitCode, CliError> {
+    match cli.command {
+        Some(Command::Eval(args)) => handle_eval_command(args),
+        Some(
+            Command::View
+            | Command::Cache
+            | Command::Redteam
+            | Command::Mcp
+            | Command::CodeScans
+            | Command::ScanModel
+            | Command::Import
+            | Command::Export,
+        )
+        | None => Ok(ExitCode::SUCCESS),
+    }
+}
+
+pub fn handle_eval_command(args: EvalArgs) -> Result<ExitCode, CliError> {
+    let config_path = args
+        .config
+        .ok_or_else(|| CliError::new("config path is required for eval (-c, --config)"))?;
+    let config = load_promptfoo_config(&config_path, &EnvOverlay::default())
+        .map_err(|err| CliError::new(format!("config {}: {err}", config_path.display())))?;
+    let envelope = run_eval(config, EvalOptions::default()).map_err(CliError::new)?;
+    let json = serde_json::to_string(&envelope)
+        .map_err(|err| CliError::new(format!("result envelope serialization failed: {err}")))?;
+    println!("{json}");
     Ok(ExitCode::SUCCESS)
 }
 
@@ -78,3 +107,11 @@ impl std::fmt::Display for CliError {
 }
 
 impl std::error::Error for CliError {}
+
+impl CliError {
+    pub fn new(message: impl Into<String>) -> Self {
+        Self {
+            message: message.into(),
+        }
+    }
+}
