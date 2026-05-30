@@ -1,7 +1,13 @@
+pub mod redaction;
+pub mod sandbox;
+
 use std::fmt;
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
+
+pub use redaction::{redact_secrets, RedactionPolicy};
+pub use sandbox::{ScriptBridge, ScriptRequest, ScriptResponse, ScriptSandboxOptions};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ScriptAuthorization {
@@ -34,6 +40,9 @@ impl fmt::Display for ScriptKind {
 pub enum ScriptBridgeErrorKind {
     Unauthorized,
     ExecutionDeferred,
+    Timeout,
+    Io,
+    StdinLimitExceeded,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

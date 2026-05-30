@@ -18,17 +18,26 @@ fn test_9_1_1_allow_scripts_disabled_returns_stable_error() {
     assert_eq!(error.kind, ScriptBridgeErrorKind::Unauthorized);
     assert_eq!(error.code, "script_not_authorized");
     assert_eq!(error.script_kind, ScriptKind::Shell);
-    assert_eq!(error.path, PathBuf::from("test/fixtures/script-bridge/inline"));
+    assert_eq!(
+        error.path,
+        PathBuf::from("test/fixtures/script-bridge/inline")
+    );
     assert!(error.message.contains("--allow-scripts"), "{error:?}");
 }
 
 #[test]
 fn test_9_1_2_authorized_subprocess_io_and_timeout_are_stable() {
-    let response = ScriptBridge::execute(shell_request(echo_script(), "hello from stdin"), ScriptAuthorization::Allow)
-        .expect("authorized shell script executes");
+    let response = ScriptBridge::execute(
+        shell_request(echo_script(), "hello from stdin"),
+        ScriptAuthorization::Allow,
+    )
+    .expect("authorized shell script executes");
 
     assert_eq!(response.exit_code, Some(0));
-    assert!(response.stdout.contains("stdin:hello from stdin"), "{response:?}");
+    assert!(
+        response.stdout.contains("stdin:hello from stdin"),
+        "{response:?}"
+    );
     assert!(response.stdout.contains("allowed:visible"), "{response:?}");
     assert!(response.stderr.contains("stderr:bridge"), "{response:?}");
 
@@ -43,8 +52,9 @@ fn test_9_1_2_authorized_subprocess_io_and_timeout_are_stable() {
 
 #[test]
 fn test_9_1_3_env_allowlist_and_secret_redaction_are_stable() {
-    let response = ScriptBridge::execute(shell_request(env_script(), ""), ScriptAuthorization::Allow)
-        .expect("authorized shell script executes");
+    let response =
+        ScriptBridge::execute(shell_request(env_script(), ""), ScriptAuthorization::Allow)
+            .expect("authorized shell script executes");
 
     assert_eq!(response.exit_code, Some(0));
     assert!(response.stdout.contains("allowed:visible"), "{response:?}");
