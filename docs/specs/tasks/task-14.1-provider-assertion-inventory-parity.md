@@ -1,6 +1,6 @@
 # Task 14.1: provider-assertion-inventory-parity
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 14 — provider-assertion-redteam-parity
