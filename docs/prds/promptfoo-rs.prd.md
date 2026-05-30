@@ -1,0 +1,313 @@
+# promptfoo-rs · 产品需求文档（PRD）
+
+> 本 PRD 由 `/s2v-prd` 生成。
+>
+> ⚠️ **不要手工重命名章节标题**（`/s2v-init` 按"中文｜English"双语锚点解析）。修改章节内容随时可以；改章节名会让 init 漏读字段。
+>
+> 解析逻辑：`## Vision` 或 `## 愿景` 任一命中即认；但 `## 产品愿景` / `## Product Vision` 会失败（不在双语模板内）。
+
+**生成日期**：2026-05-30
+**作者**：leafiellune
+**版本**：v1.0
+
+---
+
+## Vision｜愿景
+
+`promptfoo-rs` 要在 3 个月内成为 `promptfoo 0.121.13` 的可审计 Rust reimplementation：现有 promptfoo 用户可以拿已有 `promptfooconfig.yaml/json`、CI 命令、输出消费脚本和核心 redteam 工作流，在默认不依赖 Node/npm/node_modules 的 Rust 单二进制路径上运行；所有兼容能力、缺口、差异和发布阻断项都通过 compatibility matrix 与 upstream golden diff 追踪。
+
+1.0 不是轻量替代品，也不是重新设计 LLM eval DSL。它的价值来自两个约束同时成立：第一，兼容 promptfoo 0.121.13 已文档化能力域；第二，把默认执行路径收敛到 Rust-native core、可复现 fixture、可审计输出和明确的脚本执行授权边界。
+
+---
+
+## Problem Statement｜问题陈述
+
+**谁有这个问题**：
+已经在用 promptfoo 做 LLM eval、redteam、CI 回归测试的 AI 应用开发者、AI infra 团队、平台工程团队和安全红队团队。他们通常在企业内网、CI/CD、离线环境或安全敏感环境运行评测，需要稳定 exit code、可审计结果文件、可控依赖链和可迁移配置。
+
+**痛点**：
+promptfoo 当前功能完整，但 Node/TypeScript 运行时、npm 依赖、node_modules 体积、供应链依赖和 CI 冷启动成本，对企业安全环境和基础设施场景不够理想。复杂 eval 涉及 provider 调用、缓存、并发、重试、resume、输出格式和 CI 集成，现有用户还沉淀了大量 `promptfooconfig.yaml`、assertions、自定义 provider、自定义脚本和输出消费脚本；迁移成本主要来自行为细节不一致，而不是 Rust 语言本身。
+
+**现状**：
+现有选择包括继续使用 promptfoo 原项目、写一个轻量 Rust eval runner、或只做 provider/assertion 局部高性能模块。继续使用原项目能获得最完整功能，但保留 Node/npm 依赖链；轻量 runner 可以快速落地，但无法承接现有配置和 CI 输出；局部模块风险较低，但不能形成完整开源差异化，也无法验证 promptfoo 行为兼容。
+
+竞品和对标包括 promptfoo 原项目、Ragas、DeepEval、LangSmith、Langfuse、Phoenix、自研脚本加 CI、以及轻量 LLM eval runners。`promptfoo-rs` 的核心对标对象是 promptfoo upstream；其他工具主要用于定位边界：Ragas/DeepEval 更偏框架，LangSmith/Langfuse/Phoenix 更偏平台和观测，自研脚本无法标准化，轻量 runner 缺少兼容生态。
+
+**为什么是现在**：
+AI eval、LLM regression testing、redteam、MCP、Agent 安全测试正在变成 AI 应用工程基础设施。promptfoo 已证明需求真实存在；企业对 AI 工具链的供应链安全、内网部署、离线运行、可重复 CI、结果可审计和本地执行边界更敏感。Rust 重构的差异化集中在部署形态、单二进制、并发调度、缓存/resume、低依赖和安全默认值。
+
+---
+
+## Users & Context｜用户与场景
+
+**主要用户**：
+- **AI 应用开发者**：维护 prompts、providers、test cases 和 assertions，需要本地与 CI 一致运行 eval。
+- **AI infra / 平台工程团队**：把 eval 接入 CI/CD、模型网关、内部 provider、缓存和结果归档系统。
+- **安全红队团队**：运行 redteam 生成、攻击策略、风险评分和报告输出，需要本地可审计执行。
+- **企业安全 / 合规团队**：审查工具链依赖、脚本执行、密钥脱敏、离线运行和 share/cloud 边界。
+
+**次要用户 / 利益相关者**：
+- **promptfoo 深度用户和社区 contributor**：关注兼容完整性、品牌边界、license notice 和行为差异解释。
+- **DevOps / CI 维护者**：关注安装方式、冷启动时间、exit code、JUnit/SARIF 输出和失败可定位性。
+- **开源维护者**：关注 issue triage、兼容矩阵更新成本、fixture 归档和 release gate 可执行性。
+
+**关键使用场景**：
+1. **CI 回归评测**：团队在 GitHub Actions 或内部 CI 执行 `promptfoo-rs eval -c promptfooconfig.yaml --output junit.xml --output results.jsonl`，用 exit code 和 JUnit 作为合并阻断。
+2. **企业内网离线评测**：开发者在不能安装 npm 依赖或不能访问公网 registry 的环境，用单二进制运行本地 HTTP/Ollama/OpenAI-compatible provider。
+3. **红队安全测试**：安全团队从 `redteam.yaml` 初始化、生成、运行、评分并输出报告，同时要求 prompts、vars、outputs 默认不上传。
+4. **兼容迁移评估**：promptfoo 用户把现有 fixtures 同时交给 upstream promptfoo 和 `promptfoo-rs`，用 golden diff 判断能否迁移。
+5. **自定义扩展保留**：已有 JS/Python/Shell custom provider/assertion 的团队显式开启脚本 bridge，在隔离子进程中继续运行兼容扩展。
+
+---
+
+## Core Capabilities｜核心能力
+
+> ≤ 5 条。多于 5 条说明范围还没收敛 — 拆 v1.0 / v1.1 / v2.0。
+
+1. **promptfoo-compatible CLI/runtime**：覆盖 promptfoo 0.121.13 的全部已文档化能力域，1.0 至少跑通 `eval`、`view`、`cache`、`redteam`、`mcp`、`code-scans`、`scan-model`、`import/export` 的兼容闭环与常用 flags。
+2. **compatibility harness**：冻结 upstream baseline 后，对同一 fixture 分别运行 promptfoo upstream 与 `promptfoo-rs`，在 mock provider 下做 golden diff；P0 能力不通过不得发布 stable。
+3. **Rust-native eval core**：配置解析、eval 调度、provider 调用、assertion 执行、cache/resume、retry/backoff、限速、流式结果写入默认由 Rust core 承担。
+4. **provider/assertion/script bridge**：OpenAI-compatible、HTTP、Ollama、Anthropic 作为 P0 provider；JS/TS、Python、Shell custom provider/assertion 通过显式授权 bridge 保留兼容。
+5. **local viewer 与多渠道分发**：本地 Web viewer 读取 JSONL/SQLite 结果；输出 JSON、JSONL、CSV、YAML、HTML、JUnit XML、SARIF；发布 GitHub Releases、Homebrew、Cargo、Docker、npm wrapper 和 GitHub Action 示例。
+
+**明确不做（Out of Scope，至少列 3 项）**：
+- 不做 promptfoo cloud/share SaaS 的替代服务；任何 share/cloud 相关 API 只登记兼容边界、错误行为和品牌风险，不把数据上传作为默认能力。
+- 不承诺所有长尾 provider 都有 Rust 原生实现；但 1.0 必须在兼容矩阵中登记所有 promptfoo 0.121.13 已文档化 provider/assertion/redteam/plugin/CLI 能力，并标明 `native` / `bridge` / `unsupported` / `later`。
+- 不默认执行 JS/Python/Shell/Ruby custom code；脚本扩展必须通过 `--allow-scripts` 或配置显式开启。
+- 不重新设计 promptfoo 配置格式、assertion DSL、输出格式或 CLI 语义；新增 Rust-specific 选项不得破坏 promptfoo-compatible 默认路径。
+- 不把非稳定 Web UI 像素级还原作为 1.0 gate；1.0 关注结果可读、筛选、导出和与稳定结果 schema 的一致性。
+
+---
+
+## User Flow｜用户流程
+
+**主流程（happy path）**：
+1. 用户在已有项目中执行 `promptfoo-rs eval -c promptfooconfig.yaml --output results.jsonl --output junit.xml`。
+2. 系统加载 `.env`、配置文件、file prompts、CSV/JSON/YAML tests，解析 providers、prompts、tests、assertions 和 CLI flags。
+3. 系统构建 eval graph，按 `max-concurrency`、provider rate limit、delay、retry/backoff 和 cache 策略调度执行。
+4. 系统把每条结果流式写入 JSONL/SQLite，生成终端摘要、JUnit/CSV/SARIF/HTML 等请求的输出格式。
+5. 用户在 CI 中读取 exit code 与 JUnit/SARIF，或执行 `promptfoo-rs view` 打开本地 viewer 检查失败样本。
+
+**异常流（≥ 2 项）**：
+- **provider 超时 / 限流**：按配置的 `retry-errors`、退避、delay 和 provider-scoped 限速重试；最终失败写入结构化错误、保留 partial results，并按 promptfoo-compatible exit code 退出。
+- **脚本扩展未授权**：配置中引用 JS/Python/Shell custom provider/assertion 但未开启 `--allow-scripts` 时，系统拒绝执行，stderr 指出具体配置路径、脚本类型和启用方式。
+- **compatibility diff 失败**：harness 输出 fixture ID、字段路径、upstream 值、rs 值、差异类别和是否 release-blocking；P0 未解释差异阻断 stable release。
+- **缓存/resume 文件损坏**：系统跳过不可解析条目并记录损坏位置；默认不删除用户缓存，提供明确命令用于重建。
+- **share/cloud 能力被调用**：默认返回本地不支持或需显式替代配置的错误，不上传 payload；错误文案必须避免暗示本项目提供 promptfoo cloud 服务。
+
+**边界场景（≥ 1 项）**：
+- **大型 eval**：10k+ cases 或大模型输出时，runner 必须流式写入 JSONL/SQLite，终端摘要只保留聚合统计和失败索引，避免完整结果集常驻内存。
+- **非确定性 model-graded assertion**：golden diff 不比较原始 LLM 文本的 byte-level 一致性，而比较归一化后的评分、阈值判断、metadata schema 和可解释差异标签。
+- **跨平台路径与 shell quoting**：Windows x64、macOS arm64、Linux x64 对 `.env`、文件路径、脚本参数和换行的解析必须有 fixture 覆盖。
+
+---
+
+## Technical Approach｜技术方案
+
+- **项目类型**：Infrastructure / CLI / Library / Web local viewer / Compatibility runtime。
+- **技术栈**：Rust + Tokio + clap + serde + reqwest + axum + sqlx/libSQL + tracing；Web viewer 使用 TypeScript + React + Vite 或 Next.js + Tailwind + shadcn/ui + TanStack Table；JS/TS 兼容使用 Node worker 或 napi-rs；Python/Shell/Ruby 兼容使用隔离 subprocess；MCP 使用 Rust MCP client/server 或协议自实现。
+- **关键模块边界**（≥ 3 个，越具体越好）：
+  - `cli`：解析 promptfoo-compatible commands、flags、exit code、stdout/stderr 协议。
+  - `config-loader`：加载 `promptfooconfig.yaml/json`、`redteam.yaml`、`.env`、file prompts、CSV/JSON/YAML tests，并保留 upstream 解析差异记录。
+  - `eval-runner`：构建 eval graph，执行并发调度、delay、retry/backoff、rate limit、partial failure 和 cancellation。
+  - `provider-registry`：注册 native provider、bridge provider、request normalization、response normalization 和 provider-scoped config/env。
+  - `assertion-engine`：执行 deterministic assertions、model-graded assertions、custom assertions 和评分聚合。
+  - `cache-resume-store`：管理 cache key、resume cursor、SQLite/libSQL schema、JSONL append 和损坏恢复策略。
+  - `output-writers`：生成 JSON、JSONL、CSV、YAML、HTML、JUnit XML、SARIF 和 terminal summary。
+  - `redteam-engine`：实现 redteam init/generate/eval/run/report、插件/strategy registry、风险评分和报告输出。
+  - `mcp-runtime`：实现 `promptfoo mcp`、MCP provider、MCP target materialization、client/server protocol adapter。
+  - `scan-engine`：实现 code-scans、scan-model、model-audit 兼容命令和 SARIF 输出。
+  - `compat-harness`：调用 upstream promptfoo baseline 与 `promptfoo-rs`，做 fixture orchestration、golden diff、差异分类和 release gate 汇总。
+  - `script-bridge`：隔离执行 JS/TS、Python、Shell/Ruby custom provider/assertion，控制 env、stdio、timeout 和 redaction。
+  - `web-viewer`：读取 SQLite/JSONL 结果，展示 eval table、filter、diff、失败样本和导出入口。
+  - `node-api-wrapper`：提供 npm package 和 Node API wrapper，把 JS programmatic usage 桥接到 Rust core。
+- **架构风格**：模块化单体。Rust core 作为稳定内部 API；CLI、viewer、Node wrapper、script bridge 和 compatibility harness 通过明确边界调用 core。
+- **数据流（如适用）**：配置/env/test files → config-loader → eval graph → provider-registry/assertion-engine/script-bridge → eval-runner → cache-resume-store → output-writers/web-viewer/CI artifacts。Compatibility harness 额外执行 upstream promptfoo → upstream artifacts → normalized diff。
+
+---
+
+## Constraints｜约束
+
+- **运行时**：默认路径为 Rust 单二进制，无 Node/Python 运行时要求；启用 JS/TS bridge 时要求 Node 20+，启用 Python bridge 时要求 Python 3.10+；npm wrapper 仅作为分发和 Node API 兼容层。
+- **平台**：Linux x64/arm64、macOS x64/arm64、Windows x64、Docker、GitHub Actions CI。
+- **性能**：CLI 冷启动 < 300ms，不含网络模型调用；1000 条 mock eval case 的本地调度与 assertion 执行 < 5s；内存基线 < 100MB，不含 Web viewer 大型结果加载；大型结果使用 JSONL/SQLite 流式写入。
+- **安全**：默认 local-first，不上传 prompts、vars、outputs；默认不执行 custom scripts；API key/token/env/provider headers/share payload 日志必须 redaction；threat model 覆盖配置任意代码执行、provider 请求泄露、CI secret 泄露、share payload 泄露、插件供应链风险。
+- **兼容性**：1.0 目标是覆盖 promptfoo 0.121.13 的全部已文档化能力域，并建立完整兼容矩阵。provider/assertion/redteam/plugin 按 P0/P1/P2 标注兼容等级：P0 必须可运行并通过 golden diff；P1 必须有协议、请求、输出快照测试；P2 至少登记为 known gap，不能沉默遗漏。
+- **发布**：GitHub Releases 二进制、Homebrew tap、`cargo install`、Docker image、npm wrapper 包、GitHub Action 示例。稳定版发布必须通过 compatibility release gate；失败时只能发 prerelease 或 nightly。
+
+---
+
+## Upstream Baseline Freeze Strategy｜上游基线冻结策略
+
+1. **候选冻结基线**：`promptfoo 0.121.13 + commit 4860e99`。
+2. **最终冻结条件**：以 tag、commit、npm artifact、container artifact 四者可追溯校验为准。四者必须写入 `docs/compatibility/baseline.lock.md` 或等价 lock artifact，包含版本号、commit SHA、npm tarball integrity、container digest、采集时间、采集命令和来源 URL。
+3. **不可变引用**：PRD 和 phase/task specs 只引用冻结基线，不引用 `latest`。发现 upstream 新版本时，只能通过新 PRD 或兼容矩阵变更流程纳入。
+4. **证据来源**：GitHub Releases、npm package artifact、GitHub Container Package、upstream repository tag/commit。任一来源缺失或不一致时，Phase 1 不得完成。
+5. **差异政策**：所有与 upstream 不一致的行为必须标为 `matching`、`intentional-difference`、`unsupported`、`later`、`upstream-ambiguous` 或 `bug`；P0 的 `bug` / 未分类差异阻断 stable release。
+
+---
+
+## Compatibility Matrix｜兼容矩阵
+
+**兼容等级定义**：
+- **P0**：1.0 必须可运行并通过 upstream golden diff；不通过不得发布 stable。
+- **P1**：1.0 必须有协议、请求、输出或 schema snapshot 测试；允许不做全量 golden diff，但不能无测试。
+- **P2**：1.0 至少登记 known gap、unsupported reason、later target 或 bridge 计划；不能沉默遗漏。
+
+**实现状态定义**：
+- **native**：Rust core 原生实现。
+- **bridge**：通过 Node/Python/Shell/Ruby/npm wrapper 等兼容桥实现。
+- **unsupported**：1.0 明确不支持，必须有用户可见错误和迁移说明。
+- **later**：已登记但推迟到后续版本，必须有理由和验证缺口。
+
+| 能力域 | 1.0 等级 | 目标状态 | 验证要求 | 备注 |
+|---|---|---|---|---|
+| CLI command/flag inventory | P0 | native | 全部已文档化命令和常用 flags 进入矩阵；P0 命令 golden diff stdout/stderr/exit code | 覆盖 `eval`、`view`、`cache`、`redteam`、`mcp`、`code-scans`、`scan-model`、`import/export` |
+| `promptfooconfig.yaml/json` | P0 | native | fixture golden diff config normalization、vars、prompts、tests、providers、assertions | 不重新设计格式 |
+| `redteam.yaml` | P0 | native | redteam init/generate/eval/run/report fixture golden diff | 插件/strategy 按 P0/P1/P2 子矩阵登记 |
+| `.env` 与 file prompts/tests | P0 | native | path/env/newline fixture 覆盖 Linux/macOS/Windows | CSV/JSON/YAML tests 均覆盖 |
+| Eval runner | P0 | native | mock provider 下结果、metadata、latency shape、error shape golden diff | 网络 provider 不比较真实延迟 |
+| Cache/resume/retry/concurrency/delay | P0 | native | cache key、resume cursor、partial results、retry 行为 fixture | Azure/assistant 等特殊 key 进入矩阵 |
+| OpenAI-compatible provider | P0 | native | request/response snapshot + golden diff | 支持 env/header/model/options |
+| HTTP provider | P0 | native | request template、headers、body、response transform snapshot | 覆盖常用 auth/header 场景 |
+| Ollama provider | P0 | native | local mock server snapshot + golden diff | 不要求真实模型下载 |
+| Anthropic provider | P0 | native | request/response snapshot + golden diff | 网络调用用 mock |
+| 其他已文档化 providers | P1/P2 | native/bridge/later | 全量登记；P1 至少请求/输出 snapshot；P2 known gap | Phase 1 生成完整 provider 子矩阵 |
+| Deterministic assertions | P0 | native | assertion result golden diff | equals/contains/regex/json/schema 等核心断言进入 P0 |
+| Model-graded assertions | P1 | native/bridge | 评分协议、prompt、threshold、metadata snapshot | 因 LLM 非确定性，不要求原始文本 byte-level golden diff |
+| JS/TS custom provider/assertion | P0 | bridge | `--allow-scripts` fixture，stdio/env/timeout/error snapshot | 默认禁用也是 P0 行为 |
+| Python custom provider/assertion | P0 | bridge | subprocess fixture，stdio/env/timeout/error snapshot | 默认禁用也是 P0 行为 |
+| Shell/Ruby custom scripts | P1 | bridge | subprocess snapshot + security gate | Ruby 若 upstream 文档覆盖则登记 |
+| JSON/JSONL/CSV/YAML output | P0 | native | schema + golden diff | 大结果必须流式写入 |
+| HTML/JUnit XML/SARIF output | P0/P1 | native | JUnit/SARIF schema snapshot；HTML stable data contract snapshot | SARIF 与 scan phase 绑定 |
+| Local Web viewer | P1 | native web | 读取 result schema、filter、失败样本、导出 smoke test | 不做像素级 upstream UI 复刻 |
+| Redteam plugins/strategies | P0/P1/P2 | native/later | 全量登记；核心插件 P0 golden diff；其他 P1/P2 标注 | 不沉默遗漏 |
+| MCP provider / `promptfoo mcp` | P1 | native | protocol/request/response snapshot | 以已文档化命令和 provider 能力为准 |
+| code-scans / scan-model / model-audit | P1 | native | CLI protocol、SARIF、finding schema snapshot | 安全扫描误报率另列非 1.0 gate |
+| Node API wrapper | P1 | bridge | JS API contract snapshot 与 Rust core 行为一致性测试 | 防止 wrapper/core 漂移 |
+| promptfoo cloud/share | P2 | unsupported/later | 能力登记、错误行为、品牌说明、无上传测试 | 1.0 不提供 SaaS |
+
+Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出 promptfoo 0.121.13 已文档化 provider、assertion、redteam plugin/strategy、CLI command/flag、output format 和 config feature。PRD 级矩阵定义覆盖政策；完整项级矩阵是 release gate 输入。
+
+---
+
+## Compatibility Harness Design｜兼容性测试设计
+
+1. **Fixture source**：从 upstream examples/docs、最小手写 fixtures、回归 issue fixtures 和用户提供真实配置裁剪样本组成。每个 fixture 必须标注能力域、P0/P1/P2、是否使用 mock provider、是否需要 script bridge。
+2. **Execution model**：harness 固定执行 `upstream promptfoo@0.121.13` 与当前 `promptfoo-rs`；同一输入目录、同一 env fixture、同一 mock provider 响应、同一时间/随机数 seed。
+3. **Normalization**：对时间戳、绝对路径、随机 ID、latency、平台换行、对象 key 顺序和非确定性 model output 做归一化；归一化规则本身需要 snapshot。
+4. **Diff classes**：`matching`、`intentional-difference`、`unsupported`、`later`、`upstream-ambiguous`、`bug`。P0 中 `bug`、未分类差异和缺 fixture 都是 release blocker。
+5. **Artifacts**：每次运行输出 upstream artifact、rs artifact、normalized artifact、diff report、matrix coverage report 和 release gate summary。
+6. **Model-graded policy**：model-graded assertions 不用真实 LLM 输出做稳定 golden；使用 mock grader 或 recorded response，比较 prompt construction、threshold、score parsing、pass/fail decision 和 metadata schema。
+7. **CI policy**：PR 必跑快速 P0 smoke；release candidate 必跑完整 P0 golden diff 与 P1 snapshot；P2 必校验登记完整性。
+
+---
+
+## Implementation Phases｜实施阶段
+
+> `/s2v-init` 会读这张表批量生成 phase spec 和 task spec。要求：
+> - `description` 列写"完成后能做什么"，不写 TODO 风格
+> - `scope` 列要列出**具体模块名 / 文件名**（不写"全部代码"）
+> - `depends_on` 用 phase 编号；零依赖写 `-`
+> - `parallel` 标"是 / 否"；写"是"时必须说明"可与谁并行"
+
+| # | Phase 名称（kebab）| 描述（完成后能做什么）| 范围（涉及模块 / 文件）| 依赖 | 可并行 |
+|---|---|---|---|---|---|
+| 1 | baseline-freeze | 冻结 `promptfoo 0.121.13 + 4860e99`，生成 baseline lock 和完整兼容矩阵骨架 | `compat-harness` + `docs/compatibility/baseline.lock.md` + `docs/compatibility/matrix.md` | - | 否 |
+| 2 | config-cli-core | `promptfoo-rs eval -c promptfooconfig.yaml` 能解析基础配置、env、prompts、tests 并进入 runner | `cli` + `config-loader` + `eval-runner` | 1 | 否 |
+| 3 | eval-runner-cache | runner 支持并发、retry、delay、cache、resume、partial result 和 cancellation | `eval-runner` + `cache-resume-store` + integration tests | 2 | 否 |
+| 4 | providers-assertions | P0 provider 与核心 assertions 可在 mock provider 下通过 golden diff | `provider-registry` + `assertion-engine` + fixtures | 2 | 是（可与 phase 5 并行）|
+| 5 | output-ci | JSON/JSONL/CSV/YAML/JUnit/SARIF/HTML 输出和 CLI exit code 协议稳定 | `output-writers` + `cli` + schema snapshots | 2 | 是（可与 phase 4 并行）|
+| 6 | compatibility-harness | upstream 与 `promptfoo-rs` 的 P0 golden diff、P1 snapshot 和 release gate 自动化可运行 | `compat-harness` + fixtures + CI scripts | 1, 3, 4, 5 | 否 |
+| 7 | redteam-core | redteam init/generate/eval/run/report 最小兼容闭环、核心插件/strategy registry、风险评分和 report 输出可运行 | `redteam-engine` + `config-loader` + `output-writers` + redteam fixtures | 4, 5, 6 | 是（可与 phase 8 和 9 并行）|
+| 8 | mcp-scan-audit | `promptfoo mcp`、MCP provider、code-scans、scan-model、model-audit 和 SARIF 输出形成兼容闭环 | `mcp-runtime` + `scan-engine` + `output-writers` + SARIF snapshots | 4, 5, 6 | 是（可与 phase 7 和 9 并行）|
+| 9 | script-bridges-node-api | JS/TS、Python、Shell/Ruby custom provider/assertion bridge 与 npm Node API wrapper 可运行并有 drift 测试 | `script-bridge` + `node-api-wrapper` + bridge fixtures | 4, 5, 6 | 是（可与 phase 7 和 8 并行）|
+| 10 | web-viewer-release | 本地 viewer 可读取结果并完成跨平台发布、安装、文档和 release gate 汇总 | `web-viewer` + release scripts + README + docs + GitHub Actions | 6, 7, 8, 9 | 否 |
+
+---
+
+## Decisions Log｜决策日志
+
+> `/s2v-init` 阶段 9.1 会把每条决策转成一份 ADR（默认 Status=Accepted）。
+> 至少 3 条；至少覆盖 S2V 8 类决策中的任 3 类。
+> 完整 8 类决策见 S2V `full-standard.md` §16.1。
+> **`类别`列取值约束**：从 full-standard.md §16.1「8 类决策类别（唯一权威）」表的 8 个字面值中选其一 —— `架构` / `依赖` / `数据持久化` / `协议接口` / `安全` / `测试工具链` / `部署发布` / `兼容性`（**逐字照抄、勿用同义词**；下游 `/s2v-init` 渲染 ADR `Category` + 做"8 类是否都覆盖"审计按字符串相等匹配，写法不一致会让已覆盖类别被误判为未覆盖）。
+
+| ID (D1, D2...) | 类别 | 决策（一句话）| 选择 | 候选方案 | 拒绝候选的理由 |
+|---|---|---|---|---|---|
+| D1 | 架构 | 默认执行路径采用 Rust core，脚本运行时只作为兼容桥 | 模块化 Rust core + optional bridges | 纯 Rust 无 bridge / Node 主体重写 | 纯 Rust 会断已有 custom provider/assertion；Node 主体无法解决单二进制和供应链目标 |
+| D2 | 依赖 | 核心依赖采用 Rust 生态稳定库，避免自研通用基础设施 | Tokio、clap、serde、reqwest、axum、sqlx/libSQL、tracing | 自研 async/runtime/HTTP/CLI / 继续复用 Node 包 | 自研基础设施会转移精力；复用 Node 包会保留 node_modules 和供应链问题 |
+| D3 | 数据持久化 | 大型结果采用流式 JSONL 与 SQLite/libSQL 存储 | JSONL append + SQLite/libSQL query store | 单 JSON 文件 / 只存内存 / 专用服务端数据库 | 单 JSON 和内存方案无法支撑大型 eval 与 resume；服务端数据库破坏 local-first 分发 |
+| D4 | 协议接口 | CLI exit code、stdout/stderr、JSON/JUnit/SARIF 输出 schema 作为稳定兼容协议 | 将 CLI 与输出 schema 纳入 P0/P1 snapshot 和 golden diff | 只保证人类可读输出 / 输出字段随实现漂移 | 现有用户依赖 CI、JUnit、SARIF 和脚本消费；字段漂移会直接破坏迁移 |
+| D5 | 安全 | custom scripts 默认禁用，必须显式授权 | `--allow-scripts` 或配置开启，子进程隔离 env/stdio/timeout/redaction | 默认执行 / 完全移除脚本兼容 | 默认执行扩大任意代码执行和 CI secret 泄露面；完全移除会断现有生态 |
+| D6 | 测试工具链 | 兼容性测试优先于覆盖率数字 | fixture golden diff + schema snapshot + Rust unit/integration | 只写 Rust 单元测试 / 手工对比 | 单元测试不能证明 promptfoo 行为兼容；手工对比不可审计、不可重复 |
+| D7 | 兼容性 | upstream golden diff 是 1.0 stable release gate | P0 golden diff 不通过不得发布 stable | 把 diff 当非阻断报告 / 只在 nightly 跑 | 兼容是 1.0 的核心承诺；非阻断 diff 会让用户在 CI 中遇到不可预测迁移失败 |
+| D8 | 部署发布 | 二进制是一等产物，npm wrapper 是兼容和分发补充 | GitHub Releases/Homebrew/Cargo/Docker/npm wrapper/GitHub Action | 只发布 npm / 只发布 Cargo | 只发 npm 不能解决 Node 依赖痛点；只发 Cargo 对非 Rust 用户和 CI 不友好 |
+| D9 | 兼容性 | 1.0 兼容目标覆盖全部已文档化能力域，但按 P0/P1/P2 分级验收 | 全量登记 + 分级 release gate | 只登记已实现项 / 承诺全部 Rust native | 只登记已实现项会沉默遗漏；全部 Rust native 会把长尾 provider 范围拖垮 |
+| D10 | 协议接口 | Node API wrapper 通过稳定 JSON-RPC/stdio 或 FFI 边界调用 Rust core | wrapper contract tests 固定 API、参数、错误和结果 schema | JS wrapper 复写业务逻辑 / 只暴露 CLI subprocess | 复写业务逻辑会产生 wrapper/core 漂移；只暴露 CLI 会破坏 programmatic usage 体验 |
+
+---
+
+## Success Metrics｜成功指标
+
+**主要指标**（Primary，≥ 1 个，必须可测量）：
+- **P0 兼容 release gate**：至少 50 个核心 fixtures 在 mock provider 下 upstream promptfoo 0.121.13 与 `promptfoo-rs` 输出一致或差异可解释；P0 未分类差异数为 0。
+- **常见 eval 可迁移**：`promptfoo-rs eval -c promptfooconfig.yaml` 能运行覆盖 prompts、vars、tests、providers、assertions、cache、resume、retry 和 output 的常见配置。
+- **兼容矩阵完整性**：promptfoo 0.121.13 已文档化 provider/assertion/redteam/plugin/CLI/output/config 能力 100% 登记，均有 P0/P1/P2、状态、验证方式和 owner。
+
+**次要指标**（Secondary，≥ 2 个）：
+- **Provider P0**：OpenAI-compatible、HTTP、Ollama、Anthropic 4 类 provider 可运行并有 request/response snapshot。
+- **Output P0/P1**：JSON、JSONL、JUnit XML、CSV 至少 4 类输出可用于 CI；SARIF 对 scan 能力有 schema snapshot。
+- **性能基线**：CLI 冷启动 < 300ms；1000 条 mock eval case 本地调度与 assertion 执行 < 5s；内存基线 < 100MB。
+- **安全默认值**：未显式开启 `--allow-scripts` 时，所有 custom script fixture 均拒绝执行并产生可定位错误；日志 redaction fixture 通过。
+- **文档可用性**：README、架构文档、兼容矩阵、贡献指南、GitHub Action 示例和 release gate 说明齐全。
+
+**反指标**（Anti-metrics — 优化主指标时不能牺牲的，≥ 1 项）：
+- 不能为了 Rust-native 比例牺牲 promptfoo-compatible 配置、CLI、输出和 script bridge 迁移路径。
+- 不能为了冷启动指标删除必要的 redaction、cache integrity 或 compatibility diff 证据。
+- 不能把未实现能力从矩阵中省略来制造“高兼容率”。
+- 不能为了稳定 golden diff 对真实非确定性 LLM 输出做伪确定性断言；必须用 mock/recorded response 或明确 P1 snapshot。
+
+---
+
+## Open Questions｜开放问题
+
+> ≥ 1 项。零 open question 通常是危险信号 — 说明思考还没到位。
+
+- [ ] **完整能力清单提取方法**：Phase 1 需要确认从 upstream docs、CLI help、source registry、examples 和 release notes 中提取能力项的脚本/人工复核流程，避免矩阵漏项。
+- [ ] **baseline artifact 校验细节**：npm artifact integrity、container digest、GitHub release tag 和 commit 的采集命令需要在 Phase 1 固化。
+- [ ] **长尾 provider 分级规则**：P0/P1/P2 的 provider/assertion/redteam plugin 分级需要按使用频率、文档稳定性、实现复杂度和安全风险形成公开规则。
+- [ ] **promptfoo cloud/share 文案边界**：README、CLI 错误和兼容矩阵需要法律/社区视角复核，避免品牌混淆或暗示云服务兼容。
+- [ ] **Web viewer 技术栈最终选择**：Vite/React 与 Next.js 的取舍需以本地静态分发、结果加载体积和维护成本决定。
+- [ ] **Node API wrapper API 面**：需要确认 1.0 支持哪些 promptfoo programmatic usage，哪些只通过 CLI subprocess 暴露。
+
+---
+
+## Technical Risks｜技术风险
+
+> ≥ 3 项。
+
+| # | 风险 | 概率 | 影响 | 缓解策略 |
+|---|---|---|---|---|
+| R1 | upstream 行为细节未文档化，导致 fixture 之外的配置迁移失败 | 高 | 高 | 以 docs、examples、source registry 和用户 fixtures 扩展矩阵；差异必须分类并进入 release gate |
+| R2 | provider 长尾过多，全部 native 实现会拖垮 1.0 | 高 | 高 | 全量登记但分 P0/P1/P2；长尾允许 `bridge`、`unsupported` 或 `later`，但不能沉默遗漏 |
+| R3 | CLI 输出字段、exit code 或 JUnit/SARIF schema 漂移破坏 CI | 中 | 高 | 把 stdout/stderr、exit code、JSON/JUnit/SARIF schema 纳入 snapshot 和 golden diff |
+| R4 | script bridge 引入任意代码执行、env 泄露或 CI secret 泄露 | 中 | 高 | 默认禁用、显式授权、子进程隔离、env allowlist、timeout、redaction、审计日志 |
+| R5 | redteam、MCP、code-scan/model-audit 范围过宽，影响核心 eval 交付 | 高 | 中 | 拆成 `redteam-core` 与 `mcp-scan-audit` phase；每个 phase 定义最小兼容闭环和 later 项 |
+| R6 | Windows 路径、换行、shell quoting 与 Unix 行为不一致 | 中 | 中 | Windows x64 CI fixture 覆盖 `.env`、file prompts、script args、path normalization 和 line endings |
+| R7 | Web viewer 直接耦合 runner 内部结构，导致结果 schema 漂移 | 中 | 中 | viewer 只读取稳定 result schema；schema 变更必须通过 output-writers snapshot |
+| R8 | Node API wrapper 与 Rust core 行为漂移 | 中 | 高 | wrapper 不复写业务逻辑；建立 contract tests，对参数、错误、输出 schema 和 exit behavior 做 drift 检测 |
+| R9 | promptfoo cloud/share 相关 API 边界不清，引发用户误解或品牌风险 | 中 | 中 | 1.0 明确不提供 SaaS；矩阵标 `unsupported/later`；README、CLI 错误和 license notice 明确 reimplementation 边界 |
+| R10 | model-graded assertions 因 LLM 非确定性导致 golden diff 不稳定 | 高 | 中 | 使用 mock grader 或 recorded response；比较 prompt construction、threshold、score parsing 和 metadata schema，不比较真实模型原始文本 |
+| R11 | cache key 与 resume cursor 与 upstream 不一致，导致重复请求或漏跑 | 中 | 高 | 为 cache key、resume 文件、partial failure 和 retry-errors 建 P0 fixtures；损坏恢复行为单独测试 |
+| R12 | license/copyright notice 处理不完整 | 低 | 高 | 保留 promptfoo 原 MIT license/copyright notice；新增文件明确本项目 license；release checklist 审查 |
+
+---
+
+## Next Steps｜后续步骤
+
+1. **审本 PRD 内容**（重点：阶段表 / 决策日志 / 风险 / 兼容矩阵 / baseline 冻结策略）
+2. **后续路径**：当前项目尚未初始化 S2V；审完 PRD 后可接 `/s2v-init` 生成 adapter、phase spec、task spec、ADR 和 BDD feature
+3. **Phase 1 先行**：先冻结 `promptfoo 0.121.13 + 4860e99` 的 tag、commit、npm artifact、container artifact，再生成完整项级 compatibility matrix
+
+> ⚠️ task spec 实施完后留在原地不归档（SDD 单一事实源核心要求）。

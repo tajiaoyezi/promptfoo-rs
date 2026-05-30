@@ -1,0 +1,32 @@
+# 依赖与构建产物（通用 + 多生态）
+node_modules/
+dist/
+build/
+coverage/
+target/
+vendor/
+
+# 日志与临时文件
+*.log
+*.tmp
+.DS_Store
+
+# S2V fixture 是测试事实源，必须入库
+!test/fixtures/
+!test/fixtures/**
+!compatibility/fixtures/
+!compatibility/fixtures/**
+
+# IDE / 编辑器配置
+.idea/
+.vscode/
+*.swp
+
+# Python bridge 临时产物
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+*.egg-info/

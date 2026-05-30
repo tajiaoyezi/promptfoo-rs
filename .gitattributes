@@ -1,0 +1,4 @@
+*.sh text eol=lf
+docs/s2v/scripts/** text eol=lf
+*.md text eol=lf
+*.feature text eol=lf
