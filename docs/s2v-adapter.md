@@ -174,7 +174,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 11.1 | compatibility | docs/specs/tasks/task-11.1-current-upstream-target-policy.md | Done | Phase 11 order 1 | N/A (solo) |
 | 11.2 | compatibility-inventory | docs/specs/tasks/task-11.2-item-level-capability-inventory.md | Done | Phase 11 order 2 | N/A (solo) |
 | 11.3 | compatibility-matrix | docs/specs/tasks/task-11.3-compatibility-matrix-expansion.md | Done | Phase 11 order 3 | N/A (solo) |
-| 12.1 | compatibility-fixtures | docs/specs/tasks/task-12.1-p0-fixture-corpus.md | Ready | Phase 12 order 1 | N/A (solo) |
+| 12.1 | compatibility-fixtures | docs/specs/tasks/task-12.1-p0-fixture-corpus.md | Done | Phase 12 order 1 | N/A (solo) |
 | 12.2 | compatibility-harness | docs/specs/tasks/task-12.2-executable-upstream-rs-runner.md | Ready | Phase 12 order 2 | N/A (solo) |
 | 12.3 | release-gate | docs/specs/tasks/task-12.3-golden-diff-ci-release-gate.md | Ready | Phase 12 order 3 | N/A (solo) |
 | 13.1 | cli | docs/specs/tasks/task-13.1-command-flag-parity.md | Ready | Phase 13 order 1 | N/A (solo) |
