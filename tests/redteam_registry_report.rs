@@ -1,15 +1,9 @@
-use promptfoo_rs::compatibility::harness::{
-    Artifact, ArtifactEngine, BaselineReference,
-};
-use promptfoo_rs::compatibility::normalize::{
-    normalize_artifact, NormalizationRules,
-};
+use promptfoo_rs::compatibility::harness::{Artifact, ArtifactEngine, BaselineReference};
+use promptfoo_rs::compatibility::normalize::{normalize_artifact, NormalizationRules};
 use promptfoo_rs::redteam::registry::{CompatibilityLevel, RedteamRegistry};
 use promptfoo_rs::redteam::report::write_redteam_report;
 use promptfoo_rs::redteam::risk::{score_risk, Severity};
-use promptfoo_rs::redteam::{
-    RedteamFinding, RedteamReport, RedteamStageRecord,
-};
+use promptfoo_rs::redteam::{RedteamFinding, RedteamReport, RedteamStageRecord};
 use serde_json::Value;
 
 fn finding(case_id: &str, severity: &str) -> RedteamFinding {
@@ -88,10 +82,7 @@ fn test_7_2_3_redteam_report_output_enters_compatibility_harness() {
     write_redteam_report(&report, &mut output).expect("report writes");
     let payload: Value = serde_json::from_slice(&output).expect("report is json");
 
-    assert_eq!(
-        payload["schema_version"],
-        "promptfoo-rs.redteam.report.v1"
-    );
+    assert_eq!(payload["schema_version"], "promptfoo-rs.redteam.report.v1");
     assert_eq!(payload["risk"]["total_findings"], 1);
     assert_eq!(payload["risk"]["high"], 1);
     assert_eq!(payload["report"]["findings"][0]["case_id"], "case-high");
