@@ -1,11 +1,7 @@
-use promptfoo_rs::compatibility::diff::{
-    classify_diff, DiffClass, DiffFinding,
-};
+use promptfoo_rs::compatibility::diff::{classify_diff, DiffClass, DiffFinding};
 use promptfoo_rs::compatibility::matrix::{CapabilityMatrix, CapabilityRow};
 use promptfoo_rs::compatibility::normalize::NormalizedArtifact;
-use promptfoo_rs::compatibility::release_gate::{
-    evaluate_release_gate, ReleaseGateStatus,
-};
+use promptfoo_rs::compatibility::release_gate::{evaluate_release_gate, ReleaseGateStatus};
 use serde_json::json;
 
 fn normalized(payload: serde_json::Value) -> NormalizedArtifact {
