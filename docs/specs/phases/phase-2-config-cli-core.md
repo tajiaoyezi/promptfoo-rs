@@ -22,7 +22,7 @@ cli + config-loader + eval-runner
 |---|---|---|---|---|
 | 2.1 | workspace-cli-skeleton | ../tasks/task-2.1-workspace-cli-skeleton.md | Done | 建立 Rust workspace 与 promptfoo-compatible CLI command skeleton |
 | 2.2 | config-loader | ../tasks/task-2.2-config-loader.md | Done | 加载 promptfooconfig.yaml/json、redteam.yaml、.env、file prompts 和 CSV/JSON/YAML tests |
-| 2.3 | eval-command-smoke | ../tasks/task-2.3-eval-command-smoke.md | Ready | 让 eval -c 进入 runner 并在 mock provider 下产生最小结果 |
+| 2.3 | eval-command-smoke | ../tasks/task-2.3-eval-command-smoke.md | Done | 让 eval -c 进入 runner 并在 mock provider 下产生最小结果 |
 
 ## 5. Dependencies
 
