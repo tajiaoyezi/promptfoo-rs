@@ -17,7 +17,7 @@ Readiness basis: PRD §Compatibility Matrix, PRD §Compatibility Harness Design,
 | HTTP provider | P0 | native | request template/header/body/transform snapshot | leafiellune | common auth/header cases |
 | Ollama provider | P0 | native | local mock server snapshot + golden diff | leafiellune | no real model download required |
 | Anthropic provider | P0 | native | request/response snapshot + golden diff | leafiellune | network calls mocked |
-| Other documented providers | P1/P2 | native/bridge/later | P1 request/output snapshot; P2 known gap row | leafiellune | task 14.1 keeps dynamic provider registry visible as P2/later with reason; no silent provider omission is allowed |
+| Other documented providers | P1/P2 | native/bridge/later | P1 request/output snapshot; P2 known gap row | leafiellune | P2 reason: task 14.1 keeps dynamic provider registry visible as P2/later with reason; no silent provider omission is allowed |
 | Deterministic assertions | P0 | native | assertion result golden diff | leafiellune | equals/contains/regex/json/schema core assertions; task 14.1 verifies P0 assertion fixture coverage |
 | Model-graded assertions | P1 | native/bridge | prompt, threshold, score parsing, metadata snapshot | leafiellune | P1 because true LLM output is non-deterministic; mock/recorded grader required |
 | JS/TS custom provider/assertion | P0 | bridge | allow-scripts fixture, stdio/env/timeout/error snapshot | leafiellune | Shared sandbox default-deny, stdio, timeout, env allowlist, and redaction covered by task 9.1; task 14.1 records JS/TS boundary policy evidence |
