@@ -159,7 +159,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 6.1 | compatibility | docs/specs/tasks/task-6.1-upstream-harness-runner.md | Done | Phase 6 AUTO order | N/A (solo) |
 | 6.2 | compatibility | docs/specs/tasks/task-6.2-golden-diff-release-gate.md | Done | Phase 6 AUTO order | N/A (solo) |
 | 7.1 | redteam-engine | docs/specs/tasks/task-7.1-redteam-command-flow.md | Done | Phase 7 AUTO order | N/A (solo) |
-| 7.2 | redteam-engine | docs/specs/tasks/task-7.2-redteam-registry-report.md | Ready | Phase 7 AUTO order | N/A (solo) |
+| 7.2 | redteam-engine | docs/specs/tasks/task-7.2-redteam-registry-report.md | Done | Phase 7 AUTO order | N/A (solo) |
 | 8.1 | mcp-runtime | docs/specs/tasks/task-8.1-mcp-runtime.md | Ready | Phase 8 AUTO order | N/A (solo) |
 | 8.2 | scan-engine | docs/specs/tasks/task-8.2-scan-audit-sarif.md | Ready | Phase 8 AUTO order | N/A (solo) |
 | 9.1 | script-bridge | docs/specs/tasks/task-9.1-script-bridge-sandbox.md | Ready | Phase 9 AUTO order | N/A (solo) |

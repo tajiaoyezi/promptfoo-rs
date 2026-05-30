@@ -1,8 +1,8 @@
 # Task 7.2: redteam-registry-report
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-7.2 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 7 — redteam-core
@@ -62,17 +62,17 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): 核心 redteam plugin/strategy 矩阵登记 P0/P1/P2
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 风险评分字段稳定并可 snapshot
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): report 输出能进入 compatibility harness
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): 核心 redteam plugin/strategy 矩阵登记 P0/P1/P2
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 风险评分字段稳定并可 snapshot
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): report 输出能进入 compatibility harness
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-7.2.1 | TEST-7.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-7.2.2 | TEST-7.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-7.2.3 | TEST-7.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-7.2.1 | TEST-7.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-7.2.2 | TEST-7.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-7.2.3 | TEST-7.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -89,15 +89,25 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - src/redteam/mod.rs
+  - src/redteam/registry.rs
+  - src/redteam/risk.rs
+  - src/redteam/report.rs
+  - tests/redteam_registry_report.rs
+  - docs/specs/tasks/task-7.2-redteam-registry-report.md
+  - docs/specs/phases/phase-7-redteam-core.md
+  - docs/s2v-adapter.md
+  - docs/compatibility/matrix.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - f2c6a0d test(redteam): add task-7.2 registry report RED tests
+  - 14d1a2d feat(redteam): add registry risk report contract
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-7.2 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: passed — `cargo fetch` 通过；viewer/npm install 按 adapter N/A 跳过。
+  - typecheck: passed — `cargo check --workspace` 通过。
+  - unit-test: passed — `cargo test --workspace` 通过，TEST-7.2.1~TEST-7.2.3 加入后 48 个 integration tests 全部通过。
+  - manual: passed — 已核对 AC1/AC2/AC3、SCEN-7.2.1~7.2.3、TEST-7.2.1~TEST-7.2.3、compatibility matrix 的 Redteam plugins/strategies 行与本实现/测试一致；Codex 非交互环境无 `/dev/tty`，manual key 以人工审查记录留证。
+- **剩余风险 / 未做项**：本 task 固定 core defaults registry、risk score snapshot 和 schema-versioned report artifact；长尾 redteam plugin/strategy 行为仍按 matrix P1/P2 后续扩展。
+- **下游 task 影响**：Phase 6 compatibility harness 可将 `promptfoo-rs.redteam.report.v1` artifact 纳入 golden diff；Phase 8 scan/audit 可复用 `RiskSummary` 风险字段。
