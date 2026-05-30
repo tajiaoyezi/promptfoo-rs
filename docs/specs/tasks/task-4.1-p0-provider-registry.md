@@ -1,8 +1,8 @@
 # Task 4.1: p0-provider-registry
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-4.1 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 4 — providers-assertions
@@ -71,9 +71,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-4.1.1 | TEST-4.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-4.1.2 | TEST-4.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-4.1.3 | TEST-4.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-4.1.1 | TEST-4.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-4.1.2 | TEST-4.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-4.1.3 | TEST-4.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -90,15 +90,26 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - Cargo.toml
+  - Cargo.lock
+  - src/lib.rs
+  - src/providers/mod.rs
+  - src/providers/openai.rs
+  - src/providers/http.rs
+  - src/providers/ollama.rs
+  - src/providers/anthropic.rs
+  - tests/provider_registry.rs
+  - docs/specs/tasks/task-4.1-p0-provider-registry.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - f0c2634 test(provider-registry): add task-4.1 P0 provider RED tests
+  - a328839 feat(provider-registry): implement P0 provider normalization
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-4.1 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: passed — `cargo fetch` 通过；viewer/npm install 按 adapter N/A 跳过。
+  - typecheck: passed — `cargo check --workspace` 通过。
+  - unit-test: passed — `cargo test --workspace` 通过，TEST-4.1.1~TEST-4.1.3 加入后 24 个 integration tests 全部通过。
+  - manual: passed — 已核对 AC1/AC2/AC3、SCEN-4.1.1~4.1.3、TEST-4.1.1~TEST-4.1.3、compatibility matrix 的 OpenAI-compatible/HTTP/Ollama/Anthropic P0 provider 行与本实现/测试一致；Codex 非交互环境无 `/dev/tty`，manual key 以人工审查记录留证。
+- **剩余风险 / 未做项**：当前 provider registry 固定 request/response snapshot 与本地 mock server 调用契约；upstream promptfoo 0.121.13 golden diff、长尾 provider 子矩阵和真实 provider latency/streaming 差异需在 compatibility harness task 中分类。
+- **下游 task 影响**：task-4.2 assertion engine 可消费 provider response output；task-4.3 custom provider/assertion contract 可复用 provider registry 的 request normalization 与 mock transport 边界。
