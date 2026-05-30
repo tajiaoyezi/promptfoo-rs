@@ -21,7 +21,7 @@ compat-harness + fixtures + CI scripts
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
 | 6.1 | upstream-harness-runner | ../tasks/task-6.1-upstream-harness-runner.md | Done | 执行 upstream promptfoo@0.121.13 与 promptfoo-rs 的同输入 fixture runner |
-| 6.2 | golden-diff-release-gate | ../tasks/task-6.2-golden-diff-release-gate.md | Ready | 实现 golden diff 分类、coverage report 和 stable release gate |
+| 6.2 | golden-diff-release-gate | ../tasks/task-6.2-golden-diff-release-gate.md | Done | 实现 golden diff 分类、coverage report 和 stable release gate |
 
 ## 5. Dependencies
 

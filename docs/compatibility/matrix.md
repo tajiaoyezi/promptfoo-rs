@@ -26,7 +26,7 @@ Readiness basis: PRD §Compatibility Matrix, PRD §Compatibility Harness Design,
 | JSON/JSONL/CSV/YAML output | P0 | native | schema + golden diff | leafiellune | JSONL result store streaming and SQLite query schema covered by task 5.1; JSON/JSONL/CSV/YAML formatter contract covered by task 5.2 |
 | HTML/JUnit XML/SARIF output | P0/P1 | native | JUnit/SARIF schema snapshot; HTML data contract snapshot | leafiellune | JUnit/SARIF/HTML snapshots covered by task 5.2; SARIF finding production tied to scan phase |
 | Local Web viewer | P1 | native web | result schema read/filter/export smoke | leafiellune | P1 because pixel-level upstream UI parity is out of scope |
-| Compatibility harness / golden diff gate | P0 | native | baseline lock, upstream/rs artifact snapshot, normalization snapshot | leafiellune | Harness runner locks promptfoo@0.121.13 and normalization rules covered by task 6.1; release gate classification remains task 6.2 |
+| Compatibility harness / golden diff gate | P0 | native | baseline lock, upstream/rs artifact snapshot, normalization snapshot, release gate summary | leafiellune | Harness runner locks promptfoo@0.121.13 and normalization rules covered by task 6.1; release gate classification and P0/P1/P2 summary covered by task 6.2 |
 | Redteam plugins/strategies | P0/P1/P2 | native/later | full registry; core P0 golden diff; P1/P2 annotated | leafiellune | P2 reason required for long-tail plugins deferred after inventory |
 | MCP provider / promptfoo mcp | P1 | native | protocol/request/response snapshot | leafiellune | P1 until protocol coverage is complete |
 | code-scans / scan-model / model-audit | P1 | native | CLI protocol, SARIF, finding schema snapshot | leafiellune | false positive rate is not a 1.0 gate |

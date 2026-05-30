@@ -1,8 +1,8 @@
 # Task 6.2: golden-diff-release-gate
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-6.2 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 6 — compatibility-harness
@@ -64,17 +64,17 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): diff 分类包含 matching、intentional-difference、unsupported、later、upstream-ambiguous、bug
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): P0 bug/未分类差异阻断 stable release
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): P1 snapshot 和 P2 登记完整性进入 gate summary
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): diff 分类包含 matching、intentional-difference、unsupported、later、upstream-ambiguous、bug
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): P0 bug/未分类差异阻断 stable release
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): P1 snapshot 和 P2 登记完整性进入 gate summary
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-6.2.1 | TEST-6.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-6.2.2 | TEST-6.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-6.2.3 | TEST-6.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-6.2.1 | TEST-6.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-6.2.2 | TEST-6.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-6.2.3 | TEST-6.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -91,15 +91,24 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - src/compatibility/mod.rs
+  - src/compatibility/diff.rs
+  - src/compatibility/release_gate.rs
+  - tests/golden_diff_release_gate.rs
+  - docs/specs/tasks/task-6.2-golden-diff-release-gate.md
+  - docs/specs/phases/phase-6-compatibility-harness.md
+  - docs/s2v-adapter.md
+  - docs/compatibility/matrix.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - 7bf23e2 test(compatibility): add task-6.2 release gate RED tests
+  - 4f793ac feat(compatibility): add golden diff release gate
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-6.2 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: passed — `cargo fetch` 通过；viewer/npm install 按 adapter N/A 跳过。
+  - typecheck: passed — `cargo check --workspace` 通过。
+  - unit-test: passed — `cargo test --workspace` 通过，TEST-6.2.1~TEST-6.2.3 加入后 42 个 integration tests 全部通过。
+  - manual: passed — 已核对 AC1/AC2/AC3、SCEN-6.2.1~6.2.3、TEST-6.2.1~TEST-6.2.3、compatibility matrix 的 Compatibility harness / golden diff gate 行与本实现/测试一致；Codex 非交互环境无 `/dev/tty`，manual key 以人工审查记录留证。
+- **剩余风险 / 未做项**：本 task 固定 release gate classification、P0 blocker 和 P1/P2 coverage summary contract；真实 CI job wiring 与 artifact persistence 仍由后续 release automation 接入。
+- **下游 task 影响**：后续 phase 可调用 `classify_diff` 与 `evaluate_release_gate` 作为 stable release gate 的单一 Rust contract，Phase 8/10 可把 scan/viewer artifacts 纳入同一 gate summary。
