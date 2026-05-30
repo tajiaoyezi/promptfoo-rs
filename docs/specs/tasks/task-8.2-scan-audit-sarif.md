@@ -1,8 +1,8 @@
 # Task 8.2: scan-audit-sarif
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — scan finding schema、SARIF writer 输入契约与 false-positive known limitation 已实现并通过 §9 验证。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 8 — mcp-scan-audit
@@ -63,17 +63,17 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): scan 命令输出 finding schema snapshot
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): SARIF writer 通过 schema fixture
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 误报率不作为 1.0 gate 但 known limitation 登记
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): scan 命令输出 finding schema snapshot
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): SARIF writer 通过 schema fixture
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 误报率不作为 1.0 gate 但 known limitation 登记
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-8.2.1 | TEST-8.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-8.2.2 | TEST-8.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-8.2.3 | TEST-8.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-8.2.1 | TEST-8.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-8.2.2 | TEST-8.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-8.2.3 | TEST-8.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -90,15 +90,27 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - src/lib.rs
+  - src/cli.rs
+  - src/output/mod.rs
+  - src/output/sarif.rs
+  - src/scan/mod.rs
+  - src/scan/finding.rs
+  - tests/scan_audit_sarif.rs
+  - docs/specs/tasks/task-8.2-scan-audit-sarif.md
+  - docs/specs/phases/phase-8-mcp-scan-audit.md
+  - docs/s2v-adapter.md
+  - docs/compatibility/matrix.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - 3ac4cf1 test(scan): add task-8.2 SARIF RED tests
+  - c180cac feat(scan): add scan SARIF contract
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-8.2 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: PASS — `s2v_verify_full "install typecheck unit-test"` / `cargo fetch`
+  - typecheck: PASS — `cargo check --workspace`
+  - unit-test: PASS — `cargo test --workspace`，含 `tests/scan_audit_sarif.rs` 的 TEST-8.2.1 ~ TEST-8.2.3（54 个 integration tests 全绿）
+  - manual: PASS — 已核对 AC、SCEN/TEST、BDD feature、compatibility matrix 中 code-scans / scan-model / model-audit 行与实现一致。
+- **剩余风险 / 未做项**：当前 scan engine 只固定最小 schema 和 `eval(...)` fixture 行为；完整静态规则集、模型审计深度检查与误报率统计仍为后续扩展，且 false-positive rate 已按 PRD R5 登记为非 1.0 gate。
+- **下游 task 影响**：Phase 10 release gate / docs 可引用 `promptfoo-rs.scan.v1`、SARIF properties.metadata 和 `scan.false-positive-rate` known limitation；后续 scan 规则扩展需保持 schema 兼容。

@@ -21,7 +21,7 @@ mcp-runtime + scan-engine + output-writers + SARIF snapshots
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
 | 8.1 | mcp-runtime | ../tasks/task-8.1-mcp-runtime.md | Done | 实现 promptfoo mcp 与 MCP provider 协议快照 |
-| 8.2 | scan-audit-sarif | ../tasks/task-8.2-scan-audit-sarif.md | Ready | 实现 code-scans、scan-model、model-audit 与 SARIF 输出契约 |
+| 8.2 | scan-audit-sarif | ../tasks/task-8.2-scan-audit-sarif.md | Done | 实现 code-scans、scan-model、model-audit 与 SARIF 输出契约 |
 
 ## 5. Dependencies
 
