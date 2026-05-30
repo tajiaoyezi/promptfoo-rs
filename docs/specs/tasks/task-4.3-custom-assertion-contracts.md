@@ -1,8 +1,8 @@
 # Task 4.3: custom-assertion-contracts
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-4.3 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 4 — providers-assertions
@@ -71,9 +71,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-4.3.1 | TEST-4.3.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-4.3.2 | TEST-4.3.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-4.3.3 | TEST-4.3.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-4.3.1 | TEST-4.3.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-4.3.2 | TEST-4.3.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-4.3.3 | TEST-4.3.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -90,15 +90,22 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - src/lib.rs
+  - src/assertions/mod.rs
+  - src/assertions/custom.rs
+  - src/script_bridge/mod.rs
+  - tests/custom_assertion_contracts.rs
+  - docs/specs/tasks/task-4.3-custom-assertion-contracts.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - cc7a362 test(assertion-engine): add task-4.3 custom assertion RED tests
+  - 4b947e7 feat(assertion-engine): add custom assertion script contracts
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-4.3 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: passed — `cargo fetch` 通过；viewer/npm install 按 adapter N/A 跳过。
+  - typecheck: passed — `cargo check --workspace` 通过。
+  - unit-test: passed — `cargo test --workspace` 通过，TEST-4.3.1~TEST-4.3.3 加入后 30 个 integration tests 全部通过。
+  - manual: passed — 已核对 AC1/AC2/AC3、SCEN-4.3.1~4.3.3、TEST-4.3.1~TEST-4.3.3、compatibility matrix 的 JS/TS、Python、Shell/Ruby custom provider/assertion bridge 行与本实现/测试一致；Codex 非交互环境无 `/dev/tty`，manual key 以人工审查记录留证。
+- **剩余风险 / 未做项**：本 task 只固定 custom assertion bridge contract、默认拒绝错误与 schema snapshot；实际子进程执行、stdio/env allowlist、timeout 和 redaction 留给 Phase 9 script-bridge。
+- **下游 task 影响**：Phase 9 可复用 `ScriptKind` / `ScriptAuthorization` / `ScriptBridgeError` 与 `CustomAssertionRequest` / `CustomAssertionResponse` schema；Phase 5 输出可直接序列化 script rejection error。

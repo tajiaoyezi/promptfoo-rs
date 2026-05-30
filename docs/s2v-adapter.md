@@ -153,7 +153,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 3.2 | cache-resume-store | docs/specs/tasks/task-3.2-cache-resume-retry.md | Done | Phase 3 AUTO order | N/A (solo) |
 | 4.1 | provider-registry | docs/specs/tasks/task-4.1-p0-provider-registry.md | Done | Phase 4 AUTO order | N/A (solo) |
 | 4.2 | assertion-engine | docs/specs/tasks/task-4.2-assertion-engine.md | Done | Phase 4 AUTO order | N/A (solo) |
-| 4.3 | assertion-engine | docs/specs/tasks/task-4.3-custom-assertion-contracts.md | Ready | Phase 4 AUTO order | N/A (solo) |
+| 4.3 | assertion-engine | docs/specs/tasks/task-4.3-custom-assertion-contracts.md | Done | Phase 4 AUTO order | N/A (solo) |
 | 5.1 | output-writers | docs/specs/tasks/task-5.1-result-store-schema.md | Ready | Phase 5 AUTO order | N/A (solo) |
 | 5.2 | output-writers | docs/specs/tasks/task-5.2-output-ci-contracts.md | Ready | Phase 5 AUTO order | N/A (solo) |
 | 6.1 | compatibility | docs/specs/tasks/task-6.1-upstream-harness-runner.md | Ready | Phase 6 AUTO order | N/A (solo) |
