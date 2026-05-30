@@ -4,8 +4,7 @@ use std::sync::{Arc, Mutex};
 use std::thread::{self, JoinHandle};
 
 use promptfoo_rs::providers::{
-    normalize_provider_request, ProviderConfig, ProviderId, ProviderInput, ProviderKind,
-    ProviderRegistry,
+    normalize_provider_request, ProviderConfig, ProviderId, ProviderInput, ProviderRegistry,
 };
 use serde_json::{json, Value};
 
@@ -37,13 +36,25 @@ fn test_4_1_1_p0_provider_registry_has_request_response_snapshots() {
         })
         .collect::<Vec<_>>();
 
-    assert_eq!(snapshots[0].request.url, "https://api.openai.com/v1/chat/completions");
-    assert_eq!(snapshots[0].response_output_path, "choices[0].message.content");
+    assert_eq!(
+        snapshots[0].request.url,
+        "https://api.openai.com/v1/chat/completions"
+    );
+    assert_eq!(
+        snapshots[0].response_output_path,
+        "choices[0].message.content"
+    );
     assert_eq!(snapshots[1].request.url, "https://example.invalid/provider");
     assert_eq!(snapshots[1].response_output_path, "output");
-    assert_eq!(snapshots[2].request.url, "http://localhost:11434/api/generate");
+    assert_eq!(
+        snapshots[2].request.url,
+        "http://localhost:11434/api/generate"
+    );
     assert_eq!(snapshots[2].response_output_path, "response");
-    assert_eq!(snapshots[3].request.url, "https://api.anthropic.com/v1/messages");
+    assert_eq!(
+        snapshots[3].request.url,
+        "https://api.anthropic.com/v1/messages"
+    );
     assert_eq!(snapshots[3].response_output_path, "content[0].text");
 }
 
@@ -94,8 +105,14 @@ async fn test_4_1_3_network_call_uses_mock_server_not_real_model() {
     assert_eq!(response.provider_id, "openai-compatible");
     assert_eq!(response.output, "mocked provider response");
     let received = server.received_request();
-    assert!(received.starts_with("POST /v1/chat/completions "), "{received}");
-    assert!(received.contains("authorization: Bearer sk-mock"), "{received}");
+    assert!(
+        received.starts_with("POST /v1/chat/completions "),
+        "{received}"
+    );
+    assert!(
+        received.contains("authorization: Bearer sk-mock"),
+        "{received}"
+    );
     assert!(received.contains("Ping mock provider"), "{received}");
 }
 
