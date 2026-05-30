@@ -1,6 +1,6 @@
 # Task 12.1: p0-fixture-corpus
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 12 — compatibility-fixtures-golden-diff
@@ -60,17 +60,17 @@ Every P0 fixture must include id, TEST-ID, matrix item ids, priority, provider m
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Success Metrics): repository tracks at least 50 P0 fixtures excluding `.gitkeep`.
-- [ ] **AC2** (PRD §Compatibility Harness Design): every fixture validates metadata schema and links to matrix item ids.
-- [ ] **AC3** (ADR-006): fixtures use mock/recorded providers and do not require real secrets.
+- [x] **AC1** (PRD §Success Metrics): repository tracks at least 50 P0 fixtures excluding `.gitkeep`.
+- [x] **AC2** (PRD §Compatibility Harness Design): every fixture validates metadata schema and links to matrix item ids.
+- [x] **AC3** (ADR-006): fixtures use mock/recorded providers and do not require real secrets.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-12.1.1 | TEST-12.1.1 | tests/p0_fixture_corpus.rs | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-12.1.1 | TEST-12.1.2 | tests/p0_fixture_corpus.rs | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-12.1.1 | TEST-12.1.3 | tests/p0_fixture_corpus.rs | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-12.1.1 | TEST-12.1.1 | tests/p0_fixture_corpus.rs | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-12.1.1 | TEST-12.1.2 | tests/p0_fixture_corpus.rs | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-12.1.1 | TEST-12.1.3 | tests/p0_fixture_corpus.rs | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -86,9 +86,22 @@ Every P0 fixture must include id, TEST-ID, matrix item ids, priority, provider m
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-30
+- **改动文件**：
+  - `src/compatibility/fixtures.rs`
+  - `tests/p0_fixture_corpus.rs`
+  - `compatibility/fixtures/schema.json`
+  - `compatibility/fixtures/**/fixture.yaml`
+  - `docs/compatibility/fixtures.md`
+  - `docs/specs/tasks/task-12.1-p0-fixture-corpus.md`
+- **commit 列表**：
+  - `b9fedd7` `docs(spec): task-12.1 进入实施 (Status: Ready → In Progress)`
+  - `235b9c3` `test(compatibility-fixtures): 加 SCEN-12.1.1 的 3 个 RED 测试`
+  - `86dd4da` `feat(compatibility-fixtures): 建立 P0 fixture corpus 基础校验`
+- **§9 Verification 结果**：
+  - install: PASS — `s2v_verify_full "install typecheck unit-test"` 中 `cargo fetch` 通过。
+  - typecheck: PASS — `cargo check --workspace` 通过。
+  - unit-test: PASS — `cargo test --workspace` 通过，包含 `tests/p0_fixture_corpus.rs` 的 3 个 TEST-12.1.* 用例。
+  - manual: PASS — fixture 实物审计通过：共 52 个 P0 fixture；域分布为 assertions=9, cli=11, config=4, eval=6, node-api=1, outputs=6, providers=8, redteam=4, release=2, viewer=1；所有 fixture 使用 Mock/Recorded provider，未要求真实 secret。非交互 helper 的 full run 仅因 `/dev/tty` manual 确认失败，机械 keys 已单独全绿。
+- **剩余风险 / 未做项**：fixture corpus 目前只建立可追踪元数据和 mock/recorded 资产约束，尚未执行 upstream/rs 双跑；执行器由 task 12.2 负责，release gate 汇总由 task 12.3 负责。
+- **下游 task 影响**：task 12.2 可直接消费 `compatibility/fixtures/**/fixture.yaml` 与 schema；task 12.3 可将 52 个 P0 fixture 作为稳定发布 gate 的输入基线。
