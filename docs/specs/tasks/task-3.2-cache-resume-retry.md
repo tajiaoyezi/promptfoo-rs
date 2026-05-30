@@ -1,8 +1,8 @@
 # Task 3.2: cache-resume-retry
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-3.2 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 3 — eval-runner-cache
@@ -71,9 +71,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-3.2.1 | TEST-3.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-3.2.2 | TEST-3.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-3.2.3 | TEST-3.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-3.2.1 | TEST-3.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-3.2.2 | TEST-3.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-3.2.3 | TEST-3.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -90,15 +90,25 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - Cargo.toml
+  - Cargo.lock
+  - src/lib.rs
+  - src/cache/mod.rs
+  - src/cache/resume.rs
+  - src/eval/mod.rs
+  - src/eval/retry.rs
+  - tests/cache_resume_retry.rs
+  - docs/specs/tasks/task-3.2-cache-resume-retry.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - f4ffc0c test(cache-resume-store): add task-3.2 cache resume retry RED tests
+  - e1e304d feat(cache-resume-store): implement cache resume retry core
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-3.2 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: passed — `cargo fetch` 通过；viewer/npm install 按 adapter N/A 跳过。
+  - typecheck: passed — `cargo check --workspace` 通过。
+  - unit-test: passed — `cargo test --workspace` 通过，TEST-3.2.1~TEST-3.2.3 加入后 21 个 integration tests 全部通过。
+  - manual: passed — 已核对 AC1/AC2/AC3、SCEN-3.2.1~3.2.3、TEST-3.2.1~3.2.3、compatibility matrix 的 P0 Cache/resume/retry/concurrency/delay 行与本实现/测试一致；Codex 非交互环境无 `/dev/tty`，manual key 以人工审查记录留证。
+- **剩余风险 / 未做项**：cache key 目前固定为 promptfoo-rs canonical SHA-256 输入模型，后续 compatibility harness 需用 upstream promptfoo 0.121.13 golden fixture 分类差异；SQLite schema 先覆盖 resume 所需 `results` 表，viewer/output task 可扩展查询 schema。
+- **下游 task 影响**：Phase 4 provider registry 可复用 `retry_with_backoff`；Phase 5 output/viewer 可复用 `ResumeStore` 与 JSONL/SQLite 结果读取契约。

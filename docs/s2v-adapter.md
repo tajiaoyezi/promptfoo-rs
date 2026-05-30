@@ -150,7 +150,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 2.2 | config-loader | docs/specs/tasks/task-2.2-config-loader.md | Done | Phase 2 AUTO order | N/A (solo) |
 | 2.3 | eval-runner | docs/specs/tasks/task-2.3-eval-command-smoke.md | Done | Phase 2 AUTO order | N/A (solo) |
 | 3.1 | eval-runner | docs/specs/tasks/task-3.1-scheduler-runtime.md | Done | Phase 3 AUTO order | N/A (solo) |
-| 3.2 | cache-resume-store | docs/specs/tasks/task-3.2-cache-resume-retry.md | Ready | Phase 3 AUTO order | N/A (solo) |
+| 3.2 | cache-resume-store | docs/specs/tasks/task-3.2-cache-resume-retry.md | Done | Phase 3 AUTO order | N/A (solo) |
 | 4.1 | provider-registry | docs/specs/tasks/task-4.1-p0-provider-registry.md | Ready | Phase 4 AUTO order | N/A (solo) |
 | 4.2 | assertion-engine | docs/specs/tasks/task-4.2-assertion-engine.md | Ready | Phase 4 AUTO order | N/A (solo) |
 | 4.3 | assertion-engine | docs/specs/tasks/task-4.3-custom-assertion-contracts.md | Ready | Phase 4 AUTO order | N/A (solo) |
