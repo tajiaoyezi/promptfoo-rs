@@ -4,6 +4,7 @@ pub mod cli;
 pub mod compatibility;
 pub mod config;
 pub mod eval;
+pub mod output;
 pub mod providers;
 pub mod results;
 pub mod script_bridge;

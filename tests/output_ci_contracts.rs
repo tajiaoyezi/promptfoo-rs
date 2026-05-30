@@ -6,9 +6,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use promptfoo_rs::output::{
     write_junit, write_output, write_sarif, Finding, FindingLevel, OutputFormat, RunSummary,
 };
-use promptfoo_rs::results::{
-    AssertionResultRecord, ResultRecord, ResultStatus,
-};
+use promptfoo_rs::results::{AssertionResultRecord, ResultRecord, ResultStatus};
 use serde_json::{json, Value};
 
 fn promptfoo_rs() -> Command {
@@ -59,8 +57,7 @@ fn test_5_2_1_json_junit_and_csv_are_ci_consumable() {
 
     let mut json_output = Vec::new();
     write_output(OutputFormat::Json, &summary, &mut json_output).expect("JSON output writes");
-    let json_value: Value =
-        serde_json::from_slice(&json_output).expect("JSON output is parseable");
+    let json_value: Value = serde_json::from_slice(&json_output).expect("JSON output is parseable");
     assert_eq!(json_value["schema_version"], "promptfoo-rs.output.v1");
     assert_eq!(json_value["eval_id"], "eval-ci");
     assert_eq!(json_value["summary"]["total"], 2);
@@ -71,7 +68,9 @@ fn test_5_2_1_json_junit_and_csv_are_ci_consumable() {
     let junit = String::from_utf8(junit_output).expect("JUnit is utf8");
     assert!(junit.contains(r#"<testsuite name="eval-ci" tests="2" failures="1" errors="0">"#));
     assert!(junit.contains(r#"<testcase classname="openai:gpt-4.1-mini" name="case-pass""#));
-    assert!(junit.contains(r#"<failure message="assertion failed">missing expected phrase</failure>"#));
+    assert!(
+        junit.contains(r#"<failure message="assertion failed">missing expected phrase</failure>"#)
+    );
 
     let mut csv_output = Vec::new();
     write_output(OutputFormat::Csv, &summary, &mut csv_output).expect("CSV output writes");
