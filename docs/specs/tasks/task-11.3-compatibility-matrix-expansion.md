@@ -1,6 +1,6 @@
 # Task 11.3: compatibility-matrix-expansion
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 11 — upstream-inventory-baseline
@@ -66,9 +66,9 @@ matrix completeness validator 必须在 inventory item 无 matrix row、P2 无 r
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-11.3.1 | TEST-11.3.1 | tests/compatibility_matrix_expansion.rs | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-11.3.1 | TEST-11.3.2 | tests/compatibility_matrix_expansion.rs | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-11.3.1 | TEST-11.3.3 | tests/compatibility_matrix_expansion.rs | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-11.3.1 | TEST-11.3.1 | tests/compatibility_matrix_expansion.rs | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-11.3.1 | TEST-11.3.2 | tests/compatibility_matrix_expansion.rs | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-11.3.1 | TEST-11.3.3 | tests/compatibility_matrix_expansion.rs | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -84,9 +84,21 @@ matrix completeness validator 必须在 inventory item 无 matrix row、P2 无 r
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-30
+- **改动文件**：
+  - `src/compatibility/matrix.rs`（新增 item-level matrix manifest loader、inventory expansion、no-silent-omission validator、release blocker conversion）
+  - `tests/compatibility_matrix_expansion.rs`（新增 TEST-11.3.1 ~ TEST-11.3.3）
+  - `compatibility/matrix/items.json`（新增 item-level matrix manifest）
+  - `docs/compatibility/matrix.md`（新增 item-level artifact 说明）
+  - `docs/specs/tasks/task-11.3-compatibility-matrix-expansion.md`（状态、§7、§10 回填）
+- **commit 列表**：
+  - `3716e63` docs(spec): task-11.3 进入实施 (Status: Ready → In Progress)
+  - `0e90dc7` test(compatibility-matrix): 加 SCEN-11.3.1 的 3 个 RED 测试
+  - `abbdb71` feat(compatibility-matrix): 扩展 item-level matrix 校验
+- **§9 Verification 结果**：
+  - install: PASS — `cargo fetch && ...` 成功；viewer/npm package 尚不存在，pnpm 分支未触发。
+  - typecheck: PASS — `cargo check --workspace` 成功。
+  - unit-test: PASS — `cargo test --workspace` 成功；`tests/compatibility_matrix_expansion.rs` 中 TEST-11.3.1 ~ TEST-11.3.3 共 3 passed / 0 failed，workspace Rust integration tests 共 81 passed / 0 failed。
+  - manual: PASS — 已 spot-check `compatibility/matrix/items.json` 通过 `source_inventory` 展开到与 `compatibility/inventory/upstream-items.json` 相同的 44 个 item-level rows；TEST-11.3.3 证明 aggregate row 不能隐藏 item-level omission。注：完整 `s2v_verify_full "install typecheck unit-test manual"` 已执行到 manual，但当前非交互工具环境无 `/dev/tty`，manual helper 无法读取确认输入并返回 rc=1；人工核验结果记录于本条。
+- **剩余风险 / 未做项**：matrix manifest 采用从 inventory 派生的单一事实源，避免复制漂移；后续 task-12.x 需要用 fixture/golden artifact 替换当前 `fixture:<stable_id>` / `snapshot:<stable_id>` 计划占位为真实证据。
+- **下游 task 影响**：Phase 12 可用 `matrix_release_blockers` 驱动 fixture corpus 和 release gate；task-14.x 可扩展 inventory 后自动进入 item-level matrix。
