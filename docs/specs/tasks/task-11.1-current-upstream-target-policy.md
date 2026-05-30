@@ -1,6 +1,6 @@
 # Task 11.1: current-upstream-target-policy
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 11 — upstream-inventory-baseline
@@ -68,9 +68,9 @@ Stable release target 必须是 frozen target 或 explicitly rebaselined target�
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-11.1.1 | TEST-11.1.1 | tests/current_upstream_target_policy.rs | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-11.1.1 | TEST-11.1.2 | tests/current_upstream_target_policy.rs | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-11.1.1 | TEST-11.1.3 | tests/current_upstream_target_policy.rs | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-11.1.1 | TEST-11.1.1 | tests/current_upstream_target_policy.rs | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-11.1.1 | TEST-11.1.2 | tests/current_upstream_target_policy.rs | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-11.1.1 | TEST-11.1.3 | tests/current_upstream_target_policy.rs | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -86,9 +86,20 @@ Stable release target 必须是 frozen target 或 explicitly rebaselined target�
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-30
+- **改动文件**：
+  - `src/compatibility/baseline_lock.rs`（新增 target policy 类型、loader、validator、moving upstream observation recorder）
+  - `tests/current_upstream_target_policy.rs`（新增 TEST-11.1.1 ~ TEST-11.1.3）
+  - `docs/compatibility/target-policy.md`（新增 stable target 与 moving upstream tracking policy）
+  - `docs/specs/tasks/task-11.1-current-upstream-target-policy.md`（状态、§7、§10 回填）
+- **commit 列表**：
+  - `8ef535a` docs(spec): task-11.1 进入实施 (Status: Ready → In Progress)
+  - `330c58f` test(compatibility): 加 SCEN-11.1.1 的 3 个 RED 测试
+  - `39d759b` feat(compatibility): 实现 target policy 单 stable target 校验
+- **§9 Verification 结果**：
+  - install: PASS — `cargo fetch && ...` 成功；viewer/npm package 尚不存在，pnpm 分支未触发。
+  - typecheck: PASS — `cargo check --workspace` 成功。
+  - unit-test: PASS — `cargo test --workspace` 成功；`tests/current_upstream_target_policy.rs` 中 TEST-11.1.1 ~ TEST-11.1.3 共 3 passed / 0 failed，workspace Rust integration tests 共 75 passed / 0 failed。
+  - manual: PASS — 已核对 `docs/compatibility/target-policy.md` 的 stable target 仅为 frozen baseline `promptfoo 0.121.13 + 4860e990c7e9a2f8f677173fb92cf9867b34d03f`，moving upstream observation 为 `945fda5d965ed27abb302fe0f0910b7dddea5dde` 且 `modifies_frozen_baseline=false`；与 `docs/compatibility/baseline.lock.md` 不冲突。注：完整 `s2v_verify_full "install typecheck unit-test manual"` 已执行到 manual，但当前非交互工具环境无 `/dev/tty`，manual helper 无法读取确认输入并返回 rc=1；人工核验结果记录于本条。
+- **剩余风险 / 未做项**：无；moving upstream 仅记录审计快照，后续再基线化必须走新 S2V task/ADR。
+- **下游 task 影响**：task-11.2 可复用 `CompatibilityTargetPolicy` 明确 inventory 提取目标；task-12.x release gate 可引用 single stable target policy。
