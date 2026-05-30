@@ -1,8 +1,8 @@
 # Task 8.1: mcp-runtime
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — command skeleton、provider protocol snapshot 与 target materialization 错误路径已实现并通过 §9 验证。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 8 — mcp-scan-audit
@@ -62,17 +62,17 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): promptfoo mcp command skeleton 可运行
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): MCP provider request/response 有 protocol snapshot
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): MCP target materialization 错误路径稳定
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): promptfoo mcp command skeleton 可运行
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): MCP provider request/response 有 protocol snapshot
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): MCP target materialization 错误路径稳定
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-8.1.1 | TEST-8.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-8.1.2 | TEST-8.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-8.1.3 | TEST-8.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-8.1.1 | TEST-8.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-8.1.2 | TEST-8.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-8.1.3 | TEST-8.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -89,15 +89,26 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - src/lib.rs
+  - src/cli.rs
+  - src/mcp/mod.rs
+  - src/mcp/protocol.rs
+  - src/mcp/provider.rs
+  - tests/mcp_runtime.rs
+  - docs/specs/tasks/task-8.1-mcp-runtime.md
+  - docs/specs/phases/phase-8-mcp-scan-audit.md
+  - docs/s2v-adapter.md
+  - docs/compatibility/matrix.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - f73bc4f test(mcp): add task-8.1 runtime RED tests
+  - 9c4cf12 feat(mcp): add runtime protocol snapshot
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-8.1 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: PASS — `s2v_verify_full "install typecheck unit-test"` / `cargo fetch`
+  - typecheck: PASS — `cargo check --workspace`
+  - unit-test: PASS — `cargo test --workspace`，含 `tests/mcp_runtime.rs` 的 TEST-8.1.1 ~ TEST-8.1.3（51 个 integration tests 全绿）
+  - manual: PASS — 已核对 AC、SCEN/TEST、BDD feature、compatibility matrix 中 MCP 行与实现一致。
+- **剩余风险 / 未做项**：真实 MCP server/process/HTTP transport 深度互操作仍属于后续扩展；本 task 固定 command skeleton、JSON-RPC protocol snapshot 与 target validation 错误契约。
+- **下游 task 影响**：task 8.2 与 Phase 9 可复用已公开的 `mcp` 模块导出、CLI 子命令错误处理模式和兼容矩阵登记方式。
