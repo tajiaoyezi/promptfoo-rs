@@ -130,7 +130,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | # | Phase | Phase Spec | Status | Tasks | Worktree（仅 team）|
 |---|---|---|---|---|---|
 | 1 | baseline-freeze | docs/specs/phases/phase-1-baseline-freeze.md | Done | 2 | N/A (solo) |
-| 2 | config-cli-core | docs/specs/phases/phase-2-config-cli-core.md | Ready | 3 | N/A (solo) |
+| 2 | config-cli-core | docs/specs/phases/phase-2-config-cli-core.md | Done | 3 | N/A (solo) |
 | 3 | eval-runner-cache | docs/specs/phases/phase-3-eval-runner-cache.md | Ready | 2 | N/A (solo) |
 | 4 | providers-assertions | docs/specs/phases/phase-4-providers-assertions.md | Ready | 3 | N/A (solo) |
 | 5 | output-ci | docs/specs/phases/phase-5-output-ci.md | Ready | 2 | N/A (solo) |
