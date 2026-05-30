@@ -1,6 +1,6 @@
 # Phase 14: provider-assertion-redteam-parity
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,8 +20,8 @@ src/providers/、src/assertions/、src/redteam/、src/script_bridge/、compatibi
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 14.1 | provider-assertion-inventory-parity | ../tasks/task-14.1-provider-assertion-inventory-parity.md | Ready | 按 inventory 实现或登记 provider/assertion 全量能力 |
-| 14.2 | redteam-plugin-strategy-parity | ../tasks/task-14.2-redteam-plugin-strategy-parity.md | Ready | 按 inventory 实现或登记 redteam plugin/strategy 全量能力 |
+| 14.1 | provider-assertion-inventory-parity | ../tasks/task-14.1-provider-assertion-inventory-parity.md | Done | 按 inventory 实现或登记 provider/assertion 全量能力 |
+| 14.2 | redteam-plugin-strategy-parity | ../tasks/task-14.2-redteam-plugin-strategy-parity.md | Done | 按 inventory 实现或登记 redteam plugin/strategy 全量能力 |
 
 ## 5. Dependencies
 
@@ -29,9 +29,9 @@ src/providers/、src/assertions/、src/redteam/、src/script_bridge/、compatibi
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] 每个 upstream provider/assertion/redteam item 都有 matrix row、status、verification、owner 和 P2/later reason。
-- [ ] P0 provider/assertion/redteam core fixtures 通过 golden diff 或被 release gate 阻断。
-- [ ] custom script bridge default-deny、allowlist、timeout、redaction 覆盖 JS/TS、Python、Shell/Ruby 决策边界。
+- [x] 每个 upstream provider/assertion/redteam item 都有 matrix row、status、verification、owner 和 P2/later reason。
+- [x] P0 provider/assertion/redteam core fixtures 通过 golden diff 或被 release gate 阻断。
+- [x] custom script bridge default-deny、allowlist、timeout、redaction 覆盖 JS/TS、Python、Shell/Ruby 决策边界。
 
 ## 7. Phase Risks
 
