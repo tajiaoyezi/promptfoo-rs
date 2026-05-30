@@ -5,6 +5,7 @@
 **Evidence basis**: current worktree at audit time plus a fresh `git fetch --depth=1 origin main` of `https://github.com/promptfoo/promptfoo`.
 **Inventory attachment**: `docs/audits/promptfoo-upstream-inventory-gap-2026-05-30.md`.
 **Runtime attachment**: `docs/audits/promptfoo-runtime-verification-audit-2026-05-30.md`.
+**S2V parity-claim attachment**: `docs/audits/promptfoo-s2v-parity-claim-audit-2026-05-30.md`.
 
 ## Executive Conclusion
 
@@ -139,3 +140,5 @@ Do not mark the active goal complete. The current project is a substantial local
 See `docs/audits/promptfoo-upstream-inventory-gap-2026-05-30.md` for the command/provider/assertion/redteam inventory gap used to support this decision.
 
 See `docs/audits/promptfoo-runtime-verification-audit-2026-05-30.md` for local S2V verification and CLI runtime smoke evidence.
+
+See `docs/audits/promptfoo-s2v-parity-claim-audit-2026-05-30.md` for why Phase 6 `Done` does not prove full upstream compatibility harness or golden diff release-gate execution.
