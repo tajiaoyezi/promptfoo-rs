@@ -1,8 +1,8 @@
 # Task 2.2: config-loader
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-2.2 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 2 — config-cli-core
@@ -70,9 +70,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-2.2.1 | TEST-2.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-2.2.2 | TEST-2.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-2.2.3 | TEST-2.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-2.2.1 | TEST-2.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-2.2.2 | TEST-2.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-2.2.3 | TEST-2.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -89,15 +89,22 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - Cargo.toml
+  - Cargo.lock
+  - src/lib.rs
+  - src/config/mod.rs
+  - tests/config_loader.rs
+  - docs/specs/tasks/task-2.2-config-loader.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - c049285 test(config-loader): add task-2.2 config loader RED tests
+  - 1abcd51 feat(config-loader): parse normalized promptfoo config
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-2.2 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: 通过；`s2v_verify_full` 自动项执行 `cargo fetch` 成功（viewer/npm package.json 不存在，按 adapter 条件跳过）。
+  - typecheck: 通过；`cargo check --workspace` 成功。
+  - unit-test: 通过；`cargo test --workspace` 成功，TEST-1.1.*、TEST-1.2.*、TEST-2.1.*、TEST-2.2.* 共 12 passed / 0 failed。
+  - manual: 通过；已核对 AC、BDD SCEN-2.2.1~2.2.3、TEST-2.2.1~2.2.3 与 tests/config_loader.rs。注：当前非交互 shell 无 `/dev/tty`，`s2v_run manual` 无法读取确认输入，人工核验结果记录于本条。
+- **剩余风险 / 未做项**：loader 仅覆盖 task-2.2 要求的最小 promptfooconfig YAML、`.env`、file prompt 与 compatibility finding；完整 promptfoo 解析细节留给后续 fixture 扩展。
+- **下游 task 影响**：task-2.3 可使用 `NormalizedConfig` 执行最小 eval smoke；后续 provider/assertion tasks 可扩展 config model。
