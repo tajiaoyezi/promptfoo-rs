@@ -1,7 +1,6 @@
 use promptfoo_rs::assertions::{
-    aggregate_assertions, build_model_graded_prompt, evaluate_assertion,
-    parse_model_graded_score, Assertion, AssertionContext, AssertionResult, AssertionStatus,
-    ModelGradedAssertion,
+    aggregate_assertions, build_model_graded_prompt, evaluate_assertion, parse_model_graded_score,
+    Assertion, AssertionContext, AssertionResult, AssertionStatus, ModelGradedAssertion,
 };
 use serde_json::json;
 
@@ -57,15 +56,15 @@ fn test_4_2_2_model_graded_assertion_records_prompt_threshold_score_and_metadata
 
     let request = build_model_graded_prompt(&assertion, &context);
     assert!(request.prompt.contains(&assertion.rubric));
-    assert!(request.prompt.contains("The answer explains the safety tradeoff."));
+    assert!(request
+        .prompt
+        .contains("The answer explains the safety tradeoff."));
     assert_eq!(request.threshold, 0.7);
     assert_eq!(request.metadata["grading_kind"], "model-graded");
     assert_eq!(request.metadata["compare_raw_llm_text"], false);
 
-    let passed = parse_model_graded_score(
-        &json!({"score": 0.82, "reason": "clear enough"}),
-        &request,
-    );
+    let passed =
+        parse_model_graded_score(&json!({"score": 0.82, "reason": "clear enough"}), &request);
     assert_eq!(passed.status, AssertionStatus::Passed);
     assert_eq!(passed.metadata["score"], 0.82);
     assert_eq!(passed.metadata["threshold"], 0.7);
