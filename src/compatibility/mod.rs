@@ -1,5 +1,6 @@
 pub mod baseline_lock;
 pub mod diff;
+pub mod fixtures;
 pub mod harness;
 pub mod inventory;
 pub mod matrix;
