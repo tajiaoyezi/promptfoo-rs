@@ -1,8 +1,6 @@
 use std::path::Path;
 
-use promptfoo_rs::compatibility::matrix::{
-    validate_matrix_completeness, CapabilityMatrix,
-};
+use promptfoo_rs::compatibility::matrix::{validate_matrix_completeness, CapabilityMatrix};
 
 #[test]
 fn test_1_2_1_matrix_covers_required_capability_domains() {
