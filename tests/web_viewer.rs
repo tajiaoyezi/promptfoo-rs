@@ -55,6 +55,7 @@ fn result_record(
 
 #[test]
 fn test_10_1_1_viewer_reads_stable_result_schema_from_jsonl_and_sqlite() {
+    // TEST-10.1.1
     let records = vec![
         result_record(
             "case-pass",
@@ -100,6 +101,7 @@ fn test_10_1_1_viewer_reads_stable_result_schema_from_jsonl_and_sqlite() {
 
 #[test]
 fn test_10_1_2_eval_table_filters_failed_provider_and_assertion_rows() {
+    // TEST-10.1.2
     let records = vec![
         result_record(
             "case-pass",
@@ -142,6 +144,7 @@ fn test_10_1_2_eval_table_filters_failed_provider_and_assertion_rows() {
 
 #[test]
 fn test_10_1_3_viewer_contract_is_data_parity_not_pixel_replication() {
+    // TEST-10.1.3
     let contract = viewer_contract();
 
     assert_eq!(contract.schema_version, "promptfoo-rs.viewer.v1");
