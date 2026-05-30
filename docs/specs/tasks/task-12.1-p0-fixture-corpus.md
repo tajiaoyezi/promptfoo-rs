@@ -1,6 +1,6 @@
 # Task 12.1: p0-fixture-corpus
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 12 — compatibility-fixtures-golden-diff
