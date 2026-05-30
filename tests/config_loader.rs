@@ -68,7 +68,10 @@ tests:
         load_promptfoo_config(&fixture.path("promptfooconfig.yaml"), &env).expect("config loads");
 
     assert_eq!(env.get("MODEL"), Some("mock-model"));
-    assert_eq!(config.prompts[0].source.as_deref(), Some("file://prompts/hello.txt"));
+    assert_eq!(
+        config.prompts[0].source.as_deref(),
+        Some("file://prompts/hello.txt")
+    );
     assert_eq!(config.prompts[0].body, "Hello {{name}} from mock-model");
     assert_eq!(config.tests[0].vars["name"], "Grace");
 }
