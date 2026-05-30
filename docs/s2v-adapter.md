@@ -133,7 +133,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 2 | config-cli-core | docs/specs/phases/phase-2-config-cli-core.md | Done | 3 | N/A (solo) |
 | 3 | eval-runner-cache | docs/specs/phases/phase-3-eval-runner-cache.md | Done | 2 | N/A (solo) |
 | 4 | providers-assertions | docs/specs/phases/phase-4-providers-assertions.md | Done | 3 | N/A (solo) |
-| 5 | output-ci | docs/specs/phases/phase-5-output-ci.md | Ready | 2 | N/A (solo) |
+| 5 | output-ci | docs/specs/phases/phase-5-output-ci.md | Done | 2 | N/A (solo) |
 | 6 | compatibility-harness | docs/specs/phases/phase-6-compatibility-harness.md | Ready | 2 | N/A (solo) |
 | 7 | redteam-core | docs/specs/phases/phase-7-redteam-core.md | Ready | 2 | N/A (solo) |
 | 8 | mcp-scan-audit | docs/specs/phases/phase-8-mcp-scan-audit.md | Ready | 2 | N/A (solo) |
