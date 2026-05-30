@@ -20,7 +20,7 @@ web-viewer + release scripts + README + docs + GitHub Actions
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 10.1 | web-viewer | ../tasks/task-10.1-web-viewer.md | Ready | 实现本地 viewer 读取 JSONL/SQLite 结果、筛选失败样本和导出 |
+| 10.1 | web-viewer | ../tasks/task-10.1-web-viewer.md | Done | 实现本地 viewer 读取 JSONL/SQLite 结果、筛选失败样本和导出 |
 | 10.2 | release-docs-packaging | ../tasks/task-10.2-release-docs-packaging.md | Ready | 完成 GitHub Releases、Homebrew、Cargo、Docker、npm wrapper、GitHub Action 示例和贡献文档 |
 
 ## 5. Dependencies

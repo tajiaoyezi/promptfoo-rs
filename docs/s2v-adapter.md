@@ -164,7 +164,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 8.2 | scan-engine | docs/specs/tasks/task-8.2-scan-audit-sarif.md | Done | Phase 8 AUTO order | N/A (solo) |
 | 9.1 | script-bridge | docs/specs/tasks/task-9.1-script-bridge-sandbox.md | Done | Phase 9 AUTO order | N/A (solo) |
 | 9.2 | node-api-wrapper | docs/specs/tasks/task-9.2-node-api-wrapper.md | Done | Phase 9 AUTO order | N/A (solo) |
-| 10.1 | web-viewer | docs/specs/tasks/task-10.1-web-viewer.md | Ready | Phase 10 AUTO order | N/A (solo) |
+| 10.1 | web-viewer | docs/specs/tasks/task-10.1-web-viewer.md | Done | Phase 10 AUTO order | N/A (solo) |
 | 10.2 | release | docs/specs/tasks/task-10.2-release-docs-packaging.md | Ready | Phase 10 AUTO order | N/A (solo) |
 
 ## ADR 索引

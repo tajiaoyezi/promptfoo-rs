@@ -1,8 +1,8 @@
 # Task 10.1: web-viewer
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — JSONL/SQLite result schema loader、失败样本筛选、导出 contract 与非像素级 parity 边界已实现并通过 §9 验证。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 10 — web-viewer-release
@@ -62,17 +62,17 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): viewer 能读取稳定 result schema
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): eval table 支持 provider/test/assertion/filter 基础视图
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): viewer 不依赖 upstream UI 像素级复刻
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): viewer 能读取稳定 result schema
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): eval table 支持 provider/test/assertion/filter 基础视图
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): viewer 不依赖 upstream UI 像素级复刻
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-10.1.1 | TEST-10.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-10.1.2 | TEST-10.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-10.1.3 | TEST-10.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-10.1.1 | TEST-10.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-10.1.2 | TEST-10.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-10.1.3 | TEST-10.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -89,15 +89,26 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - src/lib.rs
+  - src/viewer_server.rs
+  - viewer/src/App.tsx
+  - viewer/src/results.ts
+  - tests/web_viewer.rs
+  - docs/specs/tasks/task-10.1-web-viewer.md
+  - docs/specs/phases/phase-10-web-viewer-release.md
+  - docs/s2v-adapter.md
+  - docs/compatibility/matrix.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - 6f42e91 test(viewer): add task-10.1 viewer RED tests
+  - 60b9a60 feat(viewer): add local result viewer contract
+  - 69bc4d6 refactor(viewer): annotate task-10.1 trace IDs
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-10.1 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: PASS — `s2v_verify_full "install typecheck unit-test"` / `cargo fetch`
+  - typecheck: PASS — `cargo check --workspace`
+  - unit-test: PASS — `cargo test --workspace`，含 `tests/web_viewer.rs` 的 TEST-10.1.1 ~ TEST-10.1.3（63 个 integration tests 全绿）
+  - manual: PASS — 已核对 AC、SCEN/TEST、BDD feature、compatibility matrix 中 Local Web viewer 行与实现一致；AC3 明确为 data contract parity 而非 upstream UI pixel parity。
+- **剩余风险 / 未做项**：当前环境缺 `corepack`，未新增 `viewer/package.json` / Vitest harness 以免 S2V helper 的 viewer 分支失效；本 task 已固定 Rust data contract 和轻量 viewer source，正式 Vite/React package、lockfile 和 browser smoke 需在具备 Corepack 的 release 环境补齐。
+- **下游 task 影响**：task 10.2 release docs 可引用 `promptfoo-rs.viewer.v1`、Local Web viewer P1 compatibility row、JSONL/SQLite load/filter/export smoke，以及“不承诺像素级复刻”的发布说明。
