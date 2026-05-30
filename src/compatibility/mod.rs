@@ -6,4 +6,5 @@ pub mod harness;
 pub mod inventory;
 pub mod matrix;
 pub mod normalize;
+pub mod provider_assertion;
 pub mod release_gate;
