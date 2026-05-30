@@ -20,7 +20,7 @@ eval-runner + cache-resume-store + integration tests
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 3.1 | scheduler-runtime | ../tasks/task-3.1-scheduler-runtime.md | Ready | 实现 eval graph 调度、max-concurrency、delay、cancellation 和 partial failure |
+| 3.1 | scheduler-runtime | ../tasks/task-3.1-scheduler-runtime.md | Done | 实现 eval graph 调度、max-concurrency、delay、cancellation 和 partial failure |
 | 3.2 | cache-resume-retry | ../tasks/task-3.2-cache-resume-retry.md | Ready | 实现 cache key、resume cursor、retry-errors 和 backoff 行为 |
 
 ## 5. Dependencies

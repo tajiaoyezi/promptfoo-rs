@@ -1,8 +1,8 @@
 # Task 3.1: scheduler-runtime
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-3.1 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 3 — eval-runner-cache
@@ -70,9 +70,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-3.1.1 | TEST-3.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-3.1.2 | TEST-3.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-3.1.3 | TEST-3.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-3.1.1 | TEST-3.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-3.1.2 | TEST-3.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-3.1.3 | TEST-3.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -89,15 +89,20 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - src/eval/mod.rs
+  - src/eval/scheduler.rs
+  - tests/scheduler_runtime.rs
+  - docs/specs/tasks/task-3.1-scheduler-runtime.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - 0041c54 test(eval-runner): add task-3.1 scheduler RED tests
+  - 5ebad52 feat(eval-runner): add deterministic scheduler runtime
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-3.1 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: passed — `cargo fetch` 通过；viewer/npm install 按 adapter N/A 跳过。
+  - typecheck: passed — `cargo check --workspace` 通过。
+  - unit-test: passed — `cargo test --workspace` 通过，18 个 integration tests 全部通过。
+  - manual: passed — 已核对 AC1/AC2/AC3、SCEN-3.1.1~3.1.3、TEST-3.1.1~3.1.3 与本实现/测试一致；Codex 非交互环境无 `/dev/tty`，manual key 以人工审查记录留证。
+- **剩余风险 / 未做项**：当前实现为 deterministic single-process scheduler；真实 async provider 并发、tracing span 和远程取消传播可在 provider registry / integration harness task 中扩展，不改变本 task 已固定的调度契约。
+- **下游 task 影响**：task-3.2 可基于 `EvalPlan` / `SchedulerOptions` / `RunSummary` 增加 cache、resume、retry 和 backoff；Phase 4 provider registry 可替换测试 provider。
