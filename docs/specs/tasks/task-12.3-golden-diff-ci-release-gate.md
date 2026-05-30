@@ -1,6 +1,6 @@
 # Task 12.3: golden-diff-ci-release-gate
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 12 — compatibility-fixtures-golden-diff
