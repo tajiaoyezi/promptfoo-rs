@@ -1,0 +1,444 @@
+{
+  "items": [
+    {
+      "stable_id": "command:eval",
+      "category": "command",
+      "name": "eval",
+      "source_reference": "docs/audits/promptfoo-upstream-inventory-gap-2026-05-30.md#Command Surface",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "cli",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "command:view-directory",
+      "category": "command",
+      "name": "view [directory]",
+      "source_reference": "upstream src/commands/view.ts; audit command pattern list",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "cli",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "command:cache",
+      "category": "command",
+      "name": "cache",
+      "source_reference": "upstream src/commands/cache.ts; audit command pattern list",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "cli",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "command:redteam",
+      "category": "command",
+      "name": "redteam",
+      "source_reference": "upstream src/redteam/commands; audit command pattern list",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "redteam-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "command:mcp",
+      "category": "command",
+      "name": "mcp",
+      "source_reference": "upstream src/commands/mcp.ts; audit command pattern list",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "mcp-runtime",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "command:code-scans",
+      "category": "command",
+      "name": "code-scans",
+      "source_reference": "upstream src/codeScan; audit command pattern list",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "scan-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "command:scan-model",
+      "category": "command",
+      "name": "scan-model",
+      "source_reference": "upstream src/commands/scan-model.ts; audit command pattern list",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "scan-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "command:import-file",
+      "category": "command",
+      "name": "import <file>",
+      "source_reference": "upstream command pattern list",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "cli",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "command:export",
+      "category": "command",
+      "name": "export",
+      "source_reference": "upstream command pattern list",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "cli",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:config",
+      "category": "flag",
+      "name": "--config",
+      "source_reference": "PRD User Flow; local EvalArgs compatibility entrypoint",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "cli",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:output",
+      "category": "flag",
+      "name": "--output",
+      "source_reference": "PRD User Flow and output compatibility requirements",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "output-writers",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:max-concurrency",
+      "category": "flag",
+      "name": "--max-concurrency",
+      "source_reference": "PRD User Flow runner scheduling requirement",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "provider:openai",
+      "category": "provider",
+      "name": "openai",
+      "source_reference": "upstream src/providers/openai; PRD P0 provider list",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "provider-registry",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "provider:http",
+      "category": "provider",
+      "name": "http",
+      "source_reference": "upstream src/providers/http.ts; PRD P0 provider list",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "provider-registry",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "provider:ollama",
+      "category": "provider",
+      "name": "ollama",
+      "source_reference": "upstream src/providers/ollama.ts; PRD P0 provider list",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "provider-registry",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "provider:anthropic",
+      "category": "provider",
+      "name": "anthropic",
+      "source_reference": "upstream src/providers/anthropic; PRD P0 provider list",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "provider-registry",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "provider:azure",
+      "category": "provider",
+      "name": "azure",
+      "source_reference": "upstream src/providers/azure; audit provider directory list",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "provider-registry",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "provider:dynamic-registry",
+      "category": "provider",
+      "name": "dynamic-registry",
+      "source_reference": "upstream src/providers/providerRegistry.ts",
+      "level_hint": "P2",
+      "status": "unresolved",
+      "owner_hint": "compatibility",
+      "unresolved_reason": "dynamic provider registry requires source-level extraction in task-14.1"
+    },
+    {
+      "stable_id": "assertion:equals",
+      "category": "assertion",
+      "name": "equals",
+      "source_reference": "upstream src/assertions/equals; local deterministic assertion enum",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "assertion-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "assertion:contains",
+      "category": "assertion",
+      "name": "contains",
+      "source_reference": "upstream src/assertions/contains; local deterministic assertion enum",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "assertion-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "assertion:regex",
+      "category": "assertion",
+      "name": "regex",
+      "source_reference": "upstream src/assertions/regex; local deterministic assertion enum",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "assertion-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "assertion:json",
+      "category": "assertion",
+      "name": "json",
+      "source_reference": "upstream src/assertions/json; local deterministic assertion enum",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "assertion-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "assertion:llmrubric",
+      "category": "assertion",
+      "name": "llmRubric",
+      "source_reference": "upstream src/assertions/llmRubric.ts; audit assertion module list",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "assertion-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "assertion:javascript",
+      "category": "assertion",
+      "name": "javascript",
+      "source_reference": "upstream src/assertions/javascript.ts; script bridge compatibility",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "script-bridge",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "assertion:python",
+      "category": "assertion",
+      "name": "python",
+      "source_reference": "upstream src/assertions/python.ts; script bridge compatibility",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "script-bridge",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "redteam-plugin:prompt-injection",
+      "category": "redteam-plugin",
+      "name": "prompt-injection",
+      "source_reference": "local registry default and upstream redteam plugin inventory",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "redteam-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "redteam-plugin:harmful-content",
+      "category": "redteam-plugin",
+      "name": "harmful-content",
+      "source_reference": "local registry default and upstream harmful plugin category",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "redteam-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "redteam-plugin:medical",
+      "category": "redteam-plugin",
+      "name": "medical",
+      "source_reference": "audit representative plugin categories",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "redteam-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "redteam-strategy:jailbreak",
+      "category": "redteam-strategy",
+      "name": "jailbreak",
+      "source_reference": "local registry default and upstream redteam strategy inventory",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "redteam-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "redteam-strategy:multi-turn",
+      "category": "redteam-strategy",
+      "name": "multi-turn",
+      "source_reference": "local registry default and upstream redteam strategy inventory",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "redteam-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "redteam-strategy:agentic-chain",
+      "category": "redteam-strategy",
+      "name": "agentic-chain",
+      "source_reference": "local registry default and upstream agentic strategy evidence",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "redteam-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "output:json",
+      "category": "output",
+      "name": "json",
+      "source_reference": "PRD output compatibility matrix",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "output-writers",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "output:jsonl",
+      "category": "output",
+      "name": "jsonl",
+      "source_reference": "PRD output compatibility matrix",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "output-writers",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "output:csv",
+      "category": "output",
+      "name": "csv",
+      "source_reference": "PRD output compatibility matrix",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "output-writers",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "output:junit",
+      "category": "output",
+      "name": "junit",
+      "source_reference": "PRD output compatibility matrix",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "output-writers",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "output:sarif",
+      "category": "output",
+      "name": "sarif",
+      "source_reference": "PRD output compatibility matrix and scan-engine scope",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "scan-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "config:promptfooconfig-yaml-json",
+      "category": "config",
+      "name": "promptfooconfig yaml/json",
+      "source_reference": "PRD Compatibility Matrix",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "config-loader",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "config:redteam-yaml",
+      "category": "config",
+      "name": "redteam.yaml",
+      "source_reference": "PRD Compatibility Matrix",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "redteam-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "config:env",
+      "category": "config",
+      "name": ".env",
+      "source_reference": "PRD Compatibility Matrix",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "config-loader",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "node-api:wrapper-contract",
+      "category": "node-api",
+      "name": "wrapper contract",
+      "source_reference": "ADR-010 and PRD Node API wrapper row",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "node-api-wrapper",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "viewer:local-web-viewer",
+      "category": "viewer",
+      "name": "local web viewer",
+      "source_reference": "PRD Local Web viewer row and task-10.1",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "web-viewer",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "release:github-releases",
+      "category": "release",
+      "name": "github releases",
+      "source_reference": "PRD Release constraints and ADR-008",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "release",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "release:npm-wrapper",
+      "category": "release",
+      "name": "npm wrapper",
+      "source_reference": "PRD Release constraints and ADR-008",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "release-viewer-node",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "release:docker",
+      "category": "release",
+      "name": "docker",
+      "source_reference": "PRD Release constraints and ADR-008",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "release",
+      "unresolved_reason": null
+    }
+  ]
+}

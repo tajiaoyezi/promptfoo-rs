@@ -75,13 +75,75 @@ pub enum InventoryError {
 }
 
 pub fn extract_upstream_inventory(
-    _snapshot: &UpstreamSnapshot,
+    snapshot: &UpstreamSnapshot,
 ) -> Result<CapabilityInventory, InventoryError> {
-    unimplemented!("task-11.2 RED skeleton: upstream inventory extractor is not implemented")
+    let items = snapshot
+        .items
+        .iter()
+        .map(|item| InventoryItem {
+            stable_id: InventoryItem::stable_id(&item.category, &item.name),
+            category: item.category.clone(),
+            name: item.name.clone(),
+            source_reference: if item.source_reference.trim().is_empty() {
+                snapshot.source_ref.clone()
+            } else {
+                item.source_reference.clone()
+            },
+            level_hint: item.level_hint.clone(),
+            status: item.status.clone(),
+            owner_hint: item.owner_hint.clone(),
+            unresolved_reason: item.unresolved_reason.clone(),
+        })
+        .collect();
+    Ok(CapabilityInventory { items })
 }
 
-pub fn validate_inventory_completeness(_inventory: &CapabilityInventory) -> InventoryReport {
-    unimplemented!("task-11.2 RED skeleton: inventory completeness validator is not implemented")
+pub fn validate_inventory_completeness(inventory: &CapabilityInventory) -> InventoryReport {
+    let required_categories = [
+        "command",
+        "flag",
+        "provider",
+        "assertion",
+        "redteam-plugin",
+        "redteam-strategy",
+        "output",
+        "config",
+        "node-api",
+        "viewer",
+        "release",
+    ];
+
+    let mut missing_categories = Vec::new();
+    for category in required_categories {
+        if !inventory.items.iter().any(|item| item.category == category) {
+            missing_categories.push(category.to_string());
+        }
+    }
+
+    let mut items_missing_metadata = Vec::new();
+    let mut unresolved_items = Vec::new();
+
+    for item in &inventory.items {
+        let expected_id = InventoryItem::stable_id(&item.category, &item.name);
+        let missing_metadata = item.stable_id != expected_id
+            || item.source_reference.trim().is_empty()
+            || !matches!(item.level_hint.as_str(), "P0" | "P1" | "P2")
+            || item.status.trim().is_empty()
+            || item.owner_hint.trim().is_empty();
+        if missing_metadata {
+            items_missing_metadata.push(item.stable_id.clone());
+        }
+        if item.status == "unresolved" || item.unresolved_reason.is_some() {
+            unresolved_items.push(item.stable_id.clone());
+        }
+    }
+
+    InventoryReport {
+        missing_categories,
+        items_missing_metadata,
+        release_blocking_unresolved: unresolved_items.len(),
+        unresolved_items,
+    }
 }
 
 fn slug(value: &str) -> String {
