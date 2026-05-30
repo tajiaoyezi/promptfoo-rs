@@ -4,6 +4,7 @@
 **Audit target**: determine whether the current `promptfoo-rs` worktree fully satisfies a perfect refactor of `promptfoo/promptfoo`.
 **Evidence basis**: current worktree at audit time plus a fresh `git fetch --depth=1 origin main` of `https://github.com/promptfoo/promptfoo`.
 **Inventory attachment**: `docs/audits/promptfoo-upstream-inventory-gap-2026-05-30.md`.
+**Runtime attachment**: `docs/audits/promptfoo-runtime-verification-audit-2026-05-30.md`.
 
 ## Executive Conclusion
 
@@ -136,3 +137,5 @@ That is compatible with a partial project milestone, but not with a completed mu
 Do not mark the active goal complete. The current project is a substantial local S2V implementation, but the evidence contradicts a claim that it fully and perfectly refactors `promptfoo/promptfoo`.
 
 See `docs/audits/promptfoo-upstream-inventory-gap-2026-05-30.md` for the command/provider/assertion/redteam inventory gap used to support this decision.
+
+See `docs/audits/promptfoo-runtime-verification-audit-2026-05-30.md` for local S2V verification and CLI runtime smoke evidence.
