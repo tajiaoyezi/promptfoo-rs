@@ -52,8 +52,8 @@ fn test_8_1_2_mcp_provider_request_response_protocol_snapshot() {
 
 #[test]
 fn test_8_1_3_mcp_target_materialization_error_path_is_stable() {
-    let err = materialize_mcp_target(McpTargetConfig::stdio(""))
-        .expect_err("empty command is rejected");
+    let err =
+        materialize_mcp_target(McpTargetConfig::stdio("")).expect_err("empty command is rejected");
     assert!(err.to_string().contains("MCP target command"));
 
     let err = materialize_mcp_target(McpTargetConfig::http("ftp://example.invalid/mcp"))

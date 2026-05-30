@@ -4,6 +4,7 @@ pub mod cli;
 pub mod compatibility;
 pub mod config;
 pub mod eval;
+pub mod mcp;
 pub mod output;
 pub mod providers;
 pub mod redteam;

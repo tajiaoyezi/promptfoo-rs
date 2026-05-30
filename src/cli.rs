@@ -5,6 +5,7 @@ use clap::{Args, Parser, Subcommand, ValueEnum};
 
 use crate::config::{load_promptfoo_config, EnvOverlay};
 use crate::eval::{run_eval, EvalOptions};
+use crate::mcp::tool_listing;
 use crate::redteam::{
     load_redteam_config, run_redteam_flow, write_redteam_report_file, MockTarget,
 };
@@ -41,7 +42,7 @@ pub enum Command {
     /// Run redteam workflows.
     Redteam(RedteamArgs),
     /// Run MCP compatibility workflows.
-    Mcp,
+    Mcp(McpArgs),
     /// Run code scan workflows.
     CodeScans,
     /// Run model scan workflows.
@@ -77,20 +78,43 @@ pub enum RedteamStageArg {
     Report,
 }
 
+#[derive(Debug, Args)]
+pub struct McpArgs {
+    #[arg(long = "mode", value_enum, default_value_t = McpModeArg::ListTools)]
+    pub mode: McpModeArg,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
+pub enum McpModeArg {
+    ListTools,
+}
+
 pub fn run_cli(cli: Cli) -> Result<ExitCode, CliError> {
     match cli.command {
         Some(Command::Eval(args)) => handle_eval_command(args),
         Some(Command::Redteam(args)) => handle_redteam_command(args),
+        Some(Command::Mcp(args)) => handle_mcp_command(args),
         Some(
             Command::View
             | Command::Cache
-            | Command::Mcp
             | Command::CodeScans
             | Command::ScanModel
             | Command::Import
             | Command::Export,
         )
         | None => Ok(ExitCode::SUCCESS),
+    }
+}
+
+pub fn handle_mcp_command(args: McpArgs) -> Result<ExitCode, CliError> {
+    match args.mode {
+        McpModeArg::ListTools => {
+            let json = serde_json::to_string(&tool_listing()).map_err(|err| {
+                CliError::new(format!("mcp tool listing serialization failed: {err}"))
+            })?;
+            println!("{json}");
+            Ok(ExitCode::SUCCESS)
+        }
     }
 }
 
