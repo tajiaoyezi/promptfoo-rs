@@ -1,9 +1,9 @@
-use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
+use std::collections::BTreeMap;
 
-use super::fixtures::{validate_p0_fixture_corpus, FixtureCorpusReport, FixtureError, Priority};
 use super::inventory::{CapabilityInventory, InventoryItem};
 use super::matrix::{CapabilityMatrix, CapabilityRow};
+
+pub use super::fixtures::FixtureCorpus;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ProviderParityRegistry {
@@ -67,50 +67,6 @@ pub struct ParityInventoryItem {
 impl ParityInventoryItem {
     pub fn gap_reason(&self) -> Option<&str> {
         self.gap_reason.as_deref()
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct FixtureCorpus {
-    report: FixtureCorpusReport,
-}
-
-impl FixtureCorpus {
-    pub fn load(root: &Path, matrix: &CapabilityMatrix) -> Result<Self, FixtureError> {
-        Ok(Self {
-            report: validate_p0_fixture_corpus(root, matrix),
-        })
-    }
-
-    pub fn has_p0_fixture_for(&self, item_id: &str) -> bool {
-        self.report.fixtures.iter().any(|record| {
-            record.manifest.priority == Priority::P0
-                && record.manifest.blocks_stable_release
-                && record
-                    .manifest
-                    .matrix_item_ids
-                    .iter()
-                    .any(|matrix_id| matrix_id == item_id)
-        })
-    }
-
-    fn p0_fixture_item_count_for_prefix(&self, prefix: &str) -> usize {
-        self.p0_fixture_item_ids_for_prefix(prefix).len()
-    }
-
-    fn p0_fixture_item_ids_for_prefix(&self, prefix: &str) -> BTreeSet<String> {
-        self.report
-            .fixtures
-            .iter()
-            .filter(|record| record.manifest.priority == Priority::P0)
-            .flat_map(|record| record.manifest.matrix_item_ids.iter())
-            .filter(|matrix_id| matrix_id.starts_with(prefix))
-            .cloned()
-            .collect()
-    }
-
-    fn fixtures_requiring_real_secrets(&self) -> Vec<String> {
-        self.report.fixtures_requiring_real_secrets.clone()
     }
 }
 
