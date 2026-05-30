@@ -1,3 +1,5 @@
+pub mod scheduler;
+
 use serde::Serialize;
 
 use crate::config::NormalizedConfig;
