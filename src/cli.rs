@@ -2,16 +2,17 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use clap::{Args, Parser, Subcommand, ValueEnum};
+use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 
 use crate::compatibility::matrix::CapabilityMatrix;
 use crate::config::{load_promptfoo_config, EnvOverlay};
-use crate::eval::{run_eval, EvalOptions};
+use crate::eval::{run_eval, EvalOptions, EvalResultEnvelope};
 use crate::mcp::tool_listing;
-use crate::output::write_sarif;
+use crate::output::{write_output, write_sarif, OutputError, OutputFormat, RunSummary};
 use crate::redteam::{
     load_redteam_config, run_redteam_flow, write_redteam_report_file, MockTarget,
 };
+use crate::results::{AssertionResultRecord, ResultRecord, ResultStatus};
 use crate::scan::{known_limitations, run_scan, ScanInput};
 
 #[derive(Debug, Parser)]
@@ -63,8 +64,8 @@ pub enum Command {
 pub struct EvalArgs {
     #[arg(short = 'c', long = "config", value_name = "FILE")]
     pub config: Option<PathBuf>,
-    #[arg(long = "output", value_name = "FILE")]
-    pub output: Option<PathBuf>,
+    #[arg(long = "output", value_name = "FILE", action = ArgAction::Append)]
+    pub output: Vec<PathBuf>,
     #[arg(long = "max-concurrency", value_name = "N")]
     pub max_concurrency: Option<usize>,
 }
@@ -210,28 +211,144 @@ pub fn handle_scan_command(command: &'static str, args: ScanArgs) -> Result<Exit
 }
 
 pub fn handle_eval_command(args: EvalArgs) -> Result<ExitCode, CliError> {
-    if args.output.is_some() {
-        return Err(unsupported_command_error(
-            "eval --output",
-            "not yet implemented; output file parity is tracked for task 13.2",
-        ));
+    let artifacts = run_eval_cli(args)?;
+    let json = serde_json::to_string(&artifacts.envelope)
+        .map_err(|err| CliError::new(format!("result envelope serialization failed: {err}")))?;
+    println!("{json}");
+    if artifacts.envelope.status == "ok" {
+        Ok(ExitCode::SUCCESS)
+    } else {
+        Ok(ExitCode::FAILURE)
     }
-    if args.max_concurrency.is_some() {
-        return Err(unsupported_command_error(
-            "eval --max-concurrency",
-            "not yet implemented; scheduler parity is tracked for task 13.2",
-        ));
-    }
+}
+
+pub type EvalCliArgs = EvalArgs;
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CliRunArtifacts {
+    pub envelope: EvalResultEnvelope,
+    pub outputs: Vec<OutputArtifact>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OutputTarget {
+    pub path: PathBuf,
+    pub format: OutputFormat,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct OutputArtifact {
+    pub path: PathBuf,
+    pub format: OutputFormat,
+}
+
+pub fn run_eval_cli(args: EvalCliArgs) -> Result<CliRunArtifacts, CliError> {
     let config_path = args
         .config
+        .clone()
         .ok_or_else(|| CliError::new("config path is required for eval (-c, --config)"))?;
     let config = load_promptfoo_config(&config_path, &EnvOverlay::default())
         .map_err(|err| CliError::new(format!("config {}: {err}", config_path.display())))?;
-    let envelope = run_eval(config, EvalOptions::default()).map_err(CliError::new)?;
-    let json = serde_json::to_string(&envelope)
-        .map_err(|err| CliError::new(format!("result envelope serialization failed: {err}")))?;
-    println!("{json}");
-    Ok(ExitCode::SUCCESS)
+    let envelope = run_eval(
+        config,
+        EvalOptions {
+            max_concurrency: args.max_concurrency,
+            ..EvalOptions::default()
+        },
+    )
+    .map_err(CliError::new)?;
+    let output_targets = args
+        .output
+        .iter()
+        .map(|path| OutputTarget::from_path(path.clone()))
+        .collect::<Result<Vec<_>, _>>()?;
+    let outputs = write_requested_outputs(&envelope, &output_targets)
+        .map_err(|err| CliError::new(err.to_string()))?;
+    Ok(CliRunArtifacts { envelope, outputs })
+}
+
+pub fn write_requested_outputs(
+    envelope: &EvalResultEnvelope,
+    outputs: &[OutputTarget],
+) -> Result<Vec<OutputArtifact>, OutputError> {
+    let summary = run_summary_from_envelope(envelope);
+    let mut artifacts = Vec::new();
+    for output in outputs {
+        if let Some(parent) = output.path.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        let file = std::fs::File::create(&output.path)?;
+        write_output(output.format, &summary, file)?;
+        artifacts.push(OutputArtifact {
+            path: output.path.clone(),
+            format: output.format,
+        });
+    }
+    Ok(artifacts)
+}
+
+impl OutputTarget {
+    fn from_path(path: PathBuf) -> Result<Self, CliError> {
+        let extension = path
+            .extension()
+            .and_then(|extension| extension.to_str())
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        let format = match extension.as_str() {
+            "json" => OutputFormat::Json,
+            "jsonl" => OutputFormat::Jsonl,
+            "csv" => OutputFormat::Csv,
+            "yml" | "yaml" => OutputFormat::Yaml,
+            "xml" => OutputFormat::Junit,
+            "sarif" => OutputFormat::Sarif,
+            "html" | "htm" => OutputFormat::Html,
+            _ => {
+                return Err(CliError::new(format!(
+                    "unsupported output format for {}",
+                    path.display()
+                )))
+            }
+        };
+        Ok(Self { path, format })
+    }
+}
+
+fn run_summary_from_envelope(envelope: &EvalResultEnvelope) -> RunSummary {
+    RunSummary {
+        eval_id: "eval-cli".to_string(),
+        records: envelope
+            .results
+            .iter()
+            .map(|result| ResultRecord {
+                eval_id: "eval-cli".to_string(),
+                case_id: result.case_id.clone(),
+                provider_id: result.provider_id.clone(),
+                status: result_status(&result.status),
+                result: Some(serde_json::json!({ "output": result.output })),
+                assertion_results: result
+                    .assertion_results
+                    .iter()
+                    .map(|assertion| AssertionResultRecord {
+                        assertion_type: assertion.assertion_type.clone(),
+                        status: result_status(&assertion.status),
+                        message: assertion.message.clone(),
+                    })
+                    .collect(),
+                latency_ms: 0,
+                metadata: serde_json::json!({ "source": "eval-cli" }),
+                error: result.error.clone(),
+            })
+            .collect(),
+    }
+}
+
+fn result_status(status: &str) -> ResultStatus {
+    match status {
+        "passed" => ResultStatus::Passed,
+        "failed" => ResultStatus::Failed,
+        "error" => ResultStatus::Error,
+        _ => ResultStatus::Skipped,
+    }
 }
 
 pub fn handle_redteam_command(args: RedteamArgs) -> Result<ExitCode, CliError> {

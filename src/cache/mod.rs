@@ -2,9 +2,30 @@ pub mod resume;
 
 use std::collections::BTreeMap;
 
+use resume::{ResumeRecord, ResumeState};
 use serde::Serialize;
 use serde_json::Value;
 use sha2::{Digest, Sha256};
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct CacheStore {
+    state: ResumeState,
+}
+
+impl CacheStore {
+    pub fn from_records(records: Vec<ResumeRecord>) -> Self {
+        Self {
+            state: ResumeState {
+                records,
+                corrupt_records: Vec::new(),
+            },
+        }
+    }
+
+    pub fn state(&self) -> &ResumeState {
+        &self.state
+    }
+}
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 pub struct CacheKeyInput {

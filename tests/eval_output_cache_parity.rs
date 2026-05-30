@@ -45,7 +45,10 @@ fn test_13_2_1_eval_writes_requested_output_targets() {
     let junit = fs::read_to_string(fixture.path("junit.xml")).expect("junit exists");
     assert!(junit.contains(r#"<testsuite name="eval-cli""#), "{junit}");
     let csv = fs::read_to_string(fixture.path("results.csv")).expect("csv exists");
-    assert!(csv.starts_with("eval_id,case_id,provider_id,status"), "{csv}");
+    assert!(
+        csv.starts_with("eval_id,case_id,provider_id,status"),
+        "{csv}"
+    );
     let sarif: Value =
         serde_json::from_slice(&fs::read(fixture.path("findings.sarif")).expect("sarif exists"))
             .expect("sarif is json");
@@ -59,8 +62,11 @@ fn test_13_2_2_resume_eval_from_cache_runs_only_remaining_cases() {
     /* TEST-13.2.2 */
     let fixture = FixtureDir::new("test_13_2_2");
     fixture.write("promptfooconfig.yaml", three_case_config());
-    let config = load_promptfoo_config(&fixture.path("promptfooconfig.yaml"), &EnvOverlay::default())
-        .expect("config loads");
+    let config = load_promptfoo_config(
+        &fixture.path("promptfooconfig.yaml"),
+        &EnvOverlay::default(),
+    )
+    .expect("config loads");
     let cache = CacheStore::from_records(vec![ResumeRecord::completed(
         "case-0",
         "sha256:cached",
