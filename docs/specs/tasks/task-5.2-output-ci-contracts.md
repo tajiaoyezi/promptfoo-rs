@@ -1,8 +1,8 @@
 # Task 5.2: output-ci-contracts
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-5.2 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 5 — output-ci
@@ -64,17 +64,17 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): JSON/JUnit/CSV 至少可用于 CI 消费
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): SARIF 和 HTML 有稳定 data contract snapshot
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): stdout/stderr/exit code 与 P0 CLI fixtures 对齐
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): JSON/JUnit/CSV 至少可用于 CI 消费
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): SARIF 和 HTML 有稳定 data contract snapshot
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): stdout/stderr/exit code 与 P0 CLI fixtures 对齐
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-5.2.1 | TEST-5.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-5.2.2 | TEST-5.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-5.2.3 | TEST-5.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-5.2.1 | TEST-5.2.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-5.2.2 | TEST-5.2.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-5.2.3 | TEST-5.2.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -91,15 +91,30 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - Cargo.toml
+  - Cargo.lock
+  - src/lib.rs
+  - src/output/mod.rs
+  - src/output/json.rs
+  - src/output/junit.rs
+  - src/output/csv.rs
+  - src/output/sarif.rs
+  - src/output/html.rs
+  - tests/output_ci_contracts.rs
+  - docs/specs/tasks/task-5.2-output-ci-contracts.md
+  - docs/specs/phases/phase-5-output-ci.md
+  - docs/s2v-adapter.md
+  - docs/compatibility/matrix.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - e09f3be test(output-writers): add task-5.2 output CI RED tests
+  - 2c195ed feat(output-writers): add CI output formatters
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-5.2 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: passed — `cargo fetch` 通过；viewer/npm install 按 adapter N/A 跳过。
+  - typecheck: passed — `cargo check --workspace` 通过。
+  - unit-test: passed — `cargo test --workspace` 通过，TEST-5.2.1~TEST-5.2.3 加入后 36 个 integration tests 全部通过。
+  - manual: passed — 已核对 AC1/AC2/AC3、SCEN-5.2.1~5.2.3、TEST-5.2.1~TEST-5.2.3、compatibility matrix 的 JSON/JSONL/CSV/YAML 与 HTML/JUnit XML/SARIF output 行、P0 CLI stdout/stderr/exit code fixtures 与本实现/测试一致；Codex 非交互环境无 `/dev/tty`，manual key 以人工审查记录留证。
+- **剩余风险 / 未做项**：本 task 固定 formatter output contract 与 CLI stdout/stderr/exit code smoke；真实 SARIF finding 生产仍由 Phase 8 code-scans / scan-model / model-audit 负责接入。
+- **下游 task 影响**：Phase 6 compatibility harness 可将 `write_output` / `write_junit` / `write_sarif` 输出作为 golden diff artifact；Phase 8 可复用 `Finding` / `FindingLevel` 生成 SARIF。

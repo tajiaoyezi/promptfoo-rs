@@ -155,7 +155,7 @@ Rust coverage 工具尚未冻结。Ready 前如 task 声明 coverage 阈值，�
 | 4.2 | assertion-engine | docs/specs/tasks/task-4.2-assertion-engine.md | Done | Phase 4 AUTO order | N/A (solo) |
 | 4.3 | assertion-engine | docs/specs/tasks/task-4.3-custom-assertion-contracts.md | Done | Phase 4 AUTO order | N/A (solo) |
 | 5.1 | output-writers | docs/specs/tasks/task-5.1-result-store-schema.md | Done | Phase 5 AUTO order | N/A (solo) |
-| 5.2 | output-writers | docs/specs/tasks/task-5.2-output-ci-contracts.md | Ready | Phase 5 AUTO order | N/A (solo) |
+| 5.2 | output-writers | docs/specs/tasks/task-5.2-output-ci-contracts.md | Done | Phase 5 AUTO order | N/A (solo) |
 | 6.1 | compatibility | docs/specs/tasks/task-6.1-upstream-harness-runner.md | Ready | Phase 6 AUTO order | N/A (solo) |
 | 6.2 | compatibility | docs/specs/tasks/task-6.2-golden-diff-release-gate.md | Ready | Phase 6 AUTO order | N/A (solo) |
 | 7.1 | redteam-engine | docs/specs/tasks/task-7.1-redteam-command-flow.md | Ready | Phase 7 AUTO order | N/A (solo) |
