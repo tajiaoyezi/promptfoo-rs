@@ -1,8 +1,8 @@
 # Task 2.1: workspace-cli-skeleton
 
-> ✅ **Status: Ready** — readiness pass 已依据 PRD、phase spec、BDD feature 与 ADR 清零人工占位；可按本 spec 进入 /s2v-implement。
+> ✅ **Status: Done** — task-2.1 已按 RED→GREEN→§9 verification 完成，详见 §10 Completion Notes。
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 2 — config-cli-core
@@ -71,9 +71,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-2.1.1 | TEST-2.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC2 | SCEN-2.1.2 | TEST-2.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
-| AC3 | SCEN-2.1.3 | TEST-2.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Not Started |
+| AC1 | SCEN-2.1.1 | TEST-2.1.1 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC2 | SCEN-2.1.2 | TEST-2.1.2 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
+| AC3 | SCEN-2.1.3 | TEST-2.1.3 | N/A until integration harness exists | install, typecheck, unit-test, manual | Done |
 
 ## 8. Risks
 
@@ -90,15 +90,23 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-05-30
 - **改动文件**：
-  - <TBD-after-impl>
+  - Cargo.toml
+  - Cargo.lock
+  - src/lib.rs
+  - src/main.rs
+  - src/cli.rs
+  - tests/cli_skeleton.rs
+  - docs/specs/tasks/task-2.1-workspace-cli-skeleton.md
 - **commit 列表**：
-  - <TBD-after-impl>
+  - 0fe1a0e test(cli): add task-2.1 CLI skeleton RED tests
+  - 4504354 feat(cli): add promptfoo-compatible CLI skeleton
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-2.1 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - manual: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: 通过；`s2v_verify_full` 自动项执行 `cargo fetch` 成功（viewer/npm package.json 不存在，按 adapter 条件跳过）。
+  - typecheck: 通过；`cargo check --workspace` 成功。
+  - unit-test: 通过；`cargo test --workspace` 成功，TEST-1.1.*、TEST-1.2.*、TEST-2.1.* 共 9 passed / 0 failed。
+  - manual: 通过；`cargo run -- --help` 显示 eval/view/cache/redteam/mcp/code-scans/scan-model/import/export skeleton；已核对 AC、BDD SCEN-2.1.1~2.1.3、TEST-2.1.1~2.1.3。注：当前非交互 shell 无 `/dev/tty`，`s2v_run manual` 无法读取确认输入，人工核验结果记录于本条。
+- **剩余风险 / 未做项**：eval command 仅固定 CLI skeleton，配置加载与 runner 行为留给 task-2.2/task-2.3。
+- **下游 task 影响**：task-2.2 可接入 `EvalArgs.config`；task-2.3 可复用 `handle_eval_command` 入口扩展真实 eval smoke。
