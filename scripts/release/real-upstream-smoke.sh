@@ -33,7 +33,7 @@ YAML
 npm view promptfoo@0.121.13 version gitHead dist.tarball dist.integrity --json > "$ROOT/npm-view.json"
 
 set +e
-(cd "$WORK_DIR" && npx --yes promptfoo@0.121.13 eval -c promptfooconfig.yaml --output "../raw/upstream.json" > "../raw/upstream.stdout" 2> "../raw/upstream.stderr")
+(cd "$WORK_DIR" && PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1 NO_COLOR=1 CI=1 npx --yes promptfoo@0.121.13 eval -c promptfooconfig.yaml --output "../raw/upstream.json" > "../raw/upstream.stdout" 2> "../raw/upstream.stderr")
 upstream_exit=$?
 "$BIN" eval -c "$WORK_DIR/promptfooconfig.yaml" --output "$RAW_DIR/rs.json" > "$RAW_DIR/rs.stdout" 2> "$RAW_DIR/rs.stderr"
 rs_exit=$?
@@ -94,7 +94,7 @@ const metadata = {
     tarball: npmView.dist && npmView.dist.tarball,
     integrity: npmView.dist && npmView.dist.integrity,
   },
-  upstream_command: 'npx --yes promptfoo@0.121.13 eval -c promptfooconfig.yaml --output raw/upstream.json',
+  upstream_command: 'PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1 NO_COLOR=1 CI=1 npx --yes promptfoo@0.121.13 eval -c promptfooconfig.yaml --output raw/upstream.json',
   rs_binary: rsBinary,
   rs_command: `${rsBinary} eval -c promptfooconfig.yaml --output raw/rs.json`,
   used_test_binary: false,
