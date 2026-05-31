@@ -47,10 +47,9 @@ fn synthetic_source() -> FrozenSourceReference {
 #[test]
 fn test_17_1_1_baseline_reference_is_frozen_and_refuses_floating_refs() {
     /* TEST-17.1.1 */
-    let source = FrozenSourceReference::from_baseline_lock(Path::new(
-        "docs/compatibility/baseline.lock.md",
-    ))
-    .expect("baseline lock should parse into a frozen source reference");
+    let source =
+        FrozenSourceReference::from_baseline_lock(Path::new("docs/compatibility/baseline.lock.md"))
+            .expect("baseline lock should parse into a frozen source reference");
 
     assert_eq!(source.package_version, "0.121.13");
     assert_eq!(
@@ -133,9 +132,11 @@ fn test_17_1_4_source_inventory_evidence_records_blockers_and_status() {
 
     assert_eq!(json["schema"], "promptfoo-rs.source-inventory-evidence.v2");
     assert_eq!(json["status"], "ready-with-blockers");
-    assert!(json["release_blockers"]
-        .as_array()
-        .expect("release blockers should be an array")
-        .len()
-        >= inventory.items.len());
+    assert!(
+        json["release_blockers"]
+            .as_array()
+            .expect("release blockers should be an array")
+            .len()
+            >= inventory.items.len()
+    );
 }

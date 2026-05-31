@@ -37,7 +37,10 @@ fn test_17_3_1_real_corpus_summary_requires_50_real_upstream_runs() {
     assert_eq!(gate.status, ReleaseGateStatus::Ready, "{gate:#?}");
     assert!(gate.stable_allowed, "{gate:#?}");
     assert_eq!(gate.observed_p0_fixture_count, 50);
-    assert!(summary.fixtures.iter().all(|fixture| !fixture.used_test_binary));
+    assert!(summary
+        .fixtures
+        .iter()
+        .all(|fixture| !fixture.used_test_binary));
 
     let too_small = CorpusRunSummary::new((0..49).map(ready_fixture).collect());
     let blocked = validate_corpus_artifacts(&too_small, 50);
@@ -103,7 +106,10 @@ fn test_17_3_4_runtime_and_integration_gates_include_real_corpus() {
         .expect("integration script should exist");
 
     assert!(runtime.contains("real-upstream-corpus.sh"), "{runtime}");
-    assert!(runtime.contains("real-upstream-corpus/index.json"), "{runtime}");
+    assert!(
+        runtime.contains("real-upstream-corpus/index.json"),
+        "{runtime}"
+    );
     assert!(
         integration.contains("--test real_p0_golden_corpus_runner"),
         "{integration}"

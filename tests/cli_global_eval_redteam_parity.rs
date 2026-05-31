@@ -13,10 +13,7 @@ fn stderr(output: &std::process::Output) -> String {
 }
 
 fn write_eval_config() -> std::path::PathBuf {
-    let dir = std::env::temp_dir().join(format!(
-        "promptfoo-rs-cli-17-2-{}",
-        std::process::id()
-    ));
+    let dir = std::env::temp_dir().join(format!("promptfoo-rs-cli-17-2-{}", std::process::id()));
     std::fs::create_dir_all(&dir).expect("temp dir should be created");
     let config = dir.join("promptfooconfig.yaml");
     std::fs::write(
@@ -72,7 +69,10 @@ fn test_17_2_1_top_level_upstream_commands_are_mapped_or_explicit_gap() {
         "validate",
         "show",
     ] {
-        assert!(help.contains(command), "missing command {command} in:\n{help}");
+        assert!(
+            help.contains(command),
+            "missing command {command} in:\n{help}"
+        );
     }
 
     for command in ["share", "auth"] {
@@ -183,7 +183,10 @@ fn test_17_2_3_redteam_subcommands_have_stable_surface_and_gap_errors() {
     for command in [
         "init", "eval", "generate", "run", "report", "plugins", "discover", "poison", "setup",
     ] {
-        assert!(help.contains(command), "missing redteam {command} in:\n{help}");
+        assert!(
+            help.contains(command),
+            "missing redteam {command} in:\n{help}"
+        );
     }
 
     let plugins = promptfoo_rs()
