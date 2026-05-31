@@ -1,6 +1,6 @@
 # Phase 18: perfect-refactor-blocker-burndown
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -49,7 +49,12 @@ Phase 17 已证明 frozen baseline 的真实 upstream corpus、长尾分类和�
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **保留边界**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **Phase smoke**：PASS — `s2v_preflight_phase docs/specs/phases/phase-18-perfect-refactor-blocker-burndown.md` 通过；`s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 通过 9 项。首次 smoke 暴露 `tests/source_inventory_ledger_closure.rs` rustfmt drift，已用 `ccce5e0` 修正后重跑通过。
+- **Artifact evidence**：
+  - `target/release-gates/source-inventory-evidence.json` status=`ready-with-blockers`，missing_matrix_rows=0，release_blockers=74，p0_accounting_blocker_count=111。
+  - `target/release-gates/longtail-classification.json` status=`ready-with-blockers`，p0_provider_module_burndown initial=37/resolved_by_fixture=13/remaining=24，p0_release_blocker_count=24。
+  - `target/release-gates/current-upstream-policy.json` status=`ready`，target_mode=`frozen`，current_perfect_claim_allowed=false。
+  - `target/release-gates/publication-authority.json` publication_ready=`credential-blocked`，credential_blocked=true，legal_brand_blocked=true，blockers=6，all channels published=false。
+  - `target/release-gates/release-candidate.json` includes `target_policy` and `publication_authority`; release candidate published=false and publication_ready=`credential-blocked`。
+- **保留边界**：Phase 18 完成了 blocker 可审计化和 gate 化，不等于完美重构完成：111 个 generated P0 source accounting blockers、24 个 P0 provider module blockers、current upstream HEAD rebaseline、真实发布凭据/授权仍是后续工作边界。

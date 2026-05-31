@@ -1,6 +1,6 @@
 # promptfoo current perfect-refactor audit - 2026-05-31
 
-**Status**: Current audit verdict after Phase 18.3 target-mode gate
+**Status**: Current audit verdict after Phase 18 completion
 **Objective**: determine whether the current `promptfoo-rs` worktree completely satisfies a perfect refactor of `promptfoo/promptfoo`.
 **Verdict**: Not fully satisfied.
 
@@ -60,7 +60,7 @@ This proves the current local gate chain is executable and green. It does not by
 
 The project is materially stronger than the earlier audit snapshots:
 
-- All phase and task specs are `Done` through Phase 17.
+- All phase and task specs are `Done` through Phase 18.
 - Adapter verification commands are executable; the full 9-key local gate runs.
 - `viewer/` and `npm/` include package metadata, lockfiles, build/test scripts, and smoke scripts.
 - Phase 16 removed the previous no-op CLI behavior for `view`, `cache`, `import`, and `export`.
@@ -69,6 +69,7 @@ The project is materially stronger than the earlier audit snapshots:
 - Phase 18.2 added provider-module burndown evidence: 37 P0 provider module blockers are now split into 13 existing P0 fixture-covered rows and 24 explicit remaining blockers with item-level reasons.
 - Phase 18.3 added a current-upstream target-mode gate: `current-upstream-policy.json` and `release-candidate.json.target_policy` now make frozen/current claim scope machine-readable.
 - Phase 18.4 added publication authority evidence: `publication-authority.json` and `release-candidate.json.publication_authority` now separate local installability, credential blockers, legal/brand blockers, and actual published evidence.
+- Phase 18 smoke passed `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` after rustfmt drift was corrected.
 
 These are real progress items. They support a scoped frozen-baseline compatibility implementation, not a literal perfect refactor claim.
 
