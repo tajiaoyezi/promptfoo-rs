@@ -236,6 +236,44 @@ pub struct SourceInventoryReport {
     pub release_blockers: Vec<SourceInventoryBlocker>,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceAccountingLedger {
+    pub schema: String,
+    pub source_extracted_item_count: usize,
+    pub ledger_item_count: usize,
+    pub unrepresented_item_count: usize,
+    pub p0_blocker_count: usize,
+    pub rows: Vec<SourceAccountingRow>,
+    pub unrepresented_items: Vec<String>,
+}
+
+impl SourceAccountingLedger {
+    pub fn unrepresented_items(&self) -> Vec<String> {
+        self.unrepresented_items.clone()
+    }
+
+    pub fn p0_blockers(&self) -> Vec<String> {
+        self.rows
+            .iter()
+            .filter(|row| row.level == "P0" && row.verification.starts_with("blocker:"))
+            .map(|row| row.item_id.clone())
+            .collect()
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceAccountingRow {
+    pub item_id: String,
+    pub category: String,
+    pub source_reference: String,
+    pub level: String,
+    pub target_status: String,
+    pub owner: String,
+    pub verification: String,
+    pub reason: String,
+    pub generated: bool,
+}
+
 pub struct SourceInventoryExtractor;
 
 impl SourceInventoryExtractor {
@@ -368,6 +406,61 @@ pub fn validate_source_extracted_inventory(
     }
 }
 
+pub fn build_source_accounting_ledger(
+    inventory: &SourceExtractedInventory,
+    matrix: &CapabilityMatrix,
+) -> SourceAccountingLedger {
+    let explicit_rows: BTreeMap<&str, &super::matrix::CapabilityRow> = matrix
+        .rows
+        .iter()
+        .map(|row| (row.capability.as_str(), row))
+        .collect();
+    let mut rows = Vec::new();
+    let mut represented = BTreeSet::new();
+
+    for item in &inventory.items {
+        if let Some(row) = explicit_rows.get(item.stable_id.as_str()) {
+            represented.insert(item.stable_id.clone());
+            rows.push(SourceAccountingRow {
+                item_id: item.stable_id.clone(),
+                category: item.category.clone(),
+                source_reference: item.source_reference.clone(),
+                level: row.level.clone(),
+                target_status: row.target_status.clone(),
+                owner: row.owner.clone(),
+                verification: row.verification.clone(),
+                reason: row.notes.clone(),
+                generated: false,
+            });
+            continue;
+        }
+
+        represented.insert(item.stable_id.clone());
+        rows.push(generated_accounting_row(item));
+    }
+
+    let unrepresented_items = inventory
+        .items
+        .iter()
+        .filter(|item| !represented.contains(&item.stable_id))
+        .map(|item| item.stable_id.clone())
+        .collect::<Vec<_>>();
+    let p0_blocker_count = rows
+        .iter()
+        .filter(|row| row.level == "P0" && row.verification.starts_with("blocker:"))
+        .count();
+
+    SourceAccountingLedger {
+        schema: "promptfoo-rs.source-inventory-ledger.v1".to_string(),
+        source_extracted_item_count: inventory.items.len(),
+        ledger_item_count: rows.len(),
+        unrepresented_item_count: unrepresented_items.len(),
+        p0_blocker_count,
+        rows,
+        unrepresented_items,
+    }
+}
+
 pub fn write_source_inventory_evidence(
     report: &SourceInventoryReport,
     path: &Path,
@@ -376,6 +469,18 @@ pub fn write_source_inventory_evidence(
         fs::create_dir_all(parent).map_err(InventoryError::Write)?;
     }
     let json = serde_json::to_string_pretty(report)
+        .map_err(|error| InventoryError::Parse(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(InventoryError::Write)
+}
+
+pub fn write_source_accounting_ledger(
+    ledger: &SourceAccountingLedger,
+    path: &Path,
+) -> Result<(), InventoryError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(InventoryError::Write)?;
+    }
+    let json = serde_json::to_string_pretty(ledger)
         .map_err(|error| InventoryError::Parse(error.to_string()))?;
     fs::write(path, format!("{json}\n")).map_err(InventoryError::Write)
 }
@@ -540,6 +645,51 @@ fn insert_source_item(items: &mut BTreeMap<String, InventoryItem>, category: &st
             owner_hint,
             unresolved_reason,
         });
+}
+
+fn generated_accounting_row(item: &InventoryItem) -> SourceAccountingRow {
+    let level = item.level_hint.clone();
+    let (target_status, verification, reason_prefix) = match level.as_str() {
+        "P0" => (
+            "blocked".to_string(),
+            format!("blocker:{}", item.stable_id),
+            "generated P0 accounting row requires native fixture, bridge fixture, or explicit waiver",
+        ),
+        "P1" => (
+            "later".to_string(),
+            format!("snapshot:{}", item.stable_id),
+            "generated P1 accounting row requires snapshot verification before parity claim",
+        ),
+        "P2" => (
+            "later".to_string(),
+            format!("registration:{}", item.stable_id),
+            "generated P2 accounting row records known gap or follow-up target",
+        ),
+        _ => (
+            "blocked".to_string(),
+            format!("blocker:{}", item.stable_id),
+            "generated accounting row has invalid level and requires manual classification",
+        ),
+    };
+    let source_reason = item
+        .unresolved_reason
+        .as_deref()
+        .unwrap_or("source-extracted item was not present in explicit item-level matrix");
+
+    SourceAccountingRow {
+        item_id: item.stable_id.clone(),
+        category: item.category.clone(),
+        source_reference: item.source_reference.clone(),
+        level,
+        target_status,
+        owner: item.owner_hint.clone(),
+        verification,
+        reason: format!(
+            "{reason_prefix}; reason: {source_reason}; source: {}",
+            item.source_reference
+        ),
+        generated: true,
+    }
 }
 
 fn classify_source_item(category: &str, file: &str) -> (String, String, String, Option<String>) {

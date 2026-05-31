@@ -11,6 +11,7 @@ GATE_DIR="target/release-gates"
 mkdir -p "$GATE_DIR"
 OUT="$GATE_DIR/source-inventory-evidence.json"
 ITEMS_OUT="$GATE_DIR/source-extracted-items.json"
+LEDGER_OUT="$GATE_DIR/source-inventory-ledger.json"
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
@@ -19,7 +20,7 @@ git clone --quiet --filter=blob:none --no-checkout --depth 1 --branch "$BASELINE
 git -C "$tmpdir/upstream" rev-parse HEAD > "$tmpdir/git-head.txt"
 git -C "$tmpdir/upstream" ls-tree -r --name-only HEAD > "$tmpdir/source-files.txt"
 
-node - "$tmpdir/npm-view.json" "$tmpdir/git-head.txt" "$tmpdir/source-files.txt" "compatibility/matrix/items.json" "compatibility/inventory/upstream-items.json" "$ITEMS_OUT" "$OUT" <<'NODE'
+node - "$tmpdir/npm-view.json" "$tmpdir/git-head.txt" "$tmpdir/source-files.txt" "compatibility/matrix/items.json" "compatibility/inventory/upstream-items.json" "$ITEMS_OUT" "$LEDGER_OUT" "$OUT" <<'NODE'
 const fs = require('fs');
 
 const [
@@ -29,6 +30,7 @@ const [
   matrixPath,
   curatedInventoryPath,
   itemsOutputPath,
+  ledgerOutputPath,
   evidenceOutputPath,
 ] = process.argv.slice(2);
 
@@ -249,16 +251,95 @@ const items = Array.from(itemsById.values()).sort((left, right) =>
   left.stable_id.localeCompare(right.stable_id),
 );
 
-const matrixRows = new Set();
+const explicitRowsById = new Map();
 if (Array.isArray(matrixManifest.rows)) {
   for (const row of matrixManifest.rows) {
-    matrixRows.add(row.capability);
+    explicitRowsById.set(row.capability, {
+      item_id: row.capability,
+      category: String(row.capability || '').split(':')[0] || '<unknown>',
+      source_reference: row.notes || 'explicit matrix row',
+      level: row.level,
+      target_status: row.target_status,
+      owner: row.owner,
+      verification: row.verification,
+      reason: row.notes || 'explicit matrix row',
+      generated: false,
+    });
   }
 } else if (matrixManifest.source_inventory) {
   for (const item of curatedInventory) {
-    matrixRows.add(item.stable_id);
+    explicitRowsById.set(item.stable_id, {
+      item_id: item.stable_id,
+      category: item.category,
+      source_reference: item.source_reference,
+      level: item.level_hint,
+      target_status: item.status,
+      owner: item.owner_hint,
+      verification: verificationFor(item.level_hint, item.stable_id, item.status),
+      reason: item.unresolved_reason || 'explicit inventory row',
+      generated: false,
+    });
   }
 }
+
+function verificationFor(level, itemId, status = '') {
+  const normalizedStatus = String(status || '').toLowerCase();
+  if (level === 'P0') {
+    return normalizedStatus === 'blocked' || normalizedStatus === 'unresolved'
+      ? `blocker:${itemId}`
+      : `fixture:${itemId}`;
+  }
+  if (level === 'P1') return `snapshot:${itemId}`;
+  if (level === 'P2') return `registration:${itemId}`;
+  return `blocker:${itemId}`;
+}
+
+function generatedTargetStatus(level) {
+  if (level === 'P0') return 'blocked';
+  if (level === 'P1' || level === 'P2') return 'later';
+  return 'blocked';
+}
+
+function generatedReason(item) {
+  const base = item.unresolved_reason || 'source-extracted item was not present in explicit item-level matrix';
+  if (item.level_hint === 'P0') {
+    return `generated P0 accounting row requires native fixture, bridge fixture, or explicit waiver; reason: ${base}; source: ${item.source_reference}`;
+  }
+  if (item.level_hint === 'P1') {
+    return `generated P1 accounting row requires snapshot verification before parity claim; reason: ${base}; source: ${item.source_reference}`;
+  }
+  if (item.level_hint === 'P2') {
+    return `generated P2 accounting row records known gap or follow-up target; reason: ${base}; source: ${item.source_reference}`;
+  }
+  return `generated accounting row has invalid level and requires manual classification; reason: ${base}; source: ${item.source_reference}`;
+}
+
+const ledgerRows = [];
+const generatedMatrixRows = [];
+for (const item of items) {
+  const explicit = explicitRowsById.get(item.stable_id);
+  if (explicit) {
+    ledgerRows.push({
+      ...explicit,
+      source_reference: item.source_reference,
+    });
+    continue;
+  }
+  const generated = {
+    item_id: item.stable_id,
+    category: item.category,
+    source_reference: item.source_reference,
+    level: item.level_hint,
+    target_status: generatedTargetStatus(item.level_hint),
+    owner: item.owner_hint,
+    verification: verificationFor(item.level_hint, item.stable_id, 'blocked'),
+    reason: generatedReason(item),
+    generated: true,
+  };
+  generatedMatrixRows.push(generated);
+  ledgerRows.push(generated);
+}
+const representedRows = new Set(ledgerRows.map((row) => row.item_id));
 
 const itemsMissingMetadata = items
   .filter(
@@ -274,7 +355,7 @@ const itemsMissingMetadata = items
   .map((item) => item.stable_id || '<missing-stable-id>');
 
 const missingMatrixRows = items
-  .filter((item) => !matrixRows.has(item.stable_id))
+  .filter((item) => !representedRows.has(item.stable_id))
   .map((item) => item.stable_id);
 
 const releaseBlockers = [];
@@ -289,6 +370,14 @@ for (const itemId of itemsMissingMetadata) {
     item_id: itemId,
     reason: 'source-extracted item missing required metadata',
   });
+}
+for (const row of generatedMatrixRows) {
+  if (row.level === 'P0' && row.verification.startsWith('blocker:')) {
+    releaseBlockers.push({
+      item_id: row.item_id,
+      reason: 'generated source-accounting P0 row requires native fixture, bridge fixture, or explicit waiver before perfect parity claim',
+    });
+  }
 }
 for (const [key, minimum] of Object.entries(auditBaselineCounts)) {
   if ((sourceCounts[key] || 0) < minimum) {
@@ -339,6 +428,9 @@ const baseline = {
   acquisition_command: `git clone --filter=blob:none --no-checkout --depth 1 --branch ${baselineVersion} https://github.com/promptfoo/promptfoo.git && git ls-tree -r --name-only ${baselineCommit}`,
 };
 const extractionTimestamp = new Date().toISOString();
+const p0BlockerCount = ledgerRows.filter(
+  (row) => row.level === 'P0' && String(row.verification || '').startsWith('blocker:'),
+).length;
 
 fs.writeFileSync(
   itemsOutputPath,
@@ -349,6 +441,26 @@ fs.writeFileSync(
       extraction_timestamp: extractionTimestamp,
       source_counts: sourceCounts,
       items,
+    },
+    null,
+    2,
+  ) + '\n',
+);
+
+fs.writeFileSync(
+  ledgerOutputPath,
+  JSON.stringify(
+    {
+      schema: 'promptfoo-rs.source-inventory-ledger.v1',
+      baseline,
+      extraction_timestamp: extractionTimestamp,
+      source_extracted_item_count: items.length,
+      ledger_item_count: ledgerRows.length,
+      generated_matrix_rows_count: generatedMatrixRows.length,
+      unrepresented_item_count: missingMatrixRows.length,
+      p0_blocker_count: p0BlockerCount,
+      rows: ledgerRows,
+      unrepresented_items: missingMatrixRows,
     },
     null,
     2,
@@ -368,6 +480,10 @@ fs.writeFileSync(
       source_counts: sourceCounts,
       inventory_item_count: curatedInventory.length,
       source_extracted_item_count: items.length,
+      source_accounting_ledger: ledgerOutputPath,
+      ledger_item_count: ledgerRows.length,
+      generated_matrix_rows_count: generatedMatrixRows.length,
+      p0_accounting_blocker_count: p0BlockerCount,
       items_missing_metadata: itemsMissingMetadata,
       missing_matrix_rows: missingMatrixRows,
       silent_omissions: [],

@@ -136,6 +136,9 @@ observability_status="ready"
 real_upstream_smoke_status="ready"
 real_upstream_corpus_status="ready"
 longtail_classification_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/longtail-classification.json', 'utf8')); console.log(r.status)")"
+source_inventory_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/source-inventory-evidence.json', 'utf8')); console.log(r.status)")"
+source_inventory_missing_matrix_rows="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/source-inventory-evidence.json', 'utf8')); console.log((r.missing_matrix_rows || []).length)")"
+source_inventory_p0_accounting_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/source-inventory-evidence.json', 'utf8')); console.log(r.p0_accounting_blocker_count || 0)")"
 installability_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/installability.json', 'utf8')); console.log(r.installability_ready ? 'true' : 'false')")"
 publication_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/installability.json', 'utf8')); console.log(r.publication_ready)")"
 credential_blocked="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/installability.json', 'utf8')); console.log(r.credential_blocked ? 'true' : 'false')")"
@@ -205,9 +208,14 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "packaging": "$packaging_status",
     "observability": "$observability_status",
     "installability": "ready",
+    "source_inventory": "$source_inventory_status",
     "longtail_classification": "$longtail_classification_status",
     "real_upstream_smoke": "$real_upstream_smoke_status",
     "real_upstream_corpus": "$real_upstream_corpus_status"
+  },
+  "source_inventory": {
+    "missing_matrix_rows": $source_inventory_missing_matrix_rows,
+    "p0_accounting_blocker_count": $source_inventory_p0_accounting_blocker_count
   },
   "artifact_paths": [
     "target/release-gates/cli-help.txt",
@@ -216,6 +224,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/performance.json",
     "target/release-gates/security.json",
     "target/release-gates/source-inventory-evidence.json",
+    "target/release-gates/source-inventory-ledger.json",
     "target/release-gates/longtail-classification.json",
     "target/release-gates/installability.json",
     "target/release-gates/real-upstream-smoke/latest/metadata.json",
@@ -233,6 +242,7 @@ JSON
 
 validate_report_json "$GATE_DIR/performance.json"
 validate_report_json "$GATE_DIR/security.json"
+validate_report_json "$GATE_DIR/source-inventory-ledger.json"
 validate_report_json "$GATE_DIR/release-candidate.json"
 
 if [ "$stable_allowed" != "true" ]; then
