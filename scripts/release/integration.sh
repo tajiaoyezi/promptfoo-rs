@@ -7,6 +7,7 @@ cargo test \
   --test redteam_plugin_strategy_parity \
   --test longtail_provider_assertion_redteam_classification \
   --test release_installability_publication_readiness \
+  --test publication_authority_release_gate \
   --test current_upstream_rebaseline_gate \
   --test real_p0_golden_corpus_runner \
   --test real_upstream_smoke_gate \
