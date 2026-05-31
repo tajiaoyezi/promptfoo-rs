@@ -380,6 +380,174 @@ pub fn write_current_upstream_policy(
     fs::write(path, format!("{json}\n")).map_err(TargetPolicyError::Write)
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct NpmPackageObservation {
+    pub package_name: String,
+    pub package_version: String,
+    pub git_head: String,
+    pub tarball: String,
+    pub integrity: String,
+    pub modified: String,
+    pub source: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct UpstreamDistributionTarget {
+    pub schema: String,
+    pub status: String,
+    pub frozen: FrozenSourceReference,
+    pub npm_core: NpmPackageObservation,
+    pub github: CurrentUpstreamObservation,
+    pub npm_core_matches_frozen_baseline: bool,
+    pub repository_head_matches_npm_core: bool,
+    pub github_latest_release_is_core_package: bool,
+    pub github_latest_release_channel: String,
+    pub current_repository_perfect_claim_allowed: bool,
+    pub reason: String,
+    pub observed_at: String,
+}
+
+#[derive(Debug)]
+pub enum DistributionTargetError {
+    Read(std::io::Error),
+    Write(std::io::Error),
+    Parse(String),
+}
+
+impl std::fmt::Display for DistributionTargetError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Read(error) => write!(
+                formatter,
+                "failed to read distribution target input: {error}"
+            ),
+            Self::Write(error) => write!(
+                formatter,
+                "failed to write distribution target output: {error}"
+            ),
+            Self::Parse(error) => write!(
+                formatter,
+                "failed to parse distribution target input: {error}"
+            ),
+        }
+    }
+}
+
+impl std::error::Error for DistributionTargetError {}
+
+pub fn parse_npm_package_observation(
+    json: &str,
+) -> Result<NpmPackageObservation, DistributionTargetError> {
+    let value: serde_json::Value = serde_json::from_str(json)
+        .map_err(|error| DistributionTargetError::Parse(error.to_string()))?;
+    let package_version = json_string(&value, "version").ok_or_else(|| {
+        DistributionTargetError::Parse("npm metadata missing version".to_string())
+    })?;
+    let git_head = json_string(&value, "gitHead").ok_or_else(|| {
+        DistributionTargetError::Parse("npm metadata missing gitHead".to_string())
+    })?;
+    let tarball =
+        nested_or_flat_string(&value, &["dist", "tarball"], "dist.tarball").ok_or_else(|| {
+            DistributionTargetError::Parse("npm metadata missing dist.tarball".to_string())
+        })?;
+    let integrity = nested_or_flat_string(&value, &["dist", "integrity"], "dist.integrity")
+        .ok_or_else(|| {
+            DistributionTargetError::Parse("npm metadata missing dist.integrity".to_string())
+        })?;
+    let modified = nested_or_flat_string(&value, &["time", "modified"], "time.modified")
+        .ok_or_else(|| {
+            DistributionTargetError::Parse("npm metadata missing time.modified".to_string())
+        })?;
+
+    if !is_full_sha(&git_head) {
+        return Err(DistributionTargetError::Parse(
+            "npm gitHead must be a full 40 character SHA".to_string(),
+        ));
+    }
+    if !integrity.starts_with("sha512-") {
+        return Err(DistributionTargetError::Parse(
+            "npm integrity must be a sha512 value".to_string(),
+        ));
+    }
+    if !tarball.starts_with("https://registry.npmjs.org/") {
+        return Err(DistributionTargetError::Parse(
+            "npm tarball must come from registry.npmjs.org".to_string(),
+        ));
+    }
+
+    Ok(NpmPackageObservation {
+        package_name: "promptfoo".to_string(),
+        package_version,
+        git_head,
+        tarball,
+        integrity,
+        modified,
+        source:
+            "npm view promptfoo version gitHead dist.tarball dist.integrity time.modified --json"
+                .to_string(),
+    })
+}
+
+pub fn build_upstream_distribution_target(
+    npm: NpmPackageObservation,
+    github: CurrentUpstreamObservation,
+    frozen: FrozenSourceReference,
+) -> UpstreamDistributionTarget {
+    let npm_core_matches_frozen_baseline = npm.package_version == frozen.package_version
+        && npm.git_head == frozen.git_commit
+        && npm.integrity == frozen.npm_integrity;
+    let repository_head_matches_npm_core = github.current_head == npm.git_head;
+    let github_latest_release_channel =
+        classify_github_release_channel(github.observed_release_ref.as_deref());
+    let github_latest_release_is_core_package = github_latest_release_channel == "core-package"
+        && github.observed_release_commit.as_deref() == Some(npm.git_head.as_str());
+    let current_repository_perfect_claim_allowed =
+        repository_head_matches_npm_core && github_latest_release_is_core_package;
+    let status = if current_repository_perfect_claim_allowed {
+        "ready"
+    } else if npm_core_matches_frozen_baseline {
+        "ready-with-drift"
+    } else {
+        "blocked"
+    };
+    let reason = distribution_target_reason(
+        &npm,
+        &github,
+        &frozen,
+        npm_core_matches_frozen_baseline,
+        repository_head_matches_npm_core,
+        github_latest_release_is_core_package,
+        &github_latest_release_channel,
+    );
+
+    UpstreamDistributionTarget {
+        schema: "promptfoo-rs.upstream-distribution-target.v1".to_string(),
+        status: status.to_string(),
+        frozen,
+        npm_core: npm,
+        github,
+        npm_core_matches_frozen_baseline,
+        repository_head_matches_npm_core,
+        github_latest_release_is_core_package,
+        github_latest_release_channel,
+        current_repository_perfect_claim_allowed,
+        reason,
+        observed_at: current_unix_timestamp(),
+    }
+}
+
+pub fn write_upstream_distribution_target(
+    target: &UpstreamDistributionTarget,
+    path: &Path,
+) -> Result<(), DistributionTargetError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(DistributionTargetError::Write)?;
+    }
+    let json = serde_json::to_string_pretty(target)
+        .map_err(|error| DistributionTargetError::Parse(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(DistributionTargetError::Write)
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SourceInventoryCounts {
     pub command_related_files: usize,
@@ -1522,6 +1690,84 @@ fn is_ts_or_js_file(file: &str) -> bool {
     matches!(
         file.rsplit_once('.').map(|(_, extension)| extension),
         Some("ts" | "tsx" | "js" | "jsx" | "mjs" | "cjs")
+    )
+}
+
+fn json_string(value: &serde_json::Value, key: &str) -> Option<String> {
+    value.get(key)?.as_str().map(ToString::to_string)
+}
+
+fn nested_or_flat_string(
+    value: &serde_json::Value,
+    nested_path: &[&str],
+    flat_key: &str,
+) -> Option<String> {
+    let mut nested = Some(value);
+    for key in nested_path {
+        nested = nested.and_then(|node| node.get(*key));
+    }
+    nested
+        .and_then(|node| node.as_str())
+        .map(ToString::to_string)
+        .or_else(|| json_string(value, flat_key))
+}
+
+fn classify_github_release_channel(ref_name: Option<&str>) -> String {
+    let Some(ref_name) = ref_name else {
+        return "none".to_string();
+    };
+    let tag = ref_name.strip_prefix("refs/tags/").unwrap_or(ref_name);
+    if tag.starts_with("code-scan-action-") {
+        "github-action".to_string()
+    } else if tag
+        .chars()
+        .next()
+        .map(|ch| ch.is_ascii_digit())
+        .unwrap_or(false)
+    {
+        "core-package".to_string()
+    } else {
+        "other".to_string()
+    }
+}
+
+fn distribution_target_reason(
+    npm: &NpmPackageObservation,
+    github: &CurrentUpstreamObservation,
+    frozen: &FrozenSourceReference,
+    npm_matches_frozen: bool,
+    repository_head_matches_npm_core: bool,
+    latest_release_is_core_package: bool,
+    latest_release_channel: &str,
+) -> String {
+    if repository_head_matches_npm_core && latest_release_is_core_package {
+        return format!(
+            "npm core package {}, repository HEAD, and GitHub latest core release share {}",
+            npm.package_version, npm.git_head
+        );
+    }
+    if npm_matches_frozen {
+        let mut reason = format!(
+            "npm core package {} matches frozen baseline {}, preserving frozen-baseline evidence for the published core package",
+            npm.package_version, frozen.git_commit
+        );
+        if !repository_head_matches_npm_core {
+            reason.push_str(&format!(
+                "; repository HEAD {} differs from npm core gitHead {}",
+                github.current_head, npm.git_head
+            ));
+        }
+        if !latest_release_is_core_package {
+            reason.push_str(&format!(
+                "; GitHub latest observed release {:?} is classified as {}, not npm core package evidence",
+                github.observed_release_ref, latest_release_channel
+            ));
+        }
+        return reason;
+    }
+    format!(
+        "npm core package {} ({}) differs from frozen baseline {}",
+        npm.package_version, npm.git_head, frozen.git_commit
     )
 }
 

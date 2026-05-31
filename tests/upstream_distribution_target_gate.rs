@@ -35,13 +35,12 @@ ff8eafd743cf6d63dd85b790ad8a4c73ede5828d\tHEAD
 fn test_21_1_1_npm_core_package_metadata_matches_frozen_baseline() {
     /* TEST-21.1.1 */
     let npm = parse_npm_package_observation(NPM_VIEW).expect("npm package metadata parses");
-    let target = build_upstream_distribution_target(
-        npm,
-        current_observation(),
-        frozen_reference(),
-    );
+    let target = build_upstream_distribution_target(npm, current_observation(), frozen_reference());
 
-    assert_eq!(target.schema, "promptfoo-rs.upstream-distribution-target.v1");
+    assert_eq!(
+        target.schema,
+        "promptfoo-rs.upstream-distribution-target.v1"
+    );
     assert_eq!(target.npm_core.package_name, "promptfoo");
     assert_eq!(target.npm_core.package_version, "0.121.13");
     assert_eq!(target.npm_core.git_head, FROZEN_SHA);
@@ -136,7 +135,10 @@ fn test_21_1_4_runtime_smoke_wires_distribution_target_artifact() {
             .expect("release distribution target should exist"),
     )
     .expect("release distribution target should be valid JSON");
-    assert_eq!(release_target["github_latest_release_is_core_package"], false);
+    assert_eq!(
+        release_target["github_latest_release_is_core_package"],
+        false
+    );
 
     let runtime_smoke =
         std::fs::read_to_string("scripts/release/runtime-smoke.sh").expect("runtime smoke exists");
@@ -150,7 +152,10 @@ fn test_21_1_4_runtime_smoke_wires_distribution_target_artifact() {
     ] {
         let docs = std::fs::read_to_string(docs_path).expect("docs should be readable");
         assert!(docs.contains("Task 21.1"), "{docs_path}");
-        assert!(docs.contains("upstream-distribution-target.json"), "{docs_path}");
+        assert!(
+            docs.contains("upstream-distribution-target.json"),
+            "{docs_path}"
+        );
     }
 
     let _ = std::fs::remove_dir_all(fixture_dir);
@@ -179,7 +184,9 @@ fn frozen_reference() -> FrozenSourceReference {
 }
 
 fn shell_escape(path: &Path) -> String {
-    path.to_string_lossy().replace('\\', "/").replace('\'', "'\\''")
+    path.to_string_lossy()
+        .replace('\\', "/")
+        .replace('\'', "'\\''")
 }
 
 fn git_bash() -> &'static str {

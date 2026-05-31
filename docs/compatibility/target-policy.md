@@ -39,3 +39,7 @@ Stable release gates bind to exactly one immutable compatibility target. Moving 
 ## Current Upstream Gate
 
 Task 18.3 adds `compatibility/inventory/current-upstream-target.json`, `scripts/release/current-upstream-policy.sh`, and runtime-smoke artifact `target/release-gates/current-upstream-policy.json`. The release candidate now carries `target_policy.target_mode`, `target_policy.current_perfect_claim_allowed`, frozen git commit, and observed current HEAD. In the default frozen mode, `current_perfect_claim_allowed=false` whenever observed current HEAD differs from `4860e990c7e9a2f8f677173fb92cf9867b34d03f`; current mode requires source inventory, matrix, fixtures, golden corpus, and release candidate evidence to share the same observed ref before any current-perfect claim is allowed.
+
+## Upstream Distribution Target Gate
+
+Task 21.1 adds `target/release-gates/upstream-distribution-target.json`. This artifact separates npm `promptfoo` core package metadata from GitHub repository HEAD and observed GitHub release tags. `npm_core_matches_frozen_baseline=true` means the published npm core package still matches the frozen baseline evidence; it does not mean repository HEAD or a non-core GitHub release is complete. `repository_head_matches_npm_core=false` or `github_latest_release_is_core_package=false` keeps `current_repository_perfect_claim_allowed=false` until a future rebaseline task produces same-ref inventory, matrix, fixture, golden corpus, and release candidate evidence.

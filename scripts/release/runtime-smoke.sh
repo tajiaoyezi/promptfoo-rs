@@ -20,6 +20,7 @@ cargo test \
 bash scripts/release/source-inventory-evidence.sh
 bash scripts/release/longtail-classification.sh
 bash scripts/release/current-upstream-policy.sh
+bash scripts/release/upstream-distribution-target.sh
 bash scripts/release/real-upstream-smoke.sh
 bash scripts/release/real-upstream-corpus.sh
 PROMPTFOO_RS_SKIP_RUNTIME_SMOKE=1 bash scripts/release/installability.sh
@@ -142,6 +143,12 @@ current_target_mode="$(node -e "const r = JSON.parse(require('fs').readFileSync(
 current_perfect_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-upstream-policy.json', 'utf8')); console.log(r.current_perfect_claim_allowed ? 'true' : 'false')")"
 current_upstream_head="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-upstream-policy.json', 'utf8')); console.log(r.current.current_head)")"
 frozen_git_commit="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-upstream-policy.json', 'utf8')); console.log(r.frozen.git_commit)")"
+upstream_distribution_target_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.status)")"
+upstream_distribution_npm_core_matches_frozen="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.npm_core_matches_frozen_baseline ? 'true' : 'false')")"
+upstream_distribution_repository_head_matches_npm="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.repository_head_matches_npm_core ? 'true' : 'false')")"
+upstream_distribution_github_latest_is_core="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.github_latest_release_is_core_package ? 'true' : 'false')")"
+upstream_distribution_current_repo_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.current_repository_perfect_claim_allowed ? 'true' : 'false')")"
+upstream_distribution_release_channel="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.github_latest_release_channel)")"
 source_inventory_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/source-inventory-evidence.json', 'utf8')); console.log(r.status)")"
 source_inventory_missing_matrix_rows="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/source-inventory-evidence.json', 'utf8')); console.log((r.missing_matrix_rows || []).length)")"
 source_inventory_p0_accounting_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/source-inventory-evidence.json', 'utf8')); console.log(r.p0_accounting_blocker_count || 0)")"
@@ -404,6 +411,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "longtail_classification": "$longtail_classification_status",
     "external_authority": "$external_authority_status",
     "current_upstream_policy": "$current_upstream_policy_status",
+    "upstream_distribution_target": "$upstream_distribution_target_status",
     "real_upstream_smoke": "$real_upstream_smoke_status",
     "real_upstream_corpus": "$real_upstream_corpus_status"
   },
@@ -413,6 +421,15 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "frozen_git_commit": "$frozen_git_commit",
     "current_head": "$current_upstream_head",
     "policy_artifact": "target/release-gates/current-upstream-policy.json"
+  },
+  "distribution_target": {
+    "status": "$upstream_distribution_target_status",
+    "npm_core_matches_frozen_baseline": $upstream_distribution_npm_core_matches_frozen,
+    "repository_head_matches_npm_core": $upstream_distribution_repository_head_matches_npm,
+    "github_latest_release_is_core_package": $upstream_distribution_github_latest_is_core,
+    "github_latest_release_channel": "$upstream_distribution_release_channel",
+    "current_repository_perfect_claim_allowed": $upstream_distribution_current_repo_claim_allowed,
+    "target_artifact": "target/release-gates/upstream-distribution-target.json"
   },
   "source_inventory": {
     "missing_matrix_rows": $source_inventory_missing_matrix_rows,
@@ -430,6 +447,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/external-authority-blockers.json",
     "target/release-gates/perfect-refactor-claim.json",
     "target/release-gates/current-upstream-policy.json",
+    "target/release-gates/upstream-distribution-target.json",
     "target/release-gates/installability.json",
     "target/release-gates/publication-authority.json",
     "target/release-gates/real-upstream-smoke/latest/metadata.json",
@@ -450,6 +468,7 @@ validate_report_json "$GATE_DIR/security.json"
 validate_report_json "$GATE_DIR/source-inventory-ledger.json"
 validate_report_json "$GATE_DIR/external-authority-blockers.json"
 validate_report_json "$GATE_DIR/perfect-refactor-claim.json"
+validate_report_json "$GATE_DIR/upstream-distribution-target.json"
 validate_report_json "$GATE_DIR/release-candidate.json"
 
 if [ "$stable_allowed" != "true" ]; then
