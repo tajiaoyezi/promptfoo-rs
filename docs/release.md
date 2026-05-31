@@ -73,7 +73,7 @@ Each external authority item records `authority_type`, `required_decision`, `cur
 
 Task 20.2 adds `target/release-gates/perfect-refactor-claim.json` and links it from `target/release-gates/release-candidate.json.perfect_refactor_claim`. This is the authority for any statement that the project fully satisfies the promptfoo perfect-refactor target.
 
-Current local stable release gates can pass for the frozen baseline while `perfect_refactor_claim_allowed=false`. The claim stays false until source accounting blockers are zero, current-upstream evidence is ready, external authority blockers are resolved, publication authority is ready, and `published=true` has external URL/digest evidence. Local stable means the local frozen-baseline release gate is ready; it is not a public or perfect-refactor completion claim.
+Current local stable release gates can pass for the frozen baseline while `perfect_refactor_claim_allowed=false`. The claim stays false until source accounting blockers are zero, current-upstream evidence is ready, external authority blockers are resolved, publication authority is ready, and the publication flag is true with external URL/digest evidence. Local stable means the local frozen-baseline release gate is ready; it is not a public or perfect-refactor completion claim.
 
 ## S2V Release Checklist
 
