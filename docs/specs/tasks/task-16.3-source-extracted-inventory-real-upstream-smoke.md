@@ -1,6 +1,6 @@
 # Task 16.3: source-extracted-inventory-real-upstream-smoke
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 16 — parity-proof-hardening
@@ -67,19 +67,19 @@ Inventory extraction 必须读取冻结 upstream package/source evidence 并输�
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-009): source-extracted inventory evidence records discovered command/provider/assertion/redteam/output/config/API counts and source references for frozen upstream.
-- [ ] **AC2** (ADR-007): at least one P0 fixture is executed by real `promptfoo@0.121.13` and current `promptfoo-rs` binary, with upstream/rs/normalized/diff artifacts persisted.
-- [ ] **AC3** (PRD §Success Metrics): stable release gate blocks when real upstream smoke artifacts are missing, stale, or produced by a local test binary substitute.
-- [ ] **AC4** (PRD §Compatibility Matrix): newly discovered inventory items either receive matrix rows with verification evidence or release-blocking missing-row evidence.
+- [x] **AC1** (ADR-009): source-extracted inventory evidence records discovered command/provider/assertion/redteam/output/config/API counts and source references for frozen upstream.
+- [x] **AC2** (ADR-007): at least one P0 fixture is executed by real `promptfoo@0.121.13` and current `promptfoo-rs` binary, with upstream/rs/normalized/diff artifacts persisted.
+- [x] **AC3** (PRD §Success Metrics): stable release gate blocks when real upstream smoke artifacts are missing, stale, or produced by a local test binary substitute.
+- [x] **AC4** (PRD §Compatibility Matrix): newly discovered inventory items either receive matrix rows with verification evidence or release-blocking missing-row evidence.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-16.3.1 | TEST-16.3.1 | tests/real_upstream_smoke_gate.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Not Started |
-| AC2 | SCEN-16.3.1 | TEST-16.3.2 | tests/real_upstream_smoke_gate.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Not Started |
-| AC3 | SCEN-16.3.1 | TEST-16.3.3 | tests/real_upstream_smoke_gate.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Not Started |
-| AC4 | SCEN-16.3.1 | TEST-16.3.4 | tests/item_level_capability_inventory.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Not Started |
+| AC1 | SCEN-16.3.1 | TEST-16.3.1 | tests/real_upstream_smoke_gate.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Done |
+| AC2 | SCEN-16.3.1 | TEST-16.3.2 | tests/real_upstream_smoke_gate.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Done |
+| AC3 | SCEN-16.3.1 | TEST-16.3.3 | tests/real_upstream_smoke_gate.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Done |
+| AC4 | SCEN-16.3.1 | TEST-16.3.4 | tests/item_level_capability_inventory.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Done |
 
 ## 8. Risks
 
@@ -98,9 +98,26 @@ Inventory extraction 必须读取冻结 upstream package/source evidence 并输�
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `scripts/release/source-inventory-evidence.sh`
+  - `scripts/release/real-upstream-smoke.sh`
+  - `scripts/release/integration.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `tests/real_upstream_smoke_gate.rs`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-16-parity-proof-hardening.md`
+  - `docs/specs/tasks/task-16.3-source-extracted-inventory-real-upstream-smoke.md`
+- **commit 列表**：
+  - `babe2f8` `docs(spec): task-16.3 进入实施 (Status: Ready → In Progress)`
+  - `75766c9` `test(compatibility): 加 SCEN-16.3.1 的 real upstream smoke RED 测试`
+  - `ab1c6a7` `feat(compatibility): 加入真实 upstream smoke 与 source inventory evidence`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-16.3.1 ~ TEST-16.3.4 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 纳入 `real_upstream_smoke_gate` contract tests 并通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 执行 source inventory evidence 与真实 upstream smoke；`source-inventory-evidence.json` status=ready，inventory item count=44，package file count=536；`real-upstream-smoke/latest/metadata.json` status=ready，upstream/rs exit_code=0，diff findings=`[]`。
+- **剩余风险 / 未做项**：source evidence 当前使用 npm pack 文件列表加 inventory source references，不是完整 TypeScript AST 级 semantic extractor；若后续要求自动枚举全部 provider/assertion/redteam 插件，需要新增更深的 extractor task。真实 upstream smoke 依赖公网 npm registry，可用性失败会 fail closed，不需要密钥。
+- **下游 task 影响**：Phase 16 已满足收尾条件；runtime/release gate 现在包含 source inventory evidence 与真实 upstream smoke artifacts。

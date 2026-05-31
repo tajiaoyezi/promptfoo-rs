@@ -186,7 +186,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 15.2 | release-gates | docs/specs/tasks/task-15.2-performance-security-observability-gates.md | Done | Phase 15 order 2 | N/A (solo) |
 | 16.1 | cli | docs/specs/tasks/task-16.1-cli-command-behavior-closure.md | Done | Phase 16 order 1 | N/A (solo) |
 | 16.2 | release-gates | docs/specs/tasks/task-16.2-measured-release-gate-reports.md | Done | Phase 16 order 2 | N/A (solo) |
-| 16.3 | compatibility | docs/specs/tasks/task-16.3-source-extracted-inventory-real-upstream-smoke.md | In Progress | Phase 16 order 3 | N/A (solo) |
+| 16.3 | compatibility | docs/specs/tasks/task-16.3-source-extracted-inventory-real-upstream-smoke.md | Done | Phase 16 order 3 | N/A (solo) |
 
 ## ADR 索引
 
