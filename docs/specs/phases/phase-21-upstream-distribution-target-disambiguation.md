@@ -1,6 +1,6 @@
 # Phase 21: upstream-distribution-target-disambiguation
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,10 +28,10 @@ Phase 20 已禁止 perfect-refactor claim，但 current-upstream blocker 仍把 
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `upstream-distribution-target.json` 记录 npm core package version/gitHead/integrity、GitHub repository HEAD、GitHub latest observed release ref，并给出 full SHA / integrity evidence。
-- [ ] artifact 区分 `npm_core_matches_frozen_baseline`、`repository_head_matches_npm_core`、`github_latest_release_is_core_package`，且不能把 non-core GitHub release 当成 promptfoo core package rebaseline。
-- [ ] `release-candidate.json` 引用 distribution target artifact，并把 distribution target status 纳入 gate status。
-- [ ] docs/audit/compatibility matrix 明确说明：published npm core package alignment 可以保留 frozen-baseline claim；repository HEAD 或 non-core release drift 仍阻止 current repository perfect-refactor claim。
+- [x] `upstream-distribution-target.json` 记录 npm core package version/gitHead/integrity、GitHub repository HEAD、GitHub latest observed release ref，并给出 full SHA / integrity evidence。
+- [x] artifact 区分 `npm_core_matches_frozen_baseline`、`repository_head_matches_npm_core`、`github_latest_release_is_core_package`，且不能把 non-core GitHub release 当成 promptfoo core package rebaseline。
+- [x] `release-candidate.json` 引用 distribution target artifact，并把 distribution target status 纳入 gate status。
+- [x] docs/audit/compatibility matrix 明确说明：published npm core package alignment 可以保留 frozen-baseline claim；repository HEAD 或 non-core release drift 仍阻止 current repository perfect-refactor claim。
 
 ## 7. Phase Risks
 
@@ -45,7 +45,7 @@ task 21.1 Done 后，执行 phase §6 smoke：`s2v_verify_full "install lint typ
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **保留边界**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **Phase smoke**：PASS。执行 `s2v_preflight_phase docs/specs/phases/phase-21-upstream-distribution-target-disambiguation.md` 通过；随后执行 `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"`，9 项全部通过。
+- **Artifact evidence**：`target/release-gates/upstream-distribution-target.json` 记录 `status=ready-with-drift`、npm core package `0.121.13`、npm `gitHead=4860e990c7e9a2f8f677173fb92cf9867b34d03f`、npm integrity `sha512-DBPSixUophzcD7S7lML6SqVwnVtrhK5A3HsZ03IG9Xrw0t24r5imG7nLj+YMb0vlAjbdFtE7yFG+rsqDpfYp6g==`、`npm_core_matches_frozen_baseline=true`、`repository_head_matches_npm_core=false`、`github_latest_release_is_core_package=false`、`github_latest_release_channel=github-action`、`current_repository_perfect_claim_allowed=false`；`target/release-gates/release-candidate.json.distribution_target` 引用同一 artifact；`target/release-gates/perfect-refactor-claim.json` 仍为 `perfect_refactor_claim_allowed=false`、`local_stable_allowed=true`、`published=false`、`publication_ready=credential-blocked`。
+- **保留边界**：Phase 21 只澄清 upstream distribution target，不解除 current repository rebaseline、source accounting、external authority 或 publication authority blocker；不得据此声明当前 repository 已完成 perfect refactor。
