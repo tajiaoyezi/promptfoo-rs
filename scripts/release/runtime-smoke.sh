@@ -19,6 +19,7 @@ cargo test \
 
 bash scripts/release/source-inventory-evidence.sh
 bash scripts/release/real-upstream-smoke.sh
+bash scripts/release/real-upstream-corpus.sh
 
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
@@ -131,7 +132,8 @@ compatibility_status="ready"
 packaging_status="ready"
 observability_status="ready"
 real_upstream_smoke_status="ready"
-stable_allowed="$(stable_allowed_from_gate "$adapter_status" "$compatibility_status" "$performance_status" "$security_status" "$packaging_status" "$observability_status" "$real_upstream_smoke_status")"
+real_upstream_corpus_status="ready"
+stable_allowed="$(stable_allowed_from_gate "$adapter_status" "$compatibility_status" "$performance_status" "$security_status" "$packaging_status" "$observability_status" "$real_upstream_smoke_status" "$real_upstream_corpus_status")"
 if [ "$stable_allowed" = "true" ]; then
   decision="stable"
 else
@@ -192,7 +194,8 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "security": "$security_status",
     "packaging": "$packaging_status",
     "observability": "$observability_status",
-    "real_upstream_smoke": "$real_upstream_smoke_status"
+    "real_upstream_smoke": "$real_upstream_smoke_status",
+    "real_upstream_corpus": "$real_upstream_corpus_status"
   },
   "artifact_paths": [
     "target/release-gates/cli-help.txt",
@@ -202,6 +205,8 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/security.json",
     "target/release-gates/source-inventory-evidence.json",
     "target/release-gates/real-upstream-smoke/latest/metadata.json",
+    "target/release-gates/real-upstream-corpus/index.json",
+    "target/release-gates/real-upstream-corpus/summary.json",
     "target/release-gates/real-upstream-smoke/latest/raw/upstream.json",
     "target/release-gates/real-upstream-smoke/latest/raw/rs.json",
     "target/release-gates/real-upstream-smoke/latest/normalized/upstream.json",

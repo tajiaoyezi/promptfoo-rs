@@ -11,6 +11,7 @@ use crate::compatibility::executor::{execute_command, CommandExecution, CommandS
 use crate::compatibility::fixtures::FixtureManifest;
 use crate::compatibility::normalize::NormalizationRules;
 use crate::compatibility::normalize::{normalize_artifact, NormalizedArtifact};
+use crate::compatibility::release_gate::{ReleaseChannel, ReleaseGateStatus, ReleaseGateSummary};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BaselineReference {
@@ -153,6 +154,156 @@ pub struct PersistedRunArtifacts {
     pub upstream_normalized_path: PathBuf,
     pub rs_normalized_path: PathBuf,
     pub diff_path: PathBuf,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CorpusFixtureArtifacts {
+    pub fixture_id: String,
+    pub matrix_item_ids: Vec<String>,
+    pub upstream_command: String,
+    pub rs_command: String,
+    pub used_test_binary: bool,
+    pub upstream_exit_code: i32,
+    pub rs_exit_code: i32,
+    pub duration_ms: u64,
+    pub normalization_rules: Vec<String>,
+    pub artifact_paths: Vec<String>,
+    pub diff_findings: Vec<DiffFinding>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CorpusRunSummary {
+    pub schema: String,
+    pub fixtures: Vec<CorpusFixtureArtifacts>,
+}
+
+impl CorpusRunSummary {
+    pub fn new(fixtures: Vec<CorpusFixtureArtifacts>) -> Self {
+        Self {
+            schema: "promptfoo-rs.real-upstream-corpus.v1".to_string(),
+            fixtures,
+        }
+    }
+}
+
+pub fn validate_corpus_artifacts(
+    summary: &CorpusRunSummary,
+    required_p0_fixture_count: usize,
+) -> ReleaseGateSummary {
+    let mut blocking_findings = Vec::new();
+    let mut artifact_paths = Vec::new();
+    let mut missing_artifact_paths = Vec::new();
+
+    for fixture in &summary.fixtures {
+        artifact_paths.extend(fixture.artifact_paths.iter().cloned().map(PathBuf::from));
+        if fixture.used_test_binary {
+            blocking_findings.push(DiffFinding::bug(
+                fixture.fixture_id.clone(),
+                "used_test_binary",
+                "real upstream corpus used a local test binary substitute",
+            ));
+        }
+        if fixture.upstream_exit_code != 0 || fixture.rs_exit_code != 0 {
+            blocking_findings.push(DiffFinding::bug(
+                fixture.fixture_id.clone(),
+                "exit_code",
+                format!(
+                    "upstream_exit_code={} rs_exit_code={}",
+                    fixture.upstream_exit_code, fixture.rs_exit_code
+                ),
+            ));
+        }
+        if fixture.normalization_rules.is_empty() {
+            blocking_findings.push(DiffFinding::unclassified(
+                fixture.fixture_id.clone(),
+                "normalization_rules",
+                "fixture did not record normalization rules",
+            ));
+        }
+        for required in [
+            "metadata.json",
+            "raw/upstream.json",
+            "raw/rs.json",
+            "normalized/upstream.json",
+            "normalized/rs.json",
+            "diff/findings.json",
+        ] {
+            if !fixture
+                .artifact_paths
+                .iter()
+                .any(|path| path.ends_with(required))
+            {
+                missing_artifact_paths.push(format!("{}:{required}", fixture.fixture_id));
+            }
+        }
+        blocking_findings.extend(
+            fixture
+                .diff_findings
+                .iter()
+                .filter(|finding| {
+                    matches!(
+                        finding.class,
+                        crate::compatibility::diff::DiffClass::Bug
+                            | crate::compatibility::diff::DiffClass::Unclassified
+                    )
+                })
+                .cloned(),
+        );
+    }
+
+    let observed_p0_fixture_count = summary
+        .fixtures
+        .iter()
+        .filter(|fixture| {
+            !fixture.used_test_binary
+                && fixture.upstream_exit_code == 0
+                && fixture.rs_exit_code == 0
+                && fixture.diff_findings.is_empty()
+        })
+        .count();
+    if observed_p0_fixture_count < required_p0_fixture_count {
+        blocking_findings.push(DiffFinding::bug(
+            "real-upstream-corpus",
+            "observed_p0_fixture_count",
+            format!(
+                "P0 real upstream corpus coverage below threshold: {observed_p0_fixture_count}/{required_p0_fixture_count}"
+            ),
+        ));
+    }
+
+    let status = if blocking_findings.is_empty() && missing_artifact_paths.is_empty() {
+        ReleaseGateStatus::Ready
+    } else {
+        ReleaseGateStatus::Blocked
+    };
+
+    ReleaseGateSummary {
+        status,
+        release_channel: ReleaseChannel::Stable,
+        stable_allowed: status == ReleaseGateStatus::Ready,
+        blocking_findings,
+        required_p0_fixture_count,
+        observed_p0_fixture_count,
+        artifact_paths: artifact_paths
+            .iter()
+            .map(|path| path.display().to_string())
+            .collect(),
+        missing_artifact_paths,
+        p1_snapshot_total: 0,
+        p1_snapshot_covered: 0,
+        p2_registration_total: 0,
+        p2_registered: 0,
+        notes: vec![format!(
+            "real upstream corpus coverage: {observed_p0_fixture_count}/{required_p0_fixture_count}"
+        )],
+    }
+}
+
+pub fn write_corpus_index(summary: &CorpusRunSummary, path: &Path) -> Result<(), HarnessError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(HarnessError::from_io)?;
+    }
+    write_json(path, summary)
 }
 
 #[derive(Clone, Debug)]
