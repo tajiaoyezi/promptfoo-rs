@@ -1,6 +1,6 @@
 # Task 20.2: perfect-refactor-claim-contract
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 20 — cross-ledger-perfect-claim-closure
@@ -67,19 +67,19 @@ Perfect-refactor claim contract 必须聚合已有 release artifacts，不替代
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Success Metrics): `perfect-refactor-claim.json` reports `perfect_refactor_claim_allowed=false` while source/current/publication/external blockers remain.
-- [ ] **AC2** (ADR-008): local `stable_allowed=true` never implies `published=true` or perfect-refactor claim readiness without publication authority evidence.
-- [ ] **AC3** (ADR-009): claim blockers include source accounting, current-upstream, provider external-authority and publication authority records with source artifact paths.
-- [ ] **AC4** (docs/release): user-facing docs and audit state the exact boundary: local stable gate can pass, but promptfoo perfect-refactor completion remains blocked until external/current/publication evidence exists.
+- [x] **AC1** (PRD §Success Metrics): `perfect-refactor-claim.json` reports `perfect_refactor_claim_allowed=false` while source/current/publication/external blockers remain.
+- [x] **AC2** (ADR-008): local `stable_allowed=true` never implies `published=true` or perfect-refactor claim readiness without publication authority evidence.
+- [x] **AC3** (ADR-009): claim blockers include source accounting, current-upstream, provider external-authority and publication authority records with source artifact paths.
+- [x] **AC4** (docs/release): user-facing docs and audit state the exact boundary: local stable gate can pass, but promptfoo perfect-refactor completion remains blocked until external/current/publication evidence exists.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-20.2.1 | TEST-20.2.1 | tests/perfect_refactor_claim_contract.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-20.2.1 | TEST-20.2.2 | tests/perfect_refactor_claim_contract.rs | install, typecheck, unit-test, coverage, build | Not Started |
-| AC3 | SCEN-20.2.1 | TEST-20.2.3 | tests/perfect_refactor_claim_contract.rs | install, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC4 | SCEN-20.2.1 | TEST-20.2.4 | tests/perfect_refactor_claim_contract.rs | install, typecheck, unit-test, e2e, build | Not Started |
+| AC1 | SCEN-20.2.1 | TEST-20.2.1 | tests/perfect_refactor_claim_contract.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-20.2.1 | TEST-20.2.2 | tests/perfect_refactor_claim_contract.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-20.2.1 | TEST-20.2.3 | tests/perfect_refactor_claim_contract.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC4 | SCEN-20.2.1 | TEST-20.2.4 | tests/perfect_refactor_claim_contract.rs | install, typecheck, unit-test, e2e, build | Done |
 
 ## 8. Risks
 
@@ -100,9 +100,32 @@ Perfect-refactor claim contract 必须聚合已有 release artifacts，不替代
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/perfect_refactor_claim_contract.rs`
+  - `src/release.rs`
+  - `scripts/release/runtime-smoke.sh`
+  - `docs/release.md`
+  - `docs/compatibility/matrix.md`
+  - `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-20-cross-ledger-perfect-claim-closure.md`
+  - `docs/specs/tasks/task-20.2-perfect-refactor-claim-contract.md`
+- **commit 列表**：
+  - `9a640bf` `test(release): add SCEN-20.2.1 perfect refactor claim RED tests`
+  - `5d1d9f7` `feat(release): add perfect refactor claim contract gate`
+  - `6bd361f` `fix(release): preserve publication boundary wording in claim docs`
+- **§9 Verification 结果**：
+  - install: PASS — `cargo fetch` 通过。
+  - typecheck: PASS — `cargo check --workspace --all-targets` 通过。
+  - unit-test: PASS — `cargo test --workspace --all-targets` 通过，覆盖 `TEST-20.2.1` ~ `TEST-20.2.4`。
+  - integration: PASS — adapter §Commands Integration tests 通过。
+  - e2e: PASS — adapter §Commands E2E tests 通过。
+  - coverage: PASS — adapter §Commands Coverage 通过；`s2v_coverage_threshold_guard` 通过。
+  - build: PASS — adapter §Commands Build 通过。
+  - runtime-smoke: PASS — `scripts/release/runtime-smoke.sh` 生成 `target/release-gates/perfect-refactor-claim.json`，并在 `release-candidate.json.perfect_refactor_claim` 记录 `perfect_refactor_claim_allowed=false`。
+- **剩余风险 / 未做项**：
+  - `perfect_refactor_claim_allowed=false` 是预期边界：当前仍保留 22 个 source accounting blockers、21 个 external authority blockers、current-upstream rebaseline blocker、publication credential/legal/brand blocker。
+  - 未使用真实密钥、账号、私有服务权限或公开发布权限；未把 frozen baseline 等同为 current-upstream perfect。
+- **下游 task 影响**：
+  - Phase 20 已具备收尾 smoke 条件；后续若获得真实外部凭据、current upstream rebaseline 和 publication authority，需要新增 task 解除 claim blocker，而不是直接改写本 task 结论。
