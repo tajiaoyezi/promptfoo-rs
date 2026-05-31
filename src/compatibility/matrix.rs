@@ -131,7 +131,12 @@ pub fn expand_matrix_from_inventory(
         .items
         .iter()
         .map(|item| {
-            let target_status = if item.status == "unresolved" {
+            let item_status = item.status.to_ascii_lowercase();
+            let target_status = if item_status == "blocked" {
+                "blocked".to_string()
+            } else if item_status == "unsupported" {
+                "unsupported".to_string()
+            } else if item_status == "later" || item.status == "unresolved" {
                 policy.p2_target_status.clone()
             } else if item.owner_hint == "script-bridge"
                 || item.owner_hint == "node-api-wrapper"
@@ -145,7 +150,7 @@ pub fn expand_matrix_from_inventory(
             };
 
             let verification = match item.level_hint.as_str() {
-                "P0" if item.status == "unresolved" => {
+                "P0" if matches!(item_status.as_str(), "blocked" | "unresolved") => {
                     format!("blocker:{}", item.stable_id)
                 }
                 "P0" => format!("{}{}", policy.p0_verification_prefix, item.stable_id),
@@ -154,9 +159,17 @@ pub fn expand_matrix_from_inventory(
                 _ => "blocked:invalid-level".to_string(),
             };
 
-            let notes = if item.level_hint == "P2" || item.status == "unresolved" {
+            let notes = if matches!(item_status.as_str(), "blocked" | "unsupported" | "later")
+                || item.level_hint == "P2"
+                || item.status == "unresolved"
+            {
+                let class_token = match item_status.as_str() {
+                    "blocked" => "blocked",
+                    "unsupported" => "unsupported",
+                    _ => "later",
+                };
                 format!(
-                    "reason: {}; later: {} classification task; source: {}",
+                    "reason: {}; {class_token}: {} classification; source: {}",
                     item.unresolved_reason
                         .as_deref()
                         .unwrap_or("P2 item requires known-gap registration"),
@@ -229,8 +242,12 @@ pub fn validate_no_silent_omissions(
             let notes = normalize(&row.notes);
             let status = normalize(&row.target_status);
             if !notes.contains("reason:")
-                || !(notes.contains("later:") || notes.contains("unsupported:"))
-                || !(status.contains("later") || status.contains("unsupported"))
+                || !(notes.contains("later:")
+                    || notes.contains("unsupported:")
+                    || notes.contains("blocked:"))
+                || !(status.contains("later")
+                    || status.contains("unsupported")
+                    || status.contains("blocked"))
             {
                 report
                     .p2_rows_missing_reason_or_target
@@ -373,7 +390,7 @@ fn has_compatibility_level(level: &str) -> bool {
 
 fn has_target_status(status: &str) -> bool {
     let normalized = normalize(status);
-    ["native", "bridge", "unsupported", "later"]
+    ["native", "bridge", "unsupported", "later", "blocked"]
         .iter()
         .any(|allowed| normalized.contains(allowed))
 }

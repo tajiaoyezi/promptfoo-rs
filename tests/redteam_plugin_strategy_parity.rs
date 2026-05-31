@@ -18,8 +18,14 @@ fn test_14_2_1_redteam_inventory_items_have_matrix_and_registry_coverage_status(
         RedteamInventoryCoverage::from_registry(&RedteamRegistry::core_defaults(), &inventory);
     let report = validate_redteam_parity(&coverage, &fixtures);
 
-    assert_eq!(coverage.plugin_items().len(), 3, "{coverage:#?}");
-    assert_eq!(coverage.strategy_items().len(), 3, "{coverage:#?}");
+    assert!(
+        coverage.plugin_items().len() >= 120,
+        "Phase 17 source-extracted redteam plugin inventory should include long-tail rows: {coverage:#?}"
+    );
+    assert!(
+        coverage.strategy_items().len() >= 30,
+        "Phase 17 source-extracted redteam strategy inventory should include long-tail rows: {coverage:#?}"
+    );
     assert_eq!(
         coverage.status_for("redteam-plugin:prompt-injection"),
         Some("native")
@@ -27,6 +33,10 @@ fn test_14_2_1_redteam_inventory_items_have_matrix_and_registry_coverage_status(
     assert_eq!(coverage.status_for("redteam-plugin:medical"), Some("later"));
     assert_eq!(
         coverage.status_for("redteam-strategy:agentic-chain"),
+        Some("later")
+    );
+    assert_eq!(
+        coverage.status_for("redteam-plugin:src-redteam-plugins-aegis"),
         Some("later")
     );
     assert!(report.missing_matrix_rows.is_empty(), "{report:#?}");

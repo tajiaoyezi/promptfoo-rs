@@ -5,6 +5,7 @@ cargo test \
   --test golden_diff_ci_release_gate \
   --test provider_assertion_inventory_parity \
   --test redteam_plugin_strategy_parity \
+  --test longtail_provider_assertion_redteam_classification \
   --test real_p0_golden_corpus_runner \
   --test real_upstream_smoke_gate \
   --test viewer_node_packaging_release \

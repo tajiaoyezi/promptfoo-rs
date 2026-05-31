@@ -109,6 +109,244 @@ pub struct ScriptBoundaryPolicy {
     pub redaction_required: bool,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ParityPolicy {
+    pub docs_link: String,
+}
+
+impl Default for ParityPolicy {
+    fn default() -> Self {
+        Self {
+            docs_link: "docs/compatibility/matrix.md".to_string(),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LongtailClass {
+    Native,
+    Bridge,
+    Unsupported,
+    Later,
+    Blocked,
+}
+
+impl LongtailClass {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Native => "native",
+            Self::Bridge => "bridge",
+            Self::Unsupported => "unsupported",
+            Self::Later => "later",
+            Self::Blocked => "blocked",
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LongtailClassification {
+    pub item_id: String,
+    pub class: LongtailClass,
+    pub reason: String,
+    pub owner: String,
+    pub verification: String,
+}
+
+pub type ProviderClassification = LongtailClassification;
+pub type AssertionClassification = LongtailClassification;
+pub type RedteamClassification = LongtailClassification;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum GapClass {
+    Later,
+    Unsupported,
+    Blocked,
+}
+
+impl GapClass {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Later => "later",
+            Self::Unsupported => "unsupported",
+            Self::Blocked => "blocked",
+        }
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CompatibilityError {
+    item_id: String,
+    class: GapClass,
+    message: String,
+    exit_code: i32,
+}
+
+impl CompatibilityError {
+    pub fn exit_code(&self) -> i32 {
+        self.exit_code
+    }
+
+    pub fn item_id(&self) -> &str {
+        &self.item_id
+    }
+
+    pub fn class(&self) -> GapClass {
+        self.class
+    }
+}
+
+impl std::fmt::Display for CompatibilityError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str(&self.message)
+    }
+}
+
+impl std::error::Error for CompatibilityError {}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct LongtailParityReport {
+    pub classified_item_count: usize,
+    pub classified_by_category: BTreeMap<String, usize>,
+    pub missing_classification: Vec<String>,
+    pub rows_missing_owner: Vec<String>,
+    pub rows_missing_verification: Vec<String>,
+    pub rows_missing_reason: Vec<String>,
+    pub unresolved_rows: Vec<String>,
+    pub p0_missing_fixture_or_blocker: Vec<String>,
+    pub p0_release_blocker_count: usize,
+    pub p1_missing_snapshot_plan: Vec<String>,
+    pub p2_or_later_missing_reason: Vec<String>,
+    pub script_boundary_gaps: Vec<String>,
+    pub script_boundaries: Vec<ScriptBoundaryPolicy>,
+}
+
+impl LongtailParityReport {
+    pub fn script_boundary_for(&self, runtime: &str) -> Option<&ScriptBoundaryPolicy> {
+        self.script_boundaries
+            .iter()
+            .find(|boundary| boundary.runtime == runtime)
+    }
+}
+
+pub fn classify_provider_item(
+    item: &InventoryItem,
+    policy: &ParityPolicy,
+) -> ProviderClassification {
+    classify_inventory_item(item, "provider", policy)
+}
+
+pub fn classify_assertion_item(
+    item: &InventoryItem,
+    policy: &ParityPolicy,
+) -> AssertionClassification {
+    classify_inventory_item(item, "assertion", policy)
+}
+
+pub fn classify_redteam_item(item: &InventoryItem, policy: &ParityPolicy) -> RedteamClassification {
+    classify_inventory_item(item, "redteam", policy)
+}
+
+pub fn compatibility_gap_error(item_id: &str, class: GapClass, reason: &str) -> CompatibilityError {
+    let reason = redact_sensitive_assignments(reason);
+    CompatibilityError {
+        item_id: item_id.to_string(),
+        class,
+        message: format!(
+            "{item_id}: {} compatibility gap; reason: {reason}; docs: docs/compatibility/matrix.md",
+            class.as_str()
+        ),
+        exit_code: 1,
+    }
+}
+
+pub fn validate_longtail_classification(
+    matrix: &CapabilityMatrix,
+    fixtures: &FixtureCorpus,
+) -> LongtailParityReport {
+    let mut report = LongtailParityReport {
+        script_boundaries: script_boundary_policies(),
+        ..LongtailParityReport::default()
+    };
+
+    for row in matrix
+        .rows
+        .iter()
+        .filter(|row| is_longtail_row(&row.capability))
+    {
+        report.classified_item_count += 1;
+        let category = row
+            .capability
+            .split_once(':')
+            .map(|(category, _)| category.to_string())
+            .unwrap_or_else(|| "<unknown>".to_string());
+        *report.classified_by_category.entry(category).or_default() += 1;
+
+        let Some(class) = longtail_class_from_status(&row.target_status) else {
+            report.missing_classification.push(row.capability.clone());
+            continue;
+        };
+
+        if row.owner.trim().is_empty() {
+            report.rows_missing_owner.push(row.capability.clone());
+        }
+        if row.verification.trim().is_empty() {
+            report
+                .rows_missing_verification
+                .push(row.capability.clone());
+        }
+        if row
+            .target_status
+            .to_ascii_lowercase()
+            .contains("unresolved")
+            || row
+                .notes
+                .to_ascii_lowercase()
+                .contains("task-17.4 classification")
+        {
+            report.unresolved_rows.push(row.capability.clone());
+        }
+
+        if requires_reason(row, class) && !row_has_reason_for_class(row, class) {
+            report.rows_missing_reason.push(row.capability.clone());
+        }
+
+        if row.level == "P0"
+            && !fixtures.has_p0_fixture_for(&row.capability)
+            && !row.verification.starts_with("blocker:")
+        {
+            report
+                .p0_missing_fixture_or_blocker
+                .push(row.capability.clone());
+        }
+        if row.level == "P0" && row.verification.starts_with("blocker:") {
+            report.p0_release_blocker_count += 1;
+        }
+        if row.level == "P1" && !row.verification.starts_with("snapshot:") {
+            report.p1_missing_snapshot_plan.push(row.capability.clone());
+        }
+        if (row.level == "P2" || matches!(class, LongtailClass::Later))
+            && !row_has_reason_for_class(row, class)
+        {
+            report
+                .p2_or_later_missing_reason
+                .push(row.capability.clone());
+        }
+    }
+
+    for boundary in &report.script_boundaries {
+        if !(boundary.default_deny
+            && boundary.explicit_allow_required
+            && boundary.timeout_required
+            && boundary.env_allowlist_required
+            && boundary.redaction_required)
+        {
+            report.script_boundary_gaps.push(boundary.runtime.clone());
+        }
+    }
+
+    report
+}
+
 pub fn validate_provider_assertion_parity(
     matrix: &CapabilityMatrix,
     fixtures: &FixtureCorpus,
@@ -198,8 +436,12 @@ fn validate_row(
         let notes = row.notes.to_ascii_lowercase();
         let target_status = row.target_status.to_ascii_lowercase();
         if !notes.contains("reason:")
-            || !(notes.contains("later:") || notes.contains("unsupported:"))
-            || !(target_status.contains("later") || target_status.contains("unsupported"))
+            || !(notes.contains("later:")
+                || notes.contains("unsupported:")
+                || notes.contains("blocked:"))
+            || !(target_status.contains("later")
+                || target_status.contains("unsupported")
+                || target_status.contains("blocked"))
         {
             report.p2_rows_missing_reason.push(row.capability.clone());
         }
@@ -262,4 +504,137 @@ fn script_boundary_policies() -> Vec<ScriptBoundaryPolicy> {
             redaction_required: true,
         })
         .collect()
+}
+
+fn classify_inventory_item(
+    item: &InventoryItem,
+    domain: &str,
+    policy: &ParityPolicy,
+) -> LongtailClassification {
+    let status = item.status.to_ascii_lowercase();
+    let owner = item.owner_hint.to_ascii_lowercase();
+    let name = item.name.to_ascii_lowercase();
+    let class = if status == "blocked" {
+        LongtailClass::Blocked
+    } else if status == "unsupported" {
+        LongtailClass::Unsupported
+    } else if status == "later" || status == "unresolved" {
+        LongtailClass::Later
+    } else if owner == "script-bridge"
+        || ["javascript", "typescript", "python", "shell", "ruby"]
+            .iter()
+            .any(|runtime| name.contains(runtime))
+    {
+        LongtailClass::Bridge
+    } else if item.level_hint == "P2"
+        || (domain == "redteam" && item.level_hint != "P0")
+        || item.unresolved_reason.is_some()
+    {
+        LongtailClass::Later
+    } else {
+        LongtailClass::Native
+    };
+
+    let reason = match class {
+        LongtailClass::Native => format!(
+            "native implementation evidence from {}",
+            item.source_reference
+        ),
+        LongtailClass::Bridge => format!(
+            "script bridge default-deny compatibility path; docs: {}",
+            policy.docs_link
+        ),
+        LongtailClass::Unsupported | LongtailClass::Later | LongtailClass::Blocked => {
+            item.unresolved_reason.clone().unwrap_or_else(|| {
+                format!(
+                    "{} source item requires explicit compatibility registration",
+                    item.stable_id
+                )
+            })
+        }
+    };
+    let verification = match (item.level_hint.as_str(), class) {
+        ("P0", LongtailClass::Blocked) => format!("blocker:{}", item.stable_id),
+        ("P0", _) => format!("fixture:{}", item.stable_id),
+        ("P1", _) => format!("snapshot:{}", item.stable_id),
+        ("P2", _) => format!("registration:{}", item.stable_id),
+        _ => format!("blocker:{}", item.stable_id),
+    };
+
+    LongtailClassification {
+        item_id: item.stable_id.clone(),
+        class,
+        reason,
+        owner: item.owner_hint.clone(),
+        verification,
+    }
+}
+
+fn longtail_class_from_status(status: &str) -> Option<LongtailClass> {
+    let normalized = status.trim().to_ascii_lowercase();
+    if normalized.contains("native") {
+        Some(LongtailClass::Native)
+    } else if normalized.contains("bridge") {
+        Some(LongtailClass::Bridge)
+    } else if normalized.contains("unsupported") {
+        Some(LongtailClass::Unsupported)
+    } else if normalized.contains("later") {
+        Some(LongtailClass::Later)
+    } else if normalized.contains("blocked") {
+        Some(LongtailClass::Blocked)
+    } else {
+        None
+    }
+}
+
+fn is_longtail_row(capability: &str) -> bool {
+    capability.starts_with("provider:")
+        || capability.starts_with("assertion:")
+        || capability.starts_with("redteam-plugin:")
+        || capability.starts_with("redteam-strategy:")
+}
+
+fn requires_reason(row: &CapabilityRow, class: LongtailClass) -> bool {
+    row.level == "P2"
+        || row.verification.starts_with("blocker:")
+        || matches!(
+            class,
+            LongtailClass::Unsupported | LongtailClass::Later | LongtailClass::Blocked
+        )
+}
+
+fn row_has_reason_for_class(row: &CapabilityRow, class: LongtailClass) -> bool {
+    let notes = row.notes.to_ascii_lowercase();
+    if !notes.contains("reason:") {
+        return false;
+    }
+    match class {
+        LongtailClass::Native | LongtailClass::Bridge => true,
+        LongtailClass::Unsupported => notes.contains("unsupported:"),
+        LongtailClass::Later => notes.contains("later:"),
+        LongtailClass::Blocked => {
+            notes.contains("blocked:") || row.verification.starts_with("blocker:")
+        }
+    }
+}
+
+fn redact_sensitive_assignments(input: &str) -> String {
+    input
+        .split_whitespace()
+        .map(|token| {
+            let Some((key, _value)) = token.split_once('=') else {
+                return token.to_string();
+            };
+            let key_lower = key.to_ascii_lowercase();
+            if key_lower.contains("key")
+                || key_lower.contains("token")
+                || key_lower.contains("secret")
+            {
+                format!("{key}=[REDACTED]")
+            } else {
+                token.to_string()
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
 }

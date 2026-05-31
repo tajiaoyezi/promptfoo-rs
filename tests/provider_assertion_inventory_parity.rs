@@ -18,8 +18,14 @@ fn test_14_1_1_provider_and_assertion_inventory_rows_have_classified_matrix_evid
     let assertions = AssertionParityRegistry::from_inventory(&inventory);
     let report = validate_provider_assertion_parity(&matrix, &fixtures);
 
-    assert_eq!(providers.items().len(), 6, "{providers:#?}");
-    assert_eq!(assertions.items().len(), 7, "{assertions:#?}");
+    assert!(
+        providers.items().len() >= 200,
+        "Phase 17 source-extracted provider inventory should include long-tail rows: {providers:#?}"
+    );
+    assert!(
+        assertions.items().len() >= 50,
+        "Phase 17 source-extracted assertion inventory should include long-tail rows: {assertions:#?}"
+    );
     for expected in [
         "provider:openai",
         "provider:http",
@@ -59,6 +65,14 @@ fn test_14_1_1_provider_and_assertion_inventory_rows_have_classified_matrix_evid
         .gap_reason()
         .expect("P2 provider needs gap reason")
         .contains("dynamic provider registry"));
+    let longtail = providers
+        .item("provider:src-providers-ai21")
+        .expect("source-extracted long-tail provider should stay visible");
+    assert_eq!(longtail.level, "P2");
+    assert!(longtail
+        .gap_reason()
+        .expect("long-tail provider needs explicit later reason")
+        .contains("source-extracted long-tail provider"));
 }
 
 #[test]

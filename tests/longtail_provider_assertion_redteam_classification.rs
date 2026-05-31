@@ -48,7 +48,10 @@ fn test_17_4_2_p0_p1_p2_rows_have_fixture_snapshot_or_blocker_evidence() {
     let fixtures = load_fixtures(&matrix);
     let report = validate_longtail_classification(&matrix, &fixtures);
 
-    assert!(report.p0_missing_fixture_or_blocker.is_empty(), "{report:#?}");
+    assert!(
+        report.p0_missing_fixture_or_blocker.is_empty(),
+        "{report:#?}"
+    );
     assert!(report.p1_missing_snapshot_plan.is_empty(), "{report:#?}");
     assert!(report.p2_or_later_missing_reason.is_empty(), "{report:#?}");
     assert!(
@@ -92,7 +95,10 @@ fn test_17_4_3_script_backed_rows_remain_default_deny_and_redacted() {
     assert_eq!(error.exit_code(), 1);
     assert!(message.contains("assertion:javascript"), "{message}");
     assert!(message.contains("blocked"), "{message}");
-    assert!(message.contains("docs/compatibility/matrix.md"), "{message}");
+    assert!(
+        message.contains("docs/compatibility/matrix.md"),
+        "{message}"
+    );
     assert!(!message.contains("sk-test"), "{message}");
     assert!(!message.contains("secret"), "{message}");
 }
@@ -118,9 +124,21 @@ fn test_17_4_4_gap_errors_include_item_class_reason_and_docs_link() {
     ));
 
     for (item_id, class, reason) in [
-        ("provider:src-providers-ai21", GapClass::Later, "requires provider-specific compatibility work"),
-        ("provider:cloud-upload", GapClass::Unsupported, "cloud upload is not local-only"),
-        ("redteam-plugin:src-redteam-plugins-aegis", GapClass::Blocked, "requires policy review"),
+        (
+            "provider:src-providers-ai21",
+            GapClass::Later,
+            "requires provider-specific compatibility work",
+        ),
+        (
+            "provider:cloud-upload",
+            GapClass::Unsupported,
+            "cloud upload is not local-only",
+        ),
+        (
+            "redteam-plugin:src-redteam-plugins-aegis",
+            GapClass::Blocked,
+            "requires policy review",
+        ),
     ] {
         let error = compatibility_gap_error(item_id, class, reason);
         let message = error.to_string();
@@ -128,7 +146,10 @@ fn test_17_4_4_gap_errors_include_item_class_reason_and_docs_link() {
         assert!(message.contains(item_id), "{message}");
         assert!(message.contains(class.as_str()), "{message}");
         assert!(message.contains("reason:"), "{message}");
-        assert!(message.contains("docs/compatibility/matrix.md"), "{message}");
+        assert!(
+            message.contains("docs/compatibility/matrix.md"),
+            "{message}"
+        );
     }
 }
 
