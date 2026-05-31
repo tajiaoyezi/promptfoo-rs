@@ -17,6 +17,9 @@ cargo test \
   --test performance_security_observability_gates \
   --test security_redaction
 
+bash scripts/release/source-inventory-evidence.sh
+bash scripts/release/real-upstream-smoke.sh
+
 tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
@@ -127,7 +130,8 @@ adapter_status="ready"
 compatibility_status="ready"
 packaging_status="ready"
 observability_status="ready"
-stable_allowed="$(stable_allowed_from_gate "$adapter_status" "$compatibility_status" "$performance_status" "$security_status" "$packaging_status" "$observability_status")"
+real_upstream_smoke_status="ready"
+stable_allowed="$(stable_allowed_from_gate "$adapter_status" "$compatibility_status" "$performance_status" "$security_status" "$packaging_status" "$observability_status" "$real_upstream_smoke_status")"
 if [ "$stable_allowed" = "true" ]; then
   decision="stable"
 else
@@ -187,14 +191,22 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "performance": "$performance_status",
     "security": "$security_status",
     "packaging": "$packaging_status",
-    "observability": "$observability_status"
+    "observability": "$observability_status",
+    "real_upstream_smoke": "$real_upstream_smoke_status"
   },
   "artifact_paths": [
     "target/release-gates/cli-help.txt",
     "target/package-smoke/viewer-dist.json",
     "target/package-smoke/npm-wrapper-dist.json",
     "target/release-gates/performance.json",
-    "target/release-gates/security.json"
+    "target/release-gates/security.json",
+    "target/release-gates/source-inventory-evidence.json",
+    "target/release-gates/real-upstream-smoke/latest/metadata.json",
+    "target/release-gates/real-upstream-smoke/latest/raw/upstream.json",
+    "target/release-gates/real-upstream-smoke/latest/raw/rs.json",
+    "target/release-gates/real-upstream-smoke/latest/normalized/upstream.json",
+    "target/release-gates/real-upstream-smoke/latest/normalized/rs.json",
+    "target/release-gates/real-upstream-smoke/latest/diff/findings.json"
   ],
   "no_upload_evidence": "local-only runtime smoke; no prompt, vars, output, or telemetry upload"
 }

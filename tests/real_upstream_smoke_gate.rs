@@ -9,9 +9,22 @@ fn test_16_3_1_source_inventory_evidence_uses_frozen_upstream_package() {
         script.contains("npm pack") || script.contains("npm view"),
         "source evidence must inspect the frozen npm package: {script}"
     );
-    assert!(script.contains("source-inventory-evidence.json"), "{script}");
-    for category in ["command", "provider", "assertion", "redteam", "output", "config"] {
-        assert!(script.contains(category), "missing category evidence for {category}");
+    assert!(
+        script.contains("source-inventory-evidence.json"),
+        "{script}"
+    );
+    for category in [
+        "command",
+        "provider",
+        "assertion",
+        "redteam",
+        "output",
+        "config",
+    ] {
+        assert!(
+            script.contains(category),
+            "missing category evidence for {category}"
+        );
     }
 }
 
@@ -22,7 +35,10 @@ fn test_16_3_2_real_upstream_smoke_script_executes_npx_and_rs_binary() {
         .expect("real upstream smoke script should exist");
 
     assert!(script.contains("npx --yes promptfoo@0.121.13"), "{script}");
-    assert!(script.contains(" eval "), "upstream smoke must execute eval: {script}");
+    assert!(
+        script.contains(" eval "),
+        "upstream smoke must execute eval: {script}"
+    );
     assert!(script.contains("target/release/promptfoo-rs"), "{script}");
     assert!(script.contains("upstream.json"), "{script}");
     assert!(script.contains("rs.json"), "{script}");
