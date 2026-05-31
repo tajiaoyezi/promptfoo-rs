@@ -28,7 +28,10 @@ fn test_16_2_1_runtime_smoke_script_replaces_synthetic_performance_literals() {
         "\"memory_baseline_mb\": 64",
         "cat > target/release-gates/performance.json <<'JSON'",
     ] {
-        assert!(!script.contains(forbidden), "synthetic literal remains: {forbidden}");
+        assert!(
+            !script.contains(forbidden),
+            "synthetic literal remains: {forbidden}"
+        );
     }
 }
 
@@ -81,7 +84,10 @@ fn test_16_2_3_runtime_smoke_script_derives_release_candidate_decision() {
         "\"stable_allowed\": true",
         "cat > target/release-gates/release-candidate.json <<'JSON'",
     ] {
-        assert!(!script.contains(forbidden), "fixed release decision remains: {forbidden}");
+        assert!(
+            !script.contains(forbidden),
+            "fixed release decision remains: {forbidden}"
+        );
     }
 }
 
@@ -91,7 +97,10 @@ fn test_16_2_4_runtime_smoke_runs_cli_command_closure_and_security_checks() {
     let script = std::fs::read_to_string("scripts/release/runtime-smoke.sh")
         .expect("runtime smoke script should exist");
 
-    assert!(script.contains("--test cli_command_behavior_closure"), "{script}");
+    assert!(
+        script.contains("--test cli_command_behavior_closure"),
+        "{script}"
+    );
     assert!(script.contains("--test security_redaction"), "{script}");
     assert!(script.contains("no_upload_evidence"), "{script}");
     assert!(
