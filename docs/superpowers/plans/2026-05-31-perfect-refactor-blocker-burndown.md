@@ -80,11 +80,11 @@ Expected: all listed keys pass.
 - Modify: `docs/compatibility/target-policy.md`
 - Modify: `scripts/release/runtime-smoke.sh`
 
-- [ ] **Step 1: Write failing tests for target-mode policy**
-- [ ] **Step 2: Parse `git ls-remote` output into frozen/current observations**
-- [ ] **Step 3: Fail current-perfect claim in frozen mode when HEAD differs**
-- [ ] **Step 4: Add runtime-smoke artifact and docs**
-- [ ] **Step 5: Commit RED, GREEN, and docs completion notes**
+- [x] **Step 1: Write failing tests for target-mode policy**
+- [x] **Step 2: Parse `git ls-remote` output into frozen/current observations**
+- [x] **Step 3: Fail current-perfect claim in frozen mode when HEAD differs**
+- [x] **Step 4: Add runtime-smoke artifact and docs**
+- [x] **Step 5: Commit RED, GREEN, and docs completion notes**
 
 ### Task 4: Publication Authority Release Gate
 

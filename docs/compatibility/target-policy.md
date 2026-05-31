@@ -35,3 +35,7 @@ Stable release gates bind to exactly one immutable compatibility target. Moving 
 - Stable releases must use the single `stable_targets[0]` entry above until an explicit rebaseline task updates this policy and all dependent compatibility evidence.
 - References such as `latest`, `main`, `master`, or `HEAD` are never valid stable targets.
 - Moving upstream observations can record drift in current upstream `origin/main`, but they are tracking-only and cannot modify `docs/compatibility/baseline.lock.md`.
+
+## Current Upstream Gate
+
+Task 18.3 adds `compatibility/inventory/current-upstream-target.json`, `scripts/release/current-upstream-policy.sh`, and runtime-smoke artifact `target/release-gates/current-upstream-policy.json`. The release candidate now carries `target_policy.target_mode`, `target_policy.current_perfect_claim_allowed`, frozen git commit, and observed current HEAD. In the default frozen mode, `current_perfect_claim_allowed=false` whenever observed current HEAD differs from `4860e990c7e9a2f8f677173fb92cf9867b34d03f`; current mode requires source inventory, matrix, fixtures, golden corpus, and release candidate evidence to share the same observed ref before any current-perfect claim is allowed.

@@ -1,6 +1,6 @@
 # Task 18.3: current-upstream-rebaseline-gate
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 18 — perfect-refactor-blocker-burndown
@@ -65,19 +65,19 @@ Release gate 必须输出 machine-readable current upstream policy。policy 包�
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (docs/audits §Scope): current upstream HEAD and frozen baseline are both recorded with full SHAs; floating `main/latest` is never accepted as a stable target.
-- [ ] **AC2** (ADR-007): frozen mode explicitly sets `current_perfect_claim_allowed=false` when current HEAD differs from frozen tag.
-- [ ] **AC3** (PRD §Compatibility Matrix): current mode requires current source inventory, matrix, fixtures, golden corpus, and release candidate evidence to share the same observed ref.
-- [ ] **AC4** (ADR-009): audit docs and release candidate summaries display target mode, preventing ambiguous “perfect refactor” claims.
+- [x] **AC1** (docs/audits §Scope): current upstream HEAD and frozen baseline are both recorded with full SHAs; floating `main/latest` is never accepted as a stable target.
+- [x] **AC2** (ADR-007): frozen mode explicitly sets `current_perfect_claim_allowed=false` when current HEAD differs from frozen tag.
+- [x] **AC3** (PRD §Compatibility Matrix): current mode requires current source inventory, matrix, fixtures, golden corpus, and release candidate evidence to share the same observed ref.
+- [x] **AC4** (ADR-009): audit docs and release candidate summaries display target mode, preventing ambiguous “perfect refactor” claims.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-18.3.1 | TEST-18.3.1 | tests/current_upstream_rebaseline_gate.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-18.3.1 | TEST-18.3.2 | tests/current_upstream_rebaseline_gate.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC3 | SCEN-18.3.1 | TEST-18.3.3 | tests/current_upstream_rebaseline_gate.rs | install, typecheck, unit-test, coverage, build | Not Started |
-| AC4 | SCEN-18.3.1 | TEST-18.3.4 | tests/current_upstream_rebaseline_gate.rs | install, typecheck, unit-test, runtime-smoke, build | Not Started |
+| AC1 | SCEN-18.3.1 | TEST-18.3.1 | tests/current_upstream_rebaseline_gate.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-18.3.1 | TEST-18.3.2 | tests/current_upstream_rebaseline_gate.rs | install, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-18.3.1 | TEST-18.3.3 | tests/current_upstream_rebaseline_gate.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-18.3.1 | TEST-18.3.4 | tests/current_upstream_rebaseline_gate.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -97,9 +97,30 @@ Release gate 必须输出 machine-readable current upstream policy。policy 包�
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/current_upstream_rebaseline_gate.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-upstream-policy.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `scripts/release/integration.sh`
+  - `compatibility/inventory/current-upstream-target.json`
+  - `docs/specs/tasks/task-18.3-current-upstream-rebaseline-gate.md`
+  - `docs/specs/phases/phase-18-perfect-refactor-blocker-burndown.md`
+  - `docs/s2v-adapter.md`
+  - `docs/compatibility/target-policy.md`
+  - `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`
+  - `docs/superpowers/plans/2026-05-31-perfect-refactor-blocker-burndown.md`
+- **commit 列表**：
+  - `6032925` `test(compatibility): add SCEN-18.3.1 current upstream gate RED tests`
+  - `05c0160` `feat(compatibility): add current upstream target-mode gate`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-18.3.1 ~ TEST-18.3.4 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 通过，包含 `current_upstream_rebaseline_gate`。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 通过；`target/release-gates/current-upstream-policy.json` status=`ready`，target_mode=`frozen`，current_perfect_claim_allowed=false，current.current_head=`ff8eafd743cf6d63dd85b790ad8a4c73ede5828d`，frozen.git_commit=`4860e990c7e9a2f8f677173fb92cf9867b34d03f`；`target/release-gates/release-candidate.json` 包含 `target_policy` 同步字段。
+- **剩余风险 / 未做项**：本 task 只建立 claim gate，不把 moving HEAD 自动设为 stable target。current mode 仍需要 source inventory、matrix、fixtures、golden corpus、release candidate 全部共享同一 observed ref 后才允许 current-perfect claim；当前 frozen mode 下仍只能声明 frozen-baseline compatibility。
+- **下游 task 影响**：task 18.4 可在 publication authority gate 中引用 `release-candidate.json.target_policy`，防止把 local installability 或 frozen evidence 当作 current-upstream/publication 完成证据；Phase 18 smoke 需要检查 `current-upstream-policy.json` 与 audit 结论一致。

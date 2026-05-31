@@ -1,6 +1,6 @@
 # promptfoo current perfect-refactor audit - 2026-05-31
 
-**Status**: Current audit verdict after Phase 18.2 provider-module burndown
+**Status**: Current audit verdict after Phase 18.3 target-mode gate
 **Objective**: determine whether the current `promptfoo-rs` worktree completely satisfies a perfect refactor of `promptfoo/promptfoo`.
 **Verdict**: Not fully satisfied.
 
@@ -67,6 +67,7 @@ The project is materially stronger than the earlier audit snapshots:
 - Runtime smoke produces measured `performance.json`, `security.json`, and `release-candidate.json`.
 - Phase 17 added source-tree extraction evidence, CLI/flag closure evidence, a 50-fixture real upstream P0 corpus, long-tail classification, and release installability evidence.
 - Phase 18.2 added provider-module burndown evidence: 37 P0 provider module blockers are now split into 13 existing P0 fixture-covered rows and 24 explicit remaining blockers with item-level reasons.
+- Phase 18.3 added a current-upstream target-mode gate: `current-upstream-policy.json` and `release-candidate.json.target_policy` now make frozen/current claim scope machine-readable.
 
 These are real progress items. They support a scoped frozen-baseline compatibility implementation, not a literal perfect refactor claim.
 
@@ -77,6 +78,13 @@ These are real progress items. They support a scoped frozen-baseline compatibili
 The project specs intentionally target `promptfoo@0.121.13` and commit `4860e990c7e9a2f8f677173fb92cf9867b34d03f`. Current GitHub `HEAD` is `ff8eafd743cf6d63dd85b790ad8a4c73ede5828d`, and GitHub releases show a later `code-scan-action: 0.1.7` release after `0.121.13`.
 
 Verdict: the project can claim only frozen-baseline compatibility. It cannot honestly claim to be a complete refactor of current `promptfoo/promptfoo`.
+
+Task 18.3 now makes this boundary enforceable in release evidence:
+
+- `target/release-gates/current-upstream-policy.json` reports `target_mode=frozen`, `status=ready`, `current_perfect_claim_allowed=false`, frozen git commit `4860e990c7e9a2f8f677173fb92cf9867b34d03f`, and observed current HEAD `ff8eafd743cf6d63dd85b790ad8a4c73ede5828d`.
+- `target/release-gates/release-candidate.json.target_policy` repeats the target mode, frozen commit, current HEAD, and `current_perfect_claim_allowed=false`.
+
+This does not complete current-upstream parity; it prevents ambiguous or overstated “perfect refactor” claims.
 
 ### P0 - Source inventory ledger closes silent missing rows, but P0 accounting blockers remain
 
@@ -145,7 +153,8 @@ Local dry-run installability is proven. Real multi-channel publication is not pr
 | All local S2V phase/task specs complete | 42 task specs `Done`; 17 phase specs `Done`; phase preflight passes | Met |
 | Local verification gates executable and green | Full 9-key S2V verification passed on 2026-05-31 | Met |
 | Frozen baseline traceable | npm version/gitHead/integrity, git tag, baseline lock, and artifacts point to `0.121.13` / `4860e99` | Met for frozen target |
-| Current upstream repository parity | GitHub `HEAD=ff8eafd...` differs from frozen tag; later `code-scan-action: 0.1.7` release exists | Not met |
+| Target-mode claim separation | `current-upstream-policy.json` and `release-candidate.json.target_policy` record frozen mode and `current_perfect_claim_allowed=false` | Met |
+| Current upstream repository parity | GitHub `HEAD=ff8eafd...` differs from frozen tag; later `code-scan-action: 0.1.7` release exists; current mode lacks same-ref inventory/matrix/fixtures/golden/release evidence | Not met |
 | 100% source-extracted upstream item accounting | 2549 source-extracted items now have 2549 ledger rows and missing matrix rows are 0 | Met as accounting, not implementation parity |
 | P0 real upstream golden diff corpus | 50 real upstream P0 fixtures are recorded and smoke metadata is ready | Met for recorded corpus |
 | Provider/assertion/redteam long-tail parity | 433 tracked long-tail rows; provider module burndown resolves 13 of 37 via fixture evidence, but 24 explicit P0 provider module release blockers remain | Not met |
@@ -161,7 +170,7 @@ The remaining gap is no longer basic project readiness. It is deep parity and re
 
 1. resolve the 111 P0 source accounting blockers now exposed by the ledger,
 2. resolve the 24 remaining P0 long-tail provider module blockers,
-3. decide whether to rebaseline from frozen `0.121.13` to current upstream `HEAD`,
+3. decide whether to implement and verify current-mode evidence for current upstream `HEAD`,
 4. either implement or formally scope out the current upstream surfaces that are outside the frozen PRD target,
 5. complete real publication evidence for the intended release channels once credentials and release authority exist.
 
