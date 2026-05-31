@@ -1,12 +1,12 @@
 # promptfoo current perfect-refactor audit - 2026-05-31
 
-**Status**: Current audit verdict
+**Status**: Current audit verdict after Phase 17 refresh
 **Objective**: determine whether the current `promptfoo-rs` worktree completely satisfies a perfect refactor of `promptfoo/promptfoo`.
 **Verdict**: Not fully satisfied.
 
 ## Scope
 
-This audit supersedes the 2026-05-30 negative audit for current-state purposes only. The older audit remains useful history, but Phase 11-16 have since changed the repository substantially.
+This audit supersedes the 2026-05-30 negative audit and the earlier 2026-05-31 pre-Phase-17 audit for current-state purposes.
 
 The compatibility target in project specs is the frozen upstream baseline:
 
@@ -14,11 +14,17 @@ The compatibility target in project specs is the frozen upstream baseline:
 - git tag: `refs/tags/0.121.13`
 - commit: `4860e990c7e9a2f8f677173fb92cf9867b34d03f`
 
-The current npm `latest` value checked during this audit is also `0.121.13`, with npm `gitHead=4860e990c7e9a2f8f677173fb92cf9867b34d03f`. Current GitHub `main` is ahead of the frozen tag at `6e4ba60eba69ff696d0404aabf5453311214c500`; project stable claims must therefore remain scoped to the frozen tag unless a future rebaseline task changes the target.
+Fresh external checks during this audit:
+
+- `npm view promptfoo version gitHead dist.tarball dist.integrity time.modified --json` reports `version=0.121.13`, `gitHead=4860e990c7e9a2f8f677173fb92cf9867b34d03f`, and npm modified time `2026-05-28T23:59:40.582Z`.
+- `git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/0.121.13 refs/tags/code-scan-action-0.1.7` reports GitHub `HEAD=ff8eafd743cf6d63dd85b790ad8a4c73ede5828d`, tag `0.121.13=4860e990c7e9a2f8f677173fb92cf9867b34d03f`, and tag `code-scan-action-0.1.7=1c743afe0e4807882e858c4f322fc064fa5f0770`.
+- The GitHub releases page currently marks `code-scan-action: 0.1.7` as the latest release dated 2026-05-29, after `0.121.13` dated 2026-05-28.
+
+Therefore any stable compatibility claim must remain scoped to the frozen npm baseline unless a future rebaseline task explicitly changes the target.
 
 ## Current Verification Evidence
 
-Full local S2V verification passed on 2026-05-31 with Git for Windows Bash:
+Full local S2V verification was rerun on 2026-05-31 with Git for Windows Bash:
 
 ```bash
 source docs/s2v/scripts/lib/preflight.sh
@@ -39,137 +45,127 @@ Observed result:
 - `runtime-smoke`: PASS
 - helper summary: `§9 Verification 全套通过（共 9 项）`
 
-This proves the current local gate chain is executable and green. It does not by itself prove full upstream semantic parity.
+Additional current-state checks:
+
+- `git status --short --branch`: clean `master...origin/master` before this audit edit.
+- `git rev-parse HEAD origin/master`: both refs were `81a9060c274bd2692c4a7f321f4f516af733b7f8`.
+- Task status scan: 42 task specs are `Done`.
+- Phase status scan: 17 phase specs are `Done`.
+- Project specs scan: no real `<TBD-by-user>` remains in `docs/specs/tasks`, `docs/specs/phases`, `docs/decisions`, or `docs/compatibility`.
+- `s2v_preflight_phase` passes for every phase spec.
+
+This proves the current local gate chain is executable and green. It does not by itself prove a complete or perfect refactor of the full upstream repository.
 
 ## Improvements Since The Previous Audit
 
-The project is materially stronger than the 2026-05-30 audit snapshot:
+The project is materially stronger than the earlier audit snapshots:
 
-- All phase and task specs are `Done` through Phase 16.
-- Adapter verification commands are no longer `N/A`; full local gates run.
-- `viewer/` and `npm/` now include package metadata, lockfiles, build/test scripts, and smoke scripts.
-- `compatibility/fixtures/` contains 53 tracked fixture manifest files.
+- All phase and task specs are `Done` through Phase 17.
+- Adapter verification commands are executable; the full 9-key local gate runs.
+- `viewer/` and `npm/` include package metadata, lockfiles, build/test scripts, and smoke scripts.
 - Phase 16 removed the previous no-op CLI behavior for `view`, `cache`, `import`, and `export`.
-- Runtime smoke now produces measured `performance.json`, `security.json`, and `release-candidate.json`.
-- Runtime smoke includes one real upstream execution path using `npx --yes promptfoo@0.121.13 eval`.
+- Runtime smoke produces measured `performance.json`, `security.json`, and `release-candidate.json`.
+- Phase 17 added source-tree extraction evidence, CLI/flag closure evidence, a 50-fixture real upstream P0 corpus, long-tail classification, and release installability evidence.
 
-These are real progress items and should not be confused with the older audit's pre-Phase-16 state.
+These are real progress items. They support a scoped frozen-baseline compatibility implementation, not a literal perfect refactor claim.
 
 ## Blocking Findings
 
-### P0 - Local CLI surface is still much smaller than upstream
+### P0 - Scope is frozen baseline, not current upstream repository
 
-`promptfoo-rs --help` currently exposes these top-level commands:
+The project specs intentionally target `promptfoo@0.121.13` and commit `4860e990c7e9a2f8f677173fb92cf9867b34d03f`. Current GitHub `HEAD` is `ff8eafd743cf6d63dd85b790ad8a4c73ede5828d`, and GitHub releases show a later `code-scan-action: 0.1.7` release after `0.121.13`.
 
-`eval`, `view`, `cache`, `redteam`, `mcp`, `code-scans`, `scan-model`, `model-audit`, `import`, `export`.
+Verdict: the project can claim only frozen-baseline compatibility. It cannot honestly claim to be a complete refactor of current `promptfoo/promptfoo`.
 
-`promptfoo@0.121.13 --help` exposes additional user-visible top-level commands including:
-
-`init`, `share`, `auth`, `config`, `debug`, `delete`, `generate`, `feedback`, `list`, `logs`, `optimize`, `retry`, `validate`, and `show`.
-
-`promptfoo-rs eval --help` exposes only:
-
-`--config`, `--output`, and `--max-concurrency`.
-
-`promptfoo@0.121.13 eval --help` exposes a much broader flag/subcommand surface, including assertions/prompts/providers/tests/vars, model outputs, prompt prefix/suffix, tags, repeat, delay, no-cache, filters, table/no-table, share/no-share, resume, retry-errors, no-write, grader, suggest-prompts, watch, extension hooks, description, progress bar control, env-file/env-path, and `setup`.
-
-`promptfoo-rs redteam --help` models redteam stages as one `--stage` option. Upstream `promptfoo redteam --help` exposes subcommands such as `init`, `eval`, `discover`, `generate`, `run`, `poison`, `report`, `setup`, and `plugins`.
-
-Verdict: the project has a useful compatible CLI subset, but not a perfect CLI refactor.
-
-### P0 - Item-level upstream inventory is not complete enough to support a perfect-refactor claim
-
-Current local inventory:
-
-- `compatibility/inventory/upstream-items.json`: 44 items
-- categories: 9 command, 3 flag, 6 provider, 7 assertion, 6 redteam, 5 output, 3 config, 1 node-api, 1 viewer, 3 release
-- one unresolved P2 row remains: `provider:dynamic-registry`
-
-Direct frozen-tag upstream tree counts for `4860e990c7e9a2f8f677173fb92cf9867b34d03f`:
-
-- tracked files: 5290
-- `src/` files: 1595
-- command-related TS/JS files: 85
-- provider TS/JS files: 219
-- assertion TS/JS files: 56
-- redteam TS/JS files: 217
-- redteam plugin files: 125
-- redteam strategy files: 32
-- app/viewer files: 701
-- example files: 1220
-
-The current local inventory is a curated matrix seed, not a source-extracted complete inventory of all documented and source-visible upstream capability items.
-
-### P0 - The real upstream smoke is too narrow
-
-`target/release-gates/real-upstream-smoke/latest/metadata.json` proves one real upstream eval:
-
-- fixture: `real-upstream-smoke-echo`
-- upstream command: `npx --yes promptfoo@0.121.13 eval -c promptfooconfig.yaml --output raw/upstream.json`
-- rs command: `target/release/promptfoo-rs.exe eval -c promptfooconfig.yaml --output raw/rs.json`
-- upstream exit code: 0
-- rs exit code: 0
-- diff status: ready
-
-This is valuable, but it is one minimal echo fixture. It does not prove the PRD's broader P0 gate of at least 50 core fixtures with upstream artifact, rs artifact, normalization output, and diff report for the real CLI/runtime surface.
-
-### P1 - Source inventory evidence is too weak
+### P0 - Source inventory still records release blockers
 
 `target/release-gates/source-inventory-evidence.json` reports:
 
-- `inventory_item_count`: 44
-- `package_file_count`: 536
-- `package_file_counts.assertion`: 0
-- `package_file_counts.redteam`: 0
-- `package_file_counts.config`: 0
-- `status`: ready
+- `schema`: `promptfoo-rs.source-inventory-evidence.v2`
+- `status`: `ready-with-blockers`
+- `source_extracted_item_count`: 2549
+- `missing_matrix_rows`: 2116
+- `release_blockers`: 2116
 
-The ready status only proves the current script found category coverage and source-reference strings. It does not prove AST-level or source-level extraction of all upstream commands, providers, assertions, redteam plugins/strategies, config features, examples, and viewer/API surfaces.
+The evidence is stronger than the old curated seed matrix because it is source-extracted. The result still directly contradicts a "complete upstream surface implemented or accounted for" claim.
 
-### P1 - Some compatibility matrix rows intentionally remain later or unsupported
+### P0 - Long-tail classification still has P0 release blockers
 
-The project correctly registers some non-goals and deferred areas, for example:
+`target/release-gates/longtail-classification.json` reports:
 
-- `promptfoo cloud/share`: P2 unsupported/later by PRD scope
-- `redteam-plugin:medical`: later
-- `redteam-strategy:agentic-chain`: later
-- `provider:dynamic-registry`: unresolved/P2 seed item
+- `schema`: `promptfoo-rs.longtail-classification.v1`
+- `status`: `ready-with-blockers`
+- `source_extracted_item_count`: 433
+- `tracked_longtail_item_count`: 433
+- `p0_release_blocker_count`: 37
+- `unresolved_rows`: 0
+- `missing_reason_rows`: 0
 
-This is acceptable for a scoped 1.0 compatibility plan, but it contradicts a literal "perfect refactor" claim unless the phrase is explicitly redefined as "complete according to the frozen PRD P0/P1/P2 policy, with documented P2 gaps".
+This is good auditability: the long tail is classified, unresolved rows are cleared, and missing reasons are not hidden. It is still not perfect/native parity because 37 P0 provider module blockers remain explicit.
+
+### P1 - Compatibility matrix intentionally contains later, unsupported, and partial-parity rows
+
+The project correctly registers non-goals and deferred areas, including:
+
+- `Other documented providers`: P1/P2 with `native/bridge/later`.
+- `Python custom provider/assertion`: Python runtime discovery fixture remains follow-up.
+- `Shell/Ruby custom scripts`: Ruby depends on upstream documentation inventory.
+- `Local Web viewer`: P1 data-contract parity; pixel-level upstream UI parity is out of scope.
+- `MCP provider / promptfoo mcp`: P1 until protocol coverage is complete.
+- `code-scans / scan-model / model-audit`: false-positive rate is a known limitation, not a 1.0 gate.
+- `Node API wrapper`: npm package scaffold depends on a Corepack-enabled packaging environment.
+- `promptfoo cloud/share`: P2 unsupported/later; brand/legal copy needs review before public release.
+
+This is acceptable for the PRD's P0/P1/P2 compatibility policy. It contradicts a literal "perfect refactor" claim unless the phrase is redefined as "complete according to the frozen PRD compatibility policy with documented P2 gaps."
+
+### P1 - Public release is still credential-blocked and unpublished
+
+`target/release-gates/installability.json` and `target/release-gates/release-candidate.json` report:
+
+- `installability_ready`: true
+- `publication_ready`: `credential-blocked`
+- `credential_blocked`: true
+- release-candidate `published`: false
+- channel-level `published`: false for GitHub Releases, Cargo, npm wrapper, Docker, Homebrew, and GitHub Action
+- Homebrew status: `tool-unavailable`, blocker `Homebrew CLI unavailable; tap publication requires credentials`
+
+Local dry-run installability is proven. Real multi-channel publication is not proven and cannot be claimed without credentials and release authority.
 
 ## Requirement Verdict
 
 | Requirement | Current evidence | Verdict |
 |---|---|---|
-| All local S2V phase/task specs complete | Adapter indexes Phase 1-16 as `Done`; status scan found no Draft/Ready/In Progress task specs | Met |
-| Local verification gates executable and green | Full 9-key S2V verification passed | Met |
-| Frozen baseline traceable | npm, tag, commit, integrity, and container digest recorded; npm latest still 0.121.13 | Met for frozen target |
-| CLI command/flag parity | Local top-level commands and eval/redteam flags are much narrower than upstream help | Not met |
-| 100% upstream item-level inventory | Local inventory has 44 curated items; frozen tag has 85 command files, 219 provider files, 56 assertion files, 217 redteam files | Not met |
-| P0 real upstream golden diff corpus | One real upstream smoke fixture exists; the 50-fixture corpus is manifest-level/local-gate evidence, not 50 real upstream runs | Not proven |
-| Provider/assertion/redteam full parity | P0 subsets are covered; long-tail source surface is not fully enumerated or implemented | Not met |
+| All local S2V phase/task specs complete | 42 task specs `Done`; 17 phase specs `Done`; phase preflight passes | Met |
+| Local verification gates executable and green | Full 9-key S2V verification passed on 2026-05-31 | Met |
+| Frozen baseline traceable | npm version/gitHead/integrity, git tag, baseline lock, and artifacts point to `0.121.13` / `4860e99` | Met for frozen target |
+| Current upstream repository parity | GitHub `HEAD=ff8eafd...` differs from frozen tag; later `code-scan-action: 0.1.7` release exists | Not met |
+| 100% source-extracted upstream item accounting | 2549 source-extracted items, but 2116 missing matrix rows / release blockers remain | Not met |
+| P0 real upstream golden diff corpus | 50 real upstream P0 fixtures are recorded and smoke metadata is ready | Met for recorded corpus |
+| Provider/assertion/redteam long-tail parity | 433 tracked long-tail rows, but 37 explicit P0 provider module release blockers remain | Not met |
+| Compatibility matrix honesty | P1/P2/later/unsupported rows are explicit and reasoned | Met as auditability, not perfect parity |
 | Viewer/npm package local build smoke | Viewer and npm package smoke scripts pass in full local gate | Met for local smoke |
-| Multi-channel public release | Packaging model and dry-run evidence exist; real external credentials/publication are outside current evidence | Not proven |
+| Multi-channel public release | Dry-run artifacts exist, but all channels are unpublished and publication is credential-blocked | Not proven |
 
 ## Conclusion
 
-The current project is a substantially improved, locally verified, S2V-complete Rust compatibility implementation for a frozen promptfoo baseline. It is not yet a complete or perfect refactor of `promptfoo/promptfoo`.
+The current project is a substantially improved, locally verified, S2V-complete Rust compatibility implementation for the frozen `promptfoo@0.121.13` baseline. It is not yet a complete or perfect refactor of `promptfoo/promptfoo`.
 
-The remaining gap is no longer basic project readiness. It is deep parity proof:
+The remaining gap is no longer basic project readiness. It is deep parity and release proof:
 
-1. source-extracted complete upstream inventory,
-2. broader CLI command/flag behavior parity,
-3. real upstream-vs-rs golden diff execution across the required P0 corpus,
-4. complete provider/assertion/redteam long-tail classification or implementation evidence,
-5. final release publication/installability evidence where credentials and public channels are required.
+1. close or explicitly re-scope the 2116 source inventory release blockers,
+2. resolve the 37 P0 long-tail provider module blockers,
+3. decide whether to rebaseline from frozen `0.121.13` to current upstream `HEAD`,
+4. either implement or formally scope out the current upstream surfaces that are outside the frozen PRD target,
+5. complete real publication evidence for the intended release channels once credentials and release authority exist.
+
+Until those are resolved, the honest project claim is "auditable frozen-baseline compatibility implementation with explicit blockers," not "perfect refactor."
 
 ## Recommended Next S2V Work
 
-Add a new phase after Phase 16 focused on deep parity proof rather than smoke hardening:
+Add follow-up S2V work focused on blocker burn-down rather than smoke hardening:
 
-- source-extracted upstream inventory from `refs/tags/0.121.13`;
-- CLI global/eval/redteam command and flag parity expansion;
-- real upstream golden corpus runner over at least 50 P0 fixtures;
-- provider/assertion/redteam long-tail extractor and classifier;
-- release publication dry-run/installability artifact hardening.
-
+- source inventory blocker reduction for the 2116 missing matrix rows;
+- fixture or waiver decisions for the 37 P0 long-tail provider module blockers;
+- explicit rebaseline ADR if the target changes from `0.121.13` to current upstream `HEAD`;
+- publication credential/authority checklist for GitHub Releases, Cargo, npm, Docker, Homebrew, and GitHub Action;
+- compatibility matrix update that separates "frozen-baseline complete" from "current-upstream complete."
