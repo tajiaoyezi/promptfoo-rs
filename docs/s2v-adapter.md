@@ -150,7 +150,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 19 | source-accounting-native-burndown | docs/specs/phases/phase-19-source-accounting-native-burndown.md | Done | 4 | N/A (solo) |
 | 20 | cross-ledger-perfect-claim-closure | docs/specs/phases/phase-20-cross-ledger-perfect-claim-closure.md | Done | 2 | N/A (solo) |
 | 21 | upstream-distribution-target-disambiguation | docs/specs/phases/phase-21-upstream-distribution-target-disambiguation.md | Done | 1 | N/A (solo) |
-| 22 | perfect-refactor-unblock-packet | docs/specs/phases/phase-22-perfect-refactor-unblock-packet.md | Ready | 1 | N/A (solo) |
+| 22 | perfect-refactor-unblock-packet | docs/specs/phases/phase-22-perfect-refactor-unblock-packet.md | Done | 1 | N/A (solo) |
 
 ## Task 总索引
 

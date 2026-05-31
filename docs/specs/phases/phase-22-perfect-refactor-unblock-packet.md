@@ -1,6 +1,6 @@
 # Phase 22: perfect-refactor-unblock-packet
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,10 +28,10 @@
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `perfect-refactor-unblock-packet.json` 聚合 `perfect-refactor-claim.json`、`source-inventory-evidence.json`、`external-authority-blockers.json`、`publication-authority.json`、`upstream-distribution-target.json` 的剩余 blocker。
-- [ ] packet 明确区分 source-only config blockers、provider/account/product authority blockers、publication channel blockers 和 current-upstream rebaseline requirement，且不得重复计算同一 provider blocker。
-- [ ] packet 中每个 unblock item 都包含 `required_actor`、`required_evidence`、`source_artifact`、`release_impact` 和 `auto_resolvable=false`，防止 agent 自动伪造授权。
-- [ ] runtime smoke 与 release candidate 引用该 packet；docs/audit/compatibility matrix 说明该 packet 是 handoff/blocker artifact，不是 perfect-refactor completion claim。
+- [x] `perfect-refactor-unblock-packet.json` 聚合 `perfect-refactor-claim.json`、`source-inventory-evidence.json`、`external-authority-blockers.json`、`publication-authority.json`、`upstream-distribution-target.json` 的剩余 blocker。
+- [x] packet 明确区分 source-only config blockers、provider/account/product authority blockers、publication channel blockers 和 current-upstream rebaseline requirement，且不得重复计算同一 provider blocker。
+- [x] packet 中每个 unblock item 都包含 `required_actor`、`required_evidence`、`source_artifact`、`release_impact` 和 `auto_resolvable=false`，防止 agent 自动伪造授权。
+- [x] runtime smoke 与 release candidate 引用该 packet；docs/audit/compatibility matrix 说明该 packet 是 handoff/blocker artifact，不是 perfect-refactor completion claim。
 
 ## 7. Phase Risks
 
@@ -45,7 +45,10 @@ task 22.1 Done 后，执行 phase §6 smoke：`s2v_verify_full "install lint typ
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **保留边界**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **Phase smoke**：PASS — `s2v_preflight_phase docs/specs/phases/phase-22-perfect-refactor-unblock-packet.md` 通过，随后 `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全量通过（9 项）。
+- **Artifact evidence**：
+  - `target/release-gates/perfect-refactor-unblock-packet.json`：`status=blocked`，`auto_resolvable=false`，`required_user_decision_count=29`，`source_p0_accounting_blocker_count=22`，`external_authority_blocker_count=21`，`current_upstream_rebaseline_required=true`，`perfect_refactor_claim_allowed=false`。
+  - `target/release-gates/perfect-refactor-claim.json`：`perfect_refactor_claim_allowed=false`，`local_stable_allowed=true`，`published=false`，`publication_ready=credential-blocked`，`blocker_count=4`。
+  - `target/release-gates/release-candidate.json.perfect_refactor_unblock_packet`：引用 `target/release-gates/perfect-refactor-unblock-packet.json`，并记录 `status=blocked`、`auto_resolvable=false`、`required_user_decision_count=29`。
+- **保留边界**：Phase 22 完成的是 blocker handoff 和 release gate wiring；它没有也不能替代真实 credentials、账号/私有服务权限、法律/品牌授权、公开发布 URL/digest 或 current-upstream same-ref rebaseline 证据，因此完美重构 claim 仍保持 false。
