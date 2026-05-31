@@ -645,6 +645,52 @@ pub struct PerfectRefactorClaimDecision {
     pub reasons: Vec<String>,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PerfectRefactorUnblockInputs {
+    pub claim: PerfectRefactorClaimContract,
+    pub source_p0_blockers: Vec<String>,
+    pub external_authority_items: Vec<PerfectRefactorUnblockItem>,
+    pub current_upstream_rebaseline_required: bool,
+    pub source_artifacts: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PerfectRefactorUnblockItem {
+    pub item_id: String,
+    pub category: String,
+    pub authority_type: String,
+    pub required_actor: String,
+    pub required_evidence: String,
+    pub source_artifact: String,
+    pub source_reference: Option<String>,
+    pub safe_local_fallback: String,
+    pub release_impact: String,
+    pub auto_resolvable: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PerfectRefactorUnblockPacket {
+    pub schema: String,
+    pub status: String,
+    pub perfect_refactor_claim_allowed: bool,
+    pub auto_resolvable: bool,
+    pub blocker_count: usize,
+    pub source_p0_accounting_blocker_count: usize,
+    pub external_authority_blocker_count: usize,
+    pub required_user_decision_count: usize,
+    pub current_upstream_rebaseline_required: bool,
+    pub decision_items: Vec<PerfectRefactorUnblockItem>,
+    pub source_artifacts: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PerfectRefactorUnblockValidation {
+    pub ready: bool,
+    pub blocked_count: usize,
+    pub missing_required_fields: Vec<String>,
+    pub invalid_auto_resolvable_items: Vec<String>,
+}
+
 #[derive(Debug)]
 pub enum ReleaseError {
     Io { path: PathBuf, message: String },
@@ -988,12 +1034,200 @@ pub fn write_perfect_refactor_claim_contract(
     })
 }
 
+pub fn build_perfect_refactor_unblock_packet(
+    inputs: PerfectRefactorUnblockInputs,
+) -> PerfectRefactorUnblockPacket {
+    let mut decisions = BTreeMap::<String, PerfectRefactorUnblockItem>::new();
+    let external_authority_blocker_count = inputs.external_authority_items.len();
+
+    for mut item in inputs.external_authority_items {
+        item.auto_resolvable = false;
+        decisions.insert(item.item_id.clone(), item);
+    }
+
+    let source_artifact =
+        claim_source_artifact(&inputs.source_artifacts, "source-inventory-evidence.json");
+    for item_id in &inputs.source_p0_blockers {
+        if decisions.contains_key(item_id) {
+            continue;
+        }
+        decisions.insert(
+            item_id.clone(),
+            source_only_unblock_item(item_id, &source_artifact),
+        );
+    }
+
+    if inputs.current_upstream_rebaseline_required || !inputs.claim.current_perfect_claim_allowed {
+        let source_artifact = claim_source_artifact(
+            &inputs.source_artifacts,
+            "upstream-distribution-target.json",
+        );
+        decisions.insert(
+            "current-upstream:rebaseline".to_string(),
+            PerfectRefactorUnblockItem {
+                item_id: "current-upstream:rebaseline".to_string(),
+                category: "current-upstream".to_string(),
+                authority_type: "target-policy".to_string(),
+                required_actor: "maintainer".to_string(),
+                required_evidence:
+                    "same-ref source inventory, matrix, fixtures, golden corpus, and release candidate evidence; otherwise keep frozen-baseline scope"
+                        .to_string(),
+                source_artifact,
+                source_reference: Some("promptfoo repository HEAD / npm core package target".to_string()),
+                safe_local_fallback:
+                    "Keep current repository perfect-refactor claim blocked and preserve frozen-baseline compatibility wording"
+                        .to_string(),
+                release_impact:
+                    "Blocks current repository perfect-refactor claim until rebaseline evidence is complete"
+                        .to_string(),
+                auto_resolvable: false,
+            },
+        );
+    }
+
+    for blocker in &inputs.claim.blockers {
+        if blocker.category == "publication-authority"
+            && !decisions
+                .keys()
+                .any(|item_id| item_id.starts_with("publication:"))
+        {
+            decisions.insert(
+                "publication:all-channels".to_string(),
+                PerfectRefactorUnblockItem {
+                    item_id: "publication:all-channels".to_string(),
+                    category: "publication-authority".to_string(),
+                    authority_type: "publication-authority".to_string(),
+                    required_actor: "release maintainer".to_string(),
+                    required_evidence:
+                        "Public publication requires credentials, release authority, legal/brand approval, and external URL/digest evidence"
+                            .to_string(),
+                    source_artifact: claim_source_artifact(
+                        &inputs.source_artifacts,
+                        "publication-authority.json",
+                    ),
+                    source_reference: Some(blocker.source_artifact.clone()),
+                    safe_local_fallback: "Keep dry-run installability evidence only".to_string(),
+                    release_impact:
+                        "Blocks public perfect-refactor availability until external publication evidence exists"
+                            .to_string(),
+                    auto_resolvable: false,
+                },
+            );
+        }
+    }
+
+    let decision_items = decisions.into_values().collect::<Vec<_>>();
+    let perfect_refactor_claim_allowed =
+        inputs.claim.perfect_refactor_claim_allowed && decision_items.is_empty();
+    let status = if perfect_refactor_claim_allowed {
+        "ready"
+    } else {
+        "blocked"
+    };
+    let auto_resolvable = perfect_refactor_claim_allowed && decision_items.is_empty();
+
+    PerfectRefactorUnblockPacket {
+        schema: "promptfoo-rs.perfect-refactor-unblock-packet.v1".to_string(),
+        status: status.to_string(),
+        perfect_refactor_claim_allowed,
+        auto_resolvable,
+        blocker_count: inputs.claim.blockers.len(),
+        source_p0_accounting_blocker_count: inputs.source_p0_blockers.len(),
+        external_authority_blocker_count,
+        required_user_decision_count: decision_items.len(),
+        current_upstream_rebaseline_required: inputs.current_upstream_rebaseline_required,
+        decision_items,
+        source_artifacts: inputs.source_artifacts,
+    }
+}
+
+pub fn validate_perfect_refactor_unblock_packet(
+    packet: &PerfectRefactorUnblockPacket,
+) -> PerfectRefactorUnblockValidation {
+    let mut missing_required_fields = Vec::new();
+    let mut invalid_auto_resolvable_items = Vec::new();
+
+    for item in &packet.decision_items {
+        if item.required_actor.trim().is_empty()
+            || item.required_evidence.trim().is_empty()
+            || item.source_artifact.trim().is_empty()
+            || item.release_impact.trim().is_empty()
+        {
+            missing_required_fields.push(item.item_id.clone());
+        }
+        if item.auto_resolvable {
+            invalid_auto_resolvable_items.push(item.item_id.clone());
+        }
+    }
+
+    let ready = packet.status == "ready"
+        && packet.perfect_refactor_claim_allowed
+        && packet.auto_resolvable
+        && packet.decision_items.is_empty()
+        && missing_required_fields.is_empty()
+        && invalid_auto_resolvable_items.is_empty();
+    let blocked_count = if ready {
+        0
+    } else {
+        packet.decision_items.len()
+    };
+
+    PerfectRefactorUnblockValidation {
+        ready,
+        blocked_count,
+        missing_required_fields,
+        invalid_auto_resolvable_items,
+    }
+}
+
+pub fn write_perfect_refactor_unblock_packet(
+    packet: &PerfectRefactorUnblockPacket,
+    path: &Path,
+) -> Result<(), ReleaseError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|error| ReleaseError::Io {
+            path: parent.to_path_buf(),
+            message: error.to_string(),
+        })?;
+    }
+    let json = serde_json::to_string_pretty(packet)
+        .map_err(|error| ReleaseError::Serialize(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(|error| ReleaseError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })
+}
+
 fn claim_source_artifact(source_artifacts: &[String], needle: &str) -> String {
     source_artifacts
         .iter()
         .find(|artifact| artifact.ends_with(needle))
         .cloned()
         .unwrap_or_else(|| format!("target/release-gates/{needle}"))
+}
+
+fn source_only_unblock_item(item_id: &str, source_artifact: &str) -> PerfectRefactorUnblockItem {
+    let authority_type = if item_id.starts_with("config:") {
+        "product-service-authority"
+    } else {
+        "source-accounting"
+    };
+    PerfectRefactorUnblockItem {
+        item_id: item_id.to_string(),
+        category: "source-accounting".to_string(),
+        authority_type: authority_type.to_string(),
+        required_actor: "user or maintainer".to_string(),
+        required_evidence: format!(
+            "Native/bridge fixture evidence or approved external-authority waiver for {item_id}"
+        ),
+        source_artifact: source_artifact.to_string(),
+        source_reference: Some(item_id.to_string()),
+        safe_local_fallback: "Keep the item release-blocking; do not claim parity".to_string(),
+        release_impact: format!(
+            "Blocks perfect-refactor source accounting claim until {item_id} has evidence"
+        ),
+        auto_resolvable: false,
+    }
 }
 
 pub fn collect_publication_authority(channels: &[ReleaseChannel]) -> PublicationAuthorityReport {

@@ -328,6 +328,10 @@ fs.writeFileSync(`${gateDir}/perfect-refactor-claim.json`, `${JSON.stringify(con
 NODE
 perfect_refactor_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-claim.json', 'utf8')); console.log(r.perfect_refactor_claim_allowed ? 'true' : 'false')")"
 perfect_refactor_claim_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-claim.json', 'utf8')); console.log((r.blockers || []).length)")"
+bash scripts/release/perfect-refactor-unblock-packet.sh
+perfect_refactor_unblock_packet_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-unblock-packet.json', 'utf8')); console.log(r.status)")"
+perfect_refactor_unblock_packet_decision_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-unblock-packet.json', 'utf8')); console.log(r.required_user_decision_count)")"
+perfect_refactor_unblock_packet_auto_resolvable="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-unblock-packet.json', 'utf8')); console.log(r.auto_resolvable ? 'true' : 'false')")"
 
 cat > "$GATE_DIR/performance.json" <<JSON
 {
@@ -399,6 +403,12 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "blocker_count": $perfect_refactor_claim_blocker_count,
     "claim_artifact": "target/release-gates/perfect-refactor-claim.json"
   },
+  "perfect_refactor_unblock_packet": {
+    "status": "$perfect_refactor_unblock_packet_status",
+    "required_user_decision_count": $perfect_refactor_unblock_packet_decision_count,
+    "auto_resolvable": $perfect_refactor_unblock_packet_auto_resolvable,
+    "packet_artifact": "target/release-gates/perfect-refactor-unblock-packet.json"
+  },
   "gate_statuses": {
     "adapter": "$adapter_status",
     "compatibility": "$compatibility_status",
@@ -446,6 +456,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/longtail-classification.json",
     "target/release-gates/external-authority-blockers.json",
     "target/release-gates/perfect-refactor-claim.json",
+    "target/release-gates/perfect-refactor-unblock-packet.json",
     "target/release-gates/current-upstream-policy.json",
     "target/release-gates/upstream-distribution-target.json",
     "target/release-gates/installability.json",
@@ -468,6 +479,7 @@ validate_report_json "$GATE_DIR/security.json"
 validate_report_json "$GATE_DIR/source-inventory-ledger.json"
 validate_report_json "$GATE_DIR/external-authority-blockers.json"
 validate_report_json "$GATE_DIR/perfect-refactor-claim.json"
+validate_report_json "$GATE_DIR/perfect-refactor-unblock-packet.json"
 validate_report_json "$GATE_DIR/upstream-distribution-target.json"
 validate_report_json "$GATE_DIR/release-candidate.json"
 

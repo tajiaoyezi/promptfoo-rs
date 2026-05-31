@@ -75,6 +75,12 @@ Task 20.2 adds `target/release-gates/perfect-refactor-claim.json` and links it f
 
 Current local stable release gates can pass for the frozen baseline while `perfect_refactor_claim_allowed=false`. The claim stays false until source accounting blockers are zero, current-upstream evidence is ready, external authority blockers are resolved, publication authority is ready, and the publication flag is true with external URL/digest evidence. Local stable means the local frozen-baseline release gate is ready; it is not a public or perfect-refactor completion claim.
 
+## Perfect Refactor Unblock Packet
+
+Task 22.1 adds `target/release-gates/perfect-refactor-unblock-packet.json` and links it from `target/release-gates/release-candidate.json.perfect_refactor_unblock_packet`. This packet is a blocker handoff artifact: it lists the minimum user, maintainer, product owner, account owner, service owner, legal/brand reviewer, or release maintainer decisions still required before a perfect-refactor claim can become true.
+
+Every unblock item records `required_actor`, `required_evidence`, `source_artifact`, `release_impact`, and `auto_resolvable=false`. Dry-run installability, local fixture coverage, and frozen-baseline local stable readiness do not satisfy these items. The packet must remain `status=blocked` and `auto_resolvable=false` while credentials, account/product authority, current-upstream same-ref evidence, legal/brand approval, or external publication URL/digest evidence are absent.
+
 ## S2V Release Checklist
 
 1. Run the compatibility release gate.

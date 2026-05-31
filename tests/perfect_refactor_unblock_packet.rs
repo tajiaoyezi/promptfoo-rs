@@ -14,7 +14,10 @@ fn test_22_1_1_packet_keeps_claim_false_with_remaining_blockers() {
     let packet = build_perfect_refactor_unblock_packet(blocked_inputs());
     let validation = validate_perfect_refactor_unblock_packet(&packet);
 
-    assert_eq!(packet.schema, "promptfoo-rs.perfect-refactor-unblock-packet.v1");
+    assert_eq!(
+        packet.schema,
+        "promptfoo-rs.perfect-refactor-unblock-packet.v1"
+    );
     assert_eq!(packet.status, "blocked", "{packet:#?}");
     assert!(!packet.perfect_refactor_claim_allowed, "{packet:#?}");
     assert!(!packet.auto_resolvable, "{packet:#?}");
@@ -64,7 +67,10 @@ fn test_22_1_3_publication_items_require_external_evidence_not_dry_run() {
 
     assert_eq!(cargo.category, "publication-authority");
     assert_eq!(cargo.required_actor, "release maintainer");
-    assert!(cargo.required_evidence.contains("credentials"), "{cargo:#?}");
+    assert!(
+        cargo.required_evidence.contains("credentials"),
+        "{cargo:#?}"
+    );
     assert!(
         cargo.required_evidence.contains("legal/brand approval"),
         "{cargo:#?}"
@@ -91,7 +97,10 @@ fn test_22_1_4_current_upstream_rebaseline_requirement_stays_visible() {
         .expect("current upstream rebaseline blocker should be listed");
 
     assert_eq!(rebaseline.category, "current-upstream");
-    assert!(rebaseline.required_evidence.contains("same-ref"), "{rebaseline:#?}");
+    assert!(
+        rebaseline.required_evidence.contains("same-ref"),
+        "{rebaseline:#?}"
+    );
     assert!(
         rebaseline
             .source_artifact
