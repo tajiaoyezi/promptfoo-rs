@@ -93,6 +93,8 @@ impl std::fmt::Display for InventoryError {
 
 impl std::error::Error for InventoryError {}
 
+pub type CompatibilityEvidenceError = InventoryError;
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FrozenSourceReference {
     pub package_version: String,
@@ -1042,7 +1044,7 @@ pub fn validate_core_config_source_burndown(
 pub fn write_core_config_source_burndown(
     report: &CoreConfigSourceBurndownReport,
     path: &Path,
-) -> Result<(), InventoryError> {
+) -> Result<(), CompatibilityEvidenceError> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(InventoryError::Write)?;
     }
