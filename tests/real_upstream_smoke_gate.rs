@@ -35,6 +35,17 @@ fn test_16_3_2_real_upstream_smoke_script_executes_npx_and_rs_binary() {
         .expect("real upstream smoke script should exist");
 
     assert!(script.contains("npx --yes promptfoo@0.121.13"), "{script}");
+    for required_env in [
+        "PROMPTFOO_DISABLE_TELEMETRY=1",
+        "PROMPTFOO_DISABLE_UPDATE=1",
+        "NO_COLOR=1",
+        "CI=1",
+    ] {
+        assert!(
+            script.contains(required_env),
+            "real upstream smoke must disable telemetry/update side effects with {required_env}: {script}"
+        );
+    }
     assert!(
         script.contains(" eval "),
         "upstream smoke must execute eval: {script}"
