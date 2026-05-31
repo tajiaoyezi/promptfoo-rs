@@ -20,7 +20,7 @@
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 22.1 | authority-unblock-packet-gate | ../tasks/task-22.1-authority-unblock-packet-gate.md | Ready | 生成 perfect-refactor unblock packet，将剩余阻塞转换为最小外部决策/证据清单并纳入 release gate |
+| 22.1 | authority-unblock-packet-gate | ../tasks/task-22.1-authority-unblock-packet-gate.md | Done | 生成 perfect-refactor unblock packet，将剩余阻塞转换为最小外部决策/证据清单并纳入 release gate |
 
 ## 5. Dependencies
 

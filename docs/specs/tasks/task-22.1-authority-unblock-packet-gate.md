@@ -1,6 +1,6 @@
 # Task 22.1: authority-unblock-packet-gate
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 22 — perfect-refactor-unblock-packet
@@ -73,21 +73,21 @@ Unblock packet 必须 fail-closed。只要 perfect-refactor claim 仍为 false�
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (task-20.2): packet mirrors `perfect-refactor-claim.json` and keeps `perfect_refactor_claim_allowed=false` while claim blockers remain.
-- [ ] **AC2** (task-20.1 / task-19.4): packet deduplicates provider source blockers already represented by external authority items, while preserving source-only config blockers.
-- [ ] **AC3** (ADR-008 / docs/release.md): publication unblock items require credentials, release authority, legal/brand approval, and external URL/digest evidence; dry-run installability cannot mark them ready.
-- [ ] **AC4** (task-21.1): packet includes current-upstream rebaseline requirement when repository-current perfect claim remains blocked by distribution target drift.
-- [ ] **AC5** (PRD §Success Metrics): runtime smoke and release candidate include the packet; docs/audit/matrix describe it as a blocker handoff artifact, not completion.
+- [x] **AC1** (task-20.2): packet mirrors `perfect-refactor-claim.json` and keeps `perfect_refactor_claim_allowed=false` while claim blockers remain.
+- [x] **AC2** (task-20.1 / task-19.4): packet deduplicates provider source blockers already represented by external authority items, while preserving source-only config blockers.
+- [x] **AC3** (ADR-008 / docs/release.md): publication unblock items require credentials, release authority, legal/brand approval, and external URL/digest evidence; dry-run installability cannot mark them ready.
+- [x] **AC4** (task-21.1): packet includes current-upstream rebaseline requirement when repository-current perfect claim remains blocked by distribution target drift.
+- [x] **AC5** (PRD §Success Metrics): runtime smoke and release candidate include the packet; docs/audit/matrix describe it as a blocker handoff artifact, not completion.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-22.1.1 | TEST-22.1.1 | tests/perfect_refactor_unblock_packet.rs | install, typecheck, unit-test, build | Not Started |
-| AC2 | SCEN-22.1.1 | TEST-22.1.2 | tests/perfect_refactor_unblock_packet.rs | install, typecheck, unit-test, integration, coverage, build | Not Started |
-| AC3 | SCEN-22.1.1 | TEST-22.1.3 | tests/perfect_refactor_unblock_packet.rs | install, typecheck, unit-test, e2e, build | Not Started |
-| AC4 | SCEN-22.1.1 | TEST-22.1.4 | tests/perfect_refactor_unblock_packet.rs | install, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC5 | SCEN-22.1.1 | TEST-22.1.5 | tests/perfect_refactor_unblock_packet.rs | install, lint, typecheck, unit-test, integration, e2e, coverage, runtime-smoke, build | Not Started |
+| AC1 | SCEN-22.1.1 | TEST-22.1.1 | tests/perfect_refactor_unblock_packet.rs | install, typecheck, unit-test, build | Done |
+| AC2 | SCEN-22.1.1 | TEST-22.1.2 | tests/perfect_refactor_unblock_packet.rs | install, typecheck, unit-test, integration, coverage, build | Done |
+| AC3 | SCEN-22.1.1 | TEST-22.1.3 | tests/perfect_refactor_unblock_packet.rs | install, typecheck, unit-test, e2e, build | Done |
+| AC4 | SCEN-22.1.1 | TEST-22.1.4 | tests/perfect_refactor_unblock_packet.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC5 | SCEN-22.1.1 | TEST-22.1.5 | tests/perfect_refactor_unblock_packet.rs | install, lint, typecheck, unit-test, integration, e2e, coverage, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -109,9 +109,34 @@ Unblock packet 必须 fail-closed。只要 perfect-refactor claim 仍为 false�
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-22-perfect-refactor-unblock-packet.md`
+  - `docs/specs/tasks/task-22.1-authority-unblock-packet-gate.md`
+  - `docs/superpowers/plans/2026-05-31-perfect-refactor-unblock-packet.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/perfect_refactor_unblock_packet.rs`
+  - `src/release.rs`
+  - `scripts/release/perfect-refactor-unblock-packet.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `docs/release.md`
+  - `docs/compatibility/matrix.md`
+  - `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`
+- **commit 列表**：
+  - `4b69d72 docs(spec): add phase 22 perfect refactor unblock packet`
+  - `dd1e9aa test(release): add SCEN-22.1.1 perfect refactor unblock RED tests`
+  - `0b0739a feat(release): add perfect refactor unblock packet gate`
+- **§9 Verification 结果**：
+  - install: PASS — `s2v_verify_full "$(s2v_extract_verify_keys "$TASK_SPEC")"` 于 2026-05-31 执行，adapter Install 通过。
+  - lint: PASS — `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS — `cargo check --workspace`、viewer typecheck、npm typecheck 通过。
+  - unit-test: PASS — `cargo test --workspace`、viewer tests、npm tests 通过，包含 `tests/perfect_refactor_unblock_packet.rs` 5/5 通过。
+  - integration: PASS — adapter Integration tests 通过。
+  - e2e: PASS — adapter E2E tests 通过。
+  - coverage: PASS — adapter Coverage tests 通过，`s2v_coverage_threshold_guard "$TASK_SPEC"` 通过。
+  - build: PASS — adapter Build 通过。
+  - runtime-smoke: PASS — adapter Runtime smoke 通过，并生成 `target/release-gates/perfect-refactor-unblock-packet.json`。
+- **剩余风险 / 未做项**：该 task 只生成 blocker handoff artifact，不提供真实 provider credentials、账号、私有服务权限、法律/品牌授权、公开发布 URL/digest 或 current-upstream same-ref rebaseline 证据；因此 `perfect_refactor_claim_allowed` 必须继续保持 false。
+- **下游 task 影响**：后续若用户提供授权、凭据、外部 URL/digest、正式 waiver 或 current-upstream same-ref 证据，可逐项消费 `perfect-refactor-unblock-packet.json` 中的 decision items；在这些证据缺失时，完美重构目标仍受外部阻塞约束。
