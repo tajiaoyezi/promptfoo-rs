@@ -85,7 +85,10 @@ fn test_19_1_4_docs_and_script_describe_scope_correction_not_parity_claim() {
     /* TEST-19.1.4 */
     let script = std::fs::read_to_string("scripts/release/source-inventory-evidence.sh")
         .expect("source inventory script should exist");
-    assert!(script.contains("viewer_config_reclassified_count"), "{script}");
+    assert!(
+        script.contains("viewer_config_reclassified_count"),
+        "{script}"
+    );
     assert!(script.contains("src/app/"), "{script}");
 
     let matrix =

@@ -294,6 +294,31 @@ function verificationFor(level, itemId, status = '') {
   return `blocker:${itemId}`;
 }
 
+function isViewerConfigSourceReference(sourceReference) {
+  return String(sourceReference || '').replace(/\\/g, '/').includes(':src/app/');
+}
+
+function generatedLevel(item) {
+  if (item.category === 'config' && isViewerConfigSourceReference(item.source_reference)) {
+    return 'P1';
+  }
+  return item.level_hint;
+}
+
+function generatedOwner(item) {
+  if (item.category === 'config' && isViewerConfigSourceReference(item.source_reference)) {
+    return 'web-viewer';
+  }
+  return item.owner_hint;
+}
+
+function generatedVerification(item, level, status) {
+  if (item.category === 'config' && isViewerConfigSourceReference(item.source_reference)) {
+    return `viewer:${item.stable_id}`;
+  }
+  return verificationFor(level, item.stable_id, status);
+}
+
 function generatedTargetStatus(level) {
   if (level === 'P0') return 'blocked';
   if (level === 'P1' || level === 'P2') return 'later';
@@ -302,6 +327,9 @@ function generatedTargetStatus(level) {
 
 function generatedReason(item) {
   const base = item.unresolved_reason || 'source-extracted item was not present in explicit item-level matrix';
+  if (item.category === 'config' && isViewerConfigSourceReference(item.source_reference)) {
+    return `Local Web viewer P1 scope correction; src/app config/editor source is accounted as viewer UI evidence, not P0 promptfooconfig runtime parity; reason: ${base}; source: ${item.source_reference}`;
+  }
   if (item.level_hint === 'P0') {
     return `generated P0 accounting row requires native fixture, bridge fixture, or explicit waiver; reason: ${base}; source: ${item.source_reference}`;
   }
@@ -325,14 +353,16 @@ for (const item of items) {
     });
     continue;
   }
+  const level = generatedLevel(item);
+  const targetStatus = generatedTargetStatus(level);
   const generated = {
     item_id: item.stable_id,
     category: item.category,
     source_reference: item.source_reference,
-    level: item.level_hint,
-    target_status: generatedTargetStatus(item.level_hint),
-    owner: item.owner_hint,
-    verification: verificationFor(item.level_hint, item.stable_id, 'blocked'),
+    level,
+    target_status: targetStatus,
+    owner: generatedOwner(item),
+    verification: generatedVerification(item, level, targetStatus),
     reason: generatedReason(item),
     generated: true,
   };
@@ -431,6 +461,16 @@ const extractionTimestamp = new Date().toISOString();
 const p0BlockerCount = ledgerRows.filter(
   (row) => row.level === 'P0' && String(row.verification || '').startsWith('blocker:'),
 ).length;
+const viewerConfigReclassifiedCount = ledgerRows.filter(
+  (row) =>
+    row.category === 'config' &&
+    isViewerConfigSourceReference(row.source_reference) &&
+    row.level === 'P1' &&
+    row.owner === 'web-viewer',
+).length;
+const remainingP0Blockers = ledgerRows
+  .filter((row) => row.level === 'P0' && String(row.verification || '').startsWith('blocker:'))
+  .map((row) => row.item_id);
 
 fs.writeFileSync(
   itemsOutputPath,
@@ -457,8 +497,10 @@ fs.writeFileSync(
       source_extracted_item_count: items.length,
       ledger_item_count: ledgerRows.length,
       generated_matrix_rows_count: generatedMatrixRows.length,
+      viewer_config_reclassified_count: viewerConfigReclassifiedCount,
       unrepresented_item_count: missingMatrixRows.length,
       p0_blocker_count: p0BlockerCount,
+      remaining_p0_blockers: remainingP0Blockers,
       rows: ledgerRows,
       unrepresented_items: missingMatrixRows,
     },
@@ -483,7 +525,9 @@ fs.writeFileSync(
       source_accounting_ledger: ledgerOutputPath,
       ledger_item_count: ledgerRows.length,
       generated_matrix_rows_count: generatedMatrixRows.length,
+      viewer_config_reclassified_count: viewerConfigReclassifiedCount,
       p0_accounting_blocker_count: p0BlockerCount,
+      remaining_p0_blockers: remainingP0Blockers,
       items_missing_metadata: itemsMissingMetadata,
       missing_matrix_rows: missingMatrixRows,
       silent_omissions: [],

@@ -193,3 +193,5 @@ Add follow-up S2V work focused on blocker burn-down rather than smoke hardening:
 - compatibility matrix update that separates "frozen-baseline complete" from "current-upstream complete."
 
 Phase 19 now captures the first two follow-up tracks as Ready S2V task specs: viewer config source reclassification, core config fixture burndown, provider request/response fixture burndown, and external authority blocker gate.
+
+Task 19.1 implementation adds viewer config scope correction for `src/app/**` generated config rows. This is not a claim of complete upstream React UI parity; it keeps Local Web viewer under the existing P1 boundary and leaves non-app runtime config rows as P0 blockers for task 19.2.

@@ -8,7 +8,7 @@
 
 ## 1. Background
 
-Phase 18 让 source inventory silent omissions 变成 explicit ledger rows，但 `target/release-gates/source-inventory-ledger.json` 仍把 74 个 generated `config:*` rows 计入 P0 blockers，其中 55 个来自 `promptfoo@0.121.13:src/app/**`。PRD/compatibility matrix 已把 Local Web viewer 定为 P1，因为目标是本地结果浏览和数据契约，不承诺 upstream React UI 像素级 parity。依据 PRD §Compatibility Matrix、docs/compatibility/matrix.md `Local Web viewer` 行、Phase 18 §9 artifact evidence。
+Phase 18 让 source inventory silent omissions 变成 explicit ledger rows，但 `target/release-gates/source-inventory-ledger.json` 仍把 74 个 generated `config:*` rows 计入 P0 blockers，其中 56 个来自 `promptfoo@0.121.13:src/app/**`。PRD/compatibility matrix 已把 Local Web viewer 定为 P1，因为目标是本地结果浏览和数据契约，不承诺 upstream React UI 像素级 parity。依据 PRD §Compatibility Matrix、docs/compatibility/matrix.md `Local Web viewer` 行、Phase 18 §9 artifact evidence。
 
 ## 2. Goal
 

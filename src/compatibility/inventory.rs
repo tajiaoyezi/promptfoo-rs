@@ -436,6 +436,14 @@ pub struct SourceAccountingLedger {
     pub unrepresented_items: Vec<String>,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SourceAccountingBurndownSummary {
+    pub schema: String,
+    pub viewer_config_reclassified_count: usize,
+    pub p0_accounting_blocker_count: usize,
+    pub remaining_p0_blockers: Vec<String>,
+}
+
 impl SourceAccountingLedger {
     pub fn unrepresented_items(&self) -> Vec<String> {
         self.unrepresented_items.clone()
@@ -625,7 +633,7 @@ pub fn build_source_accounting_ledger(
         }
 
         represented.insert(item.stable_id.clone());
-        rows.push(generated_accounting_row(item));
+        rows.push(classify_generated_source_accounting_row(item));
     }
 
     let unrepresented_items = inventory
@@ -836,7 +844,53 @@ fn insert_source_item(items: &mut BTreeMap<String, InventoryItem>, category: &st
         });
 }
 
-fn generated_accounting_row(item: &InventoryItem) -> SourceAccountingRow {
+pub fn is_viewer_config_source_reference(source_reference: &str) -> bool {
+    source_reference.replace('\\', "/").contains(":src/app/")
+}
+
+pub fn classify_generated_source_accounting_row(item: &InventoryItem) -> SourceAccountingRow {
+    if item.category == "config" && is_viewer_config_source_reference(&item.source_reference) {
+        return SourceAccountingRow {
+            item_id: item.stable_id.clone(),
+            category: item.category.clone(),
+            source_reference: item.source_reference.clone(),
+            level: "P1".to_string(),
+            target_status: "later".to_string(),
+            owner: "web-viewer".to_string(),
+            verification: format!("viewer:{}", item.stable_id),
+            reason: format!(
+                "Local Web viewer P1 scope correction; src/app config/editor source is accounted as viewer UI evidence, not P0 promptfooconfig runtime parity; source: {}",
+                item.source_reference
+            ),
+            generated: true,
+        };
+    }
+    default_generated_accounting_row(item)
+}
+
+pub fn source_accounting_burndown_summary(
+    ledger: &SourceAccountingLedger,
+) -> SourceAccountingBurndownSummary {
+    let viewer_config_reclassified_count = ledger
+        .rows
+        .iter()
+        .filter(|row| {
+            row.category == "config"
+                && is_viewer_config_source_reference(&row.source_reference)
+                && row.level == "P1"
+                && row.owner == "web-viewer"
+        })
+        .count();
+    let remaining_p0_blockers = ledger.p0_blockers();
+    SourceAccountingBurndownSummary {
+        schema: "promptfoo-rs.source-accounting-burndown.v1".to_string(),
+        viewer_config_reclassified_count,
+        p0_accounting_blocker_count: remaining_p0_blockers.len(),
+        remaining_p0_blockers,
+    }
+}
+
+fn default_generated_accounting_row(item: &InventoryItem) -> SourceAccountingRow {
     let level = item.level_hint.clone();
     let (target_status, verification, reason_prefix) = match level.as_str() {
         "P0" => (
