@@ -1,6 +1,6 @@
 # Task 16.2: measured-release-gate-reports
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 16 — parity-proof-hardening
@@ -63,19 +63,19 @@ runtime smoke 必须执行并记录实际 CLI cold-start、mock eval duration、
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Success Metrics): performance report records measured command evidence for CLI cold start and 1000 mock eval cases, plus threshold comparison.
-- [ ] **AC2** (ADR-005): security report is derived from default-deny/redaction/no-upload checks and blocks stable when evidence is missing.
-- [ ] **AC3** (ADR-007): release-candidate report derives `decision` and `stable_allowed` from gate statuses, not from a fixed JSON literal.
-- [ ] **AC4** (S2V adapter): runtime-smoke script fails closed if required measured artifacts are missing, malformed, or marked blocked.
+- [x] **AC1** (PRD §Success Metrics): performance report records measured command evidence for CLI cold start and 1000 mock eval cases, plus threshold comparison.
+- [x] **AC2** (ADR-005): security report is derived from default-deny/redaction/no-upload checks and blocks stable when evidence is missing.
+- [x] **AC3** (ADR-007): release-candidate report derives `decision` and `stable_allowed` from gate statuses, not from a fixed JSON literal.
+- [x] **AC4** (S2V adapter): runtime-smoke script fails closed if required measured artifacts are missing, malformed, or marked blocked.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-16.2.1 | TEST-16.2.1 | tests/measured_release_gate_reports.rs | install, typecheck, unit-test, build, runtime-smoke | Not Started |
-| AC2 | SCEN-16.2.1 | TEST-16.2.2 | tests/measured_release_gate_reports.rs | install, typecheck, unit-test, build, runtime-smoke | Not Started |
-| AC3 | SCEN-16.2.1 | TEST-16.2.3 | tests/measured_release_gate_reports.rs | install, typecheck, unit-test, build, runtime-smoke | Not Started |
-| AC4 | SCEN-16.2.1 | TEST-16.2.4 | tests/runtime_smoke.rs | install, typecheck, unit-test, build, runtime-smoke | Not Started |
+| AC1 | SCEN-16.2.1 | TEST-16.2.1 | tests/measured_release_gate_reports.rs | install, typecheck, unit-test, build, runtime-smoke | Done |
+| AC2 | SCEN-16.2.1 | TEST-16.2.2 | tests/measured_release_gate_reports.rs | install, typecheck, unit-test, build, runtime-smoke | Done |
+| AC3 | SCEN-16.2.1 | TEST-16.2.3 | tests/measured_release_gate_reports.rs | install, typecheck, unit-test, build, runtime-smoke | Done |
+| AC4 | SCEN-16.2.1 | TEST-16.2.4 | tests/runtime_smoke.rs | install, typecheck, unit-test, build, runtime-smoke | Done |
 
 ## 8. Risks
 
@@ -93,9 +93,22 @@ runtime smoke 必须执行并记录实际 CLI cold-start、mock eval duration、
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `scripts/release/runtime-smoke.sh`
+  - `tests/measured_release_gate_reports.rs`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-16-parity-proof-hardening.md`
+  - `docs/specs/tasks/task-16.2-measured-release-gate-reports.md`
+- **commit 列表**：
+  - `3e4a6fc` `docs(spec): task-16.2 进入实施 (Status: Ready → In Progress)`
+  - `c3e95a9` `test(release): 加 SCEN-16.2.1 的 measured gate RED 测试`
+  - `c4bbc15` `feat(release): 生成 measured runtime smoke gate reports`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-16.2.1 ~ TEST-16.2.4 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 构建 release binary，运行 CLI/eval/performance/security/package smoke，并生成 measured `target/release-gates/performance.json`、`security.json`、`release-candidate.json`。
+- **剩余风险 / 未做项**：memory baseline 在 Windows 通过 PowerShell `PeakWorkingSet64` 采样，Unix fallback 依赖 `/usr/bin/time -f %M`；如 CI runner 缺少可用采样工具，runtime smoke 会记录 fallback evidence，后续可用 ADR 引入跨平台专用测量器。性能数据仍是本地 mock eval，不代表真实网络 provider latency。
+- **下游 task 影响**：task-16.3 可把 real upstream smoke artifacts 纳入 runtime/release gate；Phase 16 phase smoke 将复用 measured release reports，而不再依赖固定 JSON literals。
