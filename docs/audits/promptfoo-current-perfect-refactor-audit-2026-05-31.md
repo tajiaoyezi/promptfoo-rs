@@ -77,17 +77,19 @@ The project specs intentionally target `promptfoo@0.121.13` and commit `4860e990
 
 Verdict: the project can claim only frozen-baseline compatibility. It cannot honestly claim to be a complete refactor of current `promptfoo/promptfoo`.
 
-### P0 - Source inventory still records release blockers
+### P0 - Source inventory ledger closes silent missing rows, but P0 accounting blockers remain
 
 `target/release-gates/source-inventory-evidence.json` reports:
 
 - `schema`: `promptfoo-rs.source-inventory-evidence.v2`
 - `status`: `ready-with-blockers`
 - `source_extracted_item_count`: 2549
-- `missing_matrix_rows`: 2116
-- `release_blockers`: 2116
+- `missing_matrix_rows`: 0
+- `release_blockers`: 74
+- `source_accounting_ledger`: `target/release-gates/source-inventory-ledger.json`
+- `p0_accounting_blocker_count`: 111
 
-The evidence is stronger than the old curated seed matrix because it is source-extracted. The result still directly contradicts a "complete upstream surface implemented or accounted for" claim.
+`target/release-gates/source-inventory-ledger.json` reports 2549 ledger rows and 2116 generated accounting rows. This removes the previous silent missing-row problem, but it still directly contradicts a "complete upstream surface implemented" claim because generated P0 accounting rows remain release-blocking until they get native fixture, bridge fixture, explicit waiver, or external blocker evidence.
 
 ### P0 - Long-tail classification still has P0 release blockers
 
@@ -139,7 +141,7 @@ Local dry-run installability is proven. Real multi-channel publication is not pr
 | Local verification gates executable and green | Full 9-key S2V verification passed on 2026-05-31 | Met |
 | Frozen baseline traceable | npm version/gitHead/integrity, git tag, baseline lock, and artifacts point to `0.121.13` / `4860e99` | Met for frozen target |
 | Current upstream repository parity | GitHub `HEAD=ff8eafd...` differs from frozen tag; later `code-scan-action: 0.1.7` release exists | Not met |
-| 100% source-extracted upstream item accounting | 2549 source-extracted items, but 2116 missing matrix rows / release blockers remain | Not met |
+| 100% source-extracted upstream item accounting | 2549 source-extracted items now have 2549 ledger rows and missing matrix rows are 0 | Met as accounting, not implementation parity |
 | P0 real upstream golden diff corpus | 50 real upstream P0 fixtures are recorded and smoke metadata is ready | Met for recorded corpus |
 | Provider/assertion/redteam long-tail parity | 433 tracked long-tail rows, but 37 explicit P0 provider module release blockers remain | Not met |
 | Compatibility matrix honesty | P1/P2/later/unsupported rows are explicit and reasoned | Met as auditability, not perfect parity |
@@ -152,7 +154,7 @@ The current project is a substantially improved, locally verified, S2V-complete 
 
 The remaining gap is no longer basic project readiness. It is deep parity and release proof:
 
-1. close or explicitly re-scope the 2116 source inventory release blockers,
+1. resolve the 111 P0 source accounting blockers now exposed by the ledger,
 2. resolve the 37 P0 long-tail provider module blockers,
 3. decide whether to rebaseline from frozen `0.121.13` to current upstream `HEAD`,
 4. either implement or formally scope out the current upstream surfaces that are outside the frozen PRD target,
@@ -164,7 +166,7 @@ Until those are resolved, the honest project claim is "auditable frozen-baseline
 
 Add follow-up S2V work focused on blocker burn-down rather than smoke hardening:
 
-- source inventory blocker reduction for the 2116 missing matrix rows;
+- source inventory P0 accounting blocker burn-down from the new ledger;
 - fixture or waiver decisions for the 37 P0 long-tail provider module blockers;
 - explicit rebaseline ADR if the target changes from `0.121.13` to current upstream `HEAD`;
 - publication credential/authority checklist for GitHub Releases, Cargo, npm, Docker, Homebrew, and GitHub Action;

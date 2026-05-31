@@ -1,6 +1,6 @@
 # Task 18.1: source-inventory-ledger-closure
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 18 — perfect-refactor-blocker-burndown
@@ -66,19 +66,19 @@
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-009): every source-extracted item gets exactly one ledger row with stable id, category, source reference, level, target status, owner, verification, and reason.
-- [ ] **AC2** (docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md): `source-inventory-evidence.json` reports `missing_matrix_rows=[]` for generated accounting coverage while still reporting P0 generated blocker rows as release blockers.
-- [ ] **AC3** (PRD §Compatibility Matrix): generated verification follows P0=`blocker:<item-id>`, P1=`snapshot:<item-id>`, P2=`registration:<item-id>`; generated rows cannot claim `native` unless explicit matrix/inventory evidence already does.
-- [ ] **AC4** (ADR-007): runtime smoke includes `source-inventory-ledger.json` and release candidate evidence links it so stable release reviewers can audit blocker burn-down.
+- [x] **AC1** (ADR-009): every source-extracted item gets exactly one ledger row with stable id, category, source reference, level, target status, owner, verification, and reason.
+- [x] **AC2** (docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md): `source-inventory-evidence.json` reports `missing_matrix_rows=[]` for generated accounting coverage while still reporting P0 generated blocker rows as release blockers.
+- [x] **AC3** (PRD §Compatibility Matrix): generated verification follows P0=`blocker:<item-id>`, P1=`snapshot:<item-id>`, P2=`registration:<item-id>`; generated rows cannot claim `native` unless explicit matrix/inventory evidence already does.
+- [x] **AC4** (ADR-007): runtime smoke includes `source-inventory-ledger.json` and release candidate evidence links it so stable release reviewers can audit blocker burn-down.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-18.1.1 | TEST-18.1.1 | tests/source_inventory_ledger_closure.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-18.1.1 | TEST-18.1.2 | tests/source_inventory_ledger_closure.rs | install, typecheck, unit-test, integration, runtime-smoke, build | Not Started |
-| AC3 | SCEN-18.1.1 | TEST-18.1.3 | tests/source_inventory_ledger_closure.rs | install, typecheck, unit-test, coverage, build | Not Started |
-| AC4 | SCEN-18.1.1 | TEST-18.1.4 | tests/source_inventory_ledger_closure.rs | install, typecheck, unit-test, integration, runtime-smoke, build | Not Started |
+| AC1 | SCEN-18.1.1 | TEST-18.1.1 | tests/source_inventory_ledger_closure.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-18.1.1 | TEST-18.1.2 | tests/source_inventory_ledger_closure.rs | install, typecheck, unit-test, integration, runtime-smoke, build | Done |
+| AC3 | SCEN-18.1.1 | TEST-18.1.3 | tests/source_inventory_ledger_closure.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-18.1.1 | TEST-18.1.4 | tests/source_inventory_ledger_closure.rs | install, typecheck, unit-test, integration, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -98,9 +98,26 @@
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/source_inventory_ledger_closure.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/source-inventory-evidence.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `docs/specs/tasks/task-18.1-source-inventory-ledger-closure.md`
+  - `docs/s2v-adapter.md`
+  - `docs/compatibility/matrix.md`
+  - `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`
+- **commit 列表**：
+  - `d281624` `test(compatibility): add SCEN-18.1.1 source ledger RED tests`
+  - `3cad24a` `feat(compatibility): add source inventory accounting ledger`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-18.1.1 ~ TEST-18.1.4 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 通过。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 通过；`target/release-gates/source-inventory-evidence.json` status=`ready-with-blockers`，source_extracted_item_count=2549，missing_matrix_rows=0，release_blockers=74；`source-inventory-ledger.json` ledger_item_count=2549，generated_matrix_rows_count=2116，p0_blocker_count=111；`release-candidate.json` 包含 ledger artifact path 且 source_inventory.missing_matrix_rows=0。
+- **剩余风险 / 未做项**：本 task 清除了 2116 个 missing-matrix-row silent omission blocker，但没有声称 native parity。仍有 111 个 P0 accounting blockers，其中 74 个来自 generated source-accounting P0 rows，37 个来自已显式分类的 P0 provider module blockers；后续 task 18.2 必须继续燃尽 provider module blockers，task 18.3/18.4 处理 current upstream 与 publication authority。
+- **下游 task 影响**：task 18.2 可直接从 `source-inventory-ledger.json` 和 `longtail-classification.json` 读取 P0 blocker；task 18.3 可把 frozen/current target mode 与 ledger evidence 绑定；task 18.4 可在 release candidate 中展示 ledger blocker 与 publication blocker 的区别。

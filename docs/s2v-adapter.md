@@ -194,7 +194,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 17.3 | compatibility-harness | docs/specs/tasks/task-17.3-real-p0-golden-corpus-runner.md | Done | Phase 17 order 3 | N/A (solo) |
 | 17.4 | provider-assertion-redteam | docs/specs/tasks/task-17.4-longtail-provider-assertion-redteam-classification.md | Done | Phase 17 order 4 | N/A (solo) |
 | 17.5 | release | docs/specs/tasks/task-17.5-release-installability-publication-readiness.md | Done | Phase 17 order 5 | N/A (solo) |
-| 18.1 | compatibility-inventory | docs/specs/tasks/task-18.1-source-inventory-ledger-closure.md | Ready | Phase 18 order 1 | N/A (solo) |
+| 18.1 | compatibility-inventory | docs/specs/tasks/task-18.1-source-inventory-ledger-closure.md | Done | Phase 18 order 1 | N/A (solo) |
 | 18.2 | providers | docs/specs/tasks/task-18.2-p0-provider-module-fixture-burndown.md | Ready | Phase 18 order 2 | N/A (solo) |
 | 18.3 | compatibility-target | docs/specs/tasks/task-18.3-current-upstream-rebaseline-gate.md | Ready | Phase 18 order 3 | N/A (solo) |
 | 18.4 | release | docs/specs/tasks/task-18.4-publication-authority-release-gate.md | Ready | Phase 18 order 4 | N/A (solo) |

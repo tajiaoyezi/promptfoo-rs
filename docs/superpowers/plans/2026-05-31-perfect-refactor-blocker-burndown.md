@@ -20,31 +20,31 @@
 - Modify: `docs/compatibility/matrix.md`
 - Modify: `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `tests/source_inventory_ledger_closure.rs` with tests that call `build_source_accounting_ledger`, assert every extracted item is represented, assert generated P0 rows remain blockers, and assert P1/P2 generated rows use snapshot/registration verification.
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `cargo test --test source_inventory_ledger_closure`
 
 Expected: FAIL because `build_source_accounting_ledger`, `SourceAccountingLedger`, and `write_source_accounting_ledger` do not exist.
 
-- [ ] **Step 3: Implement source accounting ledger**
+- [x] **Step 3: Implement source accounting ledger**
 
 Add serializable ledger structs and functions to `src/compatibility/inventory.rs`. Generated rows use `blocker:<item-id>` for P0, `snapshot:<item-id>` for P1, and `registration:<item-id>` for P2.
 
-- [ ] **Step 4: Wire release scripts**
+- [x] **Step 4: Wire release scripts**
 
 Update `scripts/release/source-inventory-evidence.sh` to write `target/release-gates/source-inventory-ledger.json`, set `missing_matrix_rows` only for truly unrepresented rows, and retain generated P0 rows in `release_blockers`.
 
-- [ ] **Step 5: Verify GREEN**
+- [x] **Step 5: Verify GREEN**
 
 Run: `cargo test --test source_inventory_ledger_closure`.
 
 Expected: PASS.
 
-- [ ] **Step 6: Run task verification**
+- [x] **Step 6: Run task verification**
 
 Run with Git for Windows Bash:
 
