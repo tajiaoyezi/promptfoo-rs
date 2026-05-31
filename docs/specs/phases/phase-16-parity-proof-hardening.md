@@ -20,7 +20,7 @@
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 16.1 | cli-command-behavior-closure | ../tasks/task-16.1-cli-command-behavior-closure.md | Ready | 将 view/cache/import/export 从 explicit later 推进到本地可执行兼容行为 |
+| 16.1 | cli-command-behavior-closure | ../tasks/task-16.1-cli-command-behavior-closure.md | Done | 将 view/cache/import/export 从 explicit later 推进到本地可执行兼容行为 |
 | 16.2 | measured-release-gate-reports | ../tasks/task-16.2-measured-release-gate-reports.md | Ready | 用实际测量/派生报告替换 runtime-smoke 中的合成 performance/security/release JSON |
 | 16.3 | source-extracted-inventory-real-upstream-smoke | ../tasks/task-16.3-source-extracted-inventory-real-upstream-smoke.md | Ready | 用 source extraction 与真实 `promptfoo@0.121.13` smoke 证明矩阵和 golden runner 不是仅靠本地替身 |
 

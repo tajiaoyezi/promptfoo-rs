@@ -1,6 +1,6 @@
 # Task 16.1: cli-command-behavior-closure
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 16 — parity-proof-hardening
@@ -67,19 +67,19 @@
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Core Capabilities / task-10.1): `view [path]` reads JSONL/SQLite result artifacts or a result directory and prints stable viewer JSON with record counts and rows.
-- [ ] **AC2** (PRD §Core Capabilities / task-13.2): `cache --path <file>` reports completed/corrupt/remaining cache state and `cache --clear` removes local cache state without uploading data.
-- [ ] **AC3** (PRD §Core Capabilities / ADR-004): `import <file>` and `export --input <file> --output <file>` provide local artifact conversion/summarization with stable exit codes and no empty success.
-- [ ] **AC4** (PRD §Compatibility Matrix / ADR-009): CLI surface status for `command:view-directory`, `command:cache`, `command:import-file`, `command:export`, `flag:output`, and `flag:max-concurrency` is implemented/native rather than `later`.
+- [x] **AC1** (PRD §Core Capabilities / task-10.1): `view [path]` reads JSONL/SQLite result artifacts or a result directory and prints stable viewer JSON with record counts and rows.
+- [x] **AC2** (PRD §Core Capabilities / task-13.2): `cache --path <file>` reports completed/corrupt/remaining cache state and `cache --clear` removes local cache state without uploading data.
+- [x] **AC3** (PRD §Core Capabilities / ADR-004): `import <file>` and `export --input <file> --output <file>` provide local artifact conversion/summarization with stable exit codes and no empty success.
+- [x] **AC4** (PRD §Compatibility Matrix / ADR-009): CLI surface status for `command:view-directory`, `command:cache`, `command:import-file`, `command:export`, `flag:output`, and `flag:max-concurrency` is implemented/native rather than `later`.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-16.1.1 | TEST-16.1.1 | tests/cli_command_behavior_closure.rs | install, typecheck, unit-test, e2e, build | Not Started |
-| AC2 | SCEN-16.1.1 | TEST-16.1.2 | tests/cli_command_behavior_closure.rs | install, typecheck, unit-test, e2e, build | Not Started |
-| AC3 | SCEN-16.1.1 | TEST-16.1.3 | tests/cli_command_behavior_closure.rs | install, typecheck, unit-test, e2e, build | Not Started |
-| AC4 | SCEN-16.1.1 | TEST-16.1.4 | tests/command_flag_parity.rs | install, typecheck, unit-test, e2e, build | Not Started |
+| AC1 | SCEN-16.1.1 | TEST-16.1.1 | tests/cli_command_behavior_closure.rs | install, typecheck, unit-test, e2e, build | Done |
+| AC2 | SCEN-16.1.1 | TEST-16.1.2 | tests/cli_command_behavior_closure.rs | install, typecheck, unit-test, e2e, build | Done |
+| AC3 | SCEN-16.1.1 | TEST-16.1.3 | tests/cli_command_behavior_closure.rs | install, typecheck, unit-test, e2e, build | Done |
+| AC4 | SCEN-16.1.1 | TEST-16.1.4 | tests/command_flag_parity.rs | install, typecheck, unit-test, e2e, build | Done |
 
 ## 8. Risks
 
@@ -97,9 +97,25 @@
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `src/cli.rs`
+  - `tests/cli_command_behavior_closure.rs`
+  - `tests/command_flag_parity.rs`
+  - `scripts/release/e2e.sh`
+  - `docs/compatibility/matrix.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-16-parity-proof-hardening.md`
+  - `docs/specs/tasks/task-16.1-cli-command-behavior-closure.md`
+- **commit 列表**：
+  - `d2c1a5c` `docs(spec): task-16.1 进入实施 (Status: Ready → In Progress)`
+  - `ab7095d` `test(cli): 加 SCEN-16.1.1 的 CLI command closure RED 测试`
+  - `5052e12` `feat(cli): 实现 view cache import export 本地兼容行为`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-16.1.1 ~ TEST-16.1.3 与更新的 command flag parity 测试通过。
+  - e2e: PASS — `bash scripts/release/e2e.sh` 包含 `cli_command_behavior_closure`、`command_flag_parity`、eval/output/runtime smoke 相关测试并通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+- **剩余风险 / 未做项**：`view` 当前输出 stable local viewer JSON contract，不自动启动浏览器；这是 task-10.1/Phase 16 定义的可测试边界。`import/export` 覆盖 local JSONL/SQLite viewer result artifacts，不实现 promptfoo cloud/share 上传或远程同步。
+- **下游 task 影响**：task-16.2 runtime smoke 可以直接调用新 CLI command closure 作为本地 smoke；task-16.3 real upstream smoke 不再需要把 `view/cache/import/export` 视为 release-blocking later rows。
