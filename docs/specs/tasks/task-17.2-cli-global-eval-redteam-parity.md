@@ -1,6 +1,6 @@
 # Task 17.2: cli-global-eval-redteam-parity
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 17 — deep-upstream-parity-proof
@@ -73,19 +73,19 @@
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-004): top-level commands from `promptfoo@0.121.13 --help` are represented in local CLI surface as implemented, unsupported, later, or blocked; missing command rows fail E2E.
-- [ ] **AC2** (PRD §User Flow): upstream `eval --help` P0 flags for config/prompts/providers/tests/vars/output/concurrency/repeat/delay/cache/resume/retry/filter/env-file/no-write are parsed and either affect eval behavior or return explicit classified errors.
-- [ ] **AC3** (PRD §Redteam / Core Capabilities): upstream redteam subcommands `init`, `eval`, `generate`, `run`, `report`, `plugins`, plus unsupported `discover`/`poison`/`setup` paths, have stable help, stdout/stderr, exit code, and matrix evidence.
-- [ ] **AC4** (PRD §Security / Out of Scope): cloud/share/auth commands do not upload data by default and return user-visible no-upload / unsupported classification with matrix item id.
+- [x] **AC1** (ADR-004): top-level commands from `promptfoo@0.121.13 --help` are represented in local CLI surface as implemented, unsupported, later, or blocked; missing command rows fail E2E.
+- [x] **AC2** (PRD §User Flow): upstream `eval --help` P0 flags for config/prompts/providers/tests/vars/output/concurrency/repeat/delay/cache/resume/retry/filter/env-file/no-write are parsed and either affect eval behavior or return explicit classified errors.
+- [x] **AC3** (PRD §Redteam / Core Capabilities): upstream redteam subcommands `init`, `eval`, `generate`, `run`, `report`, `plugins`, plus unsupported `discover`/`poison`/`setup` paths, have stable help, stdout/stderr, exit code, and matrix evidence.
+- [x] **AC4** (PRD §Security / Out of Scope): cloud/share/auth commands do not upload data by default and return user-visible no-upload / unsupported classification with matrix item id.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-17.2.1 | TEST-17.2.1 | tests/cli_global_eval_redteam_parity.rs | install, typecheck, unit-test, e2e, coverage, build | Spec Ready |
-| AC2 | SCEN-17.2.1 | TEST-17.2.2 | tests/cli_global_eval_redteam_parity.rs | install, typecheck, unit-test, e2e, coverage, build | Spec Ready |
-| AC3 | SCEN-17.2.1 | TEST-17.2.3 | tests/cli_global_eval_redteam_parity.rs | install, typecheck, unit-test, e2e, coverage, build | Spec Ready |
-| AC4 | SCEN-17.2.1 | TEST-17.2.4 | tests/cli_global_eval_redteam_parity.rs | install, typecheck, unit-test, e2e, coverage, build | Spec Ready |
+| AC1 | SCEN-17.2.1 | TEST-17.2.1 | tests/cli_global_eval_redteam_parity.rs | install, typecheck, unit-test, e2e, coverage, build | Done |
+| AC2 | SCEN-17.2.1 | TEST-17.2.2 | tests/cli_global_eval_redteam_parity.rs | install, typecheck, unit-test, e2e, coverage, build | Done |
+| AC3 | SCEN-17.2.1 | TEST-17.2.3 | tests/cli_global_eval_redteam_parity.rs | install, typecheck, unit-test, e2e, coverage, build | Done |
+| AC4 | SCEN-17.2.1 | TEST-17.2.4 | tests/cli_global_eval_redteam_parity.rs | install, typecheck, unit-test, e2e, coverage, build | Done |
 
 ## 8. Risks
 
@@ -104,9 +104,24 @@
 
 ## 10. Completion Notes
 
-- **完成日期**：待实施后回填
-- **改动文件**：待实施后回填
-- **commit 列表**：待实施后回填
-- **§9 Verification 结果**：待实施后回填
-- **剩余风险 / 未做项**：待实施后回填
-- **下游 task 影响**：待实施后回填
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/cli_global_eval_redteam_parity.rs`
+  - `src/cli.rs`
+  - `compatibility/inventory/upstream-items.json`
+  - `scripts/release/e2e.sh`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-17-deep-upstream-parity-proof.md`
+  - `docs/specs/tasks/task-17.2-cli-global-eval-redteam-parity.md`
+- **commit 列表**：
+  - `75d476c` `test(cli): add SCEN-17.2.1 CLI parity RED tests`
+  - `767dcc1` `feat(cli): expand upstream help parity surface`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-17.2.1 ~ TEST-17.2.4 通过。
+  - e2e: PASS — `bash scripts/release/e2e.sh` 已包含 `cli_global_eval_redteam_parity`，并通过 CLI closure、command flag parity、eval/output/runtime smoke e2e 子集。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+- **剩余风险 / 未做项**：本 task 将 upstream top-level commands、eval P0 flags 和 redteam subcommands 全部映射为 implemented / unsupported / later 的可见 CLI surface；其中 cloud/share/auth/delete/list/logs/feedback 等保持 no-upload unsupported，init/debug/generate/optimize/retry/validate/show 等保持 later，未伪装为 native parity。
+- **下游 task 影响**：task 17.3 可依赖扩展后的 eval flag parsing 与 e2e gate；task 17.4 继续处理 provider/assertion/redteam 长尾 runtime 分类，不需要再补 CLI surface skeleton。
