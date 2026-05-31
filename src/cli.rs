@@ -1,9 +1,10 @@
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 
+use crate::cache::resume::ResumeStore;
 use crate::compatibility::matrix::CapabilityMatrix;
 use crate::config::{load_promptfoo_config, EnvOverlay};
 use crate::eval::{run_eval, EvalOptions, EvalResultEnvelope};
@@ -14,6 +15,10 @@ use crate::redteam::{
 };
 use crate::results::{AssertionResultRecord, ResultRecord, ResultStatus};
 use crate::scan::{known_limitations, run_scan, ScanInput};
+use crate::viewer_server::{
+    build_results_table, export_viewer_records, load_viewer_records, ExportFormat, ResultSource,
+    ViewerFilter,
+};
 
 #[derive(Debug, Parser)]
 #[command(
@@ -76,7 +81,18 @@ pub struct ViewArgs {
 }
 
 #[derive(Debug, Args)]
-pub struct CacheArgs {}
+pub struct CacheArgs {
+    #[arg(
+        long = "path",
+        value_name = "FILE",
+        default_value = ".promptfoo-rs-cache.jsonl"
+    )]
+    pub path: PathBuf,
+    #[arg(long = "expected-case", value_name = "CASE_ID", action = ArgAction::Append)]
+    pub expected_cases: Vec<String>,
+    #[arg(long = "clear", action = ArgAction::SetTrue)]
+    pub clear: bool,
+}
 
 #[derive(Debug, Args)]
 pub struct RedteamArgs {
@@ -123,6 +139,8 @@ pub struct ImportArgs {
 
 #[derive(Debug, Args)]
 pub struct ExportArgs {
+    #[arg(long = "input", value_name = "FILE")]
+    pub input: Option<PathBuf>,
     #[arg(long = "output", value_name = "FILE")]
     pub output: Option<PathBuf>,
 }
@@ -141,22 +159,10 @@ pub fn run_cli(cli: Cli) -> Result<ExitCode, CliError> {
         Some(Command::CodeScans(args)) => handle_scan_command("code-scans", args),
         Some(Command::ScanModel(args)) => handle_scan_command("scan-model", args),
         Some(Command::ModelAudit(args)) => handle_scan_command("model-audit", args),
-        Some(Command::View(_)) => Err(unsupported_command_error(
-            "view",
-            "not yet implemented; local viewer CLI launch is tracked as command:view-directory",
-        )),
-        Some(Command::Cache(_)) => Err(unsupported_command_error(
-            "cache",
-            "not yet implemented; cache subcommands are tracked for task 13.2",
-        )),
-        Some(Command::Import(_)) => Err(unsupported_command_error(
-            "import",
-            "not yet implemented; promptfoo artifact import is tracked as command:import-file",
-        )),
-        Some(Command::Export(_)) => Err(unsupported_command_error(
-            "export",
-            "not yet implemented; promptfoo artifact export is tracked as command:export",
-        )),
+        Some(Command::View(args)) => handle_view_command(args),
+        Some(Command::Cache(args)) => handle_cache_command(args),
+        Some(Command::Import(args)) => handle_import_command(args),
+        Some(Command::Export(args)) => handle_export_command(args),
         None => Err(unsupported_command_error(
             "promptfoo-rs",
             "command is required; run promptfoo-rs --help",
@@ -208,6 +214,255 @@ pub fn handle_scan_command(command: &'static str, args: ScanArgs) -> Result<Exit
         }
     }
     Ok(ExitCode::SUCCESS)
+}
+
+pub fn handle_view_command(args: ViewArgs) -> Result<ExitCode, CliError> {
+    let source = resolve_viewer_source(args.directory)?;
+    let records =
+        load_viewer_records(source.clone()).map_err(|err| CliError::new(format!("view: {err}")))?;
+    let table = build_results_table(&records, ViewerFilter::default());
+    let (source_kind, source_path) = source_descriptor(&source);
+    let payload = serde_json::json!({
+        "schema_version": "promptfoo-rs.viewer.cli.v1",
+        "source": {
+            "kind": source_kind,
+            "path": source_path.to_string_lossy(),
+        },
+        "record_count": records.len(),
+        "columns": table.columns,
+        "rows": table.rows,
+    });
+    println!(
+        "{}",
+        serde_json::to_string(&payload)
+            .map_err(|err| CliError::new(format!("view result serialization failed: {err}")))?
+    );
+    Ok(ExitCode::SUCCESS)
+}
+
+pub fn handle_cache_command(args: CacheArgs) -> Result<ExitCode, CliError> {
+    if args.clear {
+        if args.path.exists() {
+            std::fs::remove_file(&args.path).map_err(|err| {
+                CliError::new(format!(
+                    "cache: failed to clear {}: {err}",
+                    args.path.display()
+                ))
+            })?;
+        }
+        let payload = serde_json::json!({
+            "schema_version": "promptfoo-rs.cache.cli.v1",
+            "status": "cleared",
+            "path": args.path.to_string_lossy(),
+            "upload_attempts": 0,
+        });
+        println!(
+            "{}",
+            serde_json::to_string(&payload).map_err(|err| CliError::new(format!(
+                "cache result serialization failed: {err}"
+            )))?
+        );
+        return Ok(ExitCode::SUCCESS);
+    }
+
+    let state = if args.path.exists() {
+        ResumeStore::load(&args.path).map_err(|err| {
+            CliError::new(format!(
+                "cache: failed to load {}: {err}",
+                args.path.display()
+            ))
+        })?
+    } else {
+        Default::default()
+    };
+    let completed_cases = state.completed_case_ids();
+    let remaining_cases = state.remaining_cases(&args.expected_cases);
+    let corrupt_records = state
+        .corrupt_records
+        .iter()
+        .map(|record| {
+            serde_json::json!({
+                "line": record.line,
+                "message": record.message,
+            })
+        })
+        .collect::<Vec<_>>();
+    let payload = serde_json::json!({
+        "schema_version": "promptfoo-rs.cache.cli.v1",
+        "path": args.path.to_string_lossy(),
+        "completed_count": completed_cases.len(),
+        "completed_cases": completed_cases,
+        "corrupt_count": state.corrupt_records.len(),
+        "corrupt_records": corrupt_records,
+        "remaining_cases": remaining_cases,
+        "upload_attempts": 0,
+    });
+    println!(
+        "{}",
+        serde_json::to_string(&payload)
+            .map_err(|err| CliError::new(format!("cache result serialization failed: {err}")))?
+    );
+    Ok(ExitCode::SUCCESS)
+}
+
+pub fn handle_import_command(args: ImportArgs) -> Result<ExitCode, CliError> {
+    let Some(file) = args.file else {
+        return Err(CliError::new("import: file path is required"));
+    };
+    let source = resolve_viewer_source(Some(file))?;
+    let records = load_viewer_records(source.clone())
+        .map_err(|err| CliError::new(format!("import: {err}")))?;
+    let (source_kind, source_path) = source_descriptor(&source);
+    let payload = serde_json::json!({
+        "schema_version": "promptfoo-rs.import.cli.v1",
+        "source": {
+            "kind": source_kind,
+            "path": source_path.to_string_lossy(),
+        },
+        "record_count": records.len(),
+        "status_counts": status_counts(&records),
+        "upload_attempts": 0,
+    });
+    println!(
+        "{}",
+        serde_json::to_string(&payload)
+            .map_err(|err| CliError::new(format!("import result serialization failed: {err}")))?
+    );
+    Ok(ExitCode::SUCCESS)
+}
+
+pub fn handle_export_command(args: ExportArgs) -> Result<ExitCode, CliError> {
+    let Some(input) = args.input else {
+        return Err(CliError::new("export: --input is required"));
+    };
+    let Some(output) = args.output else {
+        return Err(CliError::new("export: --output is required"));
+    };
+    let source = resolve_viewer_source(Some(input))?;
+    let records = load_viewer_records(source.clone())
+        .map_err(|err| CliError::new(format!("export: {err}")))?;
+    let table = build_results_table(&records, ViewerFilter::default());
+    let format = export_format_from_path(&output)?;
+    if let Some(parent) = output.parent() {
+        std::fs::create_dir_all(parent).map_err(|err| {
+            CliError::new(format!(
+                "export: failed to create {}: {err}",
+                parent.display()
+            ))
+        })?;
+    }
+    let body = export_viewer_records(&table, format.clone())
+        .map_err(|err| CliError::new(format!("export: {err}")))?;
+    std::fs::write(&output, body).map_err(|err| {
+        CliError::new(format!(
+            "export: failed to write {}: {err}",
+            output.display()
+        ))
+    })?;
+    let (source_kind, source_path) = source_descriptor(&source);
+    let payload = serde_json::json!({
+        "schema_version": "promptfoo-rs.export.cli.v1",
+        "input": source_path.to_string_lossy(),
+        "input_kind": source_kind,
+        "output": output.to_string_lossy(),
+        "format": export_format_name(&format),
+        "record_count": records.len(),
+        "upload_attempts": 0,
+    });
+    println!(
+        "{}",
+        serde_json::to_string(&payload)
+            .map_err(|err| CliError::new(format!("export result serialization failed: {err}")))?
+    );
+    Ok(ExitCode::SUCCESS)
+}
+
+pub fn resolve_viewer_source(path: Option<PathBuf>) -> Result<ResultSource, CliError> {
+    let path = match path {
+        Some(path) => path,
+        None => std::env::current_dir()
+            .map_err(|err| CliError::new(format!("view: current directory unavailable: {err}")))?,
+    };
+    if path.is_dir() {
+        for candidate in [
+            "results.jsonl",
+            "results.sqlite",
+            "results.sqlite3",
+            "results.db",
+        ] {
+            let candidate_path = path.join(candidate);
+            if candidate_path.is_file() {
+                return source_from_file(candidate_path);
+            }
+        }
+        return Err(CliError::new(format!(
+            "view: no results.jsonl, results.sqlite, results.sqlite3, or results.db found in {}",
+            path.display()
+        )));
+    }
+    if path.is_file() {
+        return source_from_file(path);
+    }
+    Err(CliError::new(format!(
+        "view: result source not found: {}",
+        path.display()
+    )))
+}
+
+fn source_from_file(path: PathBuf) -> Result<ResultSource, CliError> {
+    match path
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .unwrap_or("")
+        .to_ascii_lowercase()
+        .as_str()
+    {
+        "sqlite" | "sqlite3" | "db" => Ok(ResultSource::sqlite(path)),
+        "jsonl" => Ok(ResultSource::jsonl(path)),
+        _ => Err(CliError::new(format!(
+            "view: unsupported result source format: {}",
+            path.display()
+        ))),
+    }
+}
+
+fn source_descriptor(source: &ResultSource) -> (&'static str, &Path) {
+    match source {
+        ResultSource::Jsonl(path) => ("jsonl", path.as_path()),
+        ResultSource::Sqlite(path) => ("sqlite", path.as_path()),
+    }
+}
+
+fn status_counts(records: &[ResultRecord]) -> BTreeMap<&'static str, usize> {
+    let mut counts = BTreeMap::new();
+    for record in records {
+        *counts.entry(record.status.as_str()).or_insert(0) += 1;
+    }
+    counts
+}
+
+fn export_format_from_path(path: &Path) -> Result<ExportFormat, CliError> {
+    match path
+        .extension()
+        .and_then(|extension| extension.to_str())
+        .unwrap_or("")
+        .to_ascii_lowercase()
+        .as_str()
+    {
+        "json" => Ok(ExportFormat::Json),
+        "csv" => Ok(ExportFormat::Csv),
+        _ => Err(CliError::new(format!(
+            "export: unsupported output format for {}; use .json or .csv",
+            path.display()
+        ))),
+    }
+}
+
+fn export_format_name(format: &ExportFormat) -> &'static str {
+    match format {
+        ExportFormat::Json => "json",
+        ExportFormat::Csv => "csv",
+    }
 }
 
 pub fn handle_eval_command(args: EvalArgs) -> Result<ExitCode, CliError> {
@@ -452,17 +707,17 @@ impl CliSurface {
         Self {
             items: vec![
                 CliSurfaceItem::implemented("command:eval"),
-                CliSurfaceItem::later("command:view-directory"),
-                CliSurfaceItem::later("command:cache"),
+                CliSurfaceItem::implemented("command:view-directory"),
+                CliSurfaceItem::implemented("command:cache"),
                 CliSurfaceItem::implemented("command:redteam"),
                 CliSurfaceItem::implemented("command:mcp"),
                 CliSurfaceItem::implemented("command:code-scans"),
                 CliSurfaceItem::implemented("command:scan-model"),
-                CliSurfaceItem::later("command:import-file"),
-                CliSurfaceItem::later("command:export"),
+                CliSurfaceItem::implemented("command:import-file"),
+                CliSurfaceItem::implemented("command:export"),
                 CliSurfaceItem::implemented("flag:config"),
-                CliSurfaceItem::later("flag:output"),
-                CliSurfaceItem::later("flag:max-concurrency"),
+                CliSurfaceItem::implemented("flag:output"),
+                CliSurfaceItem::implemented("flag:max-concurrency"),
             ],
         }
     }
@@ -478,10 +733,6 @@ pub struct CliSurfaceItem {
 impl CliSurfaceItem {
     fn implemented(stable_id: &str) -> Self {
         Self::new(stable_id, CliItemStatus::Implemented)
-    }
-
-    fn later(stable_id: &str) -> Self {
-        Self::new(stable_id, CliItemStatus::Later)
     }
 
     fn new(stable_id: &str, status: CliItemStatus) -> Self {

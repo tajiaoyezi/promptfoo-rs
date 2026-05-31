@@ -15,7 +15,7 @@ fn promptfoo_rs() -> Command {
 fn test_16_1_1_view_reads_result_directory_and_prints_viewer_json() {
     /* TEST-16.1.1 */
     let fixture = FixtureDir::new("test_16_1_1");
-    write_result_jsonl(&fixture.path("results.jsonl"));
+    write_result_jsonl(fixture.path("results.jsonl"));
 
     let output = promptfoo_rs()
         .arg("view")
@@ -76,7 +76,10 @@ fn test_16_1_2_cache_reports_resume_state_and_clear_is_local_only() {
 
     assert_eq!(clear.status.code(), Some(0), "{clear:?}");
     assert!(clear.stderr.is_empty(), "{clear:?}");
-    assert!(!cache.exists(), "cache clear must remove only the local cache file");
+    assert!(
+        !cache.exists(),
+        "cache clear must remove only the local cache file"
+    );
     let json = json_stdout(&clear);
     assert_eq!(json["status"], "cleared");
     assert_eq!(json["upload_attempts"], 0);
