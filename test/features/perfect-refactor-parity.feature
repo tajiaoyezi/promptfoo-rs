@@ -20,6 +20,10 @@
 #   - docs/specs/tasks/task-17.3-real-p0-golden-corpus-runner.md
 #   - docs/specs/tasks/task-17.4-longtail-provider-assertion-redteam-classification.md
 #   - docs/specs/tasks/task-17.5-release-installability-publication-readiness.md
+#   - docs/specs/tasks/task-18.1-source-inventory-ledger-closure.md
+#   - docs/specs/tasks/task-18.2-p0-provider-module-fixture-burndown.md
+#   - docs/specs/tasks/task-18.3-current-upstream-rebaseline-gate.md
+#   - docs/specs/tasks/task-18.4-publication-authority-release-gate.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -125,3 +129,23 @@ Feature: perfect refactor parity
     Given a release candidate that passed full compatibility gates
     When release installability verification runs
     Then TEST-17.5.1 proves local archives packages checksums and install smoke evidence are present while missing external credentials remain explicit blockers
+
+  Scenario: SCEN-18.1.1 - source inventory ledger closes silent missing matrix rows
+    Given source-extracted promptfoo items include command provider assertion redteam output config viewer and example rows
+    When the source inventory ledger is generated
+    Then TEST-18.1.1 proves every source item has accounting evidence and TEST-18.1.2 proves generated P0 rows remain release-blocking
+
+  Scenario: SCEN-18.2.1 - P0 provider module blockers burn down through fixtures or explicit blockers
+    Given the long-tail classification report lists P0 provider module blockers
+    When provider module burndown verification runs
+    Then TEST-18.2.1 proves each P0 provider module has fixture evidence or an explicit external blocker
+
+  Scenario: SCEN-18.3.1 - current upstream rebaseline gate prevents ambiguous perfect claims
+    Given frozen promptfoo baseline and observed current upstream HEAD differ
+    When current upstream target policy is evaluated
+    Then TEST-18.3.2 proves frozen mode cannot claim current-upstream perfect refactor
+
+  Scenario: SCEN-18.4.1 - publication authority gate separates installability from published availability
+    Given local release artifacts are installable but external credentials are absent
+    When publication authority verification runs
+    Then TEST-18.4.2 proves dry-run artifacts cannot set published=true without external evidence
