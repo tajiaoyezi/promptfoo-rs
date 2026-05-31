@@ -20,7 +20,7 @@ Phase 20 已禁止 perfect-refactor claim，但 current-upstream blocker 仍把 
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 21.1 | upstream-distribution-target-gate | ../tasks/task-21.1-upstream-distribution-target-gate.md | Ready | 生成 upstream distribution target gate，区分 npm core package、GitHub repo HEAD 和 non-core latest release 对 perfect-refactor claim 的影响 |
+| 21.1 | upstream-distribution-target-gate | ../tasks/task-21.1-upstream-distribution-target-gate.md | Done | 生成 upstream distribution target gate，区分 npm core package、GitHub repo HEAD 和 non-core latest release 对 perfect-refactor claim 的影响 |
 
 ## 5. Dependencies
 

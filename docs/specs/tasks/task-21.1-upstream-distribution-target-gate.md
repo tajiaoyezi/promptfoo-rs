@@ -1,6 +1,6 @@
 # Task 21.1: upstream-distribution-target-gate
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 21 — upstream-distribution-target-disambiguation
@@ -70,19 +70,19 @@ Distribution target gate 必须从 npm package metadata 和 GitHub ref/release m
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Upstream Baseline Freeze Strategy): artifact records npm package version, gitHead, tarball, integrity, modified time and frozen baseline with full SHA/integrity.
-- [ ] **AC2** (task-18.3): artifact records GitHub repository HEAD and observed latest release ref/commit separately from npm package metadata.
-- [ ] **AC3** (ADR-007): non-core GitHub release tags, including `code-scan-action:*`, cannot set `github_latest_release_is_core_package=true` or allow current repository perfect-refactor claim.
-- [ ] **AC4** (task-20.2): release candidate and docs/audit consume the artifact without weakening `perfect_refactor_claim_allowed=false` while source/current/publication/external blockers remain.
+- [x] **AC1** (PRD §Upstream Baseline Freeze Strategy): artifact records npm package version, gitHead, tarball, integrity, modified time and frozen baseline with full SHA/integrity.
+- [x] **AC2** (task-18.3): artifact records GitHub repository HEAD and observed latest release ref/commit separately from npm package metadata.
+- [x] **AC3** (ADR-007): non-core GitHub release tags, including `code-scan-action:*`, cannot set `github_latest_release_is_core_package=true` or allow current repository perfect-refactor claim.
+- [x] **AC4** (task-20.2): release candidate and docs/audit consume the artifact without weakening `perfect_refactor_claim_allowed=false` while source/current/publication/external blockers remain.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-21.1.1 | TEST-21.1.1 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-21.1.1 | TEST-21.1.2 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC3 | SCEN-21.1.1 | TEST-21.1.3 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, coverage, build | Not Started |
-| AC4 | SCEN-21.1.1 | TEST-21.1.4 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Not Started |
+| AC1 | SCEN-21.1.1 | TEST-21.1.1 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-21.1.1 | TEST-21.1.2 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-21.1.1 | TEST-21.1.3 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-21.1.1 | TEST-21.1.4 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -103,9 +103,33 @@ Distribution target gate 必须从 npm package metadata 和 GitHub ref/release m
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-21-upstream-distribution-target-disambiguation.md`
+  - `docs/specs/tasks/task-21.1-upstream-distribution-target-gate.md`
+  - `docs/superpowers/plans/2026-05-31-upstream-distribution-target-disambiguation.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/upstream_distribution_target_gate.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/upstream-distribution-target.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `docs/compatibility/target-policy.md`
+  - `docs/compatibility/matrix.md`
+  - `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`
+- **commit 列表**：
+  - `7b4e84d docs(spec): add phase 21 upstream distribution target gate`
+  - `14cfdf0 test(compatibility): add SCEN-21.1.1 distribution target RED tests`
+  - `7bffdbb feat(compatibility): add upstream distribution target gate`
+- **§9 Verification 结果**：
+  - install: PASS (`s2v_verify_full` 执行 adapter §Commands Install)
+  - typecheck: PASS (`s2v_verify_full` 执行 adapter §Commands Typecheck)
+  - unit-test: PASS (`cargo test --test upstream_distribution_target_gate` 覆盖 TEST-21.1.1 ~ TEST-21.1.4，并由 adapter §Commands Unit Test 覆盖)
+  - integration: PASS (`s2v_verify_full` 执行 adapter §Commands Integration tests)
+  - e2e: PASS (`s2v_verify_full` 执行 adapter §Commands E2E tests)
+  - coverage: PASS (`s2v_verify_full` 执行 adapter §Commands Coverage)
+  - build: PASS (`s2v_verify_full` 执行 adapter §Commands Build)
+  - runtime-smoke: PASS (`s2v_verify_full` 执行 adapter §Commands Runtime smoke，生成 `target/release-gates/upstream-distribution-target.json` 并纳入 `release-candidate.json`)
+- **剩余风险 / 未做项**：该 task 只消除 npm core package / GitHub repo HEAD / GitHub latest release channel 的歧义，不解除 current repository、source accounting、external authority 或 publication authority blocker；当前 artifact 显示 npm core package 0.121.13 仍匹配 frozen baseline，但 repository HEAD 不等于 npm core gitHead，observed latest release channel 为 `github-action`，`current_repository_perfect_claim_allowed=false`。
+- **下游 task 影响**：Phase 21 可进入 phase smoke；后续若执行 current-upstream rebaseline，必须同时更新 source inventory、compatibility matrix、fixtures/golden、release candidate 和 perfect-refactor claim contract，不能只用 npm latest 或 GitHub latest release 单点替换基线。

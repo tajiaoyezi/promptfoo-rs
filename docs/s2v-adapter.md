@@ -207,7 +207,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 19.4 | compatibility-authority | docs/specs/tasks/task-19.4-external-authority-blocker-waiver-gate.md | Done | Phase 19 order 4 | N/A (solo) |
 | 20.1 | compatibility-inventory | docs/specs/tasks/task-20.1-source-provider-accounting-reconciliation.md | Done | Phase 20 order 1 | N/A (solo) |
 | 20.2 | release | docs/specs/tasks/task-20.2-perfect-refactor-claim-contract.md | Done | Phase 20 order 2 | N/A (solo) |
-| 21.1 | compatibility-target | docs/specs/tasks/task-21.1-upstream-distribution-target-gate.md | Ready | Phase 21 order 1 | N/A (solo) |
+| 21.1 | compatibility-target | docs/specs/tasks/task-21.1-upstream-distribution-target-gate.md | Done | Phase 21 order 1 | N/A (solo) |
 
 ## ADR 索引
 
