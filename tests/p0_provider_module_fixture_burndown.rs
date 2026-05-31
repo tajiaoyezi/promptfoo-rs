@@ -23,10 +23,7 @@ fn test_18_2_1_provider_module_blockers_have_fixture_or_explicit_blocker_evidenc
         "task 18.2 starts from the 37 P0 provider module blockers captured by task 17.4"
     );
     assert_eq!(report.initial_blocker_count, blocker_rows.len());
-    assert!(
-        report.resolved_by_fixture_count > 0,
-        "{report:#?}"
-    );
+    assert!(report.resolved_by_fixture_count > 0, "{report:#?}");
     assert!(
         report.remaining_blocker_count < report.initial_blocker_count,
         "{report:#?}"
@@ -57,7 +54,10 @@ fn test_18_2_1_provider_module_blockers_have_fixture_or_explicit_blocker_evidenc
         &fixtures,
         "provider:src-providers-openai-codex-sdk",
     );
-    assert_eq!(codex_sdk.kind, ProviderModuleResolutionKind::ExternalBlocker);
+    assert_eq!(
+        codex_sdk.kind,
+        ProviderModuleResolutionKind::ExternalBlocker
+    );
     assert!(codex_sdk.requires_external_authority, "{codex_sdk:#?}");
     assert!(codex_sdk.reason.contains("Codex"), "{codex_sdk:#?}");
     assert!(codex_sdk.verification.starts_with("blocker:"));
@@ -66,10 +66,7 @@ fn test_18_2_1_provider_module_blockers_have_fixture_or_explicit_blocker_evidenc
         assert!(!blocker.item_id.trim().is_empty(), "{blocker:#?}");
         assert!(!blocker.source_reference.trim().is_empty(), "{blocker:#?}");
         assert!(!blocker.reason.trim().is_empty(), "{blocker:#?}");
-        assert!(
-            blocker.verification.starts_with("blocker:"),
-            "{blocker:#?}"
-        );
+        assert!(blocker.verification.starts_with("blocker:"), "{blocker:#?}");
     }
 }
 
@@ -100,7 +97,10 @@ fn test_18_2_2_provider_module_burndown_uses_no_real_provider_secrets() {
 fn test_18_2_3_longtail_report_lists_remaining_provider_module_blockers() {
     /* TEST-18.2.3 */
     let output = Command::new(git_bash())
-        .args(["-lc", "LONGTAIL_SKIP_UNIT_TEST=1 bash scripts/release/longtail-classification.sh"])
+        .args([
+            "-lc",
+            "LONGTAIL_SKIP_UNIT_TEST=1 bash scripts/release/longtail-classification.sh",
+        ])
         .output()
         .expect("longtail classification script should execute");
     assert!(
@@ -139,15 +139,28 @@ fn test_18_2_3_longtail_report_lists_remaining_provider_module_blockers() {
     );
     assert!(remaining.iter().any(|item| {
         item["item_id"] == "provider:src-providers-openai-codex-sdk"
-            && item["reason"].as_str().unwrap_or_default().contains("Codex")
+            && item["reason"]
+                .as_str()
+                .unwrap_or_default()
+                .contains("Codex")
     }));
     assert!(!remaining
         .iter()
         .any(|item| item["item_id"] == "provider:src-providers-openai-chat"));
     for item in remaining {
-        assert!(item["item_id"].as_str().unwrap_or_default().starts_with("provider:src-providers-"));
-        assert!(!item["reason"].as_str().unwrap_or_default().trim().is_empty());
-        assert!(item["verification"].as_str().unwrap_or_default().starts_with("blocker:"));
+        assert!(item["item_id"]
+            .as_str()
+            .unwrap_or_default()
+            .starts_with("provider:src-providers-"));
+        assert!(!item["reason"]
+            .as_str()
+            .unwrap_or_default()
+            .trim()
+            .is_empty());
+        assert!(item["verification"]
+            .as_str()
+            .unwrap_or_default()
+            .starts_with("blocker:"));
     }
 }
 

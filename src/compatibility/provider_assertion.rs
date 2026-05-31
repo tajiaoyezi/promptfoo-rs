@@ -228,6 +228,34 @@ impl LongtailParityReport {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ProviderModuleResolutionKind {
+    FixtureCovered,
+    ExternalBlocker,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ProviderModuleResolution {
+    pub item_id: String,
+    pub source_reference: String,
+    pub kind: ProviderModuleResolutionKind,
+    pub reason: String,
+    pub verification: String,
+    pub fixture_ids: Vec<String>,
+    pub docs_link: String,
+    pub requires_external_authority: bool,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ProviderModuleBurndownReport {
+    pub initial_blocker_count: usize,
+    pub resolved_by_fixture_count: usize,
+    pub remaining_blocker_count: usize,
+    pub resolved_by_fixture: Vec<ProviderModuleResolution>,
+    pub remaining_blockers: Vec<ProviderModuleResolution>,
+    pub fixtures_requiring_real_secrets: Vec<String>,
+}
+
 pub fn classify_provider_item(
     item: &InventoryItem,
     policy: &ParityPolicy,
@@ -344,6 +372,85 @@ pub fn validate_longtail_classification(
         }
     }
 
+    report
+}
+
+pub fn provider_module_blocker_rows(matrix: &CapabilityMatrix) -> Vec<CapabilityRow> {
+    matrix
+        .rows
+        .iter()
+        .filter(|row| {
+            row.capability.starts_with("provider:src-providers-")
+                && row.level == "P0"
+                && row.verification.starts_with("blocker:")
+        })
+        .cloned()
+        .collect()
+}
+
+pub fn resolve_provider_module_fixture(
+    row: &CapabilityRow,
+    fixtures: &FixtureCorpus,
+) -> ProviderModuleResolution {
+    let item_id = row.capability.clone();
+    let source_reference = source_reference_from_notes(row);
+    let fixture_ids = available_fixture_ids(provider_module_fixture_ids(&item_id), fixtures);
+    if !fixture_ids.is_empty() {
+        let verification = format!("fixture:{}", fixture_ids.join("+"));
+        return ProviderModuleResolution {
+            item_id: item_id.clone(),
+            source_reference: source_reference.clone(),
+            kind: ProviderModuleResolutionKind::FixtureCovered,
+            reason: format!(
+                "aggregate provider fixture evidence ({}) covers {item_id}; source: {source_reference}",
+                fixture_ids.join(", ")
+            ),
+            verification,
+            fixture_ids,
+            docs_link: provider_module_docs_link(),
+            requires_external_authority: false,
+        };
+    }
+
+    let (reason, requires_external_authority) =
+        explicit_provider_module_blocker_reason(&item_id, &source_reference);
+    ProviderModuleResolution {
+        item_id: item_id.clone(),
+        source_reference,
+        kind: ProviderModuleResolutionKind::ExternalBlocker,
+        reason,
+        verification: format!("blocker:{item_id}"),
+        fixture_ids: Vec::new(),
+        docs_link: provider_module_docs_link(),
+        requires_external_authority,
+    }
+}
+
+pub fn validate_p0_provider_module_burndown(
+    matrix: &CapabilityMatrix,
+    fixtures: &FixtureCorpus,
+) -> ProviderModuleBurndownReport {
+    let mut report = ProviderModuleBurndownReport {
+        fixtures_requiring_real_secrets: fixtures.fixtures_requiring_real_secrets(),
+        ..ProviderModuleBurndownReport::default()
+    };
+    let blocker_rows = provider_module_blocker_rows(matrix);
+    report.initial_blocker_count = blocker_rows.len();
+
+    for row in &blocker_rows {
+        let resolution = resolve_provider_module_fixture(row, fixtures);
+        match resolution.kind {
+            ProviderModuleResolutionKind::FixtureCovered => {
+                report.resolved_by_fixture.push(resolution);
+            }
+            ProviderModuleResolutionKind::ExternalBlocker => {
+                report.remaining_blockers.push(resolution);
+            }
+        }
+    }
+
+    report.resolved_by_fixture_count = report.resolved_by_fixture.len();
+    report.remaining_blocker_count = report.remaining_blockers.len();
     report
 }
 
@@ -490,6 +597,109 @@ fn rows_for_prefix<'a>(matrix: &'a CapabilityMatrix, prefix: &str) -> Vec<&'a Ca
         .iter()
         .filter(|row| row.capability.starts_with(prefix))
         .collect()
+}
+
+fn provider_module_docs_link() -> String {
+    "docs/compatibility/matrix.md#p0-provider-module-burndown".to_string()
+}
+
+fn provider_module_fixture_ids(item_id: &str) -> &'static [&'static str] {
+    match item_id {
+        "provider:src-providers-anthropic-defaults"
+        | "provider:src-providers-anthropic-generic"
+        | "provider:src-providers-anthropic-messages"
+        | "provider:src-providers-anthropic-types"
+        | "provider:src-providers-anthropic-util" => &["p0-provider-anthropic-message"],
+        "provider:src-providers-http" => &["p0-provider-http-get", "p0-provider-http-post"],
+        "provider:src-providers-httptransforms" => &["p0-provider-http-transform"],
+        "provider:src-providers-ollama" => &["p0-provider-ollama-chat"],
+        "provider:src-providers-openai-chat"
+        | "provider:src-providers-openai-index"
+        | "provider:src-providers-openai-types" => &["p0-provider-openai-chat"],
+        "provider:src-providers-openai-defaults" => {
+            &["p0-provider-openai-env", "p0-provider-openai-headers"]
+        }
+        "provider:src-providers-openai-util" => &[
+            "p0-provider-openai-chat",
+            "p0-provider-openai-env",
+            "p0-provider-openai-headers",
+        ],
+        _ => &[],
+    }
+}
+
+fn available_fixture_ids(ids: &[&str], fixtures: &FixtureCorpus) -> Vec<String> {
+    ids.iter()
+        .filter(|id| {
+            fixtures
+                .records()
+                .iter()
+                .any(|record| record.manifest.id == **id)
+        })
+        .map(|id| (*id).to_string())
+        .collect()
+}
+
+fn source_reference_from_notes(row: &CapabilityRow) -> String {
+    row.notes
+        .split("source:")
+        .nth(1)
+        .map(str::trim)
+        .filter(|source| !source.is_empty())
+        .unwrap_or("unknown source reference")
+        .to_string()
+}
+
+fn explicit_provider_module_blocker_reason(
+    item_id: &str,
+    source_reference: &str,
+) -> (String, bool) {
+    let lower = item_id.to_ascii_lowercase();
+    let (reason, requires_external_authority) = if lower.contains("claudecodeauth") {
+        (
+            "Anthropic Claude Code auth requires real local credential flow and product authority before native parity can be claimed",
+            true,
+        )
+    } else if lower.contains("codex") {
+        (
+            "OpenAI Codex provider modules require external product authority and private SDK/server credential confirmation before native parity can be claimed",
+            true,
+        )
+    } else if lower.contains("billing") {
+        (
+            "OpenAI billing module requires account-level credentials and billing authority; no local mock may be treated as published parity",
+            true,
+        )
+    } else if lower.contains("chatkit") {
+        (
+            "OpenAI ChatKit modules require product authority and browser/session fixture confirmation before native parity can be claimed",
+            true,
+        )
+    } else if lower.contains("agents") {
+        (
+            "OpenAI Agents SDK and tracing modules require dedicated SDK/trace fixtures plus product contract review",
+            true,
+        )
+    } else if lower.contains("realtime") {
+        (
+            "OpenAI realtime module requires a dedicated streaming protocol fixture and service contract confirmation",
+            true,
+        )
+    } else if lower.contains("assistant") {
+        (
+            "OpenAI Assistants module requires a stateful API fixture and account-authorized behavior review",
+            true,
+        )
+    } else {
+        (
+            "Provider module needs a dedicated request/response fixture before aggregate provider evidence can prove per-module parity",
+            false,
+        )
+    };
+    (
+        format!("{reason}; source: {source_reference}"),
+        requires_external_authority,
+    )
 }
 
 fn script_boundary_policies() -> Vec<ScriptBoundaryPolicy> {
