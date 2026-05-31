@@ -186,6 +186,195 @@ impl FrozenSourceReference {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum TargetMode {
+    Frozen,
+    Current,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CurrentUpstreamObservation {
+    pub current_head: String,
+    pub frozen_tag_ref: String,
+    pub frozen_tag_commit: String,
+    pub observed_release_ref: Option<String>,
+    pub observed_release_commit: Option<String>,
+    pub observed_at: String,
+    pub source: String,
+    #[serde(default)]
+    pub evidence_refs: BTreeMap<String, String>,
+}
+
+impl CurrentUpstreamObservation {
+    pub fn from_ls_remote(output: &str) -> Result<Self, TargetPolicyError> {
+        let mut current_head = None;
+        let mut frozen_tag_commit = None;
+        let mut observed_release_ref = None;
+        let mut observed_release_commit = None;
+
+        for line in output
+            .lines()
+            .map(str::trim)
+            .filter(|line| !line.is_empty())
+        {
+            let mut parts = line.split_whitespace();
+            let sha = parts
+                .next()
+                .ok_or_else(|| TargetPolicyError::Parse("missing ls-remote sha".to_string()))?;
+            let reference = parts
+                .next()
+                .ok_or_else(|| TargetPolicyError::Parse("missing ls-remote ref".to_string()))?;
+            if !is_full_sha(sha) {
+                return Err(TargetPolicyError::Parse(format!(
+                    "ls-remote ref {reference} did not contain a full sha"
+                )));
+            }
+            match reference {
+                "HEAD" => current_head = Some(sha.to_string()),
+                "refs/tags/0.121.13" => frozen_tag_commit = Some(sha.to_string()),
+                other if other.starts_with("refs/tags/") => {
+                    observed_release_ref = Some(other.to_string());
+                    observed_release_commit = Some(sha.to_string());
+                }
+                _ => {}
+            }
+        }
+
+        Ok(Self {
+            current_head: current_head.ok_or_else(|| {
+                TargetPolicyError::Parse("ls-remote output missing HEAD".to_string())
+            })?,
+            frozen_tag_ref: "refs/tags/0.121.13".to_string(),
+            frozen_tag_commit: frozen_tag_commit.ok_or_else(|| {
+                TargetPolicyError::Parse("ls-remote output missing refs/tags/0.121.13".to_string())
+            })?,
+            observed_release_ref,
+            observed_release_commit,
+            observed_at: current_unix_timestamp(),
+            source: "git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/0.121.13 refs/tags/code-scan-action-0.1.7".to_string(),
+            evidence_refs: BTreeMap::new(),
+        })
+    }
+
+    pub fn with_current_evidence_refs<I, K, V>(mut self, refs: I) -> Self
+    where
+        I: IntoIterator<Item = (K, V)>,
+        K: Into<String>,
+        V: Into<String>,
+    {
+        self.evidence_refs = refs
+            .into_iter()
+            .map(|(key, value)| (key.into(), value.into()))
+            .collect();
+        self
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CurrentClaimPolicy {
+    pub schema: String,
+    pub status: String,
+    pub target_mode: TargetMode,
+    pub stable_claim: String,
+    pub current_perfect_claim_allowed: bool,
+    pub reason: String,
+    pub frozen: FrozenSourceReference,
+    pub current: CurrentUpstreamObservation,
+    pub required_current_evidence: Vec<String>,
+    pub missing_current_evidence: Vec<String>,
+    pub mismatched_current_evidence: Vec<String>,
+}
+
+#[derive(Debug)]
+pub enum TargetPolicyError {
+    Read(std::io::Error),
+    Write(std::io::Error),
+    Parse(String),
+}
+
+pub fn evaluate_current_claim_policy(
+    frozen: &FrozenSourceReference,
+    current: &CurrentUpstreamObservation,
+    mode: TargetMode,
+) -> CurrentClaimPolicy {
+    let required_current_evidence = required_current_evidence();
+    let mut missing_current_evidence = Vec::new();
+    let mut mismatched_current_evidence = Vec::new();
+
+    if mode == TargetMode::Current {
+        for evidence_key in &required_current_evidence {
+            match current.evidence_refs.get(evidence_key.as_str()) {
+                Some(ref_sha) if ref_sha == &current.current_head => {}
+                Some(_) => mismatched_current_evidence.push(evidence_key.clone()),
+                None => missing_current_evidence.push(evidence_key.clone()),
+            }
+        }
+    }
+
+    let head_differs = current.current_head != frozen.git_commit;
+    let current_mode_evidence_ready =
+        missing_current_evidence.is_empty() && mismatched_current_evidence.is_empty();
+    let current_perfect_claim_allowed = match mode {
+        TargetMode::Frozen => false,
+        TargetMode::Current => current_mode_evidence_ready,
+    };
+    let reason = match mode {
+        TargetMode::Frozen if head_differs => format!(
+            "target mode is frozen; current HEAD {} differs from frozen baseline {}",
+            current.current_head, frozen.git_commit
+        ),
+        TargetMode::Frozen => {
+            "target mode is frozen; current-perfect claims require current mode evidence"
+                .to_string()
+        }
+        TargetMode::Current if current_mode_evidence_ready => format!(
+            "all current mode evidence shares observed ref {}",
+            current.current_head
+        ),
+        TargetMode::Current => format!(
+            "current mode evidence is incomplete or mismatched for observed ref {}",
+            current.current_head
+        ),
+    };
+    let status = if mode == TargetMode::Frozen || current_perfect_claim_allowed {
+        "ready"
+    } else {
+        "blocked"
+    };
+    let stable_claim = match mode {
+        TargetMode::Frozen => "frozen-baseline compatibility",
+        TargetMode::Current if current_perfect_claim_allowed => "current-upstream perfect refactor",
+        TargetMode::Current => "current-upstream blocked",
+    };
+
+    CurrentClaimPolicy {
+        schema: "promptfoo-rs.current-upstream-policy.v1".to_string(),
+        status: status.to_string(),
+        target_mode: mode,
+        stable_claim: stable_claim.to_string(),
+        current_perfect_claim_allowed,
+        reason,
+        frozen: frozen.clone(),
+        current: current.clone(),
+        required_current_evidence,
+        missing_current_evidence,
+        mismatched_current_evidence,
+    }
+}
+
+pub fn write_current_upstream_policy(
+    policy: &CurrentClaimPolicy,
+    path: &Path,
+) -> Result<(), TargetPolicyError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(TargetPolicyError::Write)?;
+    }
+    let json = serde_json::to_string_pretty(policy)
+        .map_err(|error| TargetPolicyError::Parse(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(TargetPolicyError::Write)
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SourceInventoryCounts {
     pub command_related_files: usize,
@@ -829,6 +1018,23 @@ fn is_ts_or_js_file(file: &str) -> bool {
         file.rsplit_once('.').map(|(_, extension)| extension),
         Some("ts" | "tsx" | "js" | "jsx" | "mjs" | "cjs")
     )
+}
+
+fn required_current_evidence() -> Vec<String> {
+    [
+        "source_inventory",
+        "matrix",
+        "fixtures",
+        "golden_corpus",
+        "release_candidate",
+    ]
+    .into_iter()
+    .map(str::to_string)
+    .collect()
+}
+
+fn is_full_sha(value: &str) -> bool {
+    value.len() == 40 && value.chars().all(|ch| ch.is_ascii_hexdigit())
 }
 
 fn current_unix_timestamp() -> String {

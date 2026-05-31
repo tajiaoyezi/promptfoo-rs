@@ -1,0 +1,30 @@
+{
+  "schema": "promptfoo-rs.current-upstream-target.v1",
+  "target_mode": "frozen",
+  "basis": [
+    "docs/compatibility/target-policy.md",
+    "docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md",
+    "docs/specs/tasks/task-18.3-current-upstream-rebaseline-gate.md"
+  ],
+  "frozen": {
+    "package_version": "0.121.13",
+    "git_ref": "refs/tags/0.121.13",
+    "git_commit": "4860e990c7e9a2f8f677173fb92cf9867b34d03f",
+    "npm_integrity": "sha512-DBPSixUophzcD7S7lML6SqVwnVtrhK5A3HsZ03IG9Xrw0t24r5imG7nLj+YMb0vlAjbdFtE7yFG+rsqDpfYp6g=="
+  },
+  "current_tracking": {
+    "source": "git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/0.121.13 refs/tags/code-scan-action-0.1.7",
+    "last_reviewed_head": "ff8eafd743cf6d63dd85b790ad8a4c73ede5828d",
+    "last_reviewed_release_ref": "refs/tags/code-scan-action-0.1.7",
+    "last_reviewed_release_commit": "1c743afe0e4807882e858c4f322fc064fa5f0770",
+    "current_perfect_claim_allowed": false,
+    "reason": "Frozen baseline evidence cannot be reused as current-upstream perfect-refactor evidence unless current mode artifacts share the same observed ref."
+  },
+  "required_current_evidence": [
+    "source_inventory",
+    "matrix",
+    "fixtures",
+    "golden_corpus",
+    "release_candidate"
+  ]
+}

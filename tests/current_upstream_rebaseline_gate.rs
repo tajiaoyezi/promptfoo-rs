@@ -34,7 +34,10 @@ fn test_18_3_1_current_and_frozen_refs_are_recorded_without_floating_stable_targ
         observation.observed_release_commit.as_deref(),
         Some(CODE_SCAN_RELEASE_SHA)
     );
-    assert!(observation.current_head.chars().all(|c| c.is_ascii_hexdigit()));
+    assert!(observation
+        .current_head
+        .chars()
+        .all(|c| c.is_ascii_hexdigit()));
     assert_eq!(observation.current_head.len(), 40);
     assert!(frozen.validate_non_floating().is_ok());
 
@@ -53,7 +56,8 @@ fn test_18_3_2_frozen_mode_rejects_current_perfect_claim_when_head_differs() {
     /* TEST-18.3.2 */
     let observation = CurrentUpstreamObservation::from_ls_remote(LS_REMOTE)
         .expect("ls-remote output should parse");
-    let policy = evaluate_current_claim_policy(&frozen_reference(), &observation, TargetMode::Frozen);
+    let policy =
+        evaluate_current_claim_policy(&frozen_reference(), &observation, TargetMode::Frozen);
 
     assert_eq!(policy.target_mode, TargetMode::Frozen);
     assert!(!policy.current_perfect_claim_allowed, "{policy:#?}");
@@ -115,7 +119,8 @@ fn test_18_3_4_policy_artifact_and_release_candidate_display_target_mode() {
     /* TEST-18.3.4 */
     let observation = CurrentUpstreamObservation::from_ls_remote(LS_REMOTE)
         .expect("ls-remote output should parse");
-    let policy = evaluate_current_claim_policy(&frozen_reference(), &observation, TargetMode::Frozen);
+    let policy =
+        evaluate_current_claim_policy(&frozen_reference(), &observation, TargetMode::Frozen);
     let output_path = Path::new("target/test-current-upstream-policy.json");
     write_current_upstream_policy(&policy, output_path).expect("policy artifact should write");
     let artifact: Value = serde_json::from_str(

@@ -19,6 +19,7 @@ cargo test \
 
 bash scripts/release/source-inventory-evidence.sh
 bash scripts/release/longtail-classification.sh
+bash scripts/release/current-upstream-policy.sh
 bash scripts/release/real-upstream-smoke.sh
 bash scripts/release/real-upstream-corpus.sh
 PROMPTFOO_RS_SKIP_RUNTIME_SMOKE=1 bash scripts/release/installability.sh
@@ -136,13 +137,18 @@ observability_status="ready"
 real_upstream_smoke_status="ready"
 real_upstream_corpus_status="ready"
 longtail_classification_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/longtail-classification.json', 'utf8')); console.log(r.status)")"
+current_upstream_policy_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-upstream-policy.json', 'utf8')); console.log(r.status)")"
+current_target_mode="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-upstream-policy.json', 'utf8')); console.log(r.target_mode)")"
+current_perfect_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-upstream-policy.json', 'utf8')); console.log(r.current_perfect_claim_allowed ? 'true' : 'false')")"
+current_upstream_head="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-upstream-policy.json', 'utf8')); console.log(r.current.current_head)")"
+frozen_git_commit="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-upstream-policy.json', 'utf8')); console.log(r.frozen.git_commit)")"
 source_inventory_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/source-inventory-evidence.json', 'utf8')); console.log(r.status)")"
 source_inventory_missing_matrix_rows="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/source-inventory-evidence.json', 'utf8')); console.log((r.missing_matrix_rows || []).length)")"
 source_inventory_p0_accounting_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/source-inventory-evidence.json', 'utf8')); console.log(r.p0_accounting_blocker_count || 0)")"
 installability_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/installability.json', 'utf8')); console.log(r.installability_ready ? 'true' : 'false')")"
 publication_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/installability.json', 'utf8')); console.log(r.publication_ready)")"
 credential_blocked="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/installability.json', 'utf8')); console.log(r.credential_blocked ? 'true' : 'false')")"
-stable_allowed="$(stable_allowed_from_gate "$adapter_status" "$compatibility_status" "$performance_status" "$security_status" "$packaging_status" "$observability_status" "$real_upstream_smoke_status" "$real_upstream_corpus_status")"
+stable_allowed="$(stable_allowed_from_gate "$adapter_status" "$compatibility_status" "$performance_status" "$security_status" "$packaging_status" "$observability_status" "$current_upstream_policy_status" "$real_upstream_smoke_status" "$real_upstream_corpus_status")"
 if [ "$stable_allowed" = "true" ]; then
   decision="stable"
 else
@@ -210,8 +216,16 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "installability": "ready",
     "source_inventory": "$source_inventory_status",
     "longtail_classification": "$longtail_classification_status",
+    "current_upstream_policy": "$current_upstream_policy_status",
     "real_upstream_smoke": "$real_upstream_smoke_status",
     "real_upstream_corpus": "$real_upstream_corpus_status"
+  },
+  "target_policy": {
+    "target_mode": "$current_target_mode",
+    "current_perfect_claim_allowed": $current_perfect_claim_allowed,
+    "frozen_git_commit": "$frozen_git_commit",
+    "current_head": "$current_upstream_head",
+    "policy_artifact": "target/release-gates/current-upstream-policy.json"
   },
   "source_inventory": {
     "missing_matrix_rows": $source_inventory_missing_matrix_rows,
@@ -226,6 +240,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/source-inventory-evidence.json",
     "target/release-gates/source-inventory-ledger.json",
     "target/release-gates/longtail-classification.json",
+    "target/release-gates/current-upstream-policy.json",
     "target/release-gates/installability.json",
     "target/release-gates/real-upstream-smoke/latest/metadata.json",
     "target/release-gates/real-upstream-corpus/index.json",
