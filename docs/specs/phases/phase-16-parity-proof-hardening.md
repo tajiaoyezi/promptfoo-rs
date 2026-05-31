@@ -1,6 +1,6 @@
 # Phase 16: parity-proof-hardening
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -30,9 +30,9 @@
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `view/cache/import/export` 不再输出 “not yet implemented” 或 `later` 状态；CLI surface 与 item-level matrix 中对应 P0 rows 均有 implemented/native evidence。
-- [ ] runtime smoke 生成的 performance/security/release-candidate 报告来自本次执行的测量或 gate summary，不再写入固定 observed 值或无来源 stable 决策。
-- [ ] 至少一个 P0 fixture 由真实 `promptfoo@0.121.13` 与当前 `promptfoo-rs` 二进制执行并持久化 artifacts；若真实 upstream 执行缺失，stable gate fail closed。
+- [x] `view/cache/import/export` 不再输出 “not yet implemented” 或 `later` 状态；CLI surface 与 item-level matrix 中对应 P0 rows 均有 implemented/native evidence。
+- [x] runtime smoke 生成的 performance/security/release-candidate 报告来自本次执行的测量或 gate summary，不再写入固定 observed 值或无来源 stable 决策。
+- [x] 至少一个 P0 fixture 由真实 `promptfoo@0.121.13` 与当前 `promptfoo-rs` 二进制执行并持久化 artifacts；若真实 upstream 执行缺失，stable gate fail closed。
 
 ## 7. Phase Risks
 

@@ -144,7 +144,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 13 | cli-output-eval-parity | docs/specs/phases/phase-13-cli-output-eval-parity.md | Done | 2 | N/A (solo) |
 | 14 | provider-assertion-redteam-parity | docs/specs/phases/phase-14-provider-assertion-redteam-parity.md | Done | 2 | N/A (solo) |
 | 15 | release-hardening-performance | docs/specs/phases/phase-15-release-hardening-performance.md | Done | 2 | N/A (solo) |
-| 16 | parity-proof-hardening | docs/specs/phases/phase-16-parity-proof-hardening.md | In Progress | 3 | N/A (solo) |
+| 16 | parity-proof-hardening | docs/specs/phases/phase-16-parity-proof-hardening.md | Done | 3 | N/A (solo) |
 
 ## Task 总索引
 
