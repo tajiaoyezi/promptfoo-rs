@@ -9,6 +9,7 @@ cargo test \
   --test release_installability_publication_readiness \
   --test publication_authority_release_gate \
   --test current_upstream_rebaseline_gate \
+  --test viewer_config_source_reclassification \
   --test real_p0_golden_corpus_runner \
   --test real_upstream_smoke_gate \
   --test viewer_node_packaging_release \
