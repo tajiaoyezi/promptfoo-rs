@@ -1,6 +1,6 @@
 # promptfoo current perfect-refactor audit - 2026-05-31
 
-**Status**: Current audit verdict after Phase 18 completion
+**Status**: Current audit verdict after Phase 20 completion
 **Objective**: determine whether the current `promptfoo-rs` worktree completely satisfies a perfect refactor of `promptfoo/promptfoo`.
 **Verdict**: Not fully satisfied.
 
@@ -47,11 +47,11 @@ Observed result:
 
 Additional current-state checks:
 
-- `git status --short --branch`: clean `master...origin/master` before this audit edit.
-- `git rev-parse HEAD origin/master`: both refs were `81a9060c274bd2692c4a7f321f4f516af733b7f8`.
-- Task status scan: 42 task specs are `Done`.
-- Phase status scan: 17 phase specs are `Done`.
-- Project specs scan: no real `<TBD-by-user>` remains in `docs/specs/tasks`, `docs/specs/phases`, `docs/decisions`, or `docs/compatibility`.
+- `git status --short --branch`: final repository cleanliness is verified after the Phase 20 completion commit and push.
+- `git rev-parse HEAD origin/master`: final ref parity is verified after the Phase 20 completion commit and push.
+- Task status scan: 52 task specs are `Done`.
+- Phase status scan: 20 phase specs are `Done`.
+- Project specs scan: no real user-TBD placeholder remains in `docs/specs/tasks`, `docs/specs/phases`, `docs/decisions`, or `docs/compatibility`.
 - `s2v_preflight_phase` passes for every phase spec.
 
 This proves the current local gate chain is executable and green. It does not by itself prove a complete or perfect refactor of the full upstream repository.
@@ -60,7 +60,7 @@ This proves the current local gate chain is executable and green. It does not by
 
 The project is materially stronger than the earlier audit snapshots:
 
-- All phase and task specs are `Done` through Phase 18.
+- All phase and task specs are `Done` through Phase 20.
 - Adapter verification commands are executable; the full 9-key local gate runs.
 - `viewer/` and `npm/` include package metadata, lockfiles, build/test scripts, and smoke scripts.
 - Phase 16 removed the previous no-op CLI behavior for `view`, `cache`, `import`, and `export`.
@@ -69,7 +69,7 @@ The project is materially stronger than the earlier audit snapshots:
 - Phase 18.2 added provider-module burndown evidence: 37 P0 provider module blockers are now split into 13 existing P0 fixture-covered rows and 24 explicit remaining blockers with item-level reasons.
 - Phase 18.3 added a current-upstream target-mode gate: `current-upstream-policy.json` and `release-candidate.json.target_policy` now make frozen/current claim scope machine-readable.
 - Phase 18.4 added publication authority evidence: `publication-authority.json` and `release-candidate.json.publication_authority` now separate local installability, credential blockers, legal/brand blockers, and actual published evidence.
-- Phase 18 smoke passed `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` after rustfmt drift was corrected.
+- Phase 20 added cross-ledger source/provider accounting reconciliation and a machine-readable perfect-refactor claim contract. Phase 20 smoke passed `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"`.
 
 These are real progress items. They support a scoped frozen-baseline compatibility implementation, not a literal perfect refactor claim.
 
@@ -98,11 +98,11 @@ This does not complete current-upstream parity; it prevents ambiguous or oversta
 - `missing_matrix_rows`: 0
 - `release_blockers`: 74
 - `source_accounting_ledger`: `target/release-gates/source-inventory-ledger.json`
-- `p0_accounting_blocker_count`: 44 after task 19.2 core config source burndown
+- `p0_accounting_blocker_count`: 22 after task 20.1 source/provider accounting reconciliation
 - `viewer_config_reclassified_count`: 56
 - `core_config_source_burndown`: 18 non-app config rows, 8 fixture-covered, 7 external blockers, 3 auxiliary registrations, 0 generic blockers
 
-`target/release-gates/source-inventory-ledger.json` reports 2549 ledger rows and 2116 generated accounting rows. This removes the previous silent missing-row problem, but it still directly contradicts a "complete upstream surface implemented" claim because generated P0 accounting rows remain release-blocking until they get native fixture, bridge fixture, explicit waiver, or external blocker evidence.
+`target/release-gates/source-inventory-ledger.json` reports 2549 ledger rows and 2116 generated accounting rows. Task 20.1 reconciles provider source rows with provider burndown evidence: 37 provider source rows split into 22 fixture-covered rows, 15 external-authority provider blockers, and 0 generic provider blockers. The remaining 22 P0 accounting blockers are now explicit external-authority rows: 7 config rows plus 15 provider rows. This removes double-counted provider fixture rows, but it still directly contradicts a "complete upstream surface implemented" claim until the remaining external-authority rows get real evidence or approved waivers.
 
 ### P0 - Long-tail classification still has P0 release blockers
 
@@ -113,14 +113,16 @@ This does not complete current-upstream parity; it prevents ambiguous or oversta
 - `source_extracted_item_count`: 433
 - `tracked_longtail_item_count`: 433
 - `p0_provider_module_burndown.initial_blocker_count`: 37
-- `p0_provider_module_burndown.resolved_by_fixture_count`: 13
-- `p0_provider_module_burndown.remaining_blocker_count`: 24
-- `p0_release_blocker_count`: 24
+- `p0_provider_module_burndown.resolved_by_fixture_count`: 22
+- `p0_provider_module_burndown.remaining_blocker_count`: 15
+- `p0_provider_module_burndown.external_authority_blocker_count`: 15
+- `p0_provider_module_burndown.generic_blocker_count`: 0
+- `p0_release_blocker_count`: 15
 - `unresolved_rows`: 0
 - `missing_reason_rows`: 0
 - `p0_release_blockers[]`: lists every remaining provider module blocker by item id, source reference, reason, verification, and external-authority flag
 
-This is better auditability than Phase 17: existing OpenAI/Anthropic/HTTP/Ollama P0 fixtures now cover 13 source provider modules, while Codex, Claude Code auth, billing, ChatKit, Agents, Realtime, Assistant, and endpoint-specific unfixtureed modules remain explicit blockers. It is still not perfect/native parity because 24 P0 provider module blockers remain release-blocking.
+This is better auditability than Phase 17: existing and dedicated OpenAI/Anthropic/HTTP/Ollama P0 fixtures now cover 22 source provider modules, while Codex, Claude Code auth, billing, ChatKit, Agents, Realtime, Assistant, and related account/product-authority modules remain explicit blockers. It is still not perfect/native parity because 15 P0 provider module blockers remain release-blocking.
 
 ### P1 - Compatibility matrix intentionally contains later, unsupported, and partial-parity rows
 
@@ -158,14 +160,15 @@ Local dry-run installability and publication authority blockers are proven. Real
 
 | Requirement | Current evidence | Verdict |
 |---|---|---|
-| All local S2V phase/task specs complete | 42 task specs `Done`; 17 phase specs `Done`; phase preflight passes | Met |
+| All local S2V phase/task specs complete | 52 task specs `Done`; 20 phase specs `Done`; phase preflight passes | Met |
 | Local verification gates executable and green | Full 9-key S2V verification passed on 2026-05-31 | Met |
 | Frozen baseline traceable | npm version/gitHead/integrity, git tag, baseline lock, and artifacts point to `0.121.13` / `4860e99` | Met for frozen target |
 | Target-mode claim separation | `current-upstream-policy.json` and `release-candidate.json.target_policy` record frozen mode and `current_perfect_claim_allowed=false` | Met |
 | Current upstream repository parity | GitHub `HEAD=ff8eafd...` differs from frozen tag; later `code-scan-action: 0.1.7` release exists; current mode lacks same-ref inventory/matrix/fixtures/golden/release evidence | Not met |
 | 100% source-extracted upstream item accounting | 2549 source-extracted items now have 2549 ledger rows and missing matrix rows are 0 | Met as accounting, not implementation parity |
 | P0 real upstream golden diff corpus | 50 real upstream P0 fixtures are recorded and smoke metadata is ready | Met for recorded corpus |
-| Provider/assertion/redteam long-tail parity | 433 tracked long-tail rows; provider module burndown resolves 13 of 37 via fixture evidence, but 24 explicit P0 provider module release blockers remain | Not met |
+| Provider/assertion/redteam long-tail parity | 433 tracked long-tail rows; provider module burndown resolves 22 of 37 via fixture evidence, but 15 explicit P0 provider module release blockers remain | Not met |
+| Perfect-refactor claim readiness | `perfect-refactor-claim.json` records `perfect_refactor_claim_allowed=false` with source/current/publication/external blockers | Not met, but now machine-gated |
 | Compatibility matrix honesty | P1/P2/later/unsupported rows are explicit and reasoned | Met as auditability, not perfect parity |
 | Viewer/npm package local build smoke | Viewer and npm package smoke scripts pass in full local gate | Met for local smoke |
 | Multi-channel public release | Dry-run artifacts and publication authority blockers exist, but all channels are unpublished, publication evidence is null, and publication is credential-blocked/legal-brand-blocked | Not proven |
@@ -176,8 +179,8 @@ The current project is a substantially improved, locally verified, S2V-complete 
 
 The remaining gap is no longer basic project readiness. It is deep parity and release proof:
 
-1. resolve the 44 P0 source accounting blockers now exposed by the ledger after task 19.2,
-2. resolve the 15 remaining P0 long-tail provider module blockers after task 19.3,
+1. resolve the 22 P0 source accounting blockers now exposed by the reconciled ledger after task 20.1,
+2. resolve the 15 remaining P0 long-tail provider module blockers after task 19.3 and preserved by task 20.1,
 3. decide whether to implement and verify current-mode evidence for current upstream `HEAD`,
 4. either implement or formally scope out the current upstream surfaces that are outside the frozen PRD target,
 5. complete real publication evidence for the intended release channels once credentials and release authority exist.
@@ -188,13 +191,13 @@ Until those are resolved, the honest project claim is "auditable frozen-baseline
 
 Add follow-up S2V work focused on blocker burn-down rather than smoke hardening:
 
-- source inventory P0 accounting blocker burn-down from the new ledger;
-- fixture or waiver decisions for the 24 remaining P0 long-tail provider module blockers;
+- source inventory P0 external-authority blocker burn-down from the reconciled ledger;
+- fixture, authority evidence, or waiver decisions for the 15 remaining P0 long-tail provider module blockers;
 - explicit rebaseline ADR if the target changes from `0.121.13` to current upstream `HEAD`;
 - real publication evidence for GitHub Releases, Cargo, npm, Docker, Homebrew, and GitHub Action after credentials, authority, and legal/brand approval exist;
 - compatibility matrix update that separates "frozen-baseline complete" from "current-upstream complete."
 
-Phase 19 now captures the first two follow-up tracks as Ready S2V task specs: viewer config source reclassification, core config fixture burndown, provider request/response fixture burndown, and external authority blocker gate.
+Phases 19 and 20 captured the local follow-up tracks that could be resolved without real external authority: viewer config source reclassification, core config fixture burndown, provider request/response fixture burndown, external authority blocker gate, source/provider accounting reconciliation, and perfect-refactor claim gating.
 
 Task 19.1 implementation adds viewer config scope correction for `src/app/**` generated config rows. Current artifacts report `viewer_config_reclassified_count=56`. This is not a claim of complete upstream React UI parity; it keeps Local Web viewer under the existing P1 boundary.
 

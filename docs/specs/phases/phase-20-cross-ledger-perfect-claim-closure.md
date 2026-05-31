@@ -1,6 +1,6 @@
 # Phase 20: cross-ledger-perfect-claim-closure
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -29,10 +29,10 @@ Phase 19 已把 provider 专属 blocker 降到 15 个 external-authority rows，
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] source accounting 的 provider rows 与 provider burndown 一致：fixture-covered provider rows 不再出现在 `remaining_p0_blockers`。
-- [ ] `p0_accounting_blocker_count` 从 44 收敛到 22，且 22 = 7 config external blockers + 15 provider external-authority blockers。
-- [ ] release candidate 或相邻 artifact 明确给出 `perfect_refactor_claim_allowed=false`，并列出 source/current/publication/external blockers。
-- [ ] 文档和 audit 不再把 local stable gate 与 perfect-refactor completion 混为一谈。
+- [x] source accounting 的 provider rows 与 provider burndown 一致：fixture-covered provider rows 不再出现在 `remaining_p0_blockers`。
+- [x] `p0_accounting_blocker_count` 从 44 收敛到 22，且 22 = 7 config external blockers + 15 provider external-authority blockers。
+- [x] release candidate 或相邻 artifact 明确给出 `perfect_refactor_claim_allowed=false`，并列出 source/current/publication/external blockers。
+- [x] 文档和 audit 不再把 local stable gate 与 perfect-refactor completion 混为一谈。
 
 ## 7. Phase Risks
 
@@ -46,7 +46,12 @@ Phase 19 已把 provider 专属 blocker 降到 15 个 external-authority rows，
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **保留边界**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **Phase smoke**：PASS — `s2v_preflight_phase docs/specs/phases/phase-20-cross-ledger-perfect-claim-closure.md` 通过；随后执行 `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"`，9 项全部通过。
+- **Artifact evidence**：
+  - `target/release-gates/source-inventory-evidence.json`：`status=ready-with-blockers`，`p0_accounting_blocker_count=22`，`remaining_p0_blockers=22`。
+  - `provider_source_accounting_reconciliation`：`provider_source_total=37`，`resolved_provider_fixture_count=22`，`provider_external_authority_count=15`，`provider_source_generic_blocker_count=0`。
+  - `target/release-gates/perfect-refactor-claim.json`：`perfect_refactor_claim_allowed=false`，`local_stable_allowed=true`，`published=false`，`publication_ready=credential-blocked`，`external_authority_blocker_count=21`，`blockers=4`。
+  - `target/release-gates/release-candidate.json`：`stable_allowed=true`，`published=false`，`external_authority.status=blocked`，`publication_authority.publication_ready=credential-blocked`，`perfect_refactor_claim.blocker_count=4`。
+  - `target/release-gates/external-authority-blockers.json`：`status=blocked`，`blockers=21`。
+- **保留边界**：Phase 20 完成的是 cross-ledger 口径闭合和 perfect-refactor claim gate；它不解除真实密钥、账号、私有服务权限、法律/品牌/发布权限或 current-upstream rebaseline blocker。因此 local stable gate 可通过，但不能公开声称 promptfoo perfect-refactor completion。
