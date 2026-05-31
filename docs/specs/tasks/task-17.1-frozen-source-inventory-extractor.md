@@ -1,6 +1,6 @@
 # Task 17.1: frozen-source-inventory-extractor
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 17 — deep-upstream-parity-proof
@@ -68,19 +68,19 @@ Extractor 必须从 frozen upstream source/package 读取 command、flag、provi
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Upstream Baseline Freeze Strategy / ADR-009): extraction evidence records frozen version, commit, npm integrity, source acquisition command, extraction timestamp, and refuses `latest` / `main` / floating refs.
-- [ ] **AC2** (docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md): extractor reports source-visible counts for command-related files, provider files, assertion files, redteam plugin files, redteam strategy files, viewer/app files, and examples; counts below the audit baseline require release-blocking explanation.
-- [ ] **AC3** (PRD §Compatibility Matrix): every extracted item has stable id, category, name, source reference, P0/P1/P2 hint, owner hint, and matrix row or blocker record.
-- [ ] **AC4** (ADR-007 / ADR-009): release gate fails when source inventory evidence is missing, stale relative to baseline lock, contains unresolved rows without reason, or silently drops extracted items.
+- [x] **AC1** (PRD §Upstream Baseline Freeze Strategy / ADR-009): extraction evidence records frozen version, commit, npm integrity, source acquisition command, extraction timestamp, and refuses `latest` / `main` / floating refs.
+- [x] **AC2** (docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md): extractor reports source-visible counts for command-related files, provider files, assertion files, redteam plugin files, redteam strategy files, viewer/app files, and examples; counts below the audit baseline require release-blocking explanation.
+- [x] **AC3** (PRD §Compatibility Matrix): every extracted item has stable id, category, name, source reference, P0/P1/P2 hint, owner hint, and matrix row or blocker record.
+- [x] **AC4** (ADR-007 / ADR-009): release gate fails when source inventory evidence is missing, stale relative to baseline lock, contains unresolved rows without reason, or silently drops extracted items.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-17.1.1 | TEST-17.1.1 | tests/frozen_source_inventory_extractor.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Spec Ready |
-| AC2 | SCEN-17.1.1 | TEST-17.1.2 | tests/frozen_source_inventory_extractor.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Spec Ready |
-| AC3 | SCEN-17.1.1 | TEST-17.1.3 | tests/frozen_source_inventory_extractor.rs | install, typecheck, unit-test, integration, coverage, build, runtime-smoke | Spec Ready |
-| AC4 | SCEN-17.1.1 | TEST-17.1.4 | tests/frozen_source_inventory_extractor.rs | install, typecheck, unit-test, integration, coverage, build, runtime-smoke | Spec Ready |
+| AC1 | SCEN-17.1.1 | TEST-17.1.1 | tests/frozen_source_inventory_extractor.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Done |
+| AC2 | SCEN-17.1.1 | TEST-17.1.2 | tests/frozen_source_inventory_extractor.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Done |
+| AC3 | SCEN-17.1.1 | TEST-17.1.3 | tests/frozen_source_inventory_extractor.rs | install, typecheck, unit-test, integration, coverage, build, runtime-smoke | Done |
+| AC4 | SCEN-17.1.1 | TEST-17.1.4 | tests/frozen_source_inventory_extractor.rs | install, typecheck, unit-test, integration, coverage, build, runtime-smoke | Done |
 
 ## 8. Risks
 
@@ -100,9 +100,25 @@ Extractor 必须从 frozen upstream source/package 读取 command、flag、provi
 
 ## 10. Completion Notes
 
-- **完成日期**：待实施后回填
-- **改动文件**：待实施后回填
-- **commit 列表**：待实施后回填
-- **§9 Verification 结果**：待实施后回填
-- **剩余风险 / 未做项**：待实施后回填
-- **下游 task 影响**：待实施后回填
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/frozen_source_inventory_extractor.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/source-inventory-evidence.sh`
+  - `docs/compatibility/matrix.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-17-deep-upstream-parity-proof.md`
+  - `docs/specs/tasks/task-17.1-frozen-source-inventory-extractor.md`
+- **commit 列表**：
+  - `3b32ccf` `test(compatibility): add SCEN-17.1.1 frozen source inventory RED tests`
+  - `6beb141` `feat(compatibility): implement frozen source inventory extractor`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-17.1.1 ~ TEST-17.1.4 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 通过，包含 `real_upstream_smoke_gate` contract tests。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 通过；`source-inventory-evidence.json` schema=`promptfoo-rs.source-inventory-evidence.v2`，status=`ready-with-blockers`，source-extracted item count=2549，command/provider/assertion/redteam/plugin/strategy/viewer/example counts 均达到或超过 2026-05-31 audit baseline。
+- **剩余风险 / 未做项**：source evidence 当前如实记录 2549 个 source-extracted item 缺少 item-level matrix row 的 release blocker；这满足本 task “row or blocker” 契约，但 Phase 17 stable parity 仍需 task 17.4 将 provider/assertion/redteam 长尾分类并清理缺 reason / 缺 matrix row 风险。
+- **下游 task 影响**：task 17.2 可使用 frozen source command inventory 与 upstream help 对齐 CLI surface；task 17.3 可引用 v2 evidence 的 frozen baseline metadata；task 17.4 需要消费 `target/release-gates/source-extracted-items.json` 与 blocker 列表完成长尾分类。
