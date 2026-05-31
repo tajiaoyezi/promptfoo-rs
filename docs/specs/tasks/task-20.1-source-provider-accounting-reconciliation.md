@@ -1,6 +1,6 @@
 # Task 20.1: source-provider-accounting-reconciliation
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 20 — cross-ledger-perfect-claim-closure
@@ -64,19 +64,19 @@ Source accounting evidence 必须在 provider rows 上复用 provider burndown c
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-009): every provider source row that provider burndown resolved by fixture is represented with fixture verification and excluded from `remaining_p0_blockers`.
-- [ ] **AC2** (Phase 19): provider external-authority rows remain release-blocking with item-level required decision evidence.
-- [ ] **AC3** (PRD §Success Metrics): `source-inventory-evidence.json.p0_accounting_blocker_count` equals 22 and `remaining_p0_blockers` contains exactly 7 config external blockers + 15 provider external-authority blockers.
-- [ ] **AC4** (docs/audits): audit and compatibility docs explain the cross-ledger reconciliation without claiming external-authority completion.
+- [x] **AC1** (ADR-009): every provider source row that provider burndown resolved by fixture is represented with fixture verification and excluded from `remaining_p0_blockers`.
+- [x] **AC2** (Phase 19): provider external-authority rows remain release-blocking with item-level required decision evidence.
+- [x] **AC3** (PRD §Success Metrics): `source-inventory-evidence.json.p0_accounting_blocker_count` equals 22 and `remaining_p0_blockers` contains exactly 7 config external blockers + 15 provider external-authority blockers.
+- [x] **AC4** (docs/audits): audit and compatibility docs explain the cross-ledger reconciliation without claiming external-authority completion.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-20.1.1 | TEST-20.1.1 | tests/source_provider_accounting_reconciliation.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-20.1.1 | TEST-20.1.2 | tests/source_provider_accounting_reconciliation.rs | install, typecheck, unit-test, coverage, build | Not Started |
-| AC3 | SCEN-20.1.1 | TEST-20.1.3 | tests/source_provider_accounting_reconciliation.rs | install, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC4 | SCEN-20.1.1 | TEST-20.1.4 | tests/source_provider_accounting_reconciliation.rs | install, typecheck, unit-test, e2e, build | Not Started |
+| AC1 | SCEN-20.1.1 | TEST-20.1.1 | tests/source_provider_accounting_reconciliation.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-20.1.1 | TEST-20.1.2 | tests/source_provider_accounting_reconciliation.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-20.1.1 | TEST-20.1.3 | tests/source_provider_accounting_reconciliation.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC4 | SCEN-20.1.1 | TEST-20.1.4 | tests/source_provider_accounting_reconciliation.rs | install, typecheck, unit-test, e2e, build | Done |
 
 ## 8. Risks
 
@@ -97,9 +97,27 @@ Source accounting evidence 必须在 provider rows 上复用 provider burndown c
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/source_provider_accounting_reconciliation.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/source-inventory-evidence.sh`
+  - `docs/compatibility/matrix.md`
+  - `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-20-cross-ledger-perfect-claim-closure.md`
+  - `docs/specs/tasks/task-20.1-source-provider-accounting-reconciliation.md`
+- **commit 列表**：
+  - `8d0158d` `test(compatibility): add SCEN-20.1.1 provider source accounting RED tests`
+  - `2d47382` `feat(compatibility): reconcile provider source accounting with burndown evidence`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-20.1.1 ~ TEST-20.1.4 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 通过，包含 source inventory/provider reconciliation 相关 gate。
+  - e2e: PASS — `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 通过；`source-inventory-evidence.json` reports `p0_accounting_blocker_count=22`, 7 config blockers, 15 provider blockers, `provider_source_accounting_reconciliation.resolved_provider_fixture_count=22`, `provider_external_authority_count=15`, `provider_source_generic_blocker_count=0`。
+- **剩余风险 / 未做项**：15 个 provider external-authority blockers 和 7 个 config external blockers 仍保留为真实边界；本 task 只消除 source/provider 口径重复计数，不解除外部授权、账号、凭据或 publication/current-upstream blocker。
+- **下游 task 影响**：task 20.2 可以基于统一后的 `p0_accounting_blocker_count=22` 构建 perfect-refactor claim contract，并明确区分 local stable gate 与 perfect-refactor completion。

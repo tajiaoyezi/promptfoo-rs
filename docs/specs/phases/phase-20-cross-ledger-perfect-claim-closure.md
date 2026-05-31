@@ -20,7 +20,7 @@ Phase 19 已把 provider 专属 blocker 降到 15 个 external-authority rows，
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 20.1 | source-provider-accounting-reconciliation | ../tasks/task-20.1-source-provider-accounting-reconciliation.md | Ready | 让 source accounting ledger 消费 provider burndown evidence，已 fixture-covered provider rows 不再计入 P0 accounting blocker |
+| 20.1 | source-provider-accounting-reconciliation | ../tasks/task-20.1-source-provider-accounting-reconciliation.md | Done | 让 source accounting ledger 消费 provider burndown evidence，已 fixture-covered provider rows 不再计入 P0 accounting blocker |
 | 20.2 | perfect-refactor-claim-contract | ../tasks/task-20.2-perfect-refactor-claim-contract.md | Ready | 新增完美重构 claim contract，组合 source/current/publication/external authority gate，防止 local stable gate 被误读为目标完成 |
 
 ## 5. Dependencies
