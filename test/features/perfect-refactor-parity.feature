@@ -149,3 +149,23 @@ Feature: perfect refactor parity
     Given local release artifacts are installable but external credentials are absent
     When publication authority verification runs
     Then TEST-18.4.2 proves dry-run artifacts cannot set published=true without external evidence
+
+  Scenario: SCEN-19.1.1 - viewer config source rows are reclassified without weakening core config
+    Given source accounting ledger includes generated config rows from src/app and non-app runtime config files
+    When viewer config source reclassification runs
+    Then TEST-19.1.1 proves src/app config rows become P1 viewer evidence and TEST-19.1.2 proves non-app config rows remain P0 blockers
+
+  Scenario: SCEN-19.2.1 - core config source blockers burn down through fixtures or explicit blockers
+    Given non-app config rows remain after viewer config reclassification
+    When core config source burndown verification runs
+    Then TEST-19.2.1 proves runtime config rows have fixture evidence and TEST-19.2.3 proves unresolved config rows have specific blockers
+
+  Scenario: SCEN-19.3.1 - provider module request response blockers burn down through dedicated fixtures
+    Given remaining provider module blockers include mockable request response modules and external authority modules
+    When provider request response fixture burndown runs
+    Then TEST-19.3.1 proves non-external provider modules have dedicated fixtures or stay release-blocking with item-level reasons
+
+  Scenario: SCEN-19.4.1 - external authority blockers remain explicit and unforgeable
+    Given remaining blockers require credentials accounts private services legal brand or publication authority
+    When external authority blocker gate runs
+    Then TEST-19.4.1 proves every external blocker has a required decision and TEST-19.4.4 proves perfect refactor is not claimed while they remain

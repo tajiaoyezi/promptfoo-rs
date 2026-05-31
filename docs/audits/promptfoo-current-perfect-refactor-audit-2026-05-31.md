@@ -191,3 +191,5 @@ Add follow-up S2V work focused on blocker burn-down rather than smoke hardening:
 - explicit rebaseline ADR if the target changes from `0.121.13` to current upstream `HEAD`;
 - real publication evidence for GitHub Releases, Cargo, npm, Docker, Homebrew, and GitHub Action after credentials, authority, and legal/brand approval exist;
 - compatibility matrix update that separates "frozen-baseline complete" from "current-upstream complete."
+
+Phase 19 now captures the first two follow-up tracks as Ready S2V task specs: viewer config source reclassification, core config fixture burndown, provider request/response fixture burndown, and external authority blocker gate.

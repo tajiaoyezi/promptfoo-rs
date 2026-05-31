@@ -231,6 +231,7 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 16 | parity-proof-hardening | 移除审查中仍可观察到的 explicit later CLI 命令、合成 release 证据和非真实 upstream smoke 证据 | `src/cli` + `src/viewer_server.rs` + `src/cache` + `scripts/release/` + `compatibility/inventory/` + `compatibility/artifacts/` + `tests/` | 15 | 否 |
 | 17 | deep-upstream-parity-proof | 完整 frozen upstream source inventory、CLI/global/eval/redteam parity、50+ 真实 upstream golden corpus、长尾 capability 分类与发布安装证据均可执行 | `compatibility/inventory/` + `compatibility/matrix/` + `compatibility/fixtures/` + `compatibility/artifacts/` + `src/cli` + `src/providers` + `src/assertions` + `src/redteam` + `scripts/release/` + `.github/workflows/` | 16 | 否 |
 | 18 | perfect-refactor-blocker-burndown | 将 Phase 17 后仍阻断“完美重构”的 source missing rows、P0 provider blockers、current-upstream target 和 publication authority 转成可燃尽 release gate | `compatibility/inventory/` + `compatibility/matrix/` + `compatibility/fixtures/` + `src/compatibility/` + `src/providers` + `scripts/release/` + `docs/audits/` + `tests/` | 17 | 否 |
+| 19 | source-accounting-native-burndown | 继续燃尽 Phase 18 暴露的 P0 source accounting/provider blockers：纠正 viewer config 分类、补 core config/provider fixtures、集中 external authority blockers | `src/compatibility/` + `src/config/` + `src/providers/` + `scripts/release/` + `compatibility/fixtures/` + `docs/compatibility/` + `docs/audits/` + `tests/` | 18 | 否 |
 
 > Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
 >
@@ -239,6 +240,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 17 是 2026-05-31 当前态审计后的深度 parity proof 链路，依据 `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`、PRD §Compatibility Matrix / §Success Metrics、ADR-004、ADR-007、ADR-008、ADR-009。它承认 Phase 16 已让本地 S2V gate 变强，但继续补齐仍未证明的完整 source inventory、CLI surface、50+ 真实 golden corpus、长尾分类与发布安装证据。
 >
 > Phase 18 是 2026-05-31 Phase 17 复审后的 blocker burn-down 链路，依据 `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md` 中仍未满足“完美重构”的 2116 source inventory missing rows、37 个 P0 provider module blockers、current upstream 差异和 public publication credential blockers。它不把 blocker 改名为完成，而是把 silent omission、implementation blocker、rebaseline blocker、publication authority blocker 拆成独立可验证 task。
+
+> Phase 19 是 2026-05-31 Phase 18 完成后的 native burndown 链路，依据 Phase 18 §9 artifact evidence 中仍保留的 111 个 generated P0 source accounting blockers、24 个 P0 provider module blockers 和 publication/current-upstream 边界。它优先修正已知分级错误（`src/app/**` viewer config 应按 Local Web viewer=P1 处理），再对剩余 core config/provider blockers 补 fixture 或 external authority gate。
 
 ---
 
