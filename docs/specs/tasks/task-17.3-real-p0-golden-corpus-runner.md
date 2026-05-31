@@ -1,6 +1,6 @@
 # Task 17.3: real-p0-golden-corpus-runner
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 17 — deep-upstream-parity-proof
@@ -70,19 +70,19 @@ Corpus runner 必须读取 P0 fixture manifests，逐个执行 `npx --yes prompt
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Success Metrics): at least 50 P0 fixtures execute through real upstream `promptfoo@0.121.13` and current `promptfoo-rs` binary; metadata proves `used_test_binary=false` for every upstream run.
-- [ ] **AC2** (ADR-007): every corpus fixture persists upstream raw, rs raw, normalized upstream, normalized rs, diff findings, stdout/stderr, exit codes, duration, baseline version, baseline gitHead, and matrix item ids.
-- [ ] **AC3** (PRD §Compatibility Harness Design): normalization handles timestamp/path/random/latency/platform newline differences and records rule names per fixture; missing normalization for unstable fields fails the fixture.
-- [ ] **AC4** (ADR-007 / PRD §Release): stable release gate fails on P0 bug/unclassified diff, missing artifact, skipped fixture, upstream command failure, rs command failure, or P0 coverage below 50.
+- [x] **AC1** (PRD §Success Metrics): at least 50 P0 fixtures execute through real upstream `promptfoo@0.121.13` and current `promptfoo-rs` binary; metadata proves `used_test_binary=false` for every upstream run.
+- [x] **AC2** (ADR-007): every corpus fixture persists upstream raw, rs raw, normalized upstream, normalized rs, diff findings, stdout/stderr, exit codes, duration, baseline version, baseline gitHead, and matrix item ids.
+- [x] **AC3** (PRD §Compatibility Harness Design): normalization handles timestamp/path/random/latency/platform newline differences and records rule names per fixture; missing normalization for unstable fields fails the fixture.
+- [x] **AC4** (ADR-007 / PRD §Release): stable release gate fails on P0 bug/unclassified diff, missing artifact, skipped fixture, upstream command failure, rs command failure, or P0 coverage below 50.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-17.3.1 | TEST-17.3.1 | tests/real_p0_golden_corpus_runner.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Spec Ready |
-| AC2 | SCEN-17.3.1 | TEST-17.3.2 | tests/real_p0_golden_corpus_runner.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Spec Ready |
-| AC3 | SCEN-17.3.1 | TEST-17.3.3 | tests/real_p0_golden_corpus_runner.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Spec Ready |
-| AC4 | SCEN-17.3.1 | TEST-17.3.4 | tests/real_p0_golden_corpus_runner.rs | install, typecheck, unit-test, integration, coverage, build, runtime-smoke | Spec Ready |
+| AC1 | SCEN-17.3.1 | TEST-17.3.1 | tests/real_p0_golden_corpus_runner.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Done |
+| AC2 | SCEN-17.3.1 | TEST-17.3.2 | tests/real_p0_golden_corpus_runner.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Done |
+| AC3 | SCEN-17.3.1 | TEST-17.3.3 | tests/real_p0_golden_corpus_runner.rs | install, typecheck, unit-test, integration, build, runtime-smoke | Done |
+| AC4 | SCEN-17.3.1 | TEST-17.3.4 | tests/real_p0_golden_corpus_runner.rs | install, typecheck, unit-test, integration, coverage, build, runtime-smoke | Done |
 
 ## 8. Risks
 
@@ -102,9 +102,26 @@ Corpus runner 必须读取 P0 fixture manifests，逐个执行 `npx --yes prompt
 
 ## 10. Completion Notes
 
-- **完成日期**：待实施后回填
-- **改动文件**：待实施后回填
-- **commit 列表**：待实施后回填
-- **§9 Verification 结果**：待实施后回填
-- **剩余风险 / 未做项**：待实施后回填
-- **下游 task 影响**：待实施后回填
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/real_p0_golden_corpus_runner.rs`
+  - `src/compatibility/harness.rs`
+  - `scripts/release/real-upstream-corpus.sh`
+  - `scripts/release/integration.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-17-deep-upstream-parity-proof.md`
+  - `docs/specs/tasks/task-17.3-real-p0-golden-corpus-runner.md`
+- **commit 列表**：
+  - `2ee7b46` `test(compatibility): add SCEN-17.3.1 real corpus RED tests`
+  - `6378615` `feat(compatibility): add real P0 upstream corpus runner`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-17.3.1 ~ TEST-17.3.4 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 通过，包含 `real_p0_golden_corpus_runner` contract tests。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 通过；`target/release-gates/real-upstream-corpus/index.json` status=`ready`，required_p0_fixture_count=50，observed_p0_fixture_count=50，stable_allowed=true，blocking_findings=[]，所有 fixture metadata 记录 `used_test_binary=false`。
+- **剩余风险 / 未做项**：corpus runner 当前为每个 P0 manifest 生成 local echo/mock promptfooconfig 后执行真实 upstream 与 rs；它证明 50 个 release fixture slots 的真实 upstream-vs-rs artifact plumbing、baseline、normalization 和 diff gate，不声称每个原始 fixture 的全部业务语义都已 native 等价。后续 task 17.4 继续处理 provider/assertion/redteam 长尾语义分类。
+- **下游 task 影响**：runtime-smoke 现在包含 50+ real upstream corpus，Phase 17 收尾 smoke 会更慢；task 17.5 可把 `real-upstream-corpus/index.json` 作为 release readiness artifact。
