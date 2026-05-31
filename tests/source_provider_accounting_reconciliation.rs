@@ -23,11 +23,17 @@ fn test_20_1_1_fixture_covered_provider_rows_leave_remaining_source_blockers() {
 
     let report = validate_provider_source_accounting_reconciliation(&ledger, &provider_report);
 
-    assert_eq!(report.schema, "promptfoo-rs.provider-source-accounting-reconciliation.v1");
+    assert_eq!(
+        report.schema,
+        "promptfoo-rs.provider-source-accounting-reconciliation.v1"
+    );
     assert_eq!(report.provider_source_total, 2, "{report:#?}");
     assert_eq!(report.resolved_provider_fixture_count, 1, "{report:#?}");
     assert_eq!(report.provider_external_authority_count, 1, "{report:#?}");
-    assert_eq!(report.provider_source_generic_blocker_count, 0, "{report:#?}");
+    assert_eq!(
+        report.provider_source_generic_blocker_count, 0,
+        "{report:#?}"
+    );
     assert_eq!(report.source_p0_accounting_blocker_count, 2, "{report:#?}");
     assert_eq!(
         report.remaining_source_p0_blockers,
@@ -59,19 +65,32 @@ fn test_20_1_2_provider_external_authority_rows_remain_blocking() {
         &provider_report,
     );
     assert_eq!(
-        external_decision.classification,
-        "external-authority-provider",
+        external_decision.classification, "external-authority-provider",
         "{external_decision:#?}"
     );
-    assert_eq!(external_decision.target_status, "blocked", "{external_decision:#?}");
-    assert_eq!(external_decision.owner, "external-authority", "{external_decision:#?}");
-    assert!(external_decision.external_authority_required, "{external_decision:#?}");
+    assert_eq!(
+        external_decision.target_status, "blocked",
+        "{external_decision:#?}"
+    );
+    assert_eq!(
+        external_decision.owner, "external-authority",
+        "{external_decision:#?}"
+    );
+    assert!(
+        external_decision.external_authority_required,
+        "{external_decision:#?}"
+    );
     assert!(external_decision.release_blocking, "{external_decision:#?}");
     assert!(
-        external_decision.verification.starts_with("blocker:provider:"),
+        external_decision
+            .verification
+            .starts_with("blocker:provider:"),
         "{external_decision:#?}"
     );
-    assert!(external_decision.reason.contains("external"), "{external_decision:#?}");
+    assert!(
+        external_decision.reason.contains("external"),
+        "{external_decision:#?}"
+    );
 }
 
 #[test]
@@ -140,13 +159,19 @@ fn test_20_1_4_docs_explain_cross_ledger_reconciliation_boundary() {
 }
 
 fn assert_fixture_decision(decision: &ProviderSourceAccountingDecision) {
-    assert_eq!(decision.classification, "fixture-covered-provider", "{decision:#?}");
+    assert_eq!(
+        decision.classification, "fixture-covered-provider",
+        "{decision:#?}"
+    );
     assert_eq!(decision.target_status, "native", "{decision:#?}");
     assert_eq!(decision.owner, "provider-runtime", "{decision:#?}");
     assert!(decision.local_fixture_covered, "{decision:#?}");
     assert!(!decision.external_authority_required, "{decision:#?}");
     assert!(!decision.release_blocking, "{decision:#?}");
-    assert!(decision.verification.starts_with("fixture:"), "{decision:#?}");
+    assert!(
+        decision.verification.starts_with("fixture:"),
+        "{decision:#?}"
+    );
     assert!(decision.reason.contains("fixture"), "{decision:#?}");
 }
 
@@ -160,8 +185,7 @@ fn provider_report() -> ProviderModuleBurndownReport {
         generic_blocker_count: 0,
         resolved_by_fixture: vec![ProviderModuleResolution {
             item_id: "provider:src-providers-openai-completion".to_string(),
-            source_reference:
-                "promptfoo@0.121.13:src/providers/openai/completion.ts".to_string(),
+            source_reference: "promptfoo@0.121.13:src/providers/openai/completion.ts".to_string(),
             kind: ProviderModuleResolutionKind::FixtureCovered,
             reason: "dedicated request/response fixture evidence covers provider row".to_string(),
             verification: "fixture:p0-provider-openai-completion".to_string(),
@@ -171,8 +195,7 @@ fn provider_report() -> ProviderModuleBurndownReport {
         }],
         remaining_blockers: vec![ProviderModuleResolution {
             item_id: "provider:src-providers-openai-codex-sdk".to_string(),
-            source_reference:
-                "promptfoo@0.121.13:src/providers/openai/codexSdk.ts".to_string(),
+            source_reference: "promptfoo@0.121.13:src/providers/openai/codexSdk.ts".to_string(),
             kind: ProviderModuleResolutionKind::ExternalBlocker,
             reason: "OpenAI Codex provider modules require external product authority".to_string(),
             verification: "blocker:provider:src-providers-openai-codex-sdk".to_string(),
@@ -243,7 +266,9 @@ fn git_bash() -> &'static str {
 }
 
 #[allow(dead_code)]
-fn write_temp_reconciliation(report: &promptfoo_rs::compatibility::inventory::ProviderSourceAccountingReconciliationReport) -> Value {
+fn write_temp_reconciliation(
+    report: &promptfoo_rs::compatibility::inventory::ProviderSourceAccountingReconciliationReport,
+) -> Value {
     let path = std::env::temp_dir().join(format!(
         "promptfoo-rs-provider-source-accounting-{}.json",
         std::process::id()

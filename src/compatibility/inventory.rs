@@ -6,6 +6,9 @@ use std::time::{SystemTime, UNIX_EPOCH};
 use serde::{Deserialize, Serialize};
 
 use super::matrix::CapabilityMatrix;
+use super::provider_assertion::{
+    ProviderModuleBurndownReport, ProviderModuleResolution, ProviderModuleResolutionKind,
+};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CapabilityInventory {
@@ -470,6 +473,36 @@ pub struct CoreConfigSourceBurndownReport {
     pub non_app_config_auxiliary_registration_count: usize,
     pub non_app_config_generic_blocker_count: usize,
     pub decisions: Vec<CoreConfigSourceDecision>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ProviderSourceAccountingDecision {
+    pub item_id: String,
+    pub source_reference: String,
+    pub classification: String,
+    pub level: String,
+    pub target_status: String,
+    pub owner: String,
+    pub verification: String,
+    pub reason: String,
+    pub fixture_ids: Vec<String>,
+    pub local_fixture_covered: bool,
+    pub external_authority_required: bool,
+    pub release_blocking: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ProviderSourceAccountingReconciliationReport {
+    pub schema: String,
+    pub provider_source_total: usize,
+    pub resolved_provider_fixture_count: usize,
+    pub provider_external_authority_count: usize,
+    pub provider_source_generic_blocker_count: usize,
+    pub source_p0_accounting_blocker_count: usize,
+    pub remaining_source_p0_blockers: Vec<String>,
+    pub resolved_provider_source_rows: Vec<ProviderSourceAccountingDecision>,
+    pub remaining_provider_source_blockers: Vec<ProviderSourceAccountingDecision>,
+    pub decisions: Vec<ProviderSourceAccountingDecision>,
 }
 
 impl SourceAccountingLedger {
@@ -1075,6 +1108,136 @@ pub fn source_accounting_burndown_summary(
     }
 }
 
+pub fn classify_provider_source_accounting_row(
+    row: &SourceAccountingRow,
+    provider_report: &ProviderModuleBurndownReport,
+) -> ProviderSourceAccountingDecision {
+    if row.category != "provider" {
+        return ProviderSourceAccountingDecision {
+            item_id: row.item_id.clone(),
+            source_reference: row.source_reference.clone(),
+            classification: "non-provider".to_string(),
+            level: row.level.clone(),
+            target_status: row.target_status.clone(),
+            owner: row.owner.clone(),
+            verification: row.verification.clone(),
+            reason: row.reason.clone(),
+            fixture_ids: vec![],
+            local_fixture_covered: false,
+            external_authority_required: false,
+            release_blocking: row.level == "P0" && row.verification.starts_with("blocker:"),
+        };
+    }
+
+    if let Some(resolution) = provider_report
+        .resolved_by_fixture
+        .iter()
+        .find(|resolution| resolution.item_id == row.item_id)
+    {
+        return provider_fixture_source_decision(row, resolution);
+    }
+
+    if let Some(resolution) = provider_report
+        .remaining_blockers
+        .iter()
+        .find(|resolution| resolution.item_id == row.item_id)
+    {
+        return provider_blocker_source_decision(row, resolution);
+    }
+
+    let release_blocking = row.level == "P0" && row.verification.starts_with("blocker:");
+    ProviderSourceAccountingDecision {
+        item_id: row.item_id.clone(),
+        source_reference: row.source_reference.clone(),
+        classification: if release_blocking {
+            "provider-generic-blocker".to_string()
+        } else {
+            "already-accounted-provider".to_string()
+        },
+        level: row.level.clone(),
+        target_status: row.target_status.clone(),
+        owner: row.owner.clone(),
+        verification: row.verification.clone(),
+        reason: row.reason.clone(),
+        fixture_ids: vec![],
+        local_fixture_covered: false,
+        external_authority_required: false,
+        release_blocking,
+    }
+}
+
+pub fn validate_provider_source_accounting_reconciliation(
+    ledger: &SourceAccountingLedger,
+    provider_report: &ProviderModuleBurndownReport,
+) -> ProviderSourceAccountingReconciliationReport {
+    let decisions = ledger
+        .rows
+        .iter()
+        .filter(|row| row.category == "provider")
+        .map(|row| classify_provider_source_accounting_row(row, provider_report))
+        .collect::<Vec<_>>();
+    let resolved_provider_source_rows = decisions
+        .iter()
+        .filter(|decision| decision.local_fixture_covered && !decision.release_blocking)
+        .cloned()
+        .collect::<Vec<_>>();
+    let remaining_provider_source_blockers = decisions
+        .iter()
+        .filter(|decision| decision.release_blocking)
+        .cloned()
+        .collect::<Vec<_>>();
+    let mut remaining_source_p0_blockers = ledger
+        .rows
+        .iter()
+        .filter(|row| row.level == "P0")
+        .filter_map(|row| {
+            if row.category == "provider" {
+                decisions
+                    .iter()
+                    .find(|decision| decision.item_id == row.item_id)
+                    .filter(|decision| decision.release_blocking)
+                    .map(|decision| decision.item_id.clone())
+            } else if row.verification.starts_with("blocker:") {
+                Some(row.item_id.clone())
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+    remaining_source_p0_blockers.sort();
+
+    ProviderSourceAccountingReconciliationReport {
+        schema: "promptfoo-rs.provider-source-accounting-reconciliation.v1".to_string(),
+        provider_source_total: decisions.len(),
+        resolved_provider_fixture_count: resolved_provider_source_rows.len(),
+        provider_external_authority_count: remaining_provider_source_blockers
+            .iter()
+            .filter(|decision| decision.external_authority_required)
+            .count(),
+        provider_source_generic_blocker_count: remaining_provider_source_blockers
+            .iter()
+            .filter(|decision| !decision.external_authority_required)
+            .count(),
+        source_p0_accounting_blocker_count: remaining_source_p0_blockers.len(),
+        remaining_source_p0_blockers,
+        resolved_provider_source_rows,
+        remaining_provider_source_blockers,
+        decisions,
+    }
+}
+
+pub fn write_provider_source_accounting_reconciliation(
+    report: &ProviderSourceAccountingReconciliationReport,
+    path: &Path,
+) -> Result<(), InventoryError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(InventoryError::Write)?;
+    }
+    let json = serde_json::to_string_pretty(report)
+        .map_err(|error| InventoryError::Parse(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(InventoryError::Write)
+}
+
 fn core_config_decision_to_source_accounting_row(
     decision: &CoreConfigSourceDecision,
 ) -> SourceAccountingRow {
@@ -1088,6 +1251,65 @@ fn core_config_decision_to_source_accounting_row(
         verification: decision.verification.clone(),
         reason: decision.reason.clone(),
         generated: true,
+    }
+}
+
+fn provider_fixture_source_decision(
+    row: &SourceAccountingRow,
+    resolution: &ProviderModuleResolution,
+) -> ProviderSourceAccountingDecision {
+    ProviderSourceAccountingDecision {
+        item_id: row.item_id.clone(),
+        source_reference: row.source_reference.clone(),
+        classification: "fixture-covered-provider".to_string(),
+        level: "P0".to_string(),
+        target_status: "native".to_string(),
+        owner: "provider-runtime".to_string(),
+        verification: resolution.verification.clone(),
+        reason: format!(
+            "provider source row reconciled from provider burndown fixture evidence: {}",
+            resolution.reason
+        ),
+        fixture_ids: resolution.fixture_ids.clone(),
+        local_fixture_covered: true,
+        external_authority_required: false,
+        release_blocking: false,
+    }
+}
+
+fn provider_blocker_source_decision(
+    row: &SourceAccountingRow,
+    resolution: &ProviderModuleResolution,
+) -> ProviderSourceAccountingDecision {
+    let external_authority_required = resolution.requires_external_authority
+        || matches!(
+            resolution.kind,
+            ProviderModuleResolutionKind::ExternalBlocker
+        );
+    ProviderSourceAccountingDecision {
+        item_id: row.item_id.clone(),
+        source_reference: row.source_reference.clone(),
+        classification: if external_authority_required {
+            "external-authority-provider".to_string()
+        } else {
+            "provider-generic-blocker".to_string()
+        },
+        level: "P0".to_string(),
+        target_status: "blocked".to_string(),
+        owner: if external_authority_required {
+            "external-authority".to_string()
+        } else {
+            "provider-runtime".to_string()
+        },
+        verification: resolution.verification.clone(),
+        reason: format!(
+            "provider source row remains release-blocking from provider burndown: {}",
+            resolution.reason
+        ),
+        fixture_ids: resolution.fixture_ids.clone(),
+        local_fixture_covered: false,
+        external_authority_required,
+        release_blocking: true,
     }
 }
 

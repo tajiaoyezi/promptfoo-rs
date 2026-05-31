@@ -20,7 +20,7 @@ git clone --quiet --filter=blob:none --no-checkout --depth 1 --branch "$BASELINE
 git -C "$tmpdir/upstream" rev-parse HEAD > "$tmpdir/git-head.txt"
 git -C "$tmpdir/upstream" ls-tree -r --name-only HEAD > "$tmpdir/source-files.txt"
 
-node - "$tmpdir/npm-view.json" "$tmpdir/git-head.txt" "$tmpdir/source-files.txt" "compatibility/matrix/items.json" "compatibility/inventory/upstream-items.json" "$ITEMS_OUT" "$LEDGER_OUT" "$OUT" <<'NODE'
+node - "$tmpdir/npm-view.json" "$tmpdir/git-head.txt" "$tmpdir/source-files.txt" "compatibility/matrix/items.json" "compatibility/inventory/upstream-items.json" "$ITEMS_OUT" "$LEDGER_OUT" "$OUT" "compatibility/fixtures/providers" <<'NODE'
 const fs = require('fs');
 
 const [
@@ -32,6 +32,7 @@ const [
   itemsOutputPath,
   ledgerOutputPath,
   evidenceOutputPath,
+  providerFixtureRoot,
 ] = process.argv.slice(2);
 
 const baselineVersion = '0.121.13';
@@ -46,6 +47,7 @@ const sourceFiles = fs
   .filter(Boolean);
 const curatedInventory = JSON.parse(fs.readFileSync(curatedInventoryPath, 'utf8')).items;
 const matrixManifest = JSON.parse(fs.readFileSync(matrixPath, 'utf8'));
+const providerFixtureIds = loadProviderFixtureIds(providerFixtureRoot);
 
 const auditBaselineCounts = {
   command_related_files: 85,
@@ -392,6 +394,148 @@ function classifyNonAppCoreConfigSource(item) {
   };
 }
 
+function providerModuleFixtureIds(itemId) {
+  const direct = {
+    'provider:src-providers-anthropic-defaults': ['p0-provider-anthropic-message'],
+    'provider:src-providers-anthropic-generic': ['p0-provider-anthropic-message'],
+    'provider:src-providers-anthropic-messages': ['p0-provider-anthropic-message'],
+    'provider:src-providers-anthropic-types': ['p0-provider-anthropic-message'],
+    'provider:src-providers-anthropic-util': ['p0-provider-anthropic-message'],
+    'provider:src-providers-anthropic-completion': ['p0-provider-anthropic-completion'],
+    'provider:src-providers-http': ['p0-provider-http-get', 'p0-provider-http-post'],
+    'provider:src-providers-httpmultipart': ['p0-provider-http-multipart'],
+    'provider:src-providers-httptransforms': ['p0-provider-http-transform'],
+    'provider:src-providers-ollama': ['p0-provider-ollama-chat'],
+    'provider:src-providers-openai-chat': ['p0-provider-openai-chat'],
+    'provider:src-providers-openai-completion': ['p0-provider-openai-completion'],
+    'provider:src-providers-openai-index': ['p0-provider-openai-chat'],
+    'provider:src-providers-openai-types': ['p0-provider-openai-chat'],
+    'provider:src-providers-openai-defaults': [
+      'p0-provider-openai-env',
+      'p0-provider-openai-headers',
+    ],
+    'provider:src-providers-openai-embedding': ['p0-provider-openai-embedding'],
+    'provider:src-providers-openai-image': ['p0-provider-openai-image'],
+    'provider:src-providers-openai-moderation': ['p0-provider-openai-moderation'],
+    'provider:src-providers-openai-responses': ['p0-provider-openai-responses'],
+    'provider:src-providers-openai-transcription': ['p0-provider-openai-transcription'],
+    'provider:src-providers-openai-util': [
+      'p0-provider-openai-chat',
+      'p0-provider-openai-env',
+      'p0-provider-openai-headers',
+    ],
+    'provider:src-providers-openai-video': ['p0-provider-openai-video'],
+  };
+  return direct[itemId] || [];
+}
+
+function explicitProviderModuleBlockerReason(itemId, sourceReference) {
+  const lower = String(itemId).toLowerCase();
+  let reason =
+    'Provider module needs a dedicated request/response fixture before aggregate provider evidence can prove per-module parity';
+  let requires_external_authority = false;
+  if (lower.includes('claudecodeauth')) {
+    reason =
+      'Anthropic Claude Code auth requires real local credential flow and product authority before native parity can be claimed';
+    requires_external_authority = true;
+  } else if (lower.includes('codex')) {
+    reason =
+      'OpenAI Codex provider modules require external product authority and private SDK/server credential confirmation before native parity can be claimed';
+    requires_external_authority = true;
+  } else if (lower.includes('billing')) {
+    reason =
+      'OpenAI billing module requires account-level credentials and billing authority; no local mock may be treated as published parity';
+    requires_external_authority = true;
+  } else if (lower.includes('chatkit')) {
+    reason =
+      'OpenAI ChatKit modules require product authority and browser/session fixture confirmation before native parity can be claimed';
+    requires_external_authority = true;
+  } else if (lower.includes('agents')) {
+    reason =
+      'OpenAI Agents SDK and tracing modules require dedicated SDK/trace fixtures plus product contract review';
+    requires_external_authority = true;
+  } else if (lower.includes('realtime')) {
+    reason =
+      'OpenAI realtime module requires a dedicated streaming protocol fixture and service contract confirmation';
+    requires_external_authority = true;
+  } else if (lower.includes('assistant')) {
+    reason =
+      'OpenAI Assistants module requires a stateful API fixture and account-authorized behavior review';
+    requires_external_authority = true;
+  }
+  return {
+    reason: `${reason}; source: ${sourceReference}`,
+    requires_external_authority,
+  };
+}
+
+function loadProviderFixtureIds(root) {
+  const ids = new Set();
+  function walk(current) {
+    if (!fs.existsSync(current)) return;
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const next = require('path').join(current, entry.name);
+      if (entry.isDirectory()) {
+        walk(next);
+      } else if (entry.name === 'fixture.yaml') {
+        const yaml = fs.readFileSync(next, 'utf8');
+        const match = yaml.match(/^id:\s*["']?([^"'\r\n]+)["']?\s*$/m);
+        if (match) ids.add(match[1].trim());
+      }
+    }
+  }
+  walk(root);
+  return ids;
+}
+
+function classifyProviderSourceAccountingRow(row) {
+  const expected = providerModuleFixtureIds(row.item_id);
+  const fixtureIds = expected.filter((fixtureId) => providerFixtureIds.has(fixtureId));
+  if (fixtureIds.length > 0) {
+    return {
+      item_id: row.item_id,
+      source_reference: row.source_reference,
+      classification: 'fixture-covered-provider',
+      level: 'P0',
+      target_status: 'native',
+      owner: 'provider-runtime',
+      verification: `fixture:${fixtureIds.join('+')}`,
+      reason: `provider source row reconciled from provider burndown fixture evidence (${fixtureIds.join(', ')}); source: ${row.source_reference}`,
+      fixture_ids: fixtureIds,
+      local_fixture_covered: true,
+      external_authority_required: false,
+      release_blocking: false,
+    };
+  }
+
+  const blocker = explicitProviderModuleBlockerReason(row.item_id, row.source_reference);
+  return {
+    item_id: row.item_id,
+    source_reference: row.source_reference,
+    classification: blocker.requires_external_authority
+      ? 'external-authority-provider'
+      : 'provider-generic-blocker',
+    level: 'P0',
+    target_status: 'blocked',
+    owner: blocker.requires_external_authority ? 'external-authority' : 'provider-runtime',
+    verification: `blocker:${row.item_id}`,
+    reason: `provider source row remains release-blocking from provider burndown: ${blocker.reason}`,
+    fixture_ids: [],
+    local_fixture_covered: false,
+    external_authority_required: blocker.requires_external_authority,
+    release_blocking: true,
+  };
+}
+
+function applyProviderSourceAccountingDecision(row, decision) {
+  row.level = decision.level;
+  row.target_status = decision.target_status;
+  row.owner = decision.owner;
+  row.verification = decision.verification;
+  row.reason = decision.reason;
+  return row;
+}
+
 function generatedLevel(item) {
   if (item.category === 'config' && isViewerConfigSourceReference(item.source_reference)) {
     return 'P1';
@@ -480,6 +624,15 @@ for (const item of items) {
   }
   generatedMatrixRows.push(generated);
   ledgerRows.push(generated);
+}
+const providerSourceAccountingDecisions = [];
+for (const row of ledgerRows) {
+  if (row.category !== 'provider' || row.level !== 'P0') {
+    continue;
+  }
+  const decision = classifyProviderSourceAccountingRow(row);
+  providerSourceAccountingDecisions.push(decision);
+  applyProviderSourceAccountingDecision(row, decision);
 }
 const representedRows = new Set(ledgerRows.map((row) => row.item_id));
 
@@ -583,6 +736,28 @@ const viewerConfigReclassifiedCount = ledgerRows.filter(
 const remainingP0Blockers = ledgerRows
   .filter((row) => row.level === 'P0' && String(row.verification || '').startsWith('blocker:'))
   .map((row) => row.item_id);
+const resolvedProviderSourceRows = providerSourceAccountingDecisions.filter(
+  (decision) => decision.local_fixture_covered && !decision.release_blocking,
+);
+const remainingProviderSourceBlockers = providerSourceAccountingDecisions.filter(
+  (decision) => decision.release_blocking,
+);
+const providerSourceAccountingReconciliation = {
+  schema: 'promptfoo-rs.provider-source-accounting-reconciliation.v1',
+  provider_source_total: providerSourceAccountingDecisions.length,
+  resolved_provider_fixture_count: resolvedProviderSourceRows.length,
+  provider_external_authority_count: remainingProviderSourceBlockers.filter(
+    (decision) => decision.external_authority_required,
+  ).length,
+  provider_source_generic_blocker_count: remainingProviderSourceBlockers.filter(
+    (decision) => !decision.external_authority_required,
+  ).length,
+  source_p0_accounting_blocker_count: remainingP0Blockers.length,
+  remaining_source_p0_blockers: remainingP0Blockers,
+  resolved_provider_source_rows: resolvedProviderSourceRows,
+  remaining_provider_source_blockers: remainingProviderSourceBlockers,
+  decisions: providerSourceAccountingDecisions,
+};
 const coreConfigSourceBurndown = {
   schema: 'promptfoo-rs.core-config-source-burndown.v1',
   non_app_config_total: coreConfigSourceDecisions.length,
@@ -630,6 +805,7 @@ fs.writeFileSync(
       generated_matrix_rows_count: generatedMatrixRows.length,
       viewer_config_reclassified_count: viewerConfigReclassifiedCount,
       core_config_source_burndown: coreConfigSourceBurndown,
+      provider_source_accounting_reconciliation: providerSourceAccountingReconciliation,
       unrepresented_item_count: missingMatrixRows.length,
       p0_blocker_count: p0BlockerCount,
       remaining_p0_blockers: remainingP0Blockers,
@@ -659,6 +835,7 @@ fs.writeFileSync(
       generated_matrix_rows_count: generatedMatrixRows.length,
       viewer_config_reclassified_count: viewerConfigReclassifiedCount,
       core_config_source_burndown: coreConfigSourceBurndown,
+      provider_source_accounting_reconciliation: providerSourceAccountingReconciliation,
       non_app_config_fixture_covered_count:
         coreConfigSourceBurndown.non_app_config_fixture_covered_count,
       non_app_config_external_blocker_count:
