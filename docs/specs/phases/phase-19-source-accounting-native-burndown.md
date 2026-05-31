@@ -23,7 +23,7 @@ Phase 18 已让 silent omissions 变成可审计 blocker，但 `source-inventory
 | 19.1 | viewer-config-source-reclassification | ../tasks/task-19.1-viewer-config-source-reclassification.md | Done | 将 `src/app/**` viewer config/editor 源文件从 generated P0 core config blocker 纠正为 P1 Local Web viewer accounting evidence |
 | 19.2 | core-config-source-fixture-burndown | ../tasks/task-19.2-core-config-source-fixture-burndown.md | Done | 为剩余 non-app core config rows 补 native/bridge fixture 或显式 blocker |
 | 19.3 | provider-request-response-fixture-burndown | ../tasks/task-19.3-provider-request-response-fixture-burndown.md | Done | 为不需要真实账号授权的 provider module blockers 补 dedicated request/response fixtures |
-| 19.4 | external-authority-blocker-waiver-gate | ../tasks/task-19.4-external-authority-blocker-waiver-gate.md | Ready | 把 Codex/Agents/Assistant/Billing/ChatKit/Realtime/Claude Code/真实发布等外部授权项集中为不可伪造的 waiver/blocker gate |
+| 19.4 | external-authority-blocker-waiver-gate | ../tasks/task-19.4-external-authority-blocker-waiver-gate.md | Done | 把 Codex/Agents/Assistant/Billing/ChatKit/Realtime/Claude Code/真实发布等外部授权项集中为不可伪造的 waiver/blocker gate |
 
 ## 5. Dependencies
 
