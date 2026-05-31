@@ -147,7 +147,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 16 | parity-proof-hardening | docs/specs/phases/phase-16-parity-proof-hardening.md | Done | 3 | N/A (solo) |
 | 17 | deep-upstream-parity-proof | docs/specs/phases/phase-17-deep-upstream-parity-proof.md | Done | 5 | N/A (solo) |
 | 18 | perfect-refactor-blocker-burndown | docs/specs/phases/phase-18-perfect-refactor-blocker-burndown.md | Done | 4 | N/A (solo) |
-| 19 | source-accounting-native-burndown | docs/specs/phases/phase-19-source-accounting-native-burndown.md | Ready | 4 | N/A (solo) |
+| 19 | source-accounting-native-burndown | docs/specs/phases/phase-19-source-accounting-native-burndown.md | Done | 4 | N/A (solo) |
 
 ## Task 总索引
 

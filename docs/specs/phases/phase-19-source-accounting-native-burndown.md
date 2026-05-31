@@ -1,6 +1,6 @@
 # Phase 19: source-accounting-native-burndown
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -31,10 +31,10 @@ Phase 18 已让 silent omissions 变成可审计 blocker，但 `source-inventory
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `src/app/**` viewer config/editor rows 不再计入 P0 core config accounting blocker；它们必须保留为 P1 Local Web viewer evidence，并带有 reason、owner、verification。
-- [ ] non-app config source rows 要么有 native/bridge fixture evidence，要么保留 explicit blocker；不得把 core config P0 降级成 viewer P1。
-- [ ] 不需要真实账号/私有服务的 provider module blockers 要有 dedicated request/response fixture evidence；仍需账号/产品授权的项进入 external authority gate。
-- [ ] Phase 19 artifacts 继续阻止“完美重构”过度声明：current-upstream、真实发布、外部产品授权和剩余 P0 blocker 必须可机读。
+- [x] `src/app/**` viewer config/editor rows 不再计入 P0 core config accounting blocker；它们必须保留为 P1 Local Web viewer evidence，并带有 reason、owner、verification。
+- [x] non-app config source rows 要么有 native/bridge fixture evidence，要么保留 explicit blocker；不得把 core config P0 降级成 viewer P1。
+- [x] 不需要真实账号/私有服务的 provider module blockers 要有 dedicated request/response fixture evidence；仍需账号/产品授权的项进入 external authority gate。
+- [x] Phase 19 artifacts 继续阻止“完美重构”过度声明：current-upstream、真实发布、外部产品授权和剩余 P0 blocker 必须可机读。
 
 ## 7. Phase Risks
 
@@ -48,7 +48,12 @@ Phase 18 已让 silent omissions 变成可审计 blocker，但 `source-inventory
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **保留边界**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **Phase smoke**：PASS — `s2v_preflight_phase docs/specs/phases/phase-19-source-accounting-native-burndown.md` 通过；随后 `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 通过 9 项。
+- **Artifact evidence**：
+  - `target/release-gates/source-inventory-evidence.json`: status=`ready-with-blockers`, `viewer_config_reclassified_count=56`, `p0_accounting_blocker_count=44`。
+  - `target/release-gates/longtail-classification.json`: status=`ready-with-blockers`, `p0_provider_module_burndown.remaining_blocker_count=15`, `external_authority_blocker_count=15`, `generic_blocker_count=0`, `p0_release_blocker_count=15`。
+  - `target/release-gates/external-authority-blockers.json`: status=`blocked`, `blocker_count=21`, `provider_external_blocker_count=15`, `publication_blocker_count=6`, `ready_count=0`。
+  - `target/release-gates/publication-authority.json`: publication_ready=`credential-blocked`, `credential_blocked=true`, `legal_brand_blocked=true`, blockers=6。
+  - `target/release-gates/release-candidate.json`: `stable_allowed=true` for local release gates while `external_authority.status=blocked`, `publication_authority.publication_ready=credential-blocked`, and `published=false` preserve non-perfect/publication boundaries.
+- **保留边界**：Phase 19 burns down generated/provider ambiguity but does not claim current-upstream parity, public publication, or external product/account authority. Remaining blockers are explicit and machine-readable: 44 P0 source accounting blockers, 15 provider external-authority blockers, and 6 publication authority blockers.
