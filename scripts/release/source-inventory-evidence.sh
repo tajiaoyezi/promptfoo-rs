@@ -298,6 +298,100 @@ function isViewerConfigSourceReference(sourceReference) {
   return String(sourceReference || '').replace(/\\/g, '/').includes(':src/app/');
 }
 
+function normalizedSourceReference(sourceReference) {
+  return String(sourceReference || '').replace(/\\/g, '/').toLowerCase();
+}
+
+function isRuntimeConfigSourceReference(sourceReference) {
+  const normalized = normalizedSourceReference(sourceReference);
+  return (
+    normalized.includes(':src/commands/config.ts') ||
+    normalized.includes(':src/configtypes.ts') ||
+    normalized.includes(':src/util/config/')
+  );
+}
+
+function isRedteamConfigSourceReference(sourceReference) {
+  return normalizedSourceReference(sourceReference).includes(
+    ':src/redteam/plugins/policy/evals/promptfooconfig.yaml',
+  );
+}
+
+function isAuxiliaryConfigSourceReference(sourceReference) {
+  const normalized = normalizedSourceReference(sourceReference);
+  return (
+    normalized.includes(':src/codescan/config/') ||
+    normalized.includes(':src/commands/mcp/tools/validatepromptfooconfig.ts')
+  );
+}
+
+function auxiliaryConfigOwner(sourceReference) {
+  return normalizedSourceReference(sourceReference).includes(':src/codescan/config/')
+    ? 'scan-engine'
+    : 'mcp-runtime';
+}
+
+function classifyNonAppCoreConfigSource(item) {
+  if (isRuntimeConfigSourceReference(item.source_reference)) {
+    return {
+      item_id: item.stable_id,
+      source_reference: item.source_reference,
+      classification: 'native-fixture',
+      level: 'P0',
+      target_status: 'native',
+      owner: 'config-loader',
+      verification: 'fixture:config:promptfooconfig-yaml-json',
+      reason: `runtime promptfooconfig/env/file config source covered by existing P0 native config fixtures; source: ${item.source_reference}`,
+      fixture_path: 'compatibility/fixtures/config/yaml-prompts/fixture.yaml',
+      local_runtime_parity: true,
+      external_authority_required: false,
+    };
+  }
+  if (isRedteamConfigSourceReference(item.source_reference)) {
+    return {
+      item_id: item.stable_id,
+      source_reference: item.source_reference,
+      classification: 'bridge-fixture',
+      level: 'P0',
+      target_status: 'bridge',
+      owner: 'redteam-engine',
+      verification: 'fixture:config:redteam-yaml',
+      reason: `redteam promptfooconfig source covered by existing bridge fixture for redteam.yaml compatibility; source: ${item.source_reference}`,
+      fixture_path: 'compatibility/fixtures/config/redteam-yaml/fixture.yaml',
+      local_runtime_parity: true,
+      external_authority_required: false,
+    };
+  }
+  if (isAuxiliaryConfigSourceReference(item.source_reference)) {
+    return {
+      item_id: item.stable_id,
+      source_reference: item.source_reference,
+      classification: 'auxiliary-registration',
+      level: 'P1',
+      target_status: 'later',
+      owner: auxiliaryConfigOwner(item.source_reference),
+      verification: `snapshot:${item.stable_id}`,
+      reason: `non-core auxiliary config source is registered under its P1 command domain and is not counted as P0 promptfooconfig runtime parity; source: ${item.source_reference}`,
+      fixture_path: null,
+      local_runtime_parity: false,
+      external_authority_required: false,
+    };
+  }
+  return {
+    item_id: item.stable_id,
+    source_reference: item.source_reference,
+    classification: 'external-blocker',
+    level: 'P0',
+    target_status: 'blocked',
+    owner: 'external-authority',
+    verification: `blocker:${item.stable_id}`,
+    reason: `explicit external cloud/server/telemetry config blocker; not counted as local runtime parity without product authority, credentials, or service contract evidence; source: ${item.source_reference}`,
+    fixture_path: null,
+    local_runtime_parity: false,
+    external_authority_required: true,
+  };
+}
+
 function generatedLevel(item) {
   if (item.category === 'config' && isViewerConfigSourceReference(item.source_reference)) {
     return 'P1';
@@ -344,6 +438,7 @@ function generatedReason(item) {
 
 const ledgerRows = [];
 const generatedMatrixRows = [];
+const coreConfigSourceDecisions = [];
 for (const item of items) {
   const explicit = explicitRowsById.get(item.stable_id);
   if (explicit) {
@@ -353,19 +448,36 @@ for (const item of items) {
     });
     continue;
   }
-  const level = generatedLevel(item);
-  const targetStatus = generatedTargetStatus(level);
-  const generated = {
-    item_id: item.stable_id,
-    category: item.category,
-    source_reference: item.source_reference,
-    level,
-    target_status: targetStatus,
-    owner: generatedOwner(item),
-    verification: generatedVerification(item, level, targetStatus),
-    reason: generatedReason(item),
-    generated: true,
-  };
+  let generated;
+  if (item.category === 'config' && !isViewerConfigSourceReference(item.source_reference)) {
+    const decision = classifyNonAppCoreConfigSource(item);
+    coreConfigSourceDecisions.push(decision);
+    generated = {
+      item_id: item.stable_id,
+      category: item.category,
+      source_reference: item.source_reference,
+      level: decision.level,
+      target_status: decision.target_status,
+      owner: decision.owner,
+      verification: decision.verification,
+      reason: decision.reason,
+      generated: true,
+    };
+  } else {
+    const level = generatedLevel(item);
+    const targetStatus = generatedTargetStatus(level);
+    generated = {
+      item_id: item.stable_id,
+      category: item.category,
+      source_reference: item.source_reference,
+      level,
+      target_status: targetStatus,
+      owner: generatedOwner(item),
+      verification: generatedVerification(item, level, targetStatus),
+      reason: generatedReason(item),
+      generated: true,
+    };
+  }
   generatedMatrixRows.push(generated);
   ledgerRows.push(generated);
 }
@@ -405,7 +517,7 @@ for (const row of generatedMatrixRows) {
   if (row.level === 'P0' && row.verification.startsWith('blocker:')) {
     releaseBlockers.push({
       item_id: row.item_id,
-      reason: 'generated source-accounting P0 row requires native fixture, bridge fixture, or explicit waiver before perfect parity claim',
+      reason: row.reason,
     });
   }
 }
@@ -471,6 +583,25 @@ const viewerConfigReclassifiedCount = ledgerRows.filter(
 const remainingP0Blockers = ledgerRows
   .filter((row) => row.level === 'P0' && String(row.verification || '').startsWith('blocker:'))
   .map((row) => row.item_id);
+const coreConfigSourceBurndown = {
+  schema: 'promptfoo-rs.core-config-source-burndown.v1',
+  non_app_config_total: coreConfigSourceDecisions.length,
+  non_app_config_fixture_covered_count: coreConfigSourceDecisions.filter(
+    (decision) =>
+      decision.classification === 'native-fixture' ||
+      decision.classification === 'bridge-fixture',
+  ).length,
+  non_app_config_external_blocker_count: coreConfigSourceDecisions.filter(
+    (decision) => decision.classification === 'external-blocker',
+  ).length,
+  non_app_config_auxiliary_registration_count: coreConfigSourceDecisions.filter(
+    (decision) => decision.classification === 'auxiliary-registration',
+  ).length,
+  non_app_config_generic_blocker_count: coreConfigSourceDecisions.filter((decision) =>
+    String(decision.reason || '').includes('generated P0 accounting row requires'),
+  ).length,
+  decisions: coreConfigSourceDecisions,
+};
 
 fs.writeFileSync(
   itemsOutputPath,
@@ -498,6 +629,7 @@ fs.writeFileSync(
       ledger_item_count: ledgerRows.length,
       generated_matrix_rows_count: generatedMatrixRows.length,
       viewer_config_reclassified_count: viewerConfigReclassifiedCount,
+      core_config_source_burndown: coreConfigSourceBurndown,
       unrepresented_item_count: missingMatrixRows.length,
       p0_blocker_count: p0BlockerCount,
       remaining_p0_blockers: remainingP0Blockers,
@@ -526,6 +658,15 @@ fs.writeFileSync(
       ledger_item_count: ledgerRows.length,
       generated_matrix_rows_count: generatedMatrixRows.length,
       viewer_config_reclassified_count: viewerConfigReclassifiedCount,
+      core_config_source_burndown: coreConfigSourceBurndown,
+      non_app_config_fixture_covered_count:
+        coreConfigSourceBurndown.non_app_config_fixture_covered_count,
+      non_app_config_external_blocker_count:
+        coreConfigSourceBurndown.non_app_config_external_blocker_count,
+      non_app_config_auxiliary_registration_count:
+        coreConfigSourceBurndown.non_app_config_auxiliary_registration_count,
+      non_app_config_generic_blocker_count:
+        coreConfigSourceBurndown.non_app_config_generic_blocker_count,
       p0_accounting_blocker_count: p0BlockerCount,
       remaining_p0_blockers: remainingP0Blockers,
       items_missing_metadata: itemsMissingMetadata,

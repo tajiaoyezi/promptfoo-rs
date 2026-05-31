@@ -25,7 +25,10 @@ fn test_19_2_1_runtime_config_rows_have_fixture_evidence() {
         assert_eq!(decision.owner, "config-loader", "{decision:#?}");
         assert!(decision.local_runtime_parity, "{decision:#?}");
         assert!(!decision.external_authority_required, "{decision:#?}");
-        assert!(decision.verification.starts_with("fixture:config:"), "{decision:#?}");
+        assert!(
+            decision.verification.starts_with("fixture:config:"),
+            "{decision:#?}"
+        );
         assert!(
             decision
                 .fixture_path
@@ -60,7 +63,10 @@ fn test_19_2_2_external_config_rows_remain_explicit_blockers() {
         assert_eq!(decision.owner, "external-authority", "{decision:#?}");
         assert!(!decision.local_runtime_parity, "{decision:#?}");
         assert!(decision.external_authority_required, "{decision:#?}");
-        assert!(decision.verification.starts_with("blocker:config:"), "{decision:#?}");
+        assert!(
+            decision.verification.starts_with("blocker:config:"),
+            "{decision:#?}"
+        );
         assert!(decision.reason.contains("external"), "{decision:#?}");
         assert!(
             !decision
@@ -103,13 +109,22 @@ fn test_19_2_3_burndown_report_counts_specific_config_decisions() {
 
     assert_eq!(report.schema, "promptfoo-rs.core-config-source-burndown.v1");
     assert_eq!(report.non_app_config_total, 4, "{report:#?}");
-    assert_eq!(report.non_app_config_fixture_covered_count, 2, "{report:#?}");
-    assert_eq!(report.non_app_config_external_blocker_count, 1, "{report:#?}");
+    assert_eq!(
+        report.non_app_config_fixture_covered_count, 2,
+        "{report:#?}"
+    );
+    assert_eq!(
+        report.non_app_config_external_blocker_count, 1,
+        "{report:#?}"
+    );
     assert_eq!(
         report.non_app_config_auxiliary_registration_count, 1,
         "{report:#?}"
     );
-    assert_eq!(report.non_app_config_generic_blocker_count, 0, "{report:#?}");
+    assert_eq!(
+        report.non_app_config_generic_blocker_count, 0,
+        "{report:#?}"
+    );
     assert!(report.decisions.iter().any(|decision| {
         decision.item_id == "config:src-util-config-load"
             && decision.classification == "native-fixture"
@@ -139,7 +154,10 @@ fn test_19_2_4_no_non_app_config_row_remains_generic_generated_blocker() {
     );
     let report = validate_core_config_source_burndown(&ledger);
 
-    assert_eq!(report.non_app_config_generic_blocker_count, 0, "{report:#?}");
+    assert_eq!(
+        report.non_app_config_generic_blocker_count, 0,
+        "{report:#?}"
+    );
     assert!(report.decisions.iter().all(|decision| {
         !decision
             .reason
@@ -157,7 +175,10 @@ fn test_19_2_4_no_non_app_config_row_remains_generic_generated_blocker() {
             .expect("report should be valid json");
     let _ = std::fs::remove_file(&path);
 
-    assert_eq!(json["schema"], "promptfoo-rs.core-config-source-burndown.v1");
+    assert_eq!(
+        json["schema"],
+        "promptfoo-rs.core-config-source-burndown.v1"
+    );
     assert_eq!(json["non_app_config_generic_blocker_count"], 0);
     assert!(json["decisions"].is_array());
 
@@ -174,9 +195,14 @@ fn test_19_2_4_no_non_app_config_row_remains_generic_generated_blocker() {
     );
 }
 
-fn generated_config_row(source_reference: &str) -> promptfoo_rs::compatibility::inventory::SourceAccountingRow {
+fn generated_config_row(
+    source_reference: &str,
+) -> promptfoo_rs::compatibility::inventory::SourceAccountingRow {
     classify_generated_source_accounting_row(&config_item(
-        &InventoryItem::stable_id("config", source_reference.trim_start_matches("promptfoo@0.121.13:")),
+        &InventoryItem::stable_id(
+            "config",
+            source_reference.trim_start_matches("promptfoo@0.121.13:"),
+        ),
         source_reference,
     ))
 }

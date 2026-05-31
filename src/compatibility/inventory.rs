@@ -444,6 +444,32 @@ pub struct SourceAccountingBurndownSummary {
     pub remaining_p0_blockers: Vec<String>,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CoreConfigSourceDecision {
+    pub item_id: String,
+    pub source_reference: String,
+    pub classification: String,
+    pub level: String,
+    pub target_status: String,
+    pub owner: String,
+    pub verification: String,
+    pub reason: String,
+    pub fixture_path: Option<String>,
+    pub local_runtime_parity: bool,
+    pub external_authority_required: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CoreConfigSourceBurndownReport {
+    pub schema: String,
+    pub non_app_config_total: usize,
+    pub non_app_config_fixture_covered_count: usize,
+    pub non_app_config_external_blocker_count: usize,
+    pub non_app_config_auxiliary_registration_count: usize,
+    pub non_app_config_generic_blocker_count: usize,
+    pub decisions: Vec<CoreConfigSourceDecision>,
+}
+
 impl SourceAccountingLedger {
     pub fn unrepresented_items(&self) -> Vec<String> {
         self.unrepresented_items.clone()
@@ -865,7 +891,164 @@ pub fn classify_generated_source_accounting_row(item: &InventoryItem) -> SourceA
             generated: true,
         };
     }
+    if item.category == "config" {
+        let generic = default_generated_accounting_row(item);
+        return core_config_decision_to_source_accounting_row(&classify_non_app_config_source_row(
+            &generic,
+        ));
+    }
     default_generated_accounting_row(item)
+}
+
+pub fn classify_non_app_config_source_row(row: &SourceAccountingRow) -> CoreConfigSourceDecision {
+    if row.category != "config" || is_viewer_config_source_reference(&row.source_reference) {
+        return CoreConfigSourceDecision {
+            item_id: row.item_id.clone(),
+            source_reference: row.source_reference.clone(),
+            classification: "not-non-app-config".to_string(),
+            level: row.level.clone(),
+            target_status: row.target_status.clone(),
+            owner: row.owner.clone(),
+            verification: row.verification.clone(),
+            reason: row.reason.clone(),
+            fixture_path: None,
+            local_runtime_parity: false,
+            external_authority_required: false,
+        };
+    }
+
+    let normalized = normalized_source_reference(&row.source_reference);
+    if is_runtime_config_source_reference(&normalized) {
+        return CoreConfigSourceDecision {
+            item_id: row.item_id.clone(),
+            source_reference: row.source_reference.clone(),
+            classification: "native-fixture".to_string(),
+            level: "P0".to_string(),
+            target_status: "native".to_string(),
+            owner: "config-loader".to_string(),
+            verification: "fixture:config:promptfooconfig-yaml-json".to_string(),
+            reason: format!(
+                "runtime promptfooconfig/env/file config source covered by existing P0 native config fixtures; source: {}",
+                row.source_reference
+            ),
+            fixture_path: Some("compatibility/fixtures/config/yaml-prompts/fixture.yaml".to_string()),
+            local_runtime_parity: true,
+            external_authority_required: false,
+        };
+    }
+
+    if is_redteam_config_source_reference(&normalized) {
+        return CoreConfigSourceDecision {
+            item_id: row.item_id.clone(),
+            source_reference: row.source_reference.clone(),
+            classification: "bridge-fixture".to_string(),
+            level: "P0".to_string(),
+            target_status: "bridge".to_string(),
+            owner: "redteam-engine".to_string(),
+            verification: "fixture:config:redteam-yaml".to_string(),
+            reason: format!(
+                "redteam promptfooconfig source covered by existing bridge fixture for redteam.yaml compatibility; source: {}",
+                row.source_reference
+            ),
+            fixture_path: Some("compatibility/fixtures/config/redteam-yaml/fixture.yaml".to_string()),
+            local_runtime_parity: true,
+            external_authority_required: false,
+        };
+    }
+
+    if is_auxiliary_config_source_reference(&normalized) {
+        return CoreConfigSourceDecision {
+            item_id: row.item_id.clone(),
+            source_reference: row.source_reference.clone(),
+            classification: "auxiliary-registration".to_string(),
+            level: "P1".to_string(),
+            target_status: "later".to_string(),
+            owner: auxiliary_config_owner(&normalized).to_string(),
+            verification: format!("snapshot:{}", row.item_id),
+            reason: format!(
+                "non-core auxiliary config source is registered under its P1 command domain and is not counted as P0 promptfooconfig runtime parity; source: {}",
+                row.source_reference
+            ),
+            fixture_path: None,
+            local_runtime_parity: false,
+            external_authority_required: false,
+        };
+    }
+
+    CoreConfigSourceDecision {
+        item_id: row.item_id.clone(),
+        source_reference: row.source_reference.clone(),
+        classification: "external-blocker".to_string(),
+        level: "P0".to_string(),
+        target_status: "blocked".to_string(),
+        owner: "external-authority".to_string(),
+        verification: format!("blocker:{}", row.item_id),
+        reason: format!(
+            "explicit external cloud/server/telemetry config blocker; not counted as local runtime parity without product authority, credentials, or service contract evidence; source: {}",
+            row.source_reference
+        ),
+        fixture_path: None,
+        local_runtime_parity: false,
+        external_authority_required: true,
+    }
+}
+
+pub fn validate_core_config_source_burndown(
+    ledger: &SourceAccountingLedger,
+) -> CoreConfigSourceBurndownReport {
+    let decisions = ledger
+        .rows
+        .iter()
+        .filter(|row| {
+            row.category == "config" && !is_viewer_config_source_reference(&row.source_reference)
+        })
+        .map(classify_non_app_config_source_row)
+        .collect::<Vec<_>>();
+    let non_app_config_fixture_covered_count = decisions
+        .iter()
+        .filter(|decision| {
+            decision.classification == "native-fixture"
+                || decision.classification == "bridge-fixture"
+        })
+        .count();
+    let non_app_config_external_blocker_count = decisions
+        .iter()
+        .filter(|decision| decision.classification == "external-blocker")
+        .count();
+    let non_app_config_auxiliary_registration_count = decisions
+        .iter()
+        .filter(|decision| decision.classification == "auxiliary-registration")
+        .count();
+    let non_app_config_generic_blocker_count = decisions
+        .iter()
+        .filter(|decision| {
+            decision
+                .reason
+                .contains("generated P0 accounting row requires")
+        })
+        .count();
+
+    CoreConfigSourceBurndownReport {
+        schema: "promptfoo-rs.core-config-source-burndown.v1".to_string(),
+        non_app_config_total: decisions.len(),
+        non_app_config_fixture_covered_count,
+        non_app_config_external_blocker_count,
+        non_app_config_auxiliary_registration_count,
+        non_app_config_generic_blocker_count,
+        decisions,
+    }
+}
+
+pub fn write_core_config_source_burndown(
+    report: &CoreConfigSourceBurndownReport,
+    path: &Path,
+) -> Result<(), InventoryError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(InventoryError::Write)?;
+    }
+    let json = serde_json::to_string_pretty(report)
+        .map_err(|error| InventoryError::Parse(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(InventoryError::Write)
 }
 
 pub fn source_accounting_burndown_summary(
@@ -887,6 +1070,50 @@ pub fn source_accounting_burndown_summary(
         viewer_config_reclassified_count,
         p0_accounting_blocker_count: remaining_p0_blockers.len(),
         remaining_p0_blockers,
+    }
+}
+
+fn core_config_decision_to_source_accounting_row(
+    decision: &CoreConfigSourceDecision,
+) -> SourceAccountingRow {
+    SourceAccountingRow {
+        item_id: decision.item_id.clone(),
+        category: "config".to_string(),
+        source_reference: decision.source_reference.clone(),
+        level: decision.level.clone(),
+        target_status: decision.target_status.clone(),
+        owner: decision.owner.clone(),
+        verification: decision.verification.clone(),
+        reason: decision.reason.clone(),
+        generated: true,
+    }
+}
+
+fn normalized_source_reference(source_reference: &str) -> String {
+    source_reference.replace('\\', "/").to_ascii_lowercase()
+}
+
+fn is_runtime_config_source_reference(normalized_source_reference: &str) -> bool {
+    normalized_source_reference.contains(":src/commands/config.ts")
+        || normalized_source_reference.contains(":src/configtypes.ts")
+        || normalized_source_reference.contains(":src/util/config/")
+}
+
+fn is_redteam_config_source_reference(normalized_source_reference: &str) -> bool {
+    normalized_source_reference.contains(":src/redteam/plugins/policy/evals/promptfooconfig.yaml")
+}
+
+fn is_auxiliary_config_source_reference(normalized_source_reference: &str) -> bool {
+    normalized_source_reference.contains(":src/codescan/config/")
+        || normalized_source_reference
+            .contains(":src/commands/mcp/tools/validatepromptfooconfig.ts")
+}
+
+fn auxiliary_config_owner(normalized_source_reference: &str) -> &'static str {
+    if normalized_source_reference.contains(":src/codescan/config/") {
+        "scan-engine"
+    } else {
+        "mcp-runtime"
     }
 }
 

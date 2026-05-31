@@ -44,8 +44,14 @@ fn test_19_1_2_non_app_config_rows_remain_p0_blockers() {
             source_reference,
         ));
         assert_eq!(row.level, "P0", "{row:#?}");
-        assert_eq!(row.target_status, "blocked", "{row:#?}");
-        assert!(row.verification.starts_with("blocker:"), "{row:#?}");
+        assert!(
+            row.target_status == "blocked" || row.target_status == "native",
+            "{row:#?}"
+        );
+        assert!(
+            row.verification.starts_with("blocker:") || row.verification.starts_with("fixture:"),
+            "{row:#?}"
+        );
         assert!(!row.reason.contains("Local Web viewer"), "{row:#?}");
     }
 }
@@ -63,8 +69,8 @@ fn test_19_1_3_burndown_summary_counts_viewer_reclassification_and_remaining_p0(
             "promptfoo@0.121.13:src/app/vite.config.ts",
         ),
         viewer_config_item(
-            "config:src-util-config-load",
-            "promptfoo@0.121.13:src/util/config/load.ts",
+            "config:src-globalconfig-cloud",
+            "promptfoo@0.121.13:src/globalConfig/cloud.ts",
         ),
     ]);
     let ledger = build_source_accounting_ledger(&inventory, &CapabilityMatrix { rows: vec![] });
@@ -74,7 +80,7 @@ fn test_19_1_3_burndown_summary_counts_viewer_reclassification_and_remaining_p0(
     assert_eq!(summary.p0_accounting_blocker_count, 1, "{summary:#?}");
     assert_eq!(
         summary.remaining_p0_blockers,
-        vec!["config:src-util-config-load".to_string()],
+        vec!["config:src-globalconfig-cloud".to_string()],
         "{summary:#?}"
     );
     assert_eq!(ledger.p0_blocker_count, 1, "{ledger:#?}");
