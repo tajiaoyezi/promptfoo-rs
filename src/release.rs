@@ -601,6 +601,50 @@ impl ReleaseInstallabilityReport {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PerfectRefactorClaimInputs {
+    pub local_stable_allowed: bool,
+    pub published: bool,
+    pub source_p0_accounting_blocker_count: usize,
+    pub current_perfect_claim_allowed: bool,
+    pub publication_ready: PublicationReadiness,
+    pub external_authority_status: String,
+    pub external_authority_blocker_count: usize,
+    pub source_artifacts: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PerfectRefactorClaimContract {
+    pub schema: String,
+    pub perfect_refactor_claim_allowed: bool,
+    pub local_stable_allowed: bool,
+    pub local_stable_is_perfect_refactor: bool,
+    pub published: bool,
+    pub source_p0_accounting_blocker_count: usize,
+    pub current_perfect_claim_allowed: bool,
+    pub publication_ready: PublicationReadiness,
+    pub external_authority_status: String,
+    pub external_authority_blocker_count: usize,
+    pub blockers: Vec<PerfectRefactorClaimBlocker>,
+    pub source_artifacts: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PerfectRefactorClaimBlocker {
+    pub item_id: String,
+    pub category: String,
+    pub source_artifact: String,
+    pub reason: String,
+    pub required_decision: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PerfectRefactorClaimDecision {
+    pub ready: bool,
+    pub blocker_count: usize,
+    pub reasons: Vec<String>,
+}
+
 #[derive(Debug)]
 pub enum ReleaseError {
     Io { path: PathBuf, message: String },
@@ -803,6 +847,154 @@ pub fn collect_channel_evidence(channel: ReleaseChannel, workspace: &Path) -> Ch
 }
 
 pub type ReleaseEvidenceError = ReleaseError;
+
+pub fn build_perfect_refactor_claim_contract(
+    inputs: PerfectRefactorClaimInputs,
+) -> PerfectRefactorClaimContract {
+    let mut blockers = Vec::new();
+    if inputs.source_p0_accounting_blocker_count > 0 {
+        blockers.push(PerfectRefactorClaimBlocker {
+            item_id: "source-accounting:p0-blockers".to_string(),
+            category: "source-accounting".to_string(),
+            source_artifact: claim_source_artifact(
+                &inputs.source_artifacts,
+                "source-inventory-evidence.json",
+            ),
+            reason: format!(
+                "{} source P0 accounting blockers remain",
+                inputs.source_p0_accounting_blocker_count
+            ),
+            required_decision:
+                "Provide native/bridge fixture evidence or explicit external-authority waiver for every remaining source P0 blocker"
+                    .to_string(),
+        });
+    }
+    if !inputs.current_perfect_claim_allowed {
+        blockers.push(PerfectRefactorClaimBlocker {
+            item_id: "current-upstream:frozen-target".to_string(),
+            category: "current-upstream".to_string(),
+            source_artifact: claim_source_artifact(
+                &inputs.source_artifacts,
+                "current-upstream-policy.json",
+            ),
+            reason: "current upstream parity is not proven by the frozen baseline gate".to_string(),
+            required_decision:
+                "Rebaseline against current upstream with all required evidence or keep the claim limited to frozen-baseline compatibility"
+                    .to_string(),
+        });
+    }
+    if inputs.external_authority_status != "ready" || inputs.external_authority_blocker_count > 0 {
+        blockers.push(PerfectRefactorClaimBlocker {
+            item_id: "external-authority:blockers".to_string(),
+            category: "external-authority".to_string(),
+            source_artifact: claim_source_artifact(
+                &inputs.source_artifacts,
+                "external-authority-blockers.json",
+            ),
+            reason: format!(
+                "{} external authority blockers remain with status {}",
+                inputs.external_authority_blocker_count, inputs.external_authority_status
+            ),
+            required_decision:
+                "Resolve provider/product/account/legal/publication authority blockers with real external evidence"
+                    .to_string(),
+        });
+    }
+    if inputs.publication_ready != PublicationReadiness::Ready || !inputs.published {
+        blockers.push(PerfectRefactorClaimBlocker {
+            item_id: "publication-authority:published-evidence".to_string(),
+            category: "publication-authority".to_string(),
+            source_artifact: claim_source_artifact(
+                &inputs.source_artifacts,
+                "publication-authority.json",
+            ),
+            reason: format!(
+                "publication_ready={:?}, published={}",
+                inputs.publication_ready, inputs.published
+            ),
+            required_decision:
+                "Publish authorized release artifacts with external URL/digest evidence or avoid public/perfect-refactor availability claims"
+                    .to_string(),
+        });
+    }
+
+    let perfect_refactor_claim_allowed = inputs.local_stable_allowed
+        && inputs.published
+        && inputs.source_p0_accounting_blocker_count == 0
+        && inputs.current_perfect_claim_allowed
+        && inputs.publication_ready == PublicationReadiness::Ready
+        && inputs.external_authority_status == "ready"
+        && inputs.external_authority_blocker_count == 0
+        && blockers.is_empty();
+
+    PerfectRefactorClaimContract {
+        schema: "promptfoo-rs.perfect-refactor-claim.v1".to_string(),
+        perfect_refactor_claim_allowed,
+        local_stable_allowed: inputs.local_stable_allowed,
+        local_stable_is_perfect_refactor: perfect_refactor_claim_allowed,
+        published: inputs.published,
+        source_p0_accounting_blocker_count: inputs.source_p0_accounting_blocker_count,
+        current_perfect_claim_allowed: inputs.current_perfect_claim_allowed,
+        publication_ready: inputs.publication_ready,
+        external_authority_status: inputs.external_authority_status,
+        external_authority_blocker_count: inputs.external_authority_blocker_count,
+        blockers,
+        source_artifacts: inputs.source_artifacts,
+    }
+}
+
+pub fn validate_perfect_refactor_claim(
+    contract: &PerfectRefactorClaimContract,
+) -> PerfectRefactorClaimDecision {
+    let ready = contract.perfect_refactor_claim_allowed
+        && contract.local_stable_allowed
+        && contract.local_stable_is_perfect_refactor
+        && contract.published
+        && contract.blockers.is_empty();
+    let reasons = if ready {
+        vec![
+            "perfect-refactor claim has complete source/current/publication/external evidence"
+                .to_string(),
+        ]
+    } else {
+        contract
+            .blockers
+            .iter()
+            .map(|blocker| format!("{}: {}", blocker.item_id, blocker.reason))
+            .collect()
+    };
+    PerfectRefactorClaimDecision {
+        ready,
+        blocker_count: contract.blockers.len(),
+        reasons,
+    }
+}
+
+pub fn write_perfect_refactor_claim_contract(
+    contract: &PerfectRefactorClaimContract,
+    path: &Path,
+) -> Result<(), ReleaseError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|error| ReleaseError::Io {
+            path: parent.to_path_buf(),
+            message: error.to_string(),
+        })?;
+    }
+    let json = serde_json::to_string_pretty(contract)
+        .map_err(|error| ReleaseError::Serialize(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(|error| ReleaseError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })
+}
+
+fn claim_source_artifact(source_artifacts: &[String], needle: &str) -> String {
+    source_artifacts
+        .iter()
+        .find(|artifact| artifact.ends_with(needle))
+        .cloned()
+        .unwrap_or_else(|| format!("target/release-gates/{needle}"))
+}
 
 pub fn collect_publication_authority(channels: &[ReleaseChannel]) -> PublicationAuthorityReport {
     let mut report = PublicationAuthorityReport {

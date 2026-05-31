@@ -237,6 +237,91 @@ else
   decision="prerelease"
 fi
 
+node - "$stable_allowed" "false" <<'NODE'
+const fs = require('fs');
+const stableAllowed = process.argv[2] === 'true';
+const published = process.argv[3] === 'true';
+const gateDir = 'target/release-gates';
+const source = JSON.parse(fs.readFileSync(`${gateDir}/source-inventory-evidence.json`, 'utf8'));
+const current = JSON.parse(fs.readFileSync(`${gateDir}/current-upstream-policy.json`, 'utf8'));
+const publication = JSON.parse(fs.readFileSync(`${gateDir}/publication-authority.json`, 'utf8'));
+const external = JSON.parse(fs.readFileSync(`${gateDir}/external-authority-blockers.json`, 'utf8'));
+const sourceArtifacts = [
+  `${gateDir}/source-inventory-evidence.json`,
+  `${gateDir}/current-upstream-policy.json`,
+  `${gateDir}/publication-authority.json`,
+  `${gateDir}/external-authority-blockers.json`,
+  `${gateDir}/release-candidate.json`,
+];
+const blockers = [];
+if ((source.p0_accounting_blocker_count || 0) > 0) {
+  blockers.push({
+    item_id: 'source-accounting:p0-blockers',
+    category: 'source-accounting',
+    source_artifact: `${gateDir}/source-inventory-evidence.json`,
+    reason: `${source.p0_accounting_blocker_count} source P0 accounting blockers remain`,
+    required_decision:
+      'Provide native/bridge fixture evidence or explicit external-authority waiver for every remaining source P0 blocker',
+  });
+}
+if (current.current_perfect_claim_allowed !== true) {
+  blockers.push({
+    item_id: 'current-upstream:frozen-target',
+    category: 'current-upstream',
+    source_artifact: `${gateDir}/current-upstream-policy.json`,
+    reason: 'current upstream parity is not proven by the frozen baseline gate',
+    required_decision:
+      'Rebaseline against current upstream with all required evidence or keep the claim limited to frozen-baseline compatibility',
+  });
+}
+if (external.status !== 'ready' || (external.blocker_count || 0) > 0) {
+  blockers.push({
+    item_id: 'external-authority:blockers',
+    category: 'external-authority',
+    source_artifact: `${gateDir}/external-authority-blockers.json`,
+    reason: `${external.blocker_count || 0} external authority blockers remain with status ${external.status}`,
+    required_decision:
+      'Resolve provider/product/account/legal/publication authority blockers with real external evidence',
+  });
+}
+if (publication.publication_ready !== 'ready' || !published) {
+  blockers.push({
+    item_id: 'publication-authority:published-evidence',
+    category: 'publication-authority',
+    source_artifact: `${gateDir}/publication-authority.json`,
+    reason: `publication_ready=${publication.publication_ready}, published=${published}`,
+    required_decision:
+      'Publish authorized release artifacts with external URL/digest evidence or avoid public/perfect-refactor availability claims',
+  });
+}
+const perfectRefactorClaimAllowed =
+  stableAllowed &&
+  published &&
+  (source.p0_accounting_blocker_count || 0) === 0 &&
+  current.current_perfect_claim_allowed === true &&
+  publication.publication_ready === 'ready' &&
+  external.status === 'ready' &&
+  (external.blocker_count || 0) === 0 &&
+  blockers.length === 0;
+const contract = {
+  schema: 'promptfoo-rs.perfect-refactor-claim.v1',
+  perfect_refactor_claim_allowed: perfectRefactorClaimAllowed,
+  local_stable_allowed: stableAllowed,
+  local_stable_is_perfect_refactor: perfectRefactorClaimAllowed,
+  published,
+  source_p0_accounting_blocker_count: source.p0_accounting_blocker_count || 0,
+  current_perfect_claim_allowed: current.current_perfect_claim_allowed === true,
+  publication_ready: publication.publication_ready,
+  external_authority_status: external.status,
+  external_authority_blocker_count: external.blocker_count || 0,
+  blockers,
+  source_artifacts: sourceArtifacts,
+};
+fs.writeFileSync(`${gateDir}/perfect-refactor-claim.json`, `${JSON.stringify(contract, null, 2)}\n`);
+NODE
+perfect_refactor_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-claim.json', 'utf8')); console.log(r.perfect_refactor_claim_allowed ? 'true' : 'false')")"
+perfect_refactor_claim_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-claim.json', 'utf8')); console.log((r.blockers || []).length)")"
+
 cat > "$GATE_DIR/performance.json" <<JSON
 {
   "schema": "promptfoo-rs.release.performance.v1",
@@ -302,6 +387,11 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "publication_blocker_count": $external_authority_publication_blocker_count,
     "authority_artifact": "target/release-gates/external-authority-blockers.json"
   },
+  "perfect_refactor_claim": {
+    "perfect_refactor_claim_allowed": $perfect_refactor_claim_allowed,
+    "blocker_count": $perfect_refactor_claim_blocker_count,
+    "claim_artifact": "target/release-gates/perfect-refactor-claim.json"
+  },
   "gate_statuses": {
     "adapter": "$adapter_status",
     "compatibility": "$compatibility_status",
@@ -338,6 +428,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/source-inventory-ledger.json",
     "target/release-gates/longtail-classification.json",
     "target/release-gates/external-authority-blockers.json",
+    "target/release-gates/perfect-refactor-claim.json",
     "target/release-gates/current-upstream-policy.json",
     "target/release-gates/installability.json",
     "target/release-gates/publication-authority.json",
@@ -358,6 +449,7 @@ validate_report_json "$GATE_DIR/performance.json"
 validate_report_json "$GATE_DIR/security.json"
 validate_report_json "$GATE_DIR/source-inventory-ledger.json"
 validate_report_json "$GATE_DIR/external-authority-blockers.json"
+validate_report_json "$GATE_DIR/perfect-refactor-claim.json"
 validate_report_json "$GATE_DIR/release-candidate.json"
 
 if [ "$stable_allowed" != "true" ]; then

@@ -69,6 +69,12 @@ Task 19.4 adds `target/release-gates/external-authority-blockers.json` and inclu
 
 Each external authority item records `authority_type`, `required_decision`, `current_status`, `safe_local_fallback`, and `release_impact`. Provider rows may stay `waived-with-boundary` only for local mock or fixture accounting; publication rows stay `blocked` while `published=false`. No entry may become `ready` without real credentials, account or product authority, legal/brand approval where relevant, and external URL/digest evidence.
 
+## Perfect Refactor Claim Contract
+
+Task 20.2 adds `target/release-gates/perfect-refactor-claim.json` and links it from `target/release-gates/release-candidate.json.perfect_refactor_claim`. This is the authority for any statement that the project fully satisfies the promptfoo perfect-refactor target.
+
+Current local stable release gates can pass for the frozen baseline while `perfect_refactor_claim_allowed=false`. The claim stays false until source accounting blockers are zero, current-upstream evidence is ready, external authority blockers are resolved, publication authority is ready, and `published=true` has external URL/digest evidence. Local stable means the local frozen-baseline release gate is ready; it is not a public or perfect-refactor completion claim.
+
 ## S2V Release Checklist
 
 1. Run the compatibility release gate.

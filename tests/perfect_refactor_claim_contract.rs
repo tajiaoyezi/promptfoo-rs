@@ -17,7 +17,11 @@ fn test_20_2_1_perfect_refactor_claim_stays_false_with_remaining_blockers() {
     assert!(!contract.perfect_refactor_claim_allowed, "{contract:#?}");
     assert!(!contract.local_stable_is_perfect_refactor, "{contract:#?}");
     assert!(!decision.ready, "{decision:#?}");
-    assert_eq!(decision.blocker_count, contract.blockers.len(), "{decision:#?}");
+    assert_eq!(
+        decision.blocker_count,
+        contract.blockers.len(),
+        "{decision:#?}"
+    );
     assert!(contract
         .blockers
         .iter()
@@ -94,7 +98,8 @@ fn test_20_2_3_claim_blockers_include_source_artifacts_and_runtime_wiring() {
 #[test]
 fn test_20_2_4_docs_state_local_stable_vs_perfect_refactor_boundary() {
     /* TEST-20.2.4 */
-    let release_docs = std::fs::read_to_string("docs/release.md").expect("release docs should exist");
+    let release_docs =
+        std::fs::read_to_string("docs/release.md").expect("release docs should exist");
     let matrix =
         std::fs::read_to_string("docs/compatibility/matrix.md").expect("matrix should exist");
     let audit = std::fs::read_to_string(
@@ -105,9 +110,15 @@ fn test_20_2_4_docs_state_local_stable_vs_perfect_refactor_boundary() {
     for docs in [release_docs, matrix, audit] {
         assert!(docs.contains("Task 20.2"), "{docs}");
         assert!(docs.contains("perfect-refactor-claim.json"), "{docs}");
-        assert!(docs.contains("perfect_refactor_claim_allowed=false"), "{docs}");
+        assert!(
+            docs.contains("perfect_refactor_claim_allowed=false"),
+            "{docs}"
+        );
         assert!(docs.contains("local stable"), "{docs}");
-        assert!(!docs.contains("stable_allowed=true means perfect"), "{docs}");
+        assert!(
+            !docs.contains("stable_allowed=true means perfect"),
+            "{docs}"
+        );
     }
 }
 
