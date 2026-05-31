@@ -1,6 +1,6 @@
 # Task 19.1: viewer-config-source-reclassification
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 19 — source-accounting-native-burndown
@@ -64,19 +64,19 @@ Source accounting ledger 生成 generated rows 时，`source_reference` 匹配 `
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Compatibility Matrix / Local Web viewer): generated `config:*` rows under `src/app/**` become P1 Local Web viewer accounting evidence with owner, verification, and reason.
-- [ ] **AC2** (PRD §Core Capabilities): non-app config rows remain P0 blocked unless they already have explicit native/bridge fixture evidence; no blanket demotion is allowed.
-- [ ] **AC3** (Phase 18 §9): release evidence reports viewer-config reclassification counts and reduces P0 accounting blocker count from 111 to the remaining non-app config/provider blockers.
-- [ ] **AC4** (ADR-009): compatibility matrix and audit explain that this is a scope correction, not a claim of upstream React UI parity.
+- [x] **AC1** (PRD §Compatibility Matrix / Local Web viewer): generated `config:*` rows under `src/app/**` become P1 Local Web viewer accounting evidence with owner, verification, and reason.
+- [x] **AC2** (PRD §Core Capabilities): non-app config rows remain P0 blocked unless they already have explicit native/bridge fixture evidence; no blanket demotion is allowed.
+- [x] **AC3** (Phase 18 §9): release evidence reports viewer-config reclassification counts and reduces P0 accounting blocker count from 111 to the remaining non-app config/provider blockers.
+- [x] **AC4** (ADR-009): compatibility matrix and audit explain that this is a scope correction, not a claim of upstream React UI parity.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-19.1.1 | TEST-19.1.1 | tests/viewer_config_source_reclassification.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-19.1.1 | TEST-19.1.2 | tests/viewer_config_source_reclassification.rs | install, typecheck, unit-test, coverage, build | Not Started |
-| AC3 | SCEN-19.1.1 | TEST-19.1.3 | tests/viewer_config_source_reclassification.rs | install, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC4 | SCEN-19.1.1 | TEST-19.1.4 | tests/viewer_config_source_reclassification.rs | install, typecheck, unit-test, integration, build | Not Started |
+| AC1 | SCEN-19.1.1 | TEST-19.1.1 | tests/viewer_config_source_reclassification.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-19.1.1 | TEST-19.1.2 | tests/viewer_config_source_reclassification.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-19.1.1 | TEST-19.1.3 | tests/viewer_config_source_reclassification.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC4 | SCEN-19.1.1 | TEST-19.1.4 | tests/viewer_config_source_reclassification.rs | install, typecheck, unit-test, integration, build | Done |
 
 ## 8. Risks
 
@@ -96,9 +96,27 @@ Source accounting ledger 生成 generated rows 时，`source_reference` 匹配 `
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/viewer_config_source_reclassification.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/source-inventory-evidence.sh`
+  - `scripts/release/integration.sh`
+  - `docs/compatibility/matrix.md`
+  - `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-19-source-accounting-native-burndown.md`
+  - `docs/specs/tasks/task-19.1-viewer-config-source-reclassification.md`
+- **commit 列表**：
+  - `fa5f7b3` `test(compatibility): add SCEN-19.1.1 viewer config reclassification RED tests`
+  - `48eef72` `feat(compatibility): reclassify viewer config source blockers`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-19.1.1 ~ TEST-19.1.4 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 通过，包含 `viewer_config_source_reclassification`。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 通过；`target/release-gates/source-inventory-evidence.json` status=`ready-with-blockers`，viewer_config_reclassified_count=56，p0_accounting_blocker_count=55，remaining_p0_blockers=55；`target/release-gates/source-inventory-ledger.json` 同步 viewer_config_reclassified_count=56、p0_blocker_count=55。
+- **剩余风险 / 未做项**：本 task 只是 P1 viewer config scope correction，不宣称 upstream React UI parity；55 个 P0 source accounting blockers 仍需 task 19.2/19.3/19.4 继续处理。
+- **下游 task 影响**：task 19.2 可聚焦 18 个 non-app core config blockers；task 19.3/19.4 继续处理 provider fixture/external authority blockers；Phase 19 smoke 应检查 source inventory artifact 的 56/55 计数。
