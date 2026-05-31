@@ -40,8 +40,14 @@ jobs:
         run: |
           mkdir -p compatibility/artifacts/release-gate
           cargo test --test p0_fixture_corpus --test executable_upstream_rs_runner --test golden_diff_ci_release_gate
+      - name: Assert real upstream corpus gate
+        run: |
+          test -f target/release-gates/real-upstream-corpus/index.json
+          test -f target/release-gates/real-upstream-corpus/summary.json
       - name: Build release binary
         run: cargo build --workspace --release
+      - name: Release installability dry-run
+        run: PROMPTFOO_RS_SKIP_RUNTIME_SMOKE=1 bash scripts/release/installability.sh
       - name: Upload compatibility release gate artifacts
         uses: actions/upload-artifact@v4
         with:

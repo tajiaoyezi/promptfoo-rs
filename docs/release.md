@@ -42,7 +42,7 @@ Build from `Dockerfile` and publish an immutable image digest. The container is 
 
 ### npm Wrapper
 
-The npm wrapper is a compatibility distribution channel over the Rust core boundary. In this workspace, `npm/src` is present but `npm/package.json` is intentionally deferred until a Corepack-enabled release environment is available.
+The npm wrapper is a compatibility distribution channel over the Rust core boundary. The tracked `npm/package.json` supports local typecheck, test, build, smoke, and `pnpm pack` dry-run evidence. Real `npm publish` requires explicit credentials and must remain blocked in release evidence until those credentials and publication authority are provided.
 
 ### GitHub Action
 
@@ -54,3 +54,4 @@ Use `.github/workflows/release.yml` as the example shape for CI: checkout, Rust 
 2. Run `s2v_verify_full` for the release task verification keys.
 3. Confirm README, architecture, Compatibility Matrix, contributing guide, GitHub Action example, and release gate notes are current.
 4. Choose Stable only when the gate is Ready. Choose Prerelease or Nightly when the gate is Blocked.
+5. Run `bash scripts/release/installability.sh` to generate `target/release-gates/installability.json`; local installability may be ready while public publication remains `credential-blocked`.

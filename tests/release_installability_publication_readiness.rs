@@ -1,9 +1,9 @@
 use std::path::{Path, PathBuf};
 
 use promptfoo_rs::release::{
-    classify_publication_blockers, collect_channel_evidence,
-    write_release_installability_report, ChannelEvidenceStatus, PublicationReadiness,
-    ReleaseChannel, ReleaseInstallabilityConfig, ReleaseInstallabilityRunner,
+    classify_publication_blockers, collect_channel_evidence, write_release_installability_report,
+    ChannelEvidenceStatus, PublicationReadiness, ReleaseChannel, ReleaseInstallabilityConfig,
+    ReleaseInstallabilityRunner,
 };
 
 #[test]
@@ -34,7 +34,8 @@ fn test_17_5_1_installability_report_records_all_dry_run_channels() {
             "{evidence:#?}"
         );
         assert!(
-            !evidence.command.trim().is_empty() || !evidence.blocker.as_deref().unwrap_or("").is_empty(),
+            !evidence.command.trim().is_empty()
+                || !evidence.blocker.as_deref().unwrap_or("").is_empty(),
             "{evidence:#?}"
         );
     }
@@ -63,7 +64,10 @@ fn test_17_5_2_publication_is_credential_blocked_without_external_artifacts() {
     let readiness = classify_publication_blockers(&report);
 
     assert_eq!(readiness, PublicationReadiness::CredentialBlocked);
-    assert_eq!(report.publication_ready, PublicationReadiness::CredentialBlocked);
+    assert_eq!(
+        report.publication_ready,
+        PublicationReadiness::CredentialBlocked
+    );
     assert!(report.credential_blocked, "{report:#?}");
     assert!(
         report
@@ -117,15 +121,27 @@ fn test_17_5_4_report_has_checksums_no_upload_and_no_secret_leakage() {
     write_release_installability_report(&report, &output).expect("report should write");
     let json = std::fs::read_to_string(&output).expect("report should be readable");
 
-    assert!(report.no_upload_evidence.contains("no upload"), "{report:#?}");
+    assert!(
+        report.no_upload_evidence.contains("no upload"),
+        "{report:#?}"
+    );
     assert_eq!(report.security_gate_status, "ready");
     assert!(!report.checksums.is_empty(), "{report:#?}");
     assert!(report
         .checksums
         .iter()
         .all(|checksum| checksum.sha256.len() == 64));
-    for forbidden in ["sk-", "ghp_", "NPM_TOKEN", "CARGO_REGISTRY_TOKEN", "DOCKER_PASSWORD"] {
-        assert!(!json.contains(forbidden), "secret marker leaked: {forbidden}");
+    for forbidden in [
+        "sk-",
+        "ghp_",
+        "NPM_TOKEN",
+        "CARGO_REGISTRY_TOKEN",
+        "DOCKER_PASSWORD",
+    ] {
+        assert!(
+            !json.contains(forbidden),
+            "secret marker leaked: {forbidden}"
+        );
     }
 }
 
@@ -144,7 +160,12 @@ fn test_17_5_5_collect_channel_evidence_records_tool_blockers() {
         "{homebrew:#?}"
     );
     assert!(
-        homebrew.command.contains("brew") || homebrew.blocker.as_deref().unwrap_or("").contains("Homebrew"),
+        homebrew.command.contains("brew")
+            || homebrew
+                .blocker
+                .as_deref()
+                .unwrap_or("")
+                .contains("Homebrew"),
         "{homebrew:#?}"
     );
 }

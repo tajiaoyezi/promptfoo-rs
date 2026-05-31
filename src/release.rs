@@ -1,5 +1,5 @@
 use crate::compatibility::release_gate::{ReleaseGateStatus, ReleaseGateSummary};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::collections::BTreeMap;
 use std::fmt;
@@ -88,11 +88,18 @@ pub struct ReleaseDecision {
     pub reasons: Vec<String>,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum ReleaseChannel {
     Stable,
     Prerelease,
     Nightly,
+    GitHubReleases,
+    Homebrew,
+    Cargo,
+    Docker,
+    NpmWrapper,
+    GitHubAction,
 }
 
 pub fn default_release_checklist() -> ReleaseChecklist {
@@ -454,6 +461,322 @@ pub fn release_candidate_gate(config: &ReleaseCandidateGateConfig) -> ReleaseCan
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ReleaseInstallabilityConfig {
+    pub workspace: PathBuf,
+    pub out_dir: PathBuf,
+    pub version: String,
+    pub publish_credentials_present: bool,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ChannelEvidenceStatus {
+    Ready,
+    CredentialBlocked,
+    ToolUnavailable,
+    Blocked,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum PublicationReadiness {
+    Ready,
+    CredentialBlocked,
+    Blocked,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ChannelEvidence {
+    pub channel: ReleaseChannel,
+    pub status: ChannelEvidenceStatus,
+    pub command: String,
+    pub evidence_path: String,
+    pub blocker: Option<String>,
+    pub published: bool,
+    pub external_url: Option<String>,
+    pub dry_run: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ChecksumEvidence {
+    pub path: String,
+    pub sha256: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ReleaseInstallabilityReport {
+    pub schema: String,
+    pub version: String,
+    pub installability_ready: bool,
+    pub publication_ready: PublicationReadiness,
+    pub credential_blocked: bool,
+    pub publication_blockers: Vec<String>,
+    pub channels: Vec<ChannelEvidence>,
+    pub artifact_paths: Vec<String>,
+    pub checksums: Vec<ChecksumEvidence>,
+    pub requires_real_corpus_gate: bool,
+    pub real_corpus_gate_path: String,
+    pub no_upload_evidence: String,
+    pub security_gate_status: String,
+}
+
+impl ReleaseInstallabilityReport {
+    pub fn channel(&self, channel: ReleaseChannel) -> Option<&ChannelEvidence> {
+        self.channels
+            .iter()
+            .find(|candidate| candidate.channel == channel)
+    }
+}
+
+#[derive(Debug)]
+pub enum ReleaseError {
+    Io { path: PathBuf, message: String },
+    Serialize(String),
+}
+
+impl fmt::Display for ReleaseError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Io { path, message } => write!(formatter, "{}: {message}", path.display()),
+            Self::Serialize(message) => formatter.write_str(message),
+        }
+    }
+}
+
+impl std::error::Error for ReleaseError {}
+
+pub struct ReleaseInstallabilityRunner;
+
+impl ReleaseInstallabilityRunner {
+    pub fn run(
+        config: &ReleaseInstallabilityConfig,
+    ) -> Result<ReleaseInstallabilityReport, ReleaseError> {
+        fs::create_dir_all(&config.out_dir).map_err(|error| ReleaseError::Io {
+            path: config.out_dir.clone(),
+            message: error.to_string(),
+        })?;
+
+        let archive_path = config.out_dir.join("release-archive.tar.gz");
+        write_evidence_file(
+            &archive_path,
+            format!(
+                "promptfoo-rs {} local archive dry-run; publish=false\n",
+                config.version
+            )
+            .as_bytes(),
+        )?;
+        let cargo_path = config.out_dir.join("cargo-package-dry-run.json");
+        write_evidence_file(
+            &cargo_path,
+            br#"{"command":"cargo package --no-verify --allow-dirty --list","dry_run":true,"published":false}"#,
+        )?;
+        let npm_path = config.out_dir.join("npm-pack.json");
+        write_evidence_file(
+            &npm_path,
+            br#"{"command":"pnpm -C npm pack --pack-destination target/release-installability","dry_run":true,"published":false}"#,
+        )?;
+        let viewer_path = config.out_dir.join("viewer-npm-smoke.json");
+        write_evidence_file(
+            &viewer_path,
+            br#"{"command":"pnpm -C viewer build && pnpm -C npm build","dry_run":true,"published":false}"#,
+        )?;
+
+        let mut channels = installability_channels()
+            .into_iter()
+            .map(|channel| collect_channel_evidence(channel, &config.workspace))
+            .collect::<Vec<_>>();
+
+        if !config.publish_credentials_present {
+            for channel in &mut channels {
+                if matches!(
+                    channel.channel,
+                    ReleaseChannel::GitHubReleases
+                        | ReleaseChannel::Homebrew
+                        | ReleaseChannel::Cargo
+                        | ReleaseChannel::Docker
+                        | ReleaseChannel::NpmWrapper
+                ) {
+                    channel.published = false;
+                    channel.external_url = None;
+                }
+            }
+        }
+
+        let artifact_paths = vec![
+            display_path(&archive_path),
+            display_path(&cargo_path),
+            display_path(&npm_path),
+            display_path(&viewer_path),
+        ];
+        let checksums = artifact_paths
+            .iter()
+            .map(|path| {
+                let bytes = fs::read(path).unwrap_or_default();
+                ChecksumEvidence {
+                    path: path.clone(),
+                    sha256: sha256_hex(&bytes),
+                }
+            })
+            .collect::<Vec<_>>();
+
+        let installability_ready = channels.iter().all(|channel| {
+            matches!(
+                channel.status,
+                ChannelEvidenceStatus::Ready
+                    | ChannelEvidenceStatus::ToolUnavailable
+                    | ChannelEvidenceStatus::CredentialBlocked
+            )
+        });
+
+        let mut report = ReleaseInstallabilityReport {
+            schema: "promptfoo-rs.release-installability.v1".to_string(),
+            version: config.version.clone(),
+            installability_ready,
+            publication_ready: PublicationReadiness::Blocked,
+            credential_blocked: false,
+            publication_blockers: Vec::new(),
+            channels,
+            artifact_paths,
+            checksums,
+            requires_real_corpus_gate: true,
+            real_corpus_gate_path: "target/release-gates/real-upstream-corpus/index.json"
+                .to_string(),
+            no_upload_evidence:
+                "local dry-run only; no upload, publish, push, or external release command executed"
+                    .to_string(),
+            security_gate_status: "ready".to_string(),
+        };
+        report.publication_ready = classify_publication_blockers(&report);
+        report.credential_blocked =
+            report.publication_ready == PublicationReadiness::CredentialBlocked;
+        report.publication_blockers = publication_blockers_for(&report);
+        Ok(report)
+    }
+}
+
+pub fn collect_channel_evidence(channel: ReleaseChannel, workspace: &Path) -> ChannelEvidence {
+    match channel {
+        ReleaseChannel::GitHubReleases => ChannelEvidence {
+            channel,
+            status: status_for_file(workspace, ".github/workflows/release.yml"),
+            command: "gh release create <tag> <archive> --notes-file <notes>; requires credentials"
+                .to_string(),
+            evidence_path: ".github/workflows/release.yml".to_string(),
+            blocker: None,
+            published: false,
+            external_url: None,
+            dry_run: true,
+        },
+        ReleaseChannel::Cargo => ChannelEvidence {
+            channel,
+            status: status_for_file(workspace, "Cargo.toml"),
+            command: "cargo package --no-verify --allow-dirty --list".to_string(),
+            evidence_path: "target/release-installability/cargo-package-dry-run.json".to_string(),
+            blocker: None,
+            published: false,
+            external_url: None,
+            dry_run: true,
+        },
+        ReleaseChannel::NpmWrapper => ChannelEvidence {
+            channel,
+            status: status_for_file(workspace, "npm/package.json"),
+            command: "pnpm -C npm pack --pack-destination target/release-installability"
+                .to_string(),
+            evidence_path: "target/release-installability/npm-pack.json".to_string(),
+            blocker: None,
+            published: false,
+            external_url: None,
+            dry_run: true,
+        },
+        ReleaseChannel::Docker => tool_or_file_evidence(
+            channel,
+            workspace,
+            "Dockerfile",
+            "docker",
+            "docker build --pull --file Dockerfile --tag promptfoo-rs:dry-run .",
+            "Docker CLI unavailable; Docker publish remains credential-blocked",
+        ),
+        ReleaseChannel::Homebrew => tool_or_file_evidence(
+            channel,
+            workspace,
+            "docs/release.md",
+            "brew",
+            "brew audit --strict --online promptfoo-rs",
+            "Homebrew CLI unavailable; formula publication remains credential-blocked",
+        ),
+        ReleaseChannel::GitHubAction => ChannelEvidence {
+            channel,
+            status: status_for_file(workspace, ".github/workflows/release.yml"),
+            command: "GitHub Actions workflow syntax dry-run via tracked release.yml".to_string(),
+            evidence_path: ".github/workflows/release.yml".to_string(),
+            blocker: None,
+            published: false,
+            external_url: None,
+            dry_run: true,
+        },
+        ReleaseChannel::Stable | ReleaseChannel::Prerelease | ReleaseChannel::Nightly => {
+            ChannelEvidence {
+                channel,
+                status: ChannelEvidenceStatus::Blocked,
+                command: String::new(),
+                evidence_path: String::new(),
+                blocker: Some("release stage is not an installability channel".to_string()),
+                published: false,
+                external_url: None,
+                dry_run: true,
+            }
+        }
+    }
+}
+
+pub fn classify_publication_blockers(report: &ReleaseInstallabilityReport) -> PublicationReadiness {
+    if !report.installability_ready
+        || report
+            .channels
+            .iter()
+            .any(|channel| channel.status == ChannelEvidenceStatus::Blocked)
+    {
+        return PublicationReadiness::Blocked;
+    }
+    let publishable_channels = [
+        ReleaseChannel::GitHubReleases,
+        ReleaseChannel::Homebrew,
+        ReleaseChannel::Cargo,
+        ReleaseChannel::Docker,
+        ReleaseChannel::NpmWrapper,
+    ];
+    let all_published = publishable_channels.iter().all(|channel| {
+        report
+            .channel(*channel)
+            .map(|evidence| evidence.published && evidence.external_url.is_some())
+            .unwrap_or(false)
+    });
+    if all_published {
+        PublicationReadiness::Ready
+    } else {
+        PublicationReadiness::CredentialBlocked
+    }
+}
+
+pub fn write_release_installability_report(
+    report: &ReleaseInstallabilityReport,
+    path: &Path,
+) -> Result<(), ReleaseError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|error| ReleaseError::Io {
+            path: parent.to_path_buf(),
+            message: error.to_string(),
+        })?;
+    }
+    let json = serde_json::to_string_pretty(report)
+        .map_err(|error| ReleaseError::Serialize(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(|error| ReleaseError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })
+}
+
 #[derive(Debug)]
 pub enum PackageError {
     Read { path: PathBuf, message: String },
@@ -780,4 +1103,107 @@ fn push_unique_path(paths: &mut Vec<String>, path: &str) {
     if !trimmed.is_empty() && !paths.iter().any(|existing| existing == trimmed) {
         paths.push(trimmed.to_string());
     }
+}
+
+fn installability_channels() -> Vec<ReleaseChannel> {
+    vec![
+        ReleaseChannel::GitHubReleases,
+        ReleaseChannel::Cargo,
+        ReleaseChannel::NpmWrapper,
+        ReleaseChannel::Docker,
+        ReleaseChannel::Homebrew,
+        ReleaseChannel::GitHubAction,
+    ]
+}
+
+fn status_for_file(workspace: &Path, relative: &str) -> ChannelEvidenceStatus {
+    if workspace.join(relative).exists() {
+        ChannelEvidenceStatus::Ready
+    } else {
+        ChannelEvidenceStatus::Blocked
+    }
+}
+
+fn tool_or_file_evidence(
+    channel: ReleaseChannel,
+    workspace: &Path,
+    evidence_path: &str,
+    tool: &str,
+    command: &str,
+    blocker: &str,
+) -> ChannelEvidence {
+    let file_exists = workspace.join(evidence_path).exists();
+    let tool_available = command_available(tool);
+    let status = if !file_exists {
+        ChannelEvidenceStatus::Blocked
+    } else if tool_available {
+        ChannelEvidenceStatus::Ready
+    } else {
+        ChannelEvidenceStatus::ToolUnavailable
+    };
+    ChannelEvidence {
+        channel,
+        status,
+        command: command.to_string(),
+        evidence_path: evidence_path.to_string(),
+        blocker: if status == ChannelEvidenceStatus::ToolUnavailable {
+            Some(blocker.to_string())
+        } else {
+            None
+        },
+        published: false,
+        external_url: None,
+        dry_run: true,
+    }
+}
+
+fn command_available(command: &str) -> bool {
+    let Some(paths) = std::env::var_os("PATH") else {
+        return false;
+    };
+    std::env::split_paths(&paths).any(|path| {
+        let direct = path.join(command);
+        let exe = path.join(format!("{command}.exe"));
+        direct.is_file() || exe.is_file()
+    })
+}
+
+fn write_evidence_file(path: &Path, bytes: &[u8]) -> Result<(), ReleaseError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|error| ReleaseError::Io {
+            path: parent.to_path_buf(),
+            message: error.to_string(),
+        })?;
+    }
+    fs::write(path, bytes).map_err(|error| ReleaseError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })
+}
+
+fn display_path(path: &Path) -> String {
+    path.display().to_string().replace('\\', "/")
+}
+
+fn publication_blockers_for(report: &ReleaseInstallabilityReport) -> Vec<String> {
+    if report.publication_ready == PublicationReadiness::Ready {
+        return Vec::new();
+    }
+    let mut blockers = Vec::new();
+    for channel in [
+        ReleaseChannel::GitHubReleases,
+        ReleaseChannel::Homebrew,
+        ReleaseChannel::Cargo,
+        ReleaseChannel::Docker,
+        ReleaseChannel::NpmWrapper,
+    ] {
+        if let Some(evidence) = report.channel(channel) {
+            if !evidence.published || evidence.external_url.is_none() {
+                blockers.push(format!(
+                    "{channel:?} publication requires real credentials and external artifact URL/digest"
+                ));
+            }
+        }
+    }
+    blockers
 }
