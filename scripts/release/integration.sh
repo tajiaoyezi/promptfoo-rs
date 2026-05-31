@@ -11,6 +11,7 @@ cargo test \
   --test current_upstream_rebaseline_gate \
   --test viewer_config_source_reclassification \
   --test core_config_source_fixture_burndown \
+  --test provider_request_response_fixture_burndown \
   --test real_p0_golden_corpus_runner \
   --test real_upstream_smoke_gate \
   --test viewer_node_packaging_release \
