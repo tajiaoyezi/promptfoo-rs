@@ -21,7 +21,22 @@ fn test_13_1_1_every_command_and_flag_inventory_item_has_status_mapping() {
     assert!(report
         .status_by_item
         .iter()
-        .any(|(item, status)| item == "command:view-directory" && status == "later"));
+        .any(|(item, status)| item == "command:view-directory" && status == "implemented"));
+    for stable_id in [
+        "command:cache",
+        "command:import-file",
+        "command:export",
+        "flag:output",
+        "flag:max-concurrency",
+    ] {
+        assert!(
+            report
+                .status_by_item
+                .iter()
+                .any(|(item, status)| item == stable_id && status == "implemented"),
+            "{stable_id} must be implemented: {report:#?}"
+        );
+    }
     assert!(report
         .status_by_item
         .iter()
@@ -38,18 +53,21 @@ fn test_13_1_2_user_visible_commands_do_not_return_empty_success_placeholders() 
     let report = validate_cli_surface(&CliSurface::current(), &inventory);
 
     assert!(report.empty_success_commands.is_empty(), "{report:#?}");
-    for command in ["view", "cache", "import", "export"] {
+    for args in [
+        vec!["view", "definitely-missing-results-dir"],
+        vec!["import"],
+        vec!["export", "--output", "missing-input.csv"],
+    ] {
         let output = promptfoo_rs()
-            .arg(command)
+            .args(args.clone())
             .output()
-            .expect("placeholder command should execute");
-        assert_eq!(output.status.code(), Some(1), "{command}: {output:?}");
-        assert!(output.stdout.is_empty(), "{command}: {output:?}");
+            .expect("command should execute");
+        assert_eq!(output.status.code(), Some(1), "{args:?}: {output:?}");
+        assert!(output.stdout.is_empty(), "{args:?}: {output:?}");
         let stderr = String::from_utf8_lossy(&output.stderr);
-        assert!(stderr.contains(command), "{stderr}");
         assert!(
-            stderr.contains("not yet implemented") || stderr.contains("unsupported"),
-            "{stderr}"
+            !stderr.contains("not yet implemented") && !stderr.contains("tracked for task"),
+            "{args:?}: {stderr}"
         );
     }
 }
