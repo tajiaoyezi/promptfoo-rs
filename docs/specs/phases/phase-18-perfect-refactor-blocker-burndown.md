@@ -21,7 +21,7 @@ Phase 17 已证明 frozen baseline 的真实 upstream corpus、长尾分类和�
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
 | 18.1 | source-inventory-ledger-closure | ../tasks/task-18.1-source-inventory-ledger-closure.md | Done | 将 source-extracted items 全量转成 ledger/accounting rows，清零 missing-matrix-row silent omissions，同时保留真实 P0 blocker |
-| 18.2 | p0-provider-module-fixture-burndown | ../tasks/task-18.2-p0-provider-module-fixture-burndown.md | Ready | 为 37 个 P0 provider module blockers 补 fixture/native evidence 或给出可审计阻断决策 |
+| 18.2 | p0-provider-module-fixture-burndown | ../tasks/task-18.2-p0-provider-module-fixture-burndown.md | Done | 为 37 个 P0 provider module blockers 补 fixture/native evidence 或给出可审计阻断决策 |
 | 18.3 | current-upstream-rebaseline-gate | ../tasks/task-18.3-current-upstream-rebaseline-gate.md | Ready | 建立 current upstream target mode，防止 frozen baseline 完成被误称为 current promptfoo 完美重构 |
 | 18.4 | publication-authority-release-gate | ../tasks/task-18.4-publication-authority-release-gate.md | Ready | 把 dry-run installability 与真实公开发布凭据/授权拆分成可验证 gate |
 
@@ -32,7 +32,7 @@ Phase 17 已证明 frozen baseline 的真实 upstream corpus、长尾分类和�
 ## 6. Phase Acceptance Criteria
 
 - [x] source inventory evidence 不再把 source-extracted item 缺少显式矩阵行表现为 silent missing rows；每个 source item 都有 ledger row、level/status/owner/verification/reason，且 P0 未实现项仍为 release blocker。
-- [ ] 37 个 P0 provider module blockers 被逐项消解为 native fixture、bridge fixture、explicit legal/credential blocker 或 documented waiver；不得用笼统 later 行吞掉 P0。
+- [x] 37 个 P0 provider module blockers 被逐项消解为 native fixture、bridge fixture、explicit legal/credential blocker 或 documented waiver；不得用笼统 later 行吞掉 P0。
 - [ ] current upstream HEAD 与 frozen npm baseline 的目标模式在 machine-readable policy 中分离；任何“完美重构”声明必须指明 target mode，current mode 不可复用 frozen-only evidence。
 - [ ] release candidate 报告清楚区分 local installability ready、public publication credential-blocked、legal/brand blocked 和 actually published；没有真实凭据时不得把渠道标 published=true。
 

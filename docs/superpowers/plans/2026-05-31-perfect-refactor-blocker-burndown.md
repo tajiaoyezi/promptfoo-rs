@@ -60,17 +60,16 @@ Expected: all listed keys pass.
 
 **Files:**
 - Create: `tests/p0_provider_module_fixture_burndown.rs`
-- Modify: `compatibility/inventory/upstream-items.json`
-- Modify: `compatibility/fixtures/providers/`
+- Reuse: `compatibility/fixtures/providers/`
 - Modify: `src/compatibility/provider_assertion.rs`
 - Modify: `scripts/release/longtail-classification.sh`
 - Modify: `docs/compatibility/matrix.md`
 
-- [ ] **Step 1: Write failing tests for current blocker rows**
-- [ ] **Step 2: Add mock fixtures for provider helper modules that map to existing P0 providers**
-- [ ] **Step 3: Preserve external-service rows as explicit blockers**
-- [ ] **Step 4: Verify longtail report counts and reasons**
-- [ ] **Step 5: Commit RED, GREEN, and docs completion notes**
+- [x] **Step 1: Write failing tests for current blocker rows**
+- [x] **Step 2: Map provider helper modules to existing P0 mock fixtures**
+- [x] **Step 3: Preserve external-service rows as explicit blockers**
+- [x] **Step 4: Verify longtail report counts and reasons**
+- [x] **Step 5: Commit RED, GREEN, and docs completion notes**
 
 ### Task 3: Current Upstream Rebaseline Gate
 

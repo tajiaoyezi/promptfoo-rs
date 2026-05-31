@@ -1,6 +1,6 @@
 # promptfoo current perfect-refactor audit - 2026-05-31
 
-**Status**: Current audit verdict after Phase 17 refresh
+**Status**: Current audit verdict after Phase 18.2 provider-module burndown
 **Objective**: determine whether the current `promptfoo-rs` worktree completely satisfies a perfect refactor of `promptfoo/promptfoo`.
 **Verdict**: Not fully satisfied.
 
@@ -66,6 +66,7 @@ The project is materially stronger than the earlier audit snapshots:
 - Phase 16 removed the previous no-op CLI behavior for `view`, `cache`, `import`, and `export`.
 - Runtime smoke produces measured `performance.json`, `security.json`, and `release-candidate.json`.
 - Phase 17 added source-tree extraction evidence, CLI/flag closure evidence, a 50-fixture real upstream P0 corpus, long-tail classification, and release installability evidence.
+- Phase 18.2 added provider-module burndown evidence: 37 P0 provider module blockers are now split into 13 existing P0 fixture-covered rows and 24 explicit remaining blockers with item-level reasons.
 
 These are real progress items. They support a scoped frozen-baseline compatibility implementation, not a literal perfect refactor claim.
 
@@ -99,11 +100,15 @@ Verdict: the project can claim only frozen-baseline compatibility. It cannot hon
 - `status`: `ready-with-blockers`
 - `source_extracted_item_count`: 433
 - `tracked_longtail_item_count`: 433
-- `p0_release_blocker_count`: 37
+- `p0_provider_module_burndown.initial_blocker_count`: 37
+- `p0_provider_module_burndown.resolved_by_fixture_count`: 13
+- `p0_provider_module_burndown.remaining_blocker_count`: 24
+- `p0_release_blocker_count`: 24
 - `unresolved_rows`: 0
 - `missing_reason_rows`: 0
+- `p0_release_blockers[]`: lists every remaining provider module blocker by item id, source reference, reason, verification, and external-authority flag
 
-This is good auditability: the long tail is classified, unresolved rows are cleared, and missing reasons are not hidden. It is still not perfect/native parity because 37 P0 provider module blockers remain explicit.
+This is better auditability than Phase 17: existing OpenAI/Anthropic/HTTP/Ollama P0 fixtures now cover 13 source provider modules, while Codex, Claude Code auth, billing, ChatKit, Agents, Realtime, Assistant, and endpoint-specific unfixtureed modules remain explicit blockers. It is still not perfect/native parity because 24 P0 provider module blockers remain release-blocking.
 
 ### P1 - Compatibility matrix intentionally contains later, unsupported, and partial-parity rows
 
@@ -143,7 +148,7 @@ Local dry-run installability is proven. Real multi-channel publication is not pr
 | Current upstream repository parity | GitHub `HEAD=ff8eafd...` differs from frozen tag; later `code-scan-action: 0.1.7` release exists | Not met |
 | 100% source-extracted upstream item accounting | 2549 source-extracted items now have 2549 ledger rows and missing matrix rows are 0 | Met as accounting, not implementation parity |
 | P0 real upstream golden diff corpus | 50 real upstream P0 fixtures are recorded and smoke metadata is ready | Met for recorded corpus |
-| Provider/assertion/redteam long-tail parity | 433 tracked long-tail rows, but 37 explicit P0 provider module release blockers remain | Not met |
+| Provider/assertion/redteam long-tail parity | 433 tracked long-tail rows; provider module burndown resolves 13 of 37 via fixture evidence, but 24 explicit P0 provider module release blockers remain | Not met |
 | Compatibility matrix honesty | P1/P2/later/unsupported rows are explicit and reasoned | Met as auditability, not perfect parity |
 | Viewer/npm package local build smoke | Viewer and npm package smoke scripts pass in full local gate | Met for local smoke |
 | Multi-channel public release | Dry-run artifacts exist, but all channels are unpublished and publication is credential-blocked | Not proven |
@@ -155,7 +160,7 @@ The current project is a substantially improved, locally verified, S2V-complete 
 The remaining gap is no longer basic project readiness. It is deep parity and release proof:
 
 1. resolve the 111 P0 source accounting blockers now exposed by the ledger,
-2. resolve the 37 P0 long-tail provider module blockers,
+2. resolve the 24 remaining P0 long-tail provider module blockers,
 3. decide whether to rebaseline from frozen `0.121.13` to current upstream `HEAD`,
 4. either implement or formally scope out the current upstream surfaces that are outside the frozen PRD target,
 5. complete real publication evidence for the intended release channels once credentials and release authority exist.
@@ -167,7 +172,7 @@ Until those are resolved, the honest project claim is "auditable frozen-baseline
 Add follow-up S2V work focused on blocker burn-down rather than smoke hardening:
 
 - source inventory P0 accounting blocker burn-down from the new ledger;
-- fixture or waiver decisions for the 37 P0 long-tail provider module blockers;
+- fixture or waiver decisions for the 24 remaining P0 long-tail provider module blockers;
 - explicit rebaseline ADR if the target changes from `0.121.13` to current upstream `HEAD`;
 - publication credential/authority checklist for GitHub Releases, Cargo, npm, Docker, Homebrew, and GitHub Action;
 - compatibility matrix update that separates "frozen-baseline complete" from "current-upstream complete."
