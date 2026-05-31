@@ -144,7 +144,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 13 | cli-output-eval-parity | docs/specs/phases/phase-13-cli-output-eval-parity.md | Done | 2 | N/A (solo) |
 | 14 | provider-assertion-redteam-parity | docs/specs/phases/phase-14-provider-assertion-redteam-parity.md | Done | 2 | N/A (solo) |
 | 15 | release-hardening-performance | docs/specs/phases/phase-15-release-hardening-performance.md | Done | 2 | N/A (solo) |
-| 16 | parity-proof-hardening | docs/specs/phases/phase-16-parity-proof-hardening.md | Ready | 3 | N/A (solo) |
+| 16 | parity-proof-hardening | docs/specs/phases/phase-16-parity-proof-hardening.md | In Progress | 3 | N/A (solo) |
 
 ## Task 总索引
 
@@ -184,7 +184,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 14.2 | redteam-engine | docs/specs/tasks/task-14.2-redteam-plugin-strategy-parity.md | Done | Phase 14 order 2 | N/A (solo) |
 | 15.1 | release-viewer-node | docs/specs/tasks/task-15.1-viewer-node-packaging-release.md | Done | Phase 15 order 1 | N/A (solo) |
 | 15.2 | release-gates | docs/specs/tasks/task-15.2-performance-security-observability-gates.md | Done | Phase 15 order 2 | N/A (solo) |
-| 16.1 | cli | docs/specs/tasks/task-16.1-cli-command-behavior-closure.md | Ready | Phase 16 order 1 | N/A (solo) |
+| 16.1 | cli | docs/specs/tasks/task-16.1-cli-command-behavior-closure.md | In Progress | Phase 16 order 1 | N/A (solo) |
 | 16.2 | release-gates | docs/specs/tasks/task-16.2-measured-release-gate-reports.md | Ready | Phase 16 order 2 | N/A (solo) |
 | 16.3 | compatibility | docs/specs/tasks/task-16.3-source-extracted-inventory-real-upstream-smoke.md | Ready | Phase 16 order 3 | N/A (solo) |
 

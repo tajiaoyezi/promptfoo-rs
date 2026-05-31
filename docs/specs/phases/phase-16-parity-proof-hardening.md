@@ -1,6 +1,6 @@
 # Phase 16: parity-proof-hardening
 
-**Status**: Ready
+**Status**: In Progress
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 

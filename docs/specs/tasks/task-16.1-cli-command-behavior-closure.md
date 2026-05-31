@@ -1,6 +1,6 @@
 # Task 16.1: cli-command-behavior-closure
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 16 — parity-proof-hardening
