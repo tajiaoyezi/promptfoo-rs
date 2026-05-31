@@ -228,8 +228,11 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 13 | cli-output-eval-parity | CLI commands/flags、eval outputs、cache/resume/retry 行为达到 item-level parity 或有明确分类证据 | `src/cli` + `src/output` + `src/cache` + `tests/` + compatibility fixtures | 12 | 否 |
 | 14 | provider-assertion-redteam-parity | provider/assertion/redteam plugin/strategy inventory 对齐 upstream，P0 有 fixture，P2/later 有原因和用户可见行为 | `src/providers` + `src/assertions` + `src/redteam` + `docs/compatibility/` | 13 | 否 |
 | 15 | release-hardening-performance | viewer/npm packaging、lint/integration/e2e/coverage/runtime-smoke、性能、安全、观测 release gates 均可执行 | `viewer/` + `npm/` + `scripts/release/` + `.github/workflows/` + adapter commands | 14 | 否 |
+| 16 | parity-proof-hardening | 移除审查中仍可观察到的 explicit later CLI 命令、合成 release 证据和非真实 upstream smoke 证据 | `src/cli` + `src/viewer_server.rs` + `src/cache` + `scripts/release/` + `compatibility/inventory/` + `compatibility/artifacts/` + `tests/` | 15 | 否 |
 
 > Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
+>
+> Phase 16 是 2026-05-31 复审后的证据硬化链路，依据 PRD §Core Capabilities / §Success Metrics、ADR-004、ADR-007、ADR-009，以及 task-13.1 / task-15.2 §10 中登记的剩余风险。它不改写既有 Done 履迹，而是把已登记为 `later` 或合成证据的关键项推进到可执行、可审计的 stable release 证据。
 
 ---
 

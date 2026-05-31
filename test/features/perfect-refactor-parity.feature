@@ -12,6 +12,9 @@
 #   - docs/specs/tasks/task-14.2-redteam-plugin-strategy-parity.md
 #   - docs/specs/tasks/task-15.1-viewer-node-packaging-release.md
 #   - docs/specs/tasks/task-15.2-performance-security-observability-gates.md
+#   - docs/specs/tasks/task-16.1-cli-command-behavior-closure.md
+#   - docs/specs/tasks/task-16.2-measured-release-gate-reports.md
+#   - docs/specs/tasks/task-16.3-source-extracted-inventory-real-upstream-smoke.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -77,3 +80,18 @@ Feature: perfect refactor parity
     Given a release candidate build
     When full release verification runs
     Then TEST-15.2.1 proves lint integration e2e coverage runtime smoke performance and security gates are enforced
+
+  Scenario: SCEN-16.1.1 - CLI later commands become executable local compatibility behavior
+    Given local result and cache artifacts exist
+    When view cache import and export commands run
+    Then TEST-16.1.1 proves those commands return stable local JSON behavior instead of later placeholders
+
+  Scenario: SCEN-16.2.1 - release reports are measured or derived from this runtime smoke
+    Given runtime smoke executes release candidate checks
+    When performance security and release candidate reports are written
+    Then TEST-16.2.1 proves stable decisions come from measured gate evidence rather than fixed JSON literals
+
+  Scenario: SCEN-16.3.1 - real upstream smoke and source inventory evidence back the matrix
+    Given frozen promptfoo upstream artifacts are reachable
+    When source extraction and real upstream smoke run
+    Then TEST-16.3.1 proves matrix and golden artifacts are based on upstream promptfoo 0.121.13 evidence
