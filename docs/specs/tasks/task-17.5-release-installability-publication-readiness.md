@@ -1,6 +1,6 @@
 # Task 17.5: release-installability-publication-readiness
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P1
 **Owner**: leafiellune
 **Related Phase**: Phase 17 — deep-upstream-parity-proof
@@ -70,19 +70,19 @@ Release readiness command 必须在本地生成 release archive、checksums、ca
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-008): release installability report records binary archive/checksum, cargo package dry-run, npm pack, viewer/npm smoke, GitHub Action workflow gate, and Docker/Homebrew dry-run evidence or explicit unavailable-tool blocker.
-- [ ] **AC2** (PRD §Release constraints): stable publication status is `credential_blocked` unless real GitHub/Homebrew/crates.io/Docker/npm credentials and external artifact URLs/digests are present; local dry-run evidence cannot be labeled as published.
-- [ ] **AC3** (ADR-007 / task-17.3): release workflow requires full 50+ P0 real golden corpus gate before any stable artifact build or publication job.
-- [ ] **AC4** (PRD §Security): release evidence records checksums, no-upload statement, redaction/security gate result, and excludes secrets from artifacts/logs.
+- [x] **AC1** (ADR-008): release installability report records binary archive/checksum, cargo package dry-run, npm pack, viewer/npm smoke, GitHub Action workflow gate, and Docker/Homebrew dry-run evidence or explicit unavailable-tool blocker.
+- [x] **AC2** (PRD §Release constraints): stable publication status is `credential_blocked` unless real GitHub/Homebrew/crates.io/Docker/npm credentials and external artifact URLs/digests are present; local dry-run evidence cannot be labeled as published.
+- [x] **AC3** (ADR-007 / task-17.3): release workflow requires full 50+ P0 real golden corpus gate before any stable artifact build or publication job.
+- [x] **AC4** (PRD §Security): release evidence records checksums, no-upload statement, redaction/security gate result, and excludes secrets from artifacts/logs.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-17.5.1 | TEST-17.5.1 | tests/release_installability_publication_readiness.rs | install, lint, typecheck, unit-test, integration, build, runtime-smoke | Spec Ready |
-| AC2 | SCEN-17.5.1 | TEST-17.5.2 | tests/release_installability_publication_readiness.rs | install, lint, typecheck, unit-test, integration, build, runtime-smoke | Spec Ready |
-| AC3 | SCEN-17.5.1 | TEST-17.5.3 | tests/release_installability_publication_readiness.rs | install, lint, typecheck, unit-test, integration, coverage, build, runtime-smoke | Spec Ready |
-| AC4 | SCEN-17.5.1 | TEST-17.5.4 | tests/release_installability_publication_readiness.rs | install, lint, typecheck, unit-test, integration, e2e, build, runtime-smoke | Spec Ready |
+| AC1 | SCEN-17.5.1 | TEST-17.5.1 | tests/release_installability_publication_readiness.rs | install, lint, typecheck, unit-test, integration, build, runtime-smoke | Done |
+| AC2 | SCEN-17.5.1 | TEST-17.5.2 | tests/release_installability_publication_readiness.rs | install, lint, typecheck, unit-test, integration, build, runtime-smoke | Done |
+| AC3 | SCEN-17.5.1 | TEST-17.5.3 | tests/release_installability_publication_readiness.rs | install, lint, typecheck, unit-test, integration, coverage, build, runtime-smoke | Done |
+| AC4 | SCEN-17.5.1 | TEST-17.5.4 | tests/release_installability_publication_readiness.rs | install, lint, typecheck, unit-test, integration, e2e, build, runtime-smoke | Done |
 
 ## 8. Risks
 
@@ -104,9 +104,40 @@ Release readiness command 必须在本地生成 release archive、checksums、ca
 
 ## 10. Completion Notes
 
-- **完成日期**：待实施后回填
-- **改动文件**：待实施后回填
-- **commit 列表**：待实施后回填
-- **§9 Verification 结果**：待实施后回填
-- **剩余风险 / 未做项**：待实施后回填
-- **下游 task 影响**：待实施后回填
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/release_installability_publication_readiness.rs`
+  - `src/release.rs`
+  - `scripts/release/installability.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `scripts/release/integration.sh`
+  - `scripts/release/coverage.sh`
+  - `scripts/release/real-upstream-smoke.sh`
+  - `.github/workflows/release.yml`
+  - `docs/release.md`
+  - `tests/real_upstream_smoke_gate.rs`
+  - `tests/cli_global_eval_redteam_parity.rs`
+  - `tests/frozen_source_inventory_extractor.rs`
+  - `tests/real_p0_golden_corpus_runner.rs`
+  - `docs/compatibility/matrix.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-17-deep-upstream-parity-proof.md`
+  - `docs/specs/tasks/task-17.5-release-installability-publication-readiness.md`
+- **commit 列表**：
+  - `247d3cf` `test(release): add SCEN-17.5.1 installability RED tests`
+  - `de44410` `feat(release): add installability publication readiness evidence`
+  - `a2c7ff4` `refactor(test): apply rustfmt for release lint gate`
+  - `98a4a4a` `test(release): require upstream smoke telemetry guard`
+  - `115edf5` `fix(release): disable upstream telemetry in real smoke gate`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS — `bash scripts/release/lint.sh` 通过；仓库级 `cargo fmt --all -- --check` 与 `cargo clippy --workspace --all-targets -- -D warnings` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-17.5.1 ~ TEST-17.5.5 与 real-upstream smoke telemetry guard 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 通过，包含 `release_installability_publication_readiness` 与 real upstream smoke contract tests。
+  - e2e: PASS — `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 通过；`target/release-gates/installability.json` schema=`promptfoo-rs.release-installability.v1`，installability_ready=`true`，publication_ready=`credential-blocked`，credential_blocked=`true`，published=`false`，artifacts/checksums=6；`target/release-gates/real-upstream-corpus/index.json` status=`ready`，fixture_count=50；`target/release-gates/real-upstream-smoke/latest/metadata.json` status=`ready`，upstream_exit_code=0，rs_exit_code=0。
+- **剩余风险 / 未做项**：真实 GitHub Release、Homebrew tap、crates.io、Docker registry、npm publish 仍需真实凭据、账号权限和发布授权；本 task 只证明 no-upload dry-run installability，并以 `credential-blocked`/`published=false` 防止把本地证据伪装成公开发布。`longtail-classification.json` 仍如实记录 37 个 P0 provider module blocker，`source-inventory-evidence.json` 仍如实记录非 provider/assertion/redteam source rows 的 release blockers。
+- **下游 task 影响**：Phase 17 收尾 smoke 可直接引用 `installability.json`、`release-candidate.json`、50+ real corpus artifacts 与 real upstream smoke metadata；后续真实公开发布 task 必须先取得凭据和授权，并保留当前 no-upload/credential-blocked 证据边界。
