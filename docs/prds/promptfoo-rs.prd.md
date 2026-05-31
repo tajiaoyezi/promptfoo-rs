@@ -233,6 +233,7 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 18 | perfect-refactor-blocker-burndown | 将 Phase 17 后仍阻断“完美重构”的 source missing rows、P0 provider blockers、current-upstream target 和 publication authority 转成可燃尽 release gate | `compatibility/inventory/` + `compatibility/matrix/` + `compatibility/fixtures/` + `src/compatibility/` + `src/providers` + `scripts/release/` + `docs/audits/` + `tests/` | 17 | 否 |
 | 19 | source-accounting-native-burndown | 继续燃尽 Phase 18 暴露的 P0 source accounting/provider blockers：纠正 viewer config 分类、补 core config/provider fixtures、集中 external authority blockers | `src/compatibility/` + `src/config/` + `src/providers/` + `scripts/release/` + `compatibility/fixtures/` + `docs/compatibility/` + `docs/audits/` + `tests/` | 18 | 否 |
 | 20 | cross-ledger-perfect-claim-closure | 关闭 Phase 19 后 source accounting/provider burndown/release claim 的跨 artifact 口径差异：fixture-covered provider rows 不再重复计入 source blocker，并新增 perfect-refactor claim contract | `src/compatibility/` + `src/release.rs` + `scripts/release/` + `target/release-gates/` + `docs/compatibility/` + `docs/audits/` + `tests/` | 19 | 否 |
+| 21 | upstream-distribution-target-disambiguation | 区分 npm core package 最新发布、GitHub repository HEAD、GitHub latest release tag 与 frozen baseline 的关系，防止把 non-core release 或 unreleased HEAD 漂移误读为 current promptfoo 完成或缺口 | `src/compatibility/inventory.rs` + `scripts/release/upstream-distribution-target.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `docs/compatibility/` + `docs/audits/` + `tests/` | 20 | 否 |
 
 > Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
 >
@@ -245,6 +246,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 19 是 2026-05-31 Phase 18 完成后的 native burndown 链路，依据 Phase 18 §9 artifact evidence 中仍保留的 111 个 generated P0 source accounting blockers、24 个 P0 provider module blockers 和 publication/current-upstream 边界。它优先修正已知分级错误（`src/app/**` viewer config 应按 Local Web viewer=P1 处理），再对剩余 core config/provider blockers 补 fixture 或 external authority gate。
 >
 > Phase 20 是 2026-05-31 Phase 19 smoke 后的 cross-ledger closure 链路，依据 Phase 19 §9 artifact evidence 中 `source-inventory-evidence.json` 仍有 44 个 P0 accounting blockers、而 `longtail-classification.json` 已证明 22 个 provider rows fixture-covered 且 15 个 provider rows 属 external authority。它不把 external/current/publication blocker 改名为完成，而是统一 source/provider/release claim 口径。
+
+> Phase 21 是 2026-05-31 Phase 20 smoke 后的 upstream target disambiguation 链路，依据 task 18.3 / task 20.2 仍保留的 current-upstream blocker。它把 npm core package latest、GitHub repo HEAD、GitHub latest release tag 和 frozen baseline 拆成独立证据，避免把 non-core release drift 或 unreleased HEAD 漂移误读成 promptfoo core package rebaseline。
 
 ---
 

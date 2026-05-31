@@ -179,3 +179,8 @@ Feature: perfect refactor parity
     Given local stable release gates can pass while source current publication or external authority blockers remain
     When perfect refactor claim contract is generated
     Then TEST-20.2.1 proves perfect_refactor_claim_allowed is false and TEST-20.2.3 proves every blocker source is listed
+
+  Scenario: SCEN-21.1.1 - upstream distribution target separates npm core from repository drift
+    Given the latest npm promptfoo core package and GitHub repository/release observations can differ
+    When upstream distribution target evidence is generated
+    Then TEST-21.1.1 proves npm core package alignment is recorded and TEST-21.1.3 proves non-core GitHub release drift cannot imply current perfect refactor readiness

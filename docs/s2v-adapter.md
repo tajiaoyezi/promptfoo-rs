@@ -149,6 +149,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 18 | perfect-refactor-blocker-burndown | docs/specs/phases/phase-18-perfect-refactor-blocker-burndown.md | Done | 4 | N/A (solo) |
 | 19 | source-accounting-native-burndown | docs/specs/phases/phase-19-source-accounting-native-burndown.md | Done | 4 | N/A (solo) |
 | 20 | cross-ledger-perfect-claim-closure | docs/specs/phases/phase-20-cross-ledger-perfect-claim-closure.md | Done | 2 | N/A (solo) |
+| 21 | upstream-distribution-target-disambiguation | docs/specs/phases/phase-21-upstream-distribution-target-disambiguation.md | Ready | 1 | N/A (solo) |
 
 ## Task 总索引
 
@@ -206,6 +207,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 19.4 | compatibility-authority | docs/specs/tasks/task-19.4-external-authority-blocker-waiver-gate.md | Done | Phase 19 order 4 | N/A (solo) |
 | 20.1 | compatibility-inventory | docs/specs/tasks/task-20.1-source-provider-accounting-reconciliation.md | Done | Phase 20 order 1 | N/A (solo) |
 | 20.2 | release | docs/specs/tasks/task-20.2-perfect-refactor-claim-contract.md | Done | Phase 20 order 2 | N/A (solo) |
+| 21.1 | compatibility-target | docs/specs/tasks/task-21.1-upstream-distribution-target-gate.md | Ready | Phase 21 order 1 | N/A (solo) |
 
 ## ADR 索引
 
@@ -241,4 +243,4 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 8.2 | test/features/scan-engine.feature |
 | 9.1 | test/features/script-bridge.feature |
 | 10.1 | test/features/web-viewer.feature |
-| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5, 18.1, 18.2, 18.3, 18.4, 19.1, 19.2, 19.3, 19.4, 20.1, 20.2 | test/features/perfect-refactor-parity.feature |
+| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5, 18.1, 18.2, 18.3, 18.4, 19.1, 19.2, 19.3, 19.4, 20.1, 20.2, 21.1 | test/features/perfect-refactor-parity.feature |
