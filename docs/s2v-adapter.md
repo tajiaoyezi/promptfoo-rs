@@ -191,7 +191,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 17.1 | compatibility-inventory | docs/specs/tasks/task-17.1-frozen-source-inventory-extractor.md | Done | Phase 17 order 1 | N/A (solo) |
 | 17.2 | cli | docs/specs/tasks/task-17.2-cli-global-eval-redteam-parity.md | Done | Phase 17 order 2 | N/A (solo) |
 | 17.3 | compatibility-harness | docs/specs/tasks/task-17.3-real-p0-golden-corpus-runner.md | Done | Phase 17 order 3 | N/A (solo) |
-| 17.4 | provider-assertion-redteam | docs/specs/tasks/task-17.4-longtail-provider-assertion-redteam-classification.md | Ready | Phase 17 order 4 | N/A (solo) |
+| 17.4 | provider-assertion-redteam | docs/specs/tasks/task-17.4-longtail-provider-assertion-redteam-classification.md | Done | Phase 17 order 4 | N/A (solo) |
 | 17.5 | release | docs/specs/tasks/task-17.5-release-installability-publication-readiness.md | Ready | Phase 17 order 5 | N/A (solo) |
 
 ## ADR 索引

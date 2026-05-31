@@ -1,6 +1,6 @@
 # Task 17.4: longtail-provider-assertion-redteam-classification
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 17 — deep-upstream-parity-proof
@@ -74,19 +74,19 @@
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-009): all source-extracted provider/assertion/redteam rows have native/bridge/unsupported/later/blocked classification, owner, verification, reason where needed, and no unresolved/missing-reason rows.
-- [ ] **AC2** (PRD §Compatibility Matrix): P0 provider/assertion/redteam rows have real fixture, snapshot, or release-blocking blocker; P1 rows have snapshot plans; P2/later/unsupported rows have reason and target.
-- [ ] **AC3** (ADR-005): script-backed JS/TS/Python/Shell/Ruby provider/assertion rows remain default-deny, allowlisted when enabled, timed out, redacted, and covered by bridge fixtures.
-- [ ] **AC4** (PRD §User Flow / Redteam): invoking an unsupported/later/blocked provider/assertion/redteam item returns a stable user-visible error with item id, classification, reason, no secret leakage, and nonzero exit where applicable.
+- [x] **AC1** (ADR-009): all source-extracted provider/assertion/redteam rows have native/bridge/unsupported/later/blocked classification, owner, verification, reason where needed, and no unresolved/missing-reason rows.
+- [x] **AC2** (PRD §Compatibility Matrix): P0 provider/assertion/redteam rows have real fixture, snapshot, or release-blocking blocker; P1 rows have snapshot plans; P2/later/unsupported rows have reason and target.
+- [x] **AC3** (ADR-005): script-backed JS/TS/Python/Shell/Ruby provider/assertion rows remain default-deny, allowlisted when enabled, timed out, redacted, and covered by bridge fixtures.
+- [x] **AC4** (PRD §User Flow / Redteam): invoking an unsupported/later/blocked provider/assertion/redteam item returns a stable user-visible error with item id, classification, reason, no secret leakage, and nonzero exit where applicable.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-17.4.1 | TEST-17.4.1 | tests/longtail_provider_assertion_redteam_classification.rs | install, typecheck, unit-test, integration, coverage, build | Spec Ready |
-| AC2 | SCEN-17.4.1 | TEST-17.4.2 | tests/longtail_provider_assertion_redteam_classification.rs | install, typecheck, unit-test, integration, coverage, build | Spec Ready |
-| AC3 | SCEN-17.4.1 | TEST-17.4.3 | tests/longtail_provider_assertion_redteam_classification.rs | install, typecheck, unit-test, integration, runtime-smoke, build | Spec Ready |
-| AC4 | SCEN-17.4.1 | TEST-17.4.4 | tests/longtail_provider_assertion_redteam_classification.rs | install, typecheck, unit-test, integration, e2e, build | Spec Ready |
+| AC1 | SCEN-17.4.1 | TEST-17.4.1 | tests/longtail_provider_assertion_redteam_classification.rs | install, typecheck, unit-test, integration, coverage, build | Done |
+| AC2 | SCEN-17.4.1 | TEST-17.4.2 | tests/longtail_provider_assertion_redteam_classification.rs | install, typecheck, unit-test, integration, coverage, build | Done |
+| AC3 | SCEN-17.4.1 | TEST-17.4.3 | tests/longtail_provider_assertion_redteam_classification.rs | install, typecheck, unit-test, integration, runtime-smoke, build | Done |
+| AC4 | SCEN-17.4.1 | TEST-17.4.4 | tests/longtail_provider_assertion_redteam_classification.rs | install, typecheck, unit-test, integration, e2e, build | Done |
 
 ## 8. Risks
 
@@ -107,9 +107,32 @@
 
 ## 10. Completion Notes
 
-- **完成日期**：待实施后回填
-- **改动文件**：待实施后回填
-- **commit 列表**：待实施后回填
-- **§9 Verification 结果**：待实施后回填
-- **剩余风险 / 未做项**：待实施后回填
-- **下游 task 影响**：待实施后回填
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/longtail_provider_assertion_redteam_classification.rs`
+  - `src/compatibility/provider_assertion.rs`
+  - `src/compatibility/matrix.rs`
+  - `compatibility/inventory/upstream-items.json`
+  - `scripts/release/longtail-classification.sh`
+  - `scripts/release/integration.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `tests/provider_assertion_inventory_parity.rs`
+  - `tests/redteam_plugin_strategy_parity.rs`
+  - `docs/compatibility/matrix.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-17-deep-upstream-parity-proof.md`
+  - `docs/specs/tasks/task-17.4-longtail-provider-assertion-redteam-classification.md`
+- **commit 列表**：
+  - `353c385` `test(compatibility): add SCEN-17.4.1 longtail classification RED tests`
+  - `ce28501` `feat(compatibility): classify source-extracted longtail parity rows`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-17.4.1 ~ TEST-17.4.4 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 通过，包含 `longtail_provider_assertion_redteam_classification`。
+  - e2e: PASS — `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 通过；`target/release-gates/longtail-classification.json` status=`ready-with-blockers`，source_extracted_item_count=433，tracked_longtail_item_count=433，missing_tracked_rows=0，unresolved_rows=0，missing_reason_rows=0，p0_release_blocker_count=37。
+- **剩余风险 / 未做项**：37 个 source-extracted P0 provider module rows 当前以 explicit release-blocking blocker 表示；这是 AC2 允许的保守分类，不声称这些 per-file provider modules 已有独立 native fixture。后续 task 17.5 必须把该 blocker evidence 纳入 release readiness，不得把需要凭据/更细 fixture 的长尾项伪装成已公开发布可用。
+- **下游 task 影响**：task 17.5 可读取 `target/release-gates/longtail-classification.json`、更新 release readiness evidence，并把 longtail ready-with-blockers 与真实发布凭据 blocker 一起呈现。

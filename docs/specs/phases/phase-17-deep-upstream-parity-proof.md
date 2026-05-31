@@ -23,7 +23,7 @@ Phase 16 已证明本地 gate 可执行且一个真实 upstream smoke 可通过�
 | 17.1 | frozen-source-inventory-extractor | ../tasks/task-17.1-frozen-source-inventory-extractor.md | Done | 从 frozen upstream tag/package 源码提取完整 capability inventory 并阻断 silent omissions |
 | 17.2 | cli-global-eval-redteam-parity | ../tasks/task-17.2-cli-global-eval-redteam-parity.md | Done | 扩展 top-level/eval/redteam CLI command/flag parity 或明确 unsupported/later 行为 |
 | 17.3 | real-p0-golden-corpus-runner | ../tasks/task-17.3-real-p0-golden-corpus-runner.md | Done | 让至少 50 个 P0 fixture 真实执行 upstream 与 promptfoo-rs 并持久化 diff artifacts |
-| 17.4 | longtail-provider-assertion-redteam-classification | ../tasks/task-17.4-longtail-provider-assertion-redteam-classification.md | Ready | 将 provider/assertion/redteam 长尾 source rows 全量分类、实现或登记用户可见 gap |
+| 17.4 | longtail-provider-assertion-redteam-classification | ../tasks/task-17.4-longtail-provider-assertion-redteam-classification.md | Done | 将 provider/assertion/redteam 长尾 source rows 全量分类、实现或登记用户可见 gap |
 | 17.5 | release-installability-publication-readiness | ../tasks/task-17.5-release-installability-publication-readiness.md | Ready | 生成多渠道可安装 artifact dry-run 证据并区分需要真实凭据的公开发布步骤 |
 
 ## 5. Dependencies
