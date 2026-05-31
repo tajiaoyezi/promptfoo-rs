@@ -232,6 +232,7 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 17 | deep-upstream-parity-proof | 完整 frozen upstream source inventory、CLI/global/eval/redteam parity、50+ 真实 upstream golden corpus、长尾 capability 分类与发布安装证据均可执行 | `compatibility/inventory/` + `compatibility/matrix/` + `compatibility/fixtures/` + `compatibility/artifacts/` + `src/cli` + `src/providers` + `src/assertions` + `src/redteam` + `scripts/release/` + `.github/workflows/` | 16 | 否 |
 | 18 | perfect-refactor-blocker-burndown | 将 Phase 17 后仍阻断“完美重构”的 source missing rows、P0 provider blockers、current-upstream target 和 publication authority 转成可燃尽 release gate | `compatibility/inventory/` + `compatibility/matrix/` + `compatibility/fixtures/` + `src/compatibility/` + `src/providers` + `scripts/release/` + `docs/audits/` + `tests/` | 17 | 否 |
 | 19 | source-accounting-native-burndown | 继续燃尽 Phase 18 暴露的 P0 source accounting/provider blockers：纠正 viewer config 分类、补 core config/provider fixtures、集中 external authority blockers | `src/compatibility/` + `src/config/` + `src/providers/` + `scripts/release/` + `compatibility/fixtures/` + `docs/compatibility/` + `docs/audits/` + `tests/` | 18 | 否 |
+| 20 | cross-ledger-perfect-claim-closure | 关闭 Phase 19 后 source accounting/provider burndown/release claim 的跨 artifact 口径差异：fixture-covered provider rows 不再重复计入 source blocker，并新增 perfect-refactor claim contract | `src/compatibility/` + `src/release.rs` + `scripts/release/` + `target/release-gates/` + `docs/compatibility/` + `docs/audits/` + `tests/` | 19 | 否 |
 
 > Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
 >
@@ -242,6 +243,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 18 是 2026-05-31 Phase 17 复审后的 blocker burn-down 链路，依据 `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md` 中仍未满足“完美重构”的 2116 source inventory missing rows、37 个 P0 provider module blockers、current upstream 差异和 public publication credential blockers。它不把 blocker 改名为完成，而是把 silent omission、implementation blocker、rebaseline blocker、publication authority blocker 拆成独立可验证 task。
 
 > Phase 19 是 2026-05-31 Phase 18 完成后的 native burndown 链路，依据 Phase 18 §9 artifact evidence 中仍保留的 111 个 generated P0 source accounting blockers、24 个 P0 provider module blockers 和 publication/current-upstream 边界。它优先修正已知分级错误（`src/app/**` viewer config 应按 Local Web viewer=P1 处理），再对剩余 core config/provider blockers 补 fixture 或 external authority gate。
+>
+> Phase 20 是 2026-05-31 Phase 19 smoke 后的 cross-ledger closure 链路，依据 Phase 19 §9 artifact evidence 中 `source-inventory-evidence.json` 仍有 44 个 P0 accounting blockers、而 `longtail-classification.json` 已证明 22 个 provider rows fixture-covered 且 15 个 provider rows 属 external authority。它不把 external/current/publication blocker 改名为完成，而是统一 source/provider/release claim 口径。
 
 ---
 

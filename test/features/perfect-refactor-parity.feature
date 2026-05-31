@@ -169,3 +169,13 @@ Feature: perfect refactor parity
     Given remaining blockers require credentials accounts private services legal brand or publication authority
     When external authority blocker gate runs
     Then TEST-19.4.1 proves every external blocker has a required decision and TEST-19.4.4 proves perfect refactor is not claimed while they remain
+
+  Scenario: SCEN-20.1.1 - source provider accounting consumes provider burndown evidence
+    Given source accounting includes provider rows and provider burndown classifies fixture covered versus external authority rows
+    When source provider accounting reconciliation runs
+    Then TEST-20.1.1 proves fixture covered provider rows leave remaining P0 blockers and TEST-20.1.3 proves only config external and provider external blockers remain
+
+  Scenario: SCEN-20.2.1 - perfect refactor claim is separate from local stable release
+    Given local stable release gates can pass while source current publication or external authority blockers remain
+    When perfect refactor claim contract is generated
+    Then TEST-20.2.1 proves perfect_refactor_claim_allowed is false and TEST-20.2.3 proves every blocker source is listed
