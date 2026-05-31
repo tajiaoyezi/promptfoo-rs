@@ -148,6 +148,10 @@ source_inventory_p0_accounting_blocker_count="$(node -e "const r = JSON.parse(re
 installability_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/installability.json', 'utf8')); console.log(r.installability_ready ? 'true' : 'false')")"
 publication_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/installability.json', 'utf8')); console.log(r.publication_ready)")"
 credential_blocked="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/installability.json', 'utf8')); console.log(r.credential_blocked ? 'true' : 'false')")"
+publication_authority_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-authority.json', 'utf8')); console.log(r.publication_ready)")"
+publication_authority_credential_blocked="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-authority.json', 'utf8')); console.log(r.credential_blocked ? 'true' : 'false')")"
+publication_authority_legal_brand_blocked="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-authority.json', 'utf8')); console.log(r.legal_brand_blocked ? 'true' : 'false')")"
+publication_authority_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-authority.json', 'utf8')); console.log((r.blockers || []).length)")"
 stable_allowed="$(stable_allowed_from_gate "$adapter_status" "$compatibility_status" "$performance_status" "$security_status" "$packaging_status" "$observability_status" "$current_upstream_policy_status" "$real_upstream_smoke_status" "$real_upstream_corpus_status")"
 if [ "$stable_allowed" = "true" ]; then
   decision="stable"
@@ -206,6 +210,13 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
   "publication_ready": "$publication_ready",
   "credential_blocked": $credential_blocked,
   "published": false,
+  "publication_authority": {
+    "publication_ready": "$publication_authority_ready",
+    "credential_blocked": $publication_authority_credential_blocked,
+    "legal_brand_blocked": $publication_authority_legal_brand_blocked,
+    "blocker_count": $publication_authority_blocker_count,
+    "authority_artifact": "target/release-gates/publication-authority.json"
+  },
   "gate_statuses": {
     "adapter": "$adapter_status",
     "compatibility": "$compatibility_status",
@@ -242,6 +253,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/longtail-classification.json",
     "target/release-gates/current-upstream-policy.json",
     "target/release-gates/installability.json",
+    "target/release-gates/publication-authority.json",
     "target/release-gates/real-upstream-smoke/latest/metadata.json",
     "target/release-gates/real-upstream-corpus/index.json",
     "target/release-gates/real-upstream-corpus/summary.json",

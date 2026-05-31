@@ -486,6 +486,78 @@ pub enum PublicationReadiness {
     Blocked,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum PublicationAuthorityStatus {
+    Ready,
+    CredentialBlocked,
+    ToolUnavailable,
+    LegalBrandBlocked,
+    Blocked,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum CredentialProbeStatus {
+    Present,
+    MissingCredentials,
+    ToolUnavailable,
+    NotRequired,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CredentialProbe {
+    pub status: CredentialProbeStatus,
+    pub required_secrets: Vec<String>,
+    pub tool: Option<String>,
+    pub details: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PublishedEvidence {
+    pub url: String,
+    pub digest: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PublicationChannelAuthority {
+    pub channel: ReleaseChannel,
+    pub installability_status: ChannelEvidenceStatus,
+    pub authority_status: PublicationAuthorityStatus,
+    pub credential_probe: CredentialProbe,
+    pub legal_brand_requirement: String,
+    pub published: bool,
+    pub published_evidence: Option<PublishedEvidence>,
+    pub blocker: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PublicationAuthorityReport {
+    pub schema: String,
+    pub publication_ready: PublicationReadiness,
+    pub credential_blocked: bool,
+    pub legal_brand_blocked: bool,
+    pub channels: Vec<PublicationChannelAuthority>,
+    pub blockers: Vec<String>,
+    pub no_upload_evidence: String,
+}
+
+impl PublicationAuthorityReport {
+    pub fn channel(&self, channel: ReleaseChannel) -> Option<&PublicationChannelAuthority> {
+        self.channels
+            .iter()
+            .find(|candidate| candidate.channel == channel)
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PublicationGateDecision {
+    pub publication_ready: PublicationReadiness,
+    pub credential_blocked: bool,
+    pub invalid_published_evidence: Vec<ReleaseChannel>,
+    pub blockers: Vec<String>,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ChannelEvidence {
     pub channel: ReleaseChannel,
@@ -728,6 +800,117 @@ pub fn collect_channel_evidence(channel: ReleaseChannel, workspace: &Path) -> Ch
             }
         }
     }
+}
+
+pub type ReleaseEvidenceError = ReleaseError;
+
+pub fn collect_publication_authority(channels: &[ReleaseChannel]) -> PublicationAuthorityReport {
+    let mut report = PublicationAuthorityReport {
+        schema: "promptfoo-rs.publication-authority.v1".to_string(),
+        publication_ready: PublicationReadiness::Blocked,
+        credential_blocked: false,
+        legal_brand_blocked: true,
+        channels: channels
+            .iter()
+            .copied()
+            .map(publication_authority_for_channel)
+            .collect(),
+        blockers: Vec::new(),
+        no_upload_evidence:
+            "local dry-run only; no upload, publish, push, or external release command executed"
+                .to_string(),
+    };
+    let decision = validate_publication_evidence(&report);
+    report.publication_ready = decision.publication_ready;
+    report.credential_blocked = decision.credential_blocked;
+    report.blockers = decision.blockers;
+    report
+}
+
+pub fn validate_publication_evidence(
+    report: &PublicationAuthorityReport,
+) -> PublicationGateDecision {
+    let invalid_published_evidence = report
+        .channels
+        .iter()
+        .filter(|channel| {
+            channel.published
+                && channel
+                    .published_evidence
+                    .as_ref()
+                    .map(|evidence| {
+                        evidence.url.trim().is_empty() || evidence.digest.trim().is_empty()
+                    })
+                    .unwrap_or(true)
+        })
+        .map(|channel| channel.channel)
+        .collect::<Vec<_>>();
+
+    if !invalid_published_evidence.is_empty() {
+        let blockers = invalid_published_evidence
+            .iter()
+            .map(|channel| {
+                format!(
+                    "{} published=true requires external evidence URL and digest",
+                    publication_channel_label(*channel)
+                )
+            })
+            .collect();
+        return PublicationGateDecision {
+            publication_ready: PublicationReadiness::Blocked,
+            credential_blocked: false,
+            invalid_published_evidence,
+            blockers,
+        };
+    }
+
+    let blockers = report
+        .channels
+        .iter()
+        .filter(|channel| !channel.published)
+        .map(|channel| {
+            channel.blocker.clone().unwrap_or_else(|| {
+                format!(
+                    "{} publication requires real credentials, authority, and external artifact URL/digest",
+                    publication_channel_label(channel.channel)
+                )
+            })
+        })
+        .collect::<Vec<_>>();
+
+    if blockers.is_empty() {
+        PublicationGateDecision {
+            publication_ready: PublicationReadiness::Ready,
+            credential_blocked: false,
+            invalid_published_evidence,
+            blockers,
+        }
+    } else {
+        PublicationGateDecision {
+            publication_ready: PublicationReadiness::CredentialBlocked,
+            credential_blocked: true,
+            invalid_published_evidence,
+            blockers,
+        }
+    }
+}
+
+pub fn write_publication_authority_report(
+    report: &PublicationAuthorityReport,
+    path: &Path,
+) -> Result<(), ReleaseEvidenceError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|error| ReleaseError::Io {
+            path: parent.to_path_buf(),
+            message: error.to_string(),
+        })?;
+    }
+    let json = serde_json::to_string_pretty(report)
+        .map_err(|error| ReleaseError::Serialize(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(|error| ReleaseError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })
 }
 
 pub fn classify_publication_blockers(report: &ReleaseInstallabilityReport) -> PublicationReadiness {
@@ -1166,6 +1349,141 @@ fn command_available(command: &str) -> bool {
         let exe = path.join(format!("{command}.exe"));
         direct.is_file() || exe.is_file()
     })
+}
+
+fn publication_authority_for_channel(channel: ReleaseChannel) -> PublicationChannelAuthority {
+    let installability = collect_channel_evidence(channel, Path::new("."));
+    let (authority_status, credential_probe, blocker) =
+        publication_authority_requirements(channel, installability.status);
+    PublicationChannelAuthority {
+        channel,
+        installability_status: installability.status,
+        authority_status,
+        credential_probe,
+        legal_brand_requirement:
+            "Maintainer approval is required for package metadata, release notes, and brand/legal copy before public publication"
+                .to_string(),
+        published: false,
+        published_evidence: None,
+        blocker,
+    }
+}
+
+fn publication_authority_requirements(
+    channel: ReleaseChannel,
+    installability_status: ChannelEvidenceStatus,
+) -> (PublicationAuthorityStatus, CredentialProbe, Option<String>) {
+    if matches!(installability_status, ChannelEvidenceStatus::Blocked) {
+        return (
+            PublicationAuthorityStatus::Blocked,
+            CredentialProbe {
+                status: CredentialProbeStatus::MissingCredentials,
+                required_secrets: credential_requirements_for_channel(channel),
+                tool: publication_tool_for_channel(channel),
+                details: format!(
+                    "{} installability evidence is blocked before publication authority can be granted",
+                    publication_channel_label(channel)
+                ),
+            },
+            Some(format!(
+                "{} installability evidence is blocked; publication remains unavailable",
+                publication_channel_label(channel)
+            )),
+        );
+    }
+
+    if matches!(
+        installability_status,
+        ChannelEvidenceStatus::ToolUnavailable
+    ) {
+        return (
+            PublicationAuthorityStatus::ToolUnavailable,
+            CredentialProbe {
+                status: CredentialProbeStatus::ToolUnavailable,
+                required_secrets: credential_requirements_for_channel(channel),
+                tool: publication_tool_for_channel(channel),
+                details: format!(
+                    "{} publication tooling is unavailable in this environment",
+                    publication_channel_label(channel)
+                ),
+            },
+            Some(format!(
+                "{} publication requires unavailable local tooling plus real credentials and external evidence",
+                publication_channel_label(channel)
+            )),
+        );
+    }
+
+    if matches!(
+        channel,
+        ReleaseChannel::Stable | ReleaseChannel::Prerelease | ReleaseChannel::Nightly
+    ) {
+        return (
+            PublicationAuthorityStatus::LegalBrandBlocked,
+            CredentialProbe {
+                status: CredentialProbeStatus::NotRequired,
+                required_secrets: Vec::new(),
+                tool: None,
+                details: "release stage is not an external publication channel".to_string(),
+            },
+            Some("release stage is not an external publication channel".to_string()),
+        );
+    }
+
+    (
+        PublicationAuthorityStatus::CredentialBlocked,
+        CredentialProbe {
+            status: CredentialProbeStatus::MissingCredentials,
+            required_secrets: credential_requirements_for_channel(channel),
+            tool: publication_tool_for_channel(channel),
+            details: format!(
+                "{} external publication credentials are absent in local dry-run evidence",
+                publication_channel_label(channel)
+            ),
+        },
+        Some(format!(
+            "{} publication requires real credentials and external artifact URL/digest",
+            publication_channel_label(channel)
+        )),
+    )
+}
+
+fn credential_requirements_for_channel(channel: ReleaseChannel) -> Vec<String> {
+    match channel {
+        ReleaseChannel::GitHubReleases => vec!["GitHub release publish token".to_string()],
+        ReleaseChannel::Cargo => vec!["crates.io publish token".to_string()],
+        ReleaseChannel::NpmWrapper => vec!["npm publish token".to_string()],
+        ReleaseChannel::Docker => vec!["container registry credentials".to_string()],
+        ReleaseChannel::Homebrew => vec!["Homebrew tap publish token".to_string()],
+        ReleaseChannel::GitHubAction => vec!["GitHub Actions release permission".to_string()],
+        ReleaseChannel::Stable | ReleaseChannel::Prerelease | ReleaseChannel::Nightly => Vec::new(),
+    }
+}
+
+fn publication_tool_for_channel(channel: ReleaseChannel) -> Option<String> {
+    match channel {
+        ReleaseChannel::GitHubReleases => Some("gh".to_string()),
+        ReleaseChannel::Cargo => Some("cargo".to_string()),
+        ReleaseChannel::NpmWrapper => Some("pnpm/npm".to_string()),
+        ReleaseChannel::Docker => Some("docker".to_string()),
+        ReleaseChannel::Homebrew => Some("brew".to_string()),
+        ReleaseChannel::GitHubAction => Some("github-actions".to_string()),
+        ReleaseChannel::Stable | ReleaseChannel::Prerelease | ReleaseChannel::Nightly => None,
+    }
+}
+
+fn publication_channel_label(channel: ReleaseChannel) -> &'static str {
+    match channel {
+        ReleaseChannel::GitHubReleases => "GitHub Releases",
+        ReleaseChannel::Homebrew => "Homebrew",
+        ReleaseChannel::Cargo => "Cargo",
+        ReleaseChannel::Docker => "Docker",
+        ReleaseChannel::NpmWrapper => "npm wrapper",
+        ReleaseChannel::GitHubAction => "GitHub Action",
+        ReleaseChannel::Stable => "stable",
+        ReleaseChannel::Prerelease => "prerelease",
+        ReleaseChannel::Nightly => "nightly",
+    }
 }
 
 fn write_evidence_file(path: &Path, bytes: &[u8]) -> Result<(), ReleaseError> {

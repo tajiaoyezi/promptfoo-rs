@@ -48,6 +48,21 @@ The npm wrapper is a compatibility distribution channel over the Rust core bound
 
 Use `.github/workflows/release.yml` as the example shape for CI: checkout, Rust toolchain, S2V verification, build, and release artifact upload.
 
+## Publication Authority Gate
+
+`bash scripts/release/installability.sh` writes both `target/release-gates/installability.json` and `target/release-gates/publication-authority.json`. The first file proves local installability and dry-run packaging. The second file is the public publication authority gate: every channel records `installability_status`, `authority_status`, `credential_probe`, `legal_brand_requirement`, `published=false`, `published_evidence=null`, and an explicit blocker until real credentials, publication authority, and external URL/digest evidence exist.
+
+Current remaining publication blockers:
+
+- GitHub Releases: published=false; credential-blocked until a GitHub release publish token, release notes approval, and external artifact URL/checksum evidence exist.
+- Cargo: published=false; credential-blocked until crates.io publish authority and external crate URL/digest evidence exist.
+- npm wrapper: published=false; credential-blocked until npm publish authority and external package URL/digest evidence exist.
+- Docker: published=false; credential-blocked until container registry credentials and immutable image digest evidence exist.
+- Homebrew: published=false; credential-blocked/tool-unavailable when `brew` is absent; tap publication requires Homebrew tooling, tap authority, and formula URL/checksum evidence.
+- GitHub Action: published=false; credential-blocked until workflow release permission and external run/artifact evidence exist.
+
+`target/release-gates/release-candidate.json.publication_authority` must remain `credential-blocked` while any channel above is unpublished. Dry-run archives, `cargo package`, `pnpm pack`, Dockerfile checks, and Homebrew documentation checks are not public release evidence.
+
 ## S2V Release Checklist
 
 1. Run the compatibility release gate.

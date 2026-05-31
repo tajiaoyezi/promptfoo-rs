@@ -82,20 +82,89 @@ const channels = [
 ];
 
 const blocked = channels.some((channel) => channel.status === 'blocked');
+const publicationReady = blocked ? 'blocked' : 'credential-blocked';
+
+function labelFor(channel) {
+  return {
+    'github-releases': 'GitHub Releases',
+    cargo: 'Cargo',
+    'npm-wrapper': 'npm wrapper',
+    docker: 'Docker',
+    homebrew: 'Homebrew',
+    'github-action': 'GitHub Action',
+  }[channel] || channel;
+}
+
+function authorityStatus(channel) {
+  if (channel.status === 'blocked') return 'blocked';
+  if (channel.status === 'tool-unavailable') return 'tool-unavailable';
+  return 'credential-blocked';
+}
+
+function credentialProbe(channel) {
+  const requiredSecrets = {
+    'github-releases': ['GitHub release publish token'],
+    cargo: ['crates.io publish token'],
+    'npm-wrapper': ['npm publish token'],
+    docker: ['container registry credentials'],
+    homebrew: ['Homebrew tap publish token'],
+    'github-action': ['GitHub Actions release permission'],
+  }[channel.channel] || [];
+  const tool = {
+    'github-releases': 'gh',
+    cargo: 'cargo',
+    'npm-wrapper': 'pnpm/npm',
+    docker: 'docker',
+    homebrew: 'brew',
+    'github-action': 'github-actions',
+  }[channel.channel] || null;
+  return {
+    status: channel.status === 'tool-unavailable' ? 'tool-unavailable' : 'missing-credentials',
+    required_secrets: requiredSecrets,
+    tool,
+    details: `${labelFor(channel.channel)} external publication requires real credentials and authority`,
+  };
+}
+
+function publicationBlocker(channel) {
+  return channel.blocker || `${labelFor(channel.channel)} publication requires real credentials and external artifact URL/digest`;
+}
+
+const legalBrandRequirement = 'Maintainer approval is required for package metadata, release notes, and brand/legal copy before public publication';
+const authorityChannels = channels.map((channel) => ({
+  ...channel,
+  installability_status: channel.status,
+  authority_status: authorityStatus(channel),
+  credential_probe: credentialProbe(channel),
+  legal_brand_requirement: legalBrandRequirement,
+  published_evidence: null,
+  blocker: publicationBlocker(channel),
+}));
+const publicationBlockers = authorityChannels.map((channel) => channel.blocker);
+const publicationAuthority = {
+  schema: 'promptfoo-rs.publication-authority.v1',
+  publication_ready: publicationReady,
+  credential_blocked: !blocked,
+  legal_brand_blocked: true,
+  channels: authorityChannels,
+  blockers: publicationBlockers,
+  no_upload_evidence: 'local dry-run only; no upload, publish, push, or external release command executed',
+};
+
 const report = {
   schema: 'promptfoo-rs.release-installability.v1',
   version,
   installability_ready: !blocked,
-  publication_ready: blocked ? 'blocked' : 'credential-blocked',
+  publication_ready: publicationReady,
   credential_blocked: !blocked,
-  publication_blockers: [
-    'GitHubReleases publication requires real credentials and external artifact URL/digest',
-    'Homebrew publication requires real credentials and external artifact URL/digest',
-    'Cargo publication requires real credentials and external artifact URL/digest',
-    'Docker publication requires real credentials and external artifact URL/digest',
-    'NpmWrapper publication requires real credentials and external artifact URL/digest',
-  ],
-  channels,
+  publication_blockers: publicationBlockers,
+  publication_authority: {
+    publication_ready: publicationAuthority.publication_ready,
+    credential_blocked: publicationAuthority.credential_blocked,
+    legal_brand_blocked: publicationAuthority.legal_brand_blocked,
+    authority_artifact: 'target/release-gates/publication-authority.json',
+  },
+  channels: authorityChannels,
   artifact_paths: artifacts,
   checksums: artifacts.map((artifact) => ({ path: artifact, sha256: sha256(artifact) })),
   requires_real_corpus_gate: true,
@@ -104,6 +173,7 @@ const report = {
   security_gate_status: 'ready',
 };
 
+fs.writeFileSync(path.join(path.dirname(reportPath), 'publication-authority.json'), JSON.stringify(publicationAuthority, null, 2) + '\n');
 fs.writeFileSync(reportPath, JSON.stringify(report, null, 2) + '\n');
 if (blocked) {
   console.error(JSON.stringify(report, null, 2));

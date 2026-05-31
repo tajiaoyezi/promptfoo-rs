@@ -87,7 +87,10 @@ fn test_18_4_2_published_true_requires_external_evidence_not_dry_run() {
             .to_string(),
     });
     let decision = validate_publication_evidence(&report);
-    assert!(decision.invalid_published_evidence.is_empty(), "{decision:#?}");
+    assert!(
+        decision.invalid_published_evidence.is_empty(),
+        "{decision:#?}"
+    );
     assert_eq!(decision.publication_ready, PublicationReadiness::Ready);
 }
 
