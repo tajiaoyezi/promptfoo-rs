@@ -184,3 +184,10 @@ Feature: perfect refactor parity
     Given the latest npm promptfoo core package and GitHub repository/release observations can differ
     When upstream distribution target evidence is generated
     Then TEST-21.1.1 proves npm core package alignment is recorded and TEST-21.1.3 proves non-core GitHub release drift cannot imply current perfect refactor readiness
+
+  Scenario: SCEN-22.1.1 - perfect refactor unblock packet lists minimum external decisions
+    Given source accounting external authority publication authority upstream distribution and perfect refactor claim artifacts are present
+    When perfect refactor unblock packet evidence is generated
+    Then TEST-22.1.1 proves perfect_refactor_claim_allowed remains false while blockers remain
+    And TEST-22.1.2 proves provider blockers represented by external authority are not duplicated as source-only decisions
+    And TEST-22.1.5 proves runtime smoke and docs expose the packet as a blocker handoff artifact
