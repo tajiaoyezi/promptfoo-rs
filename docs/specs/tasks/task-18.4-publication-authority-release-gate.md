@@ -1,6 +1,6 @@
 # Task 18.4: publication-authority-release-gate
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P1
 **Owner**: leafiellune
 **Related Phase**: Phase 18 — perfect-refactor-blocker-burndown
@@ -62,19 +62,19 @@ Installability report 必须为 GitHub Releases、Cargo、npm wrapper、Docker�
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-008): every release channel records installability status separately from authority/credential status.
-- [ ] **AC2** (PRD §Release constraints): `published=true` requires external evidence; dry-run artifacts alone cannot set it.
-- [ ] **AC3** (docs/audits §P1 Public release): missing credentials or Homebrew tooling produce explicit blockers and keep release candidate publication state credential-blocked.
-- [ ] **AC4** (ADR-009): release docs show the exact remaining publication blockers and do not claim stable public availability when channels are unpublished.
+- [x] **AC1** (ADR-008): every release channel records installability status separately from authority/credential status.
+- [x] **AC2** (PRD §Release constraints): `published=true` requires external evidence; dry-run artifacts alone cannot set it.
+- [x] **AC3** (docs/audits §P1 Public release): missing credentials or Homebrew tooling produce explicit blockers and keep release candidate publication state credential-blocked.
+- [x] **AC4** (ADR-009): release docs show the exact remaining publication blockers and do not claim stable public availability when channels are unpublished.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-18.4.1 | TEST-18.4.1 | tests/publication_authority_release_gate.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-18.4.1 | TEST-18.4.2 | tests/publication_authority_release_gate.rs | install, typecheck, unit-test, coverage, build | Not Started |
-| AC3 | SCEN-18.4.1 | TEST-18.4.3 | tests/publication_authority_release_gate.rs | install, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC4 | SCEN-18.4.1 | TEST-18.4.4 | tests/publication_authority_release_gate.rs | install, typecheck, unit-test, e2e, build | Not Started |
+| AC1 | SCEN-18.4.1 | TEST-18.4.1 | tests/publication_authority_release_gate.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-18.4.1 | TEST-18.4.2 | tests/publication_authority_release_gate.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-18.4.1 | TEST-18.4.3 | tests/publication_authority_release_gate.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC4 | SCEN-18.4.1 | TEST-18.4.4 | tests/publication_authority_release_gate.rs | install, typecheck, unit-test, e2e, build | Done |
 
 ## 8. Risks
 
@@ -95,9 +95,30 @@ Installability report 必须为 GitHub Releases、Cargo、npm wrapper、Docker�
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/publication_authority_release_gate.rs`
+  - `src/release.rs`
+  - `scripts/release/installability.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `scripts/release/integration.sh`
+  - `docs/release.md`
+  - `docs/compatibility/matrix.md`
+  - `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-18-perfect-refactor-blocker-burndown.md`
+  - `docs/specs/tasks/task-18.4-publication-authority-release-gate.md`
+- **commit 列表**：
+  - `c620c20` `test(release): add SCEN-18.4.1 publication authority RED tests`
+  - `8c37c7a` `feat(release): add publication authority gate evidence`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-18.4.1 ~ TEST-18.4.4 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 通过，包含 `publication_authority_release_gate`。
+  - e2e: PASS — `bash scripts/release/e2e.sh` 通过。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 通过；`target/release-gates/publication-authority.json` schema=`promptfoo-rs.publication-authority.v1`，publication_ready=`credential-blocked`，credential_blocked=true，legal_brand_blocked=true，blockers=6，所有 channel `published=false` 且 `published_evidence=null`；`target/release-gates/release-candidate.json.publication_authority` 同步 credential-blocked 状态并引用 `target/release-gates/publication-authority.json`。
+- **剩余风险 / 未做项**：真实 GitHub Release、crates.io、npm、Docker registry、Homebrew tap、GitHub Action 发布仍需要真实凭据、账号权限和发布授权；本 task 只实现证据 gate，继续禁止把 dry-run installability 伪装为公开发布。
+- **下游 task 影响**：Phase 18 smoke 可以把 `publication-authority.json` 与 `release-candidate.json.publication_authority` 作为公开发布边界证据；后续若要把 publication_ready 推到 Ready，必须先新增有授权的真实发布 task/ADR 并提供外部 URL/digest evidence。

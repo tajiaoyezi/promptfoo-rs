@@ -68,6 +68,7 @@ The project is materially stronger than the earlier audit snapshots:
 - Phase 17 added source-tree extraction evidence, CLI/flag closure evidence, a 50-fixture real upstream P0 corpus, long-tail classification, and release installability evidence.
 - Phase 18.2 added provider-module burndown evidence: 37 P0 provider module blockers are now split into 13 existing P0 fixture-covered rows and 24 explicit remaining blockers with item-level reasons.
 - Phase 18.3 added a current-upstream target-mode gate: `current-upstream-policy.json` and `release-candidate.json.target_policy` now make frozen/current claim scope machine-readable.
+- Phase 18.4 added publication authority evidence: `publication-authority.json` and `release-candidate.json.publication_authority` now separate local installability, credential blockers, legal/brand blockers, and actual published evidence.
 
 These are real progress items. They support a scoped frozen-baseline compatibility implementation, not a literal perfect refactor claim.
 
@@ -135,16 +136,20 @@ This is acceptable for the PRD's P0/P1/P2 compatibility policy. It contradicts a
 
 ### P1 - Public release is still credential-blocked and unpublished
 
-`target/release-gates/installability.json` and `target/release-gates/release-candidate.json` report:
+`target/release-gates/installability.json`, `target/release-gates/publication-authority.json`, and `target/release-gates/release-candidate.json` report:
 
 - `installability_ready`: true
 - `publication_ready`: `credential-blocked`
 - `credential_blocked`: true
+- publication authority `legal_brand_blocked`: true
+- publication authority `blockers`: 6
 - release-candidate `published`: false
 - channel-level `published`: false for GitHub Releases, Cargo, npm wrapper, Docker, Homebrew, and GitHub Action
+- channel-level `published_evidence`: null for every public release channel
+- channel-level `installability_status` is recorded separately from `authority_status`
 - Homebrew status: `tool-unavailable`, blocker `Homebrew CLI unavailable; tap publication requires credentials`
 
-Local dry-run installability is proven. Real multi-channel publication is not proven and cannot be claimed without credentials and release authority.
+Local dry-run installability and publication authority blockers are proven. Real multi-channel publication is not proven and cannot be claimed without credentials, legal/brand approval, release authority, and external URL/digest evidence.
 
 ## Requirement Verdict
 
@@ -160,7 +165,7 @@ Local dry-run installability is proven. Real multi-channel publication is not pr
 | Provider/assertion/redteam long-tail parity | 433 tracked long-tail rows; provider module burndown resolves 13 of 37 via fixture evidence, but 24 explicit P0 provider module release blockers remain | Not met |
 | Compatibility matrix honesty | P1/P2/later/unsupported rows are explicit and reasoned | Met as auditability, not perfect parity |
 | Viewer/npm package local build smoke | Viewer and npm package smoke scripts pass in full local gate | Met for local smoke |
-| Multi-channel public release | Dry-run artifacts exist, but all channels are unpublished and publication is credential-blocked | Not proven |
+| Multi-channel public release | Dry-run artifacts and publication authority blockers exist, but all channels are unpublished, publication evidence is null, and publication is credential-blocked/legal-brand-blocked | Not proven |
 
 ## Conclusion
 
@@ -183,5 +188,5 @@ Add follow-up S2V work focused on blocker burn-down rather than smoke hardening:
 - source inventory P0 accounting blocker burn-down from the new ledger;
 - fixture or waiver decisions for the 24 remaining P0 long-tail provider module blockers;
 - explicit rebaseline ADR if the target changes from `0.121.13` to current upstream `HEAD`;
-- publication credential/authority checklist for GitHub Releases, Cargo, npm, Docker, Homebrew, and GitHub Action;
+- real publication evidence for GitHub Releases, Cargo, npm, Docker, Homebrew, and GitHub Action after credentials, authority, and legal/brand approval exist;
 - compatibility matrix update that separates "frozen-baseline complete" from "current-upstream complete."
