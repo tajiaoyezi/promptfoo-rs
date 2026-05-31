@@ -58,5 +58,5 @@ Phase 16 已证明本地 gate 可执行且一个真实 upstream smoke 可通过�
   - `target/release-gates/longtail-classification.json`: status=`ready-with-blockers`，tracked_longtail_item_count=433，missing_tracked_rows=0，unresolved_rows=0，missing_reason_rows=0，p0_release_blocker_count=37。
   - `target/release-gates/real-upstream-corpus/index.json`: status=`ready`，observed_p0_fixture_count=50，stable_allowed=true，所有 corpus runs 使用真实 `promptfoo@0.121.13` 与当前 release binary。
   - `target/release-gates/real-upstream-smoke/latest/metadata.json`: status=`ready`，upstream_exit_code=0，rs_exit_code=0，used_test_binary=false。
-  - `target/release-gates/installability.json`: installability_ready=true，publication_ready=`credential-blocked`，credential_blocked=true，published=false，artifacts/checksums=6。
+  - `target/release-gates/installability.json`: installability_ready=true，publication_ready=`credential-blocked`，credential_blocked=true，所有 channel evidence 均为 published=false，artifacts/checksums=6；`target/release-gates/release-candidate.json` published=false。
 - **保留边界**：Phase 17 证明了当前 PRD/P0-P1-P2 policy 下的可审计 release gate 与 blocker ledger；它不声称真实外部渠道已经公开发布，也不把 2116 个 source-inventory blocker 或 37 个 P0 provider-module blocker 当作 native parity。
