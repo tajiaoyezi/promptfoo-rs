@@ -63,6 +63,12 @@ Current remaining publication blockers:
 
 `target/release-gates/release-candidate.json.publication_authority` must remain `credential-blocked` while any channel above is unpublished. Dry-run archives, `cargo package`, `pnpm pack`, Dockerfile checks, and Homebrew documentation checks are not public release evidence.
 
+## External Authority Gate
+
+Task 19.4 adds `target/release-gates/external-authority-blockers.json` and includes it in `target/release-gates/release-candidate.json.external_authority`. This artifact combines provider/product blockers from `longtail-classification.json` with publication blockers from `publication-authority.json`.
+
+Each external authority item records `authority_type`, `required_decision`, `current_status`, `safe_local_fallback`, and `release_impact`. Provider rows may stay `waived-with-boundary` only for local mock or fixture accounting; publication rows stay `blocked` while `published=false`. No entry may become `ready` without real credentials, account or product authority, legal/brand approval where relevant, and external URL/digest evidence.
+
 ## S2V Release Checklist
 
 1. Run the compatibility release gate.

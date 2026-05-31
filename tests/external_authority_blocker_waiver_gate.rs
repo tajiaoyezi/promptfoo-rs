@@ -10,28 +10,18 @@ fn test_19_4_1_external_blockers_have_item_level_authority_decisions() {
     /* TEST-19.4.1 */
     let report = collect_external_authority_blockers();
 
-    assert_eq!(
-        report.schema,
-        "promptfoo-rs.external-authority-blockers.v1"
-    );
+    assert_eq!(report.schema, "promptfoo-rs.external-authority-blockers.v1");
     assert_eq!(report.provider_external_blocker_count, 15, "{report:#?}");
     assert!(
         report.publication_blocker_count >= 6,
         "publication blockers should be linked: {report:#?}"
     );
-    assert_eq!(
-        report.blocker_count,
-        report.blockers.len(),
-        "{report:#?}"
-    );
+    assert_eq!(report.blocker_count, report.blockers.len(), "{report:#?}");
 
     for blocker in &report.blockers {
         assert!(!blocker.item_id.trim().is_empty(), "{blocker:#?}");
         assert!(!blocker.source_reference.trim().is_empty(), "{blocker:#?}");
-        assert!(
-            !blocker.required_decision.trim().is_empty(),
-            "{blocker:#?}"
-        );
+        assert!(!blocker.required_decision.trim().is_empty(), "{blocker:#?}");
         assert!(
             !blocker.safe_local_fallback.trim().is_empty(),
             "{blocker:#?}"
@@ -149,6 +139,9 @@ fn test_19_4_4_release_candidate_and_docs_keep_external_blockers_visible() {
             docs.contains("external-authority-blockers.json"),
             "{docs_path}: {docs}"
         );
-        assert!(!docs.contains("perfect refactor complete"), "{docs_path}: {docs}");
+        assert!(
+            !docs.contains("perfect refactor complete"),
+            "{docs_path}: {docs}"
+        );
     }
 }

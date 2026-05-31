@@ -4,6 +4,11 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
+use crate::release::{
+    collect_publication_authority, PublicationAuthorityStatus, PublicationChannelAuthority,
+    ReleaseChannel,
+};
+
 use super::inventory::{
     CapabilityInventory, CompatibilityEvidenceError, InventoryError, InventoryItem,
 };
@@ -269,6 +274,61 @@ pub struct ProviderModuleBurndownReport {
 
 pub type LongtailClassificationReport = ProviderModuleBurndownReport;
 pub type ProviderFixtureBurndownReport = ProviderModuleBurndownReport;
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ExternalAuthorityType {
+    Credential,
+    Account,
+    PrivateService,
+    ProductAuthority,
+    LegalBrand,
+    PublicationAuthority,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum ExternalAuthorityStatus {
+    Blocked,
+    WaivedWithBoundary,
+    Ready,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExternalAuthorityBlocker {
+    pub item_id: String,
+    pub source_reference: String,
+    pub authority_type: ExternalAuthorityType,
+    pub required_decision: String,
+    pub current_status: ExternalAuthorityStatus,
+    pub safe_local_fallback: String,
+    pub release_impact: String,
+    pub docs_link: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExternalAuthorityBlockerReport {
+    pub schema: String,
+    pub status: ExternalAuthorityStatus,
+    pub blocker_count: usize,
+    pub provider_external_blocker_count: usize,
+    pub publication_blocker_count: usize,
+    pub ready_count: usize,
+    pub blockers: Vec<ExternalAuthorityBlocker>,
+    pub source_artifacts: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExternalAuthorityGateDecision {
+    pub ready: bool,
+    pub blocked_count: usize,
+    pub waived_with_boundary_count: usize,
+    pub ready_count: usize,
+    pub missing_required_decisions: Vec<String>,
+    pub invalid_ready_items: Vec<String>,
+    pub release_candidate_claim_allowed: bool,
+    pub blockers: Vec<String>,
+}
 
 pub fn classify_provider_item(
     item: &InventoryItem,
@@ -554,6 +614,131 @@ pub fn write_provider_fixture_burndown(
     fs::write(path, format!("{json}\n")).map_err(InventoryError::Write)
 }
 
+pub fn collect_external_authority_blockers() -> ExternalAuthorityBlockerReport {
+    let matrix = CapabilityMatrix::from_json_file(Path::new("compatibility/matrix/items.json"))
+        .expect("compatibility matrix should load for external authority gate");
+    let fixtures = FixtureCorpus::load(Path::new("compatibility/fixtures"), &matrix)
+        .expect("fixture corpus should load for external authority gate");
+    let provider_report = validate_p0_provider_module_burndown(&matrix, &fixtures);
+    let provider_blockers = provider_report
+        .remaining_blockers
+        .iter()
+        .filter(|resolution| resolution.requires_external_authority)
+        .map(provider_external_authority_blocker)
+        .collect::<Vec<_>>();
+
+    let publication_report = collect_publication_authority(&[
+        ReleaseChannel::GitHubReleases,
+        ReleaseChannel::Cargo,
+        ReleaseChannel::NpmWrapper,
+        ReleaseChannel::Docker,
+        ReleaseChannel::Homebrew,
+        ReleaseChannel::GitHubAction,
+    ]);
+    let publication_blockers = publication_report
+        .channels
+        .iter()
+        .filter(|channel| {
+            !channel.published
+                || channel.authority_status != PublicationAuthorityStatus::Ready
+                || channel.published_evidence.is_none()
+        })
+        .map(publication_external_authority_blocker)
+        .collect::<Vec<_>>();
+
+    let provider_external_blocker_count = provider_blockers.len();
+    let publication_blocker_count = publication_blockers.len();
+    let mut blockers = provider_blockers
+        .into_iter()
+        .chain(publication_blockers)
+        .collect::<Vec<_>>();
+    blockers.sort_by(|left, right| left.item_id.cmp(&right.item_id));
+    let ready_count = blockers
+        .iter()
+        .filter(|blocker| blocker.current_status == ExternalAuthorityStatus::Ready)
+        .count();
+    let status = if ready_count == blockers.len() && !blockers.is_empty() {
+        ExternalAuthorityStatus::Ready
+    } else {
+        ExternalAuthorityStatus::Blocked
+    };
+
+    ExternalAuthorityBlockerReport {
+        schema: "promptfoo-rs.external-authority-blockers.v1".to_string(),
+        status,
+        blocker_count: blockers.len(),
+        provider_external_blocker_count,
+        publication_blocker_count,
+        ready_count,
+        blockers,
+        source_artifacts: vec![
+            "target/release-gates/longtail-classification.json".to_string(),
+            "target/release-gates/publication-authority.json".to_string(),
+            "target/release-gates/release-candidate.json".to_string(),
+            "docs/compatibility/matrix.md".to_string(),
+        ],
+    }
+}
+
+pub fn validate_external_authority_gate(
+    report: &ExternalAuthorityBlockerReport,
+) -> ExternalAuthorityGateDecision {
+    let missing_required_decisions = report
+        .blockers
+        .iter()
+        .filter(|blocker| blocker.required_decision.trim().is_empty())
+        .map(|blocker| blocker.item_id.clone())
+        .collect::<Vec<_>>();
+    let invalid_ready_items = report
+        .blockers
+        .iter()
+        .filter(|blocker| blocker.current_status == ExternalAuthorityStatus::Ready)
+        .map(|blocker| blocker.item_id.clone())
+        .collect::<Vec<_>>();
+    let blocked_count = report
+        .blockers
+        .iter()
+        .filter(|blocker| blocker.current_status == ExternalAuthorityStatus::Blocked)
+        .count();
+    let waived_with_boundary_count = report
+        .blockers
+        .iter()
+        .filter(|blocker| blocker.current_status == ExternalAuthorityStatus::WaivedWithBoundary)
+        .count();
+    let ready = report.blockers.is_empty()
+        && missing_required_decisions.is_empty()
+        && invalid_ready_items.is_empty();
+    let blockers = report
+        .blockers
+        .iter()
+        .filter(|blocker| blocker.current_status != ExternalAuthorityStatus::Ready)
+        .map(|blocker| format!("{}: {}", blocker.item_id, blocker.release_impact))
+        .collect::<Vec<_>>();
+
+    ExternalAuthorityGateDecision {
+        ready,
+        blocked_count,
+        waived_with_boundary_count,
+        ready_count: report.ready_count,
+        missing_required_decisions,
+        invalid_ready_items,
+        release_candidate_claim_allowed: ready,
+        blockers,
+    }
+}
+
+pub fn write_external_authority_blockers(
+    report: &ExternalAuthorityBlockerReport,
+    path: &Path,
+) -> Result<(), CompatibilityEvidenceError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(InventoryError::Write)?;
+    }
+    let json = serde_json::to_string_pretty(report)
+        .map_err(|error| InventoryError::Parse(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(InventoryError::Write)
+}
+
 pub fn validate_provider_assertion_parity(
     matrix: &CapabilityMatrix,
     fixtures: &FixtureCorpus,
@@ -795,6 +980,108 @@ fn source_reference_from_provider_item_id(item_id: &str) -> String {
         .unwrap_or(item_id)
         .replace('-', "/");
     format!("promptfoo@0.121.13:{path}.ts")
+}
+
+fn provider_external_authority_blocker(
+    resolution: &ProviderModuleResolution,
+) -> ExternalAuthorityBlocker {
+    let authority_type = provider_external_authority_type(&resolution.item_id);
+    ExternalAuthorityBlocker {
+        item_id: resolution.item_id.clone(),
+        source_reference: resolution.source_reference.clone(),
+        authority_type,
+        required_decision: format!(
+            "User or maintainer must provide {} approval/evidence before this module can leave the external-authority boundary",
+            external_authority_type_label(authority_type)
+        ),
+        current_status: ExternalAuthorityStatus::WaivedWithBoundary,
+        safe_local_fallback:
+            "Keep local mock or fixture accounting only; this is not live product proof".to_string(),
+        release_impact: format!(
+            "Blocks perfect-refactor provider parity claim until external authority is resolved; verification remains {}",
+            resolution.verification
+        ),
+        docs_link: "docs/compatibility/matrix.md#p0-provider-module-burndown".to_string(),
+    }
+}
+
+fn publication_external_authority_blocker(
+    channel: &PublicationChannelAuthority,
+) -> ExternalAuthorityBlocker {
+    let item_id = format!("publication:{}", release_channel_id(channel.channel));
+    ExternalAuthorityBlocker {
+        item_id,
+        source_reference: format!(
+            "target/release-gates/publication-authority.json#{}",
+            release_channel_id(channel.channel)
+        ),
+        authority_type: ExternalAuthorityType::PublicationAuthority,
+        required_decision: format!(
+            "{} publication requires credentials, release authority, legal/brand approval, and external URL/digest evidence",
+            release_channel_label(channel.channel)
+        ),
+        current_status: ExternalAuthorityStatus::Blocked,
+        safe_local_fallback:
+            "Keep dry-run installability evidence and no-upload checks; public availability remains unclaimed"
+                .to_string(),
+        release_impact: format!(
+            "{} published=false; public release remains blocked without external evidence",
+            release_channel_label(channel.channel)
+        ),
+        docs_link: "docs/release.md#publication-authority-gate".to_string(),
+    }
+}
+
+fn provider_external_authority_type(item_id: &str) -> ExternalAuthorityType {
+    let lower = item_id.to_ascii_lowercase();
+    if lower.contains("billing") {
+        ExternalAuthorityType::Account
+    } else if lower.contains("claudecodeauth") {
+        ExternalAuthorityType::Credential
+    } else if lower.contains("realtime") || lower.contains("assistant") {
+        ExternalAuthorityType::PrivateService
+    } else {
+        ExternalAuthorityType::ProductAuthority
+    }
+}
+
+fn external_authority_type_label(authority_type: ExternalAuthorityType) -> &'static str {
+    match authority_type {
+        ExternalAuthorityType::Credential => "credential",
+        ExternalAuthorityType::Account => "account",
+        ExternalAuthorityType::PrivateService => "private service",
+        ExternalAuthorityType::ProductAuthority => "product authority",
+        ExternalAuthorityType::LegalBrand => "legal/brand",
+        ExternalAuthorityType::PublicationAuthority => "publication authority",
+    }
+}
+
+fn release_channel_id(channel: ReleaseChannel) -> &'static str {
+    match channel {
+        ReleaseChannel::GitHubReleases => "github-releases",
+        ReleaseChannel::Cargo => "cargo",
+        ReleaseChannel::NpmWrapper => "npm-wrapper",
+        ReleaseChannel::Docker => "docker",
+        ReleaseChannel::Homebrew => "homebrew",
+        ReleaseChannel::GitHubAction => "github-action",
+        ReleaseChannel::Stable => "stable",
+        ReleaseChannel::Prerelease => "prerelease",
+        ReleaseChannel::Nightly => "nightly",
+    }
+}
+
+fn release_channel_label(channel: ReleaseChannel) -> &'static str {
+    match channel {
+        ReleaseChannel::GitHubReleases => "GitHub Releases",
+        ReleaseChannel::Cargo => "Cargo",
+        ReleaseChannel::NpmWrapper => "npm wrapper",
+        ReleaseChannel::Docker => "Docker",
+        ReleaseChannel::Homebrew => "Homebrew",
+        ReleaseChannel::GitHubAction => "GitHub Action",
+        ReleaseChannel::Stable => "stable",
+        ReleaseChannel::Prerelease => "prerelease",
+        ReleaseChannel::Nightly => "nightly",
+    }
 }
 
 fn explicit_provider_module_blocker_reason(

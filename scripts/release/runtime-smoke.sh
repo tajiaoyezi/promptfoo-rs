@@ -152,6 +152,84 @@ publication_authority_ready="$(node -e "const r = JSON.parse(require('fs').readF
 publication_authority_credential_blocked="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-authority.json', 'utf8')); console.log(r.credential_blocked ? 'true' : 'false')")"
 publication_authority_legal_brand_blocked="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-authority.json', 'utf8')); console.log(r.legal_brand_blocked ? 'true' : 'false')")"
 publication_authority_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-authority.json', 'utf8')); console.log((r.blockers || []).length)")"
+
+node <<'NODE'
+const fs = require('fs');
+const gateDir = 'target/release-gates';
+const longtail = JSON.parse(fs.readFileSync(`${gateDir}/longtail-classification.json`, 'utf8'));
+const publication = JSON.parse(fs.readFileSync(`${gateDir}/publication-authority.json`, 'utf8'));
+
+function authorityTypeForProvider(itemId) {
+  const lower = String(itemId).toLowerCase();
+  if (lower.includes('billing')) return 'account';
+  if (lower.includes('claudecodeauth')) return 'credential';
+  if (lower.includes('realtime') || lower.includes('assistant')) return 'private-service';
+  return 'product-authority';
+}
+
+function channelLabel(channel) {
+  return {
+    'github-releases': 'GitHub Releases',
+    cargo: 'Cargo',
+    'npm-wrapper': 'npm wrapper',
+    docker: 'Docker',
+    homebrew: 'Homebrew',
+    'github-action': 'GitHub Action',
+  }[channel] || channel;
+}
+
+const providerBlockers = (longtail.p0_release_blockers || [])
+  .filter((item) => item.requires_external_authority === true)
+  .map((item) => ({
+    item_id: item.item_id,
+    source_reference: item.source_reference,
+    authority_type: authorityTypeForProvider(item.item_id),
+    required_decision: `User or maintainer must provide ${authorityTypeForProvider(item.item_id)} approval/evidence before this module can leave the external-authority boundary`,
+    current_status: 'waived-with-boundary',
+    safe_local_fallback: 'Keep local mock or fixture accounting only; this is not live product proof',
+    release_impact: `Blocks perfect-refactor provider parity claim until external authority is resolved; verification remains ${item.verification}`,
+    docs_link: 'docs/compatibility/matrix.md#p0-provider-module-burndown',
+  }));
+
+const publicationBlockers = (publication.channels || [])
+  .filter((channel) => channel.published !== true || channel.authority_status !== 'ready' || !channel.published_evidence)
+  .map((channel) => ({
+    item_id: `publication:${channel.channel}`,
+    source_reference: `target/release-gates/publication-authority.json#${channel.channel}`,
+    authority_type: 'publication-authority',
+    required_decision: `${channelLabel(channel.channel)} publication requires credentials, release authority, legal/brand approval, and external URL/digest evidence`,
+    current_status: 'blocked',
+    safe_local_fallback: 'Keep dry-run installability evidence and no-upload checks; public availability remains unclaimed',
+    release_impact: `${channelLabel(channel.channel)} published=false; public release remains blocked without external evidence`,
+    docs_link: 'docs/release.md#publication-authority-gate',
+  }));
+
+const blockers = [...providerBlockers, ...publicationBlockers].sort((left, right) =>
+  String(left.item_id).localeCompare(String(right.item_id))
+);
+const readyCount = blockers.filter((blocker) => blocker.current_status === 'ready').length;
+const report = {
+  schema: 'promptfoo-rs.external-authority-blockers.v1',
+  status: readyCount === blockers.length && blockers.length > 0 ? 'ready' : 'blocked',
+  blocker_count: blockers.length,
+  provider_external_blocker_count: providerBlockers.length,
+  publication_blocker_count: publicationBlockers.length,
+  ready_count: readyCount,
+  blockers,
+  source_artifacts: [
+    'target/release-gates/longtail-classification.json',
+    'target/release-gates/publication-authority.json',
+    'target/release-gates/release-candidate.json',
+    'docs/compatibility/matrix.md',
+  ],
+};
+fs.writeFileSync(`${gateDir}/external-authority-blockers.json`, `${JSON.stringify(report, null, 2)}\n`);
+NODE
+
+external_authority_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/external-authority-blockers.json', 'utf8')); console.log(r.status)")"
+external_authority_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/external-authority-blockers.json', 'utf8')); console.log(r.blocker_count)")"
+external_authority_provider_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/external-authority-blockers.json', 'utf8')); console.log(r.provider_external_blocker_count)")"
+external_authority_publication_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/external-authority-blockers.json', 'utf8')); console.log(r.publication_blocker_count)")"
 stable_allowed="$(stable_allowed_from_gate "$adapter_status" "$compatibility_status" "$performance_status" "$security_status" "$packaging_status" "$observability_status" "$current_upstream_policy_status" "$real_upstream_smoke_status" "$real_upstream_corpus_status")"
 if [ "$stable_allowed" = "true" ]; then
   decision="stable"
@@ -217,6 +295,13 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "blocker_count": $publication_authority_blocker_count,
     "authority_artifact": "target/release-gates/publication-authority.json"
   },
+  "external_authority": {
+    "status": "$external_authority_status",
+    "blocker_count": $external_authority_blocker_count,
+    "provider_external_blocker_count": $external_authority_provider_blocker_count,
+    "publication_blocker_count": $external_authority_publication_blocker_count,
+    "authority_artifact": "target/release-gates/external-authority-blockers.json"
+  },
   "gate_statuses": {
     "adapter": "$adapter_status",
     "compatibility": "$compatibility_status",
@@ -227,6 +312,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "installability": "ready",
     "source_inventory": "$source_inventory_status",
     "longtail_classification": "$longtail_classification_status",
+    "external_authority": "$external_authority_status",
     "current_upstream_policy": "$current_upstream_policy_status",
     "real_upstream_smoke": "$real_upstream_smoke_status",
     "real_upstream_corpus": "$real_upstream_corpus_status"
@@ -251,6 +337,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/source-inventory-evidence.json",
     "target/release-gates/source-inventory-ledger.json",
     "target/release-gates/longtail-classification.json",
+    "target/release-gates/external-authority-blockers.json",
     "target/release-gates/current-upstream-policy.json",
     "target/release-gates/installability.json",
     "target/release-gates/publication-authority.json",
@@ -270,6 +357,7 @@ JSON
 validate_report_json "$GATE_DIR/performance.json"
 validate_report_json "$GATE_DIR/security.json"
 validate_report_json "$GATE_DIR/source-inventory-ledger.json"
+validate_report_json "$GATE_DIR/external-authority-blockers.json"
 validate_report_json "$GATE_DIR/release-candidate.json"
 
 if [ "$stable_allowed" != "true" ]; then
