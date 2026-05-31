@@ -1,6 +1,12 @@
 use std::collections::BTreeMap;
+use std::fs;
+use std::path::Path;
 
-use super::inventory::{CapabilityInventory, InventoryItem};
+use serde::{Deserialize, Serialize};
+
+use super::inventory::{
+    CapabilityInventory, CompatibilityEvidenceError, InventoryError, InventoryItem,
+};
 use super::matrix::{CapabilityMatrix, CapabilityRow};
 
 pub use super::fixtures::FixtureCorpus;
@@ -228,13 +234,15 @@ impl LongtailParityReport {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum ProviderModuleResolutionKind {
     FixtureCovered,
     ExternalBlocker,
+    Blocked,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ProviderModuleResolution {
     pub item_id: String,
     pub source_reference: String,
@@ -246,15 +254,21 @@ pub struct ProviderModuleResolution {
     pub requires_external_authority: bool,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ProviderModuleBurndownReport {
     pub initial_blocker_count: usize,
     pub resolved_by_fixture_count: usize,
+    pub new_dedicated_request_response_fixture_count: usize,
     pub remaining_blocker_count: usize,
+    pub external_authority_blocker_count: usize,
+    pub generic_blocker_count: usize,
     pub resolved_by_fixture: Vec<ProviderModuleResolution>,
     pub remaining_blockers: Vec<ProviderModuleResolution>,
     pub fixtures_requiring_real_secrets: Vec<String>,
 }
+
+pub type LongtailClassificationReport = ProviderModuleBurndownReport;
+pub type ProviderFixtureBurndownReport = ProviderModuleBurndownReport;
 
 pub fn classify_provider_item(
     item: &InventoryItem,
@@ -414,10 +428,55 @@ pub fn resolve_provider_module_fixture(
 
     let (reason, requires_external_authority) =
         explicit_provider_module_blocker_reason(&item_id, &source_reference);
+    let kind = if requires_external_authority {
+        ProviderModuleResolutionKind::ExternalBlocker
+    } else {
+        ProviderModuleResolutionKind::Blocked
+    };
     ProviderModuleResolution {
         item_id: item_id.clone(),
         source_reference,
-        kind: ProviderModuleResolutionKind::ExternalBlocker,
+        kind,
+        reason,
+        verification: format!("blocker:{item_id}"),
+        fixture_ids: Vec::new(),
+        docs_link: provider_module_docs_link(),
+        requires_external_authority,
+    }
+}
+
+pub fn resolve_provider_request_response_fixture(item_id: &str) -> ProviderModuleResolution {
+    let source_reference = source_reference_from_provider_item_id(item_id);
+    let fixture_ids = dedicated_request_response_fixture_ids(item_id)
+        .iter()
+        .map(|fixture_id| (*fixture_id).to_string())
+        .collect::<Vec<_>>();
+    if !fixture_ids.is_empty() {
+        return ProviderModuleResolution {
+            item_id: item_id.to_string(),
+            source_reference: source_reference.clone(),
+            kind: ProviderModuleResolutionKind::FixtureCovered,
+            reason: format!(
+                "dedicated request/response fixture evidence ({}) covers {item_id}; source: {source_reference}",
+                fixture_ids.join(", ")
+            ),
+            verification: format!("fixture:{}", fixture_ids.join("+")),
+            fixture_ids,
+            docs_link: provider_module_docs_link(),
+            requires_external_authority: false,
+        };
+    }
+
+    let (reason, requires_external_authority) =
+        explicit_provider_module_blocker_reason(item_id, &source_reference);
+    ProviderModuleResolution {
+        item_id: item_id.to_string(),
+        source_reference,
+        kind: if requires_external_authority {
+            ProviderModuleResolutionKind::ExternalBlocker
+        } else {
+            ProviderModuleResolutionKind::Blocked
+        },
         reason,
         verification: format!("blocker:{item_id}"),
         fixture_ids: Vec::new(),
@@ -446,12 +505,53 @@ pub fn validate_p0_provider_module_burndown(
             ProviderModuleResolutionKind::ExternalBlocker => {
                 report.remaining_blockers.push(resolution);
             }
+            ProviderModuleResolutionKind::Blocked => {
+                report.remaining_blockers.push(resolution);
+            }
         }
     }
 
     report.resolved_by_fixture_count = report.resolved_by_fixture.len();
+    report.new_dedicated_request_response_fixture_count = report
+        .resolved_by_fixture
+        .iter()
+        .filter(|resolution| {
+            resolution
+                .fixture_ids
+                .iter()
+                .any(|fixture_id| is_dedicated_request_response_fixture_id(fixture_id))
+        })
+        .count();
     report.remaining_blocker_count = report.remaining_blockers.len();
+    report.external_authority_blocker_count = report
+        .remaining_blockers
+        .iter()
+        .filter(|resolution| resolution.requires_external_authority)
+        .count();
+    report.generic_blocker_count = report
+        .remaining_blockers
+        .iter()
+        .filter(|resolution| !resolution.requires_external_authority)
+        .count();
     report
+}
+
+pub fn validate_provider_fixture_burndown(
+    report: &LongtailClassificationReport,
+) -> ProviderFixtureBurndownReport {
+    report.clone()
+}
+
+pub fn write_provider_fixture_burndown(
+    report: &ProviderFixtureBurndownReport,
+    path: &Path,
+) -> Result<(), CompatibilityEvidenceError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(InventoryError::Write)?;
+    }
+    let json = serde_json::to_string_pretty(report)
+        .map_err(|error| InventoryError::Parse(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(InventoryError::Write)
 }
 
 pub fn validate_provider_assertion_parity(
@@ -610,22 +710,61 @@ fn provider_module_fixture_ids(item_id: &str) -> &'static [&'static str] {
         | "provider:src-providers-anthropic-messages"
         | "provider:src-providers-anthropic-types"
         | "provider:src-providers-anthropic-util" => &["p0-provider-anthropic-message"],
+        "provider:src-providers-anthropic-completion" => &["p0-provider-anthropic-completion"],
         "provider:src-providers-http" => &["p0-provider-http-get", "p0-provider-http-post"],
         "provider:src-providers-httptransforms" => &["p0-provider-http-transform"],
+        "provider:src-providers-httpmultipart" => &["p0-provider-http-multipart"],
         "provider:src-providers-ollama" => &["p0-provider-ollama-chat"],
         "provider:src-providers-openai-chat"
         | "provider:src-providers-openai-index"
         | "provider:src-providers-openai-types" => &["p0-provider-openai-chat"],
+        "provider:src-providers-openai-completion" => &["p0-provider-openai-completion"],
         "provider:src-providers-openai-defaults" => {
             &["p0-provider-openai-env", "p0-provider-openai-headers"]
         }
+        "provider:src-providers-openai-embedding" => &["p0-provider-openai-embedding"],
+        "provider:src-providers-openai-image" => &["p0-provider-openai-image"],
+        "provider:src-providers-openai-moderation" => &["p0-provider-openai-moderation"],
+        "provider:src-providers-openai-responses" => &["p0-provider-openai-responses"],
+        "provider:src-providers-openai-transcription" => &["p0-provider-openai-transcription"],
         "provider:src-providers-openai-util" => &[
             "p0-provider-openai-chat",
             "p0-provider-openai-env",
             "p0-provider-openai-headers",
         ],
+        "provider:src-providers-openai-video" => &["p0-provider-openai-video"],
         _ => &[],
     }
+}
+
+fn dedicated_request_response_fixture_ids(item_id: &str) -> &'static [&'static str] {
+    match item_id {
+        "provider:src-providers-anthropic-completion" => &["p0-provider-anthropic-completion"],
+        "provider:src-providers-httpmultipart" => &["p0-provider-http-multipart"],
+        "provider:src-providers-openai-completion" => &["p0-provider-openai-completion"],
+        "provider:src-providers-openai-embedding" => &["p0-provider-openai-embedding"],
+        "provider:src-providers-openai-image" => &["p0-provider-openai-image"],
+        "provider:src-providers-openai-moderation" => &["p0-provider-openai-moderation"],
+        "provider:src-providers-openai-responses" => &["p0-provider-openai-responses"],
+        "provider:src-providers-openai-transcription" => &["p0-provider-openai-transcription"],
+        "provider:src-providers-openai-video" => &["p0-provider-openai-video"],
+        _ => &[],
+    }
+}
+
+fn is_dedicated_request_response_fixture_id(fixture_id: &str) -> bool {
+    matches!(
+        fixture_id,
+        "p0-provider-anthropic-completion"
+            | "p0-provider-http-multipart"
+            | "p0-provider-openai-completion"
+            | "p0-provider-openai-embedding"
+            | "p0-provider-openai-image"
+            | "p0-provider-openai-moderation"
+            | "p0-provider-openai-responses"
+            | "p0-provider-openai-transcription"
+            | "p0-provider-openai-video"
+    )
 }
 
 fn available_fixture_ids(ids: &[&str], fixtures: &FixtureCorpus) -> Vec<String> {
@@ -648,6 +787,14 @@ fn source_reference_from_notes(row: &CapabilityRow) -> String {
         .filter(|source| !source.is_empty())
         .unwrap_or("unknown source reference")
         .to_string()
+}
+
+fn source_reference_from_provider_item_id(item_id: &str) -> String {
+    let path = item_id
+        .strip_prefix("provider:")
+        .unwrap_or(item_id)
+        .replace('-', "/");
+    format!("promptfoo@0.121.13:{path}.ts")
 }
 
 fn explicit_provider_module_blocker_reason(

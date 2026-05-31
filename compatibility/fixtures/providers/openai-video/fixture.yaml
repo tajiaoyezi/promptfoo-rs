@@ -1,0 +1,9 @@
+id: p0-provider-openai-video
+test_id: TEST-19.3.1
+matrix_item_ids: ["provider:src-providers-openai-video"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["request-json", "response-json", "redaction-evidence"]
+normalization_rules: ["time", "url", "binary-digest"]
+blocks_stable_release: true

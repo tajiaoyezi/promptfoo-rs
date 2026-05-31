@@ -58,12 +58,19 @@ fn test_19_3_1_non_external_provider_modules_have_dedicated_fixtures() {
             "{resolution:#?}"
         );
         assert_eq!(resolution.fixture_ids, vec![fixture_id.to_string()]);
-        assert!(resolution.verification.starts_with("fixture:"), "{resolution:#?}");
+        assert!(
+            resolution.verification.starts_with("fixture:"),
+            "{resolution:#?}"
+        );
         assert!(!resolution.requires_external_authority, "{resolution:#?}");
-        assert!(resolution.reason.contains("request/response"), "{resolution:#?}");
+        assert!(
+            resolution.reason.contains("request/response"),
+            "{resolution:#?}"
+        );
     }
 
-    let codex = resolve_provider_request_response_fixture("provider:src-providers-openai-codex-sdk");
+    let codex =
+        resolve_provider_request_response_fixture("provider:src-providers-openai-codex-sdk");
     assert_eq!(codex.kind, ProviderModuleResolutionKind::ExternalBlocker);
     assert!(codex.requires_external_authority, "{codex:#?}");
     assert!(codex.reason.contains("Codex"), "{codex:#?}");
@@ -85,14 +92,16 @@ fn test_19_3_2_dedicated_provider_fixtures_use_no_real_secrets() {
         .resolved_by_fixture
         .iter()
         .flat_map(|resolution| resolution.fixture_ids.iter())
-        .filter(|fixture_id| fixture_id.contains("completion")
-            || fixture_id.contains("embedding")
-            || fixture_id.contains("image")
-            || fixture_id.contains("moderation")
-            || fixture_id.contains("responses")
-            || fixture_id.contains("transcription")
-            || fixture_id.contains("video")
-            || fixture_id.contains("multipart"))
+        .filter(|fixture_id| {
+            fixture_id.contains("completion")
+                || fixture_id.contains("embedding")
+                || fixture_id.contains("image")
+                || fixture_id.contains("moderation")
+                || fixture_id.contains("responses")
+                || fixture_id.contains("transcription")
+                || fixture_id.contains("video")
+                || fixture_id.contains("multipart")
+        })
     {
         let record = fixtures
             .records()

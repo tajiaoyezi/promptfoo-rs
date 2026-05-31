@@ -62,21 +62,30 @@ function providerModuleFixtureIds(itemId) {
     'provider:src-providers-anthropic-messages': ['p0-provider-anthropic-message'],
     'provider:src-providers-anthropic-types': ['p0-provider-anthropic-message'],
     'provider:src-providers-anthropic-util': ['p0-provider-anthropic-message'],
+    'provider:src-providers-anthropic-completion': ['p0-provider-anthropic-completion'],
     'provider:src-providers-http': ['p0-provider-http-get', 'p0-provider-http-post'],
+    'provider:src-providers-httpmultipart': ['p0-provider-http-multipart'],
     'provider:src-providers-httptransforms': ['p0-provider-http-transform'],
     'provider:src-providers-ollama': ['p0-provider-ollama-chat'],
     'provider:src-providers-openai-chat': ['p0-provider-openai-chat'],
+    'provider:src-providers-openai-completion': ['p0-provider-openai-completion'],
     'provider:src-providers-openai-index': ['p0-provider-openai-chat'],
     'provider:src-providers-openai-types': ['p0-provider-openai-chat'],
     'provider:src-providers-openai-defaults': [
       'p0-provider-openai-env',
       'p0-provider-openai-headers',
     ],
+    'provider:src-providers-openai-embedding': ['p0-provider-openai-embedding'],
+    'provider:src-providers-openai-image': ['p0-provider-openai-image'],
+    'provider:src-providers-openai-moderation': ['p0-provider-openai-moderation'],
+    'provider:src-providers-openai-responses': ['p0-provider-openai-responses'],
+    'provider:src-providers-openai-transcription': ['p0-provider-openai-transcription'],
     'provider:src-providers-openai-util': [
       'p0-provider-openai-chat',
       'p0-provider-openai-env',
       'p0-provider-openai-headers',
     ],
+    'provider:src-providers-openai-video': ['p0-provider-openai-video'],
   };
   return direct[itemId] || [];
 }
@@ -89,7 +98,7 @@ function resolveProviderModule(item) {
       item_id: item.stable_id,
       source_reference: item.source_reference,
       kind: 'fixture-covered',
-      reason: `aggregate provider fixture evidence (${fixture_ids.join(', ')}) covers ${item.stable_id}; source: ${item.source_reference}`,
+      reason: `${dedicatedRequestResponseFixtureCount(fixture_ids) > 0 ? 'dedicated request/response' : 'aggregate provider'} fixture evidence (${fixture_ids.join(', ')}) covers ${item.stable_id}; source: ${item.source_reference}`,
       verification: `fixture:${fixture_ids.join('+')}`,
       fixture_ids,
       docs: 'docs/compatibility/matrix.md#p0-provider-module-burndown',
@@ -100,13 +109,28 @@ function resolveProviderModule(item) {
   return {
     item_id: item.stable_id,
     source_reference: item.source_reference,
-    kind: 'external-blocker',
+    kind: blocker.requires_external_authority ? 'external-blocker' : 'blocked',
     reason: blocker.reason,
     verification: `blocker:${item.stable_id}`,
     fixture_ids: [],
     docs: 'docs/compatibility/matrix.md#p0-provider-module-burndown',
     requires_external_authority: blocker.requires_external_authority,
   };
+}
+
+function dedicatedRequestResponseFixtureCount(fixtureIds) {
+  const dedicated = new Set([
+    'p0-provider-anthropic-completion',
+    'p0-provider-http-multipart',
+    'p0-provider-openai-completion',
+    'p0-provider-openai-embedding',
+    'p0-provider-openai-image',
+    'p0-provider-openai-moderation',
+    'p0-provider-openai-responses',
+    'p0-provider-openai-transcription',
+    'p0-provider-openai-video',
+  ]);
+  return fixtureIds.filter((fixtureId) => dedicated.has(fixtureId)).length;
 }
 
 function explicitProviderModuleBlockerReason(itemId, sourceReference) {
@@ -230,8 +254,19 @@ const report = {
   p0_provider_module_burndown: {
     initial_blocker_count: providerModuleRows.length,
     resolved_by_fixture_count: providerModuleResolved.length,
+    new_dedicated_request_response_fixture_count: providerModuleResolved.filter((item) =>
+      dedicatedRequestResponseFixtureCount(item.fixture_ids || []) > 0
+    ).length,
     remaining_blocker_count: p0ReleaseBlockers.filter((item) =>
       String(item.item_id || '').startsWith('provider:src-providers-')
+    ).length,
+    external_authority_blocker_count: p0ReleaseBlockers.filter((item) =>
+      String(item.item_id || '').startsWith('provider:src-providers-') &&
+      item.requires_external_authority === true
+    ).length,
+    generic_blocker_count: p0ReleaseBlockers.filter((item) =>
+      String(item.item_id || '').startsWith('provider:src-providers-') &&
+      item.requires_external_authority !== true
     ).length,
     resolved_by_fixture: providerModuleResolved,
   },

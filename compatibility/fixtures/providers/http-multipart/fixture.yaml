@@ -1,0 +1,9 @@
+id: p0-provider-http-multipart
+test_id: TEST-19.3.1
+matrix_item_ids: ["provider:src-providers-httpmultipart"]
+priority: P0
+provider_mocking: Mock
+required_env: []
+expected_outputs: ["request-json", "response-json", "redaction-evidence"]
+normalization_rules: ["body-order", "header-order", "time"]
+blocks_stable_release: true
