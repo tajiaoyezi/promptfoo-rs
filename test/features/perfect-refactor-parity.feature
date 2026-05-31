@@ -15,6 +15,11 @@
 #   - docs/specs/tasks/task-16.1-cli-command-behavior-closure.md
 #   - docs/specs/tasks/task-16.2-measured-release-gate-reports.md
 #   - docs/specs/tasks/task-16.3-source-extracted-inventory-real-upstream-smoke.md
+#   - docs/specs/tasks/task-17.1-frozen-source-inventory-extractor.md
+#   - docs/specs/tasks/task-17.2-cli-global-eval-redteam-parity.md
+#   - docs/specs/tasks/task-17.3-real-p0-golden-corpus-runner.md
+#   - docs/specs/tasks/task-17.4-longtail-provider-assertion-redteam-classification.md
+#   - docs/specs/tasks/task-17.5-release-installability-publication-readiness.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -95,3 +100,28 @@ Feature: perfect refactor parity
     Given frozen promptfoo upstream artifacts are reachable
     When source extraction and real upstream smoke run
     Then TEST-16.3.1 proves matrix and golden artifacts are based on upstream promptfoo 0.121.13 evidence
+
+  Scenario: SCEN-17.1.1 - frozen upstream source inventory is extracted without silent omissions
+    Given the frozen promptfoo 0.121.13 tag and npm package are the stable compatibility target
+    When the source inventory extractor runs
+    Then TEST-17.1.1 proves every extracted command provider assertion redteam output config viewer API and example item is recorded or release-blocking
+
+  Scenario: SCEN-17.2.1 - CLI global eval and redteam surfaces match or classify upstream help
+    Given upstream promptfoo help snapshots for top-level eval and redteam commands
+    When promptfoo-rs parses help commands and representative invocations
+    Then TEST-17.2.1 proves each user-visible command or flag is implemented unsupported later or blocked with stable evidence
+
+  Scenario: SCEN-17.3.1 - real P0 corpus executes upstream and rs for at least 50 fixtures
+    Given at least 50 P0 fixtures with mock or recorded providers
+    When the real golden corpus runner executes the full release gate
+    Then TEST-17.3.1 proves raw normalized diff and metadata artifacts exist for each upstream and rs run
+
+  Scenario: SCEN-17.4.1 - long-tail provider assertion and redteam rows are classified
+    Given source-extracted provider assertion and redteam inventory rows
+    When long-tail parity classification runs
+    Then TEST-17.4.1 proves no P0 row lacks fixture or blocker and no P2 later unsupported row lacks reason
+
+  Scenario: SCEN-17.5.1 - release installability evidence separates dry-run readiness from public publication
+    Given a release candidate that passed full compatibility gates
+    When release installability verification runs
+    Then TEST-17.5.1 proves local archives packages checksums and install smoke evidence are present while missing external credentials remain explicit blockers

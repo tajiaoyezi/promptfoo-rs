@@ -145,6 +145,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 14 | provider-assertion-redteam-parity | docs/specs/phases/phase-14-provider-assertion-redteam-parity.md | Done | 2 | N/A (solo) |
 | 15 | release-hardening-performance | docs/specs/phases/phase-15-release-hardening-performance.md | Done | 2 | N/A (solo) |
 | 16 | parity-proof-hardening | docs/specs/phases/phase-16-parity-proof-hardening.md | Done | 3 | N/A (solo) |
+| 17 | deep-upstream-parity-proof | docs/specs/phases/phase-17-deep-upstream-parity-proof.md | Ready | 5 | N/A (solo) |
 
 ## Task 总索引
 
@@ -187,6 +188,11 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 16.1 | cli | docs/specs/tasks/task-16.1-cli-command-behavior-closure.md | Done | Phase 16 order 1 | N/A (solo) |
 | 16.2 | release-gates | docs/specs/tasks/task-16.2-measured-release-gate-reports.md | Done | Phase 16 order 2 | N/A (solo) |
 | 16.3 | compatibility | docs/specs/tasks/task-16.3-source-extracted-inventory-real-upstream-smoke.md | Done | Phase 16 order 3 | N/A (solo) |
+| 17.1 | compatibility-inventory | docs/specs/tasks/task-17.1-frozen-source-inventory-extractor.md | Ready | Phase 17 order 1 | N/A (solo) |
+| 17.2 | cli | docs/specs/tasks/task-17.2-cli-global-eval-redteam-parity.md | Ready | Phase 17 order 2 | N/A (solo) |
+| 17.3 | compatibility-harness | docs/specs/tasks/task-17.3-real-p0-golden-corpus-runner.md | Ready | Phase 17 order 3 | N/A (solo) |
+| 17.4 | provider-assertion-redteam | docs/specs/tasks/task-17.4-longtail-provider-assertion-redteam-classification.md | Ready | Phase 17 order 4 | N/A (solo) |
+| 17.5 | release | docs/specs/tasks/task-17.5-release-installability-publication-readiness.md | Ready | Phase 17 order 5 | N/A (solo) |
 
 ## ADR 索引
 
@@ -222,4 +228,4 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 8.2 | test/features/scan-engine.feature |
 | 9.1 | test/features/script-bridge.feature |
 | 10.1 | test/features/web-viewer.feature |
-| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3 | test/features/perfect-refactor-parity.feature |
+| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5 | test/features/perfect-refactor-parity.feature |
