@@ -1,6 +1,6 @@
 # Task 19.2: core-config-source-fixture-burndown
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 19 — source-accounting-native-burndown
@@ -63,19 +63,19 @@ Non-app config rows 必须进入三类之一：native fixture covered、bridge f
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Core Capabilities): runtime config source rows have native/bridge fixture evidence tied to promptfooconfig/env/file behavior.
-- [ ] **AC2** (PRD §Non Goals): cloud/server/telemetry config rows remain explicit unsupported/external blockers and are not counted as local runtime parity.
-- [ ] **AC3** (ADR-009): `source-inventory-evidence.json` reports non-app config resolved/blocker counts with item ids and reasons.
-- [ ] **AC4** (Phase 19): no non-app config row remains as generic “generated P0 accounting row requires...” without a specific decision.
+- [x] **AC1** (PRD §Core Capabilities): runtime config source rows have native/bridge fixture evidence tied to promptfooconfig/env/file behavior.
+- [x] **AC2** (PRD §Non Goals): cloud/server/telemetry config rows remain explicit unsupported/external blockers and are not counted as local runtime parity.
+- [x] **AC3** (ADR-009): `source-inventory-evidence.json` reports non-app config resolved/blocker counts with item ids and reasons.
+- [x] **AC4** (Phase 19): no non-app config row remains as generic “generated P0 accounting row requires...” without a specific decision.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-19.2.1 | TEST-19.2.1 | tests/core_config_source_fixture_burndown.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-19.2.1 | TEST-19.2.2 | tests/core_config_source_fixture_burndown.rs | install, typecheck, unit-test, coverage, build | Not Started |
-| AC3 | SCEN-19.2.1 | TEST-19.2.3 | tests/core_config_source_fixture_burndown.rs | install, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC4 | SCEN-19.2.1 | TEST-19.2.4 | tests/core_config_source_fixture_burndown.rs | install, typecheck, unit-test, e2e, build | Not Started |
+| AC1 | SCEN-19.2.1 | TEST-19.2.1 | tests/core_config_source_fixture_burndown.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-19.2.1 | TEST-19.2.2 | tests/core_config_source_fixture_burndown.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-19.2.1 | TEST-19.2.3 | tests/core_config_source_fixture_burndown.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC4 | SCEN-19.2.1 | TEST-19.2.4 | tests/core_config_source_fixture_burndown.rs | install, typecheck, unit-test, e2e, build | Done |
 
 ## 8. Risks
 
@@ -96,9 +96,30 @@ Non-app config rows 必须进入三类之一：native fixture covered、bridge f
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-05-31
+- **改动文件**：
+  - `tests/core_config_source_fixture_burndown.rs`
+  - `tests/viewer_config_source_reclassification.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/source-inventory-evidence.sh`
+  - `scripts/release/integration.sh`
+  - `docs/compatibility/matrix.md`
+  - `docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-19-source-accounting-native-burndown.md`
+  - `docs/specs/tasks/task-19.2-core-config-source-fixture-burndown.md`
+- **commit 列表**：
+  - `c5736c2` `test(config): add SCEN-19.2.1 core config burndown RED tests`
+  - `d9f6b9b` `feat(config): classify non-app config source blockers`
+  - `3494728` `refactor(config): align core config burndown error type`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-19.2.1 ~ TEST-19.2.4 通过。
+  - integration: PASS — `bash scripts/release/integration.sh` 通过，包含 `core_config_source_fixture_burndown`。
+  - e2e: PASS — `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 通过；`source-inventory-evidence.json` status=`ready-with-blockers`，`p0_accounting_blocker_count=44`，`core_config_source_burndown.non_app_config_total=18`，`non_app_config_fixture_covered_count=8`，`non_app_config_external_blocker_count=7`，`non_app_config_auxiliary_registration_count=3`，`non_app_config_generic_blocker_count=0`。
+- **剩余风险 / 未做项**：7 个 cloud/server/telemetry/global config rows 仍是 explicit external blockers；44 个总 P0 source accounting blockers 仍阻止“完美重构”完成，其中 provider module blockers 需 task 19.3/19.4 继续燃尽。
+- **下游 task 影响**：task 19.3 可聚焦剩余 provider request/response module blockers；task 19.4 需要把 external-authority config/provider/publication blockers 集中到不可伪造 gate；Phase 19 smoke 应检查 P0=44、non-app config generic blocker=0。

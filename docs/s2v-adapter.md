@@ -200,7 +200,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 18.3 | compatibility-target | docs/specs/tasks/task-18.3-current-upstream-rebaseline-gate.md | Done | Phase 18 order 3 | N/A (solo) |
 | 18.4 | release | docs/specs/tasks/task-18.4-publication-authority-release-gate.md | Done | Phase 18 order 4 | N/A (solo) |
 | 19.1 | compatibility-inventory | docs/specs/tasks/task-19.1-viewer-config-source-reclassification.md | Done | Phase 19 order 1 | N/A (solo) |
-| 19.2 | config | docs/specs/tasks/task-19.2-core-config-source-fixture-burndown.md | Ready | Phase 19 order 2 | N/A (solo) |
+| 19.2 | config | docs/specs/tasks/task-19.2-core-config-source-fixture-burndown.md | Done | Phase 19 order 2 | N/A (solo) |
 | 19.3 | providers | docs/specs/tasks/task-19.3-provider-request-response-fixture-burndown.md | Ready | Phase 19 order 3 | N/A (solo) |
 | 19.4 | compatibility-authority | docs/specs/tasks/task-19.4-external-authority-blocker-waiver-gate.md | Ready | Phase 19 order 4 | N/A (solo) |
 

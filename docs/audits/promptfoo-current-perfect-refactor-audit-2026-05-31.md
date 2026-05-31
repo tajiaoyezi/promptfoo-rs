@@ -98,8 +98,9 @@ This does not complete current-upstream parity; it prevents ambiguous or oversta
 - `missing_matrix_rows`: 0
 - `release_blockers`: 74
 - `source_accounting_ledger`: `target/release-gates/source-inventory-ledger.json`
-- `p0_accounting_blocker_count`: 55 after task 19.1 viewer config scope correction
+- `p0_accounting_blocker_count`: 44 after task 19.2 core config source burndown
 - `viewer_config_reclassified_count`: 56
+- `core_config_source_burndown`: 18 non-app config rows, 8 fixture-covered, 7 external blockers, 3 auxiliary registrations, 0 generic blockers
 
 `target/release-gates/source-inventory-ledger.json` reports 2549 ledger rows and 2116 generated accounting rows. This removes the previous silent missing-row problem, but it still directly contradicts a "complete upstream surface implemented" claim because generated P0 accounting rows remain release-blocking until they get native fixture, bridge fixture, explicit waiver, or external blocker evidence.
 
@@ -175,7 +176,7 @@ The current project is a substantially improved, locally verified, S2V-complete 
 
 The remaining gap is no longer basic project readiness. It is deep parity and release proof:
 
-1. resolve the 55 P0 source accounting blockers now exposed by the ledger after task 19.1,
+1. resolve the 44 P0 source accounting blockers now exposed by the ledger after task 19.2,
 2. resolve the 24 remaining P0 long-tail provider module blockers,
 3. decide whether to implement and verify current-mode evidence for current upstream `HEAD`,
 4. either implement or formally scope out the current upstream surfaces that are outside the frozen PRD target,
@@ -195,4 +196,6 @@ Add follow-up S2V work focused on blocker burn-down rather than smoke hardening:
 
 Phase 19 now captures the first two follow-up tracks as Ready S2V task specs: viewer config source reclassification, core config fixture burndown, provider request/response fixture burndown, and external authority blocker gate.
 
-Task 19.1 implementation adds viewer config scope correction for `src/app/**` generated config rows. Current artifacts report `viewer_config_reclassified_count=56` and `p0_accounting_blocker_count=55`. This is not a claim of complete upstream React UI parity; it keeps Local Web viewer under the existing P1 boundary and leaves non-app runtime config/provider rows as P0 blockers for task 19.2+.
+Task 19.1 implementation adds viewer config scope correction for `src/app/**` generated config rows. Current artifacts report `viewer_config_reclassified_count=56`. This is not a claim of complete upstream React UI parity; it keeps Local Web viewer under the existing P1 boundary.
+
+Task 19.2 implementation adds non-app config burndown evidence. Current artifacts report `core_config_source_burndown.non_app_config_total=18`, `non_app_config_fixture_covered_count=8`, `non_app_config_external_blocker_count=7`, `non_app_config_auxiliary_registration_count=3`, `non_app_config_generic_blocker_count=0`, and `p0_accounting_blocker_count=44`. This removes generic non-app config accounting blockers while preserving cloud/server/telemetry/global config rows as explicit external blockers.
