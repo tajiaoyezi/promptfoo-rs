@@ -50,9 +50,10 @@ fn test_18_1_1_source_accounting_ledger_represents_every_extracted_item() {
         .rows
         .iter()
         .any(|row| row.item_id == "provider:src-providers-openai-chat" && !row.generated));
-    assert!(ledger.rows.iter().any(|row| {
-        row.item_id == "assertion:src-assertions-answerrelevance" && row.generated
-    }));
+    assert!(ledger
+        .rows
+        .iter()
+        .any(|row| { row.item_id == "assertion:src-assertions-answerrelevance" && row.generated }));
 }
 
 #[test]
@@ -124,8 +125,7 @@ fn test_18_1_4_source_accounting_ledger_writes_release_gate_json() {
     ));
     let _ = std::fs::remove_file(&path);
 
-    write_source_accounting_ledger(&ledger, Path::new(&path))
-        .expect("ledger should write json");
+    write_source_accounting_ledger(&ledger, Path::new(&path)).expect("ledger should write json");
     let json: serde_json::Value =
         serde_json::from_str(&std::fs::read_to_string(&path).expect("ledger should be readable"))
             .expect("ledger should be valid json");
