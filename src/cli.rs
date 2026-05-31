@@ -6,7 +6,10 @@ use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 
 use crate::cache::resume::ResumeStore;
 use crate::compatibility::matrix::CapabilityMatrix;
-use crate::config::{load_promptfoo_config, EnvOverlay};
+use crate::config::{
+    load_promptfoo_config, EnvOverlay, NormalizedConfig, NormalizedPrompt, NormalizedProvider,
+    NormalizedTestCase,
+};
 use crate::eval::{run_eval, EvalOptions, EvalResultEnvelope};
 use crate::mcp::tool_listing;
 use crate::output::{write_output, write_sarif, OutputError, OutputFormat, RunSummary};
@@ -63,16 +66,76 @@ pub enum Command {
     Import(ImportArgs),
     /// Export promptfoo artifacts.
     Export(ExportArgs),
+    /// Initialize a promptfoo project.
+    Init(GapCommandArgs),
+    /// Share eval results with promptfoo cloud.
+    Share(GapCommandArgs),
+    /// Manage promptfoo cloud authentication.
+    Auth(GapCommandArgs),
+    /// Manage promptfoo configuration.
+    Config(GapCommandArgs),
+    /// Run promptfoo debug workflows.
+    Debug(GapCommandArgs),
+    /// Delete promptfoo cloud resources.
+    Delete(GapCommandArgs),
+    /// Generate promptfoo assets.
+    Generate(GapCommandArgs),
+    /// Send promptfoo feedback.
+    Feedback(GapCommandArgs),
+    /// List promptfoo cloud resources.
+    List(GapCommandArgs),
+    /// Read promptfoo cloud logs.
+    Logs(GapCommandArgs),
+    /// Optimize prompts.
+    Optimize(GapCommandArgs),
+    /// Retry an eval.
+    Retry(GapCommandArgs),
+    /// Validate promptfoo configuration.
+    Validate(GapCommandArgs),
+    /// Show promptfoo resources.
+    Show(GapCommandArgs),
 }
 
 #[derive(Debug, Args)]
 pub struct EvalArgs {
     #[arg(short = 'c', long = "config", value_name = "FILE")]
     pub config: Option<PathBuf>,
+    #[arg(long = "prompts", value_name = "PROMPT", action = ArgAction::Append)]
+    pub prompts: Vec<String>,
+    #[arg(long = "providers", value_name = "PROVIDER", action = ArgAction::Append)]
+    pub providers: Vec<String>,
+    #[arg(long = "tests", value_name = "TEST", action = ArgAction::Append)]
+    pub tests: Vec<String>,
+    #[arg(long = "vars", value_name = "KEY=VALUE", action = ArgAction::Append)]
+    pub vars: Vec<String>,
     #[arg(long = "output", value_name = "FILE", action = ArgAction::Append)]
     pub output: Vec<PathBuf>,
     #[arg(long = "max-concurrency", value_name = "N")]
     pub max_concurrency: Option<usize>,
+    #[arg(long = "repeat", value_name = "N")]
+    pub repeat: Option<usize>,
+    #[arg(long = "delay", value_name = "MILLISECONDS")]
+    pub delay_ms: Option<u64>,
+    #[arg(long = "no-cache", action = ArgAction::SetTrue)]
+    pub no_cache: bool,
+    #[arg(long = "resume", action = ArgAction::SetTrue)]
+    pub resume: bool,
+    #[arg(long = "retry-errors", action = ArgAction::SetTrue)]
+    pub retry_errors: bool,
+    #[arg(long = "filter-sample", value_name = "CASE_ID", action = ArgAction::Append)]
+    pub filter_sample: Vec<String>,
+    #[arg(long = "env-file", value_name = "FILE")]
+    pub env_file: Option<PathBuf>,
+    #[arg(long = "no-write", action = ArgAction::SetTrue)]
+    pub no_write: bool,
+    #[arg(long = "table", action = ArgAction::SetTrue)]
+    pub table: bool,
+    #[arg(long = "no-table", action = ArgAction::SetTrue)]
+    pub no_table: bool,
+    #[arg(long = "share", action = ArgAction::SetTrue)]
+    pub share: bool,
+    #[arg(long = "no-share", action = ArgAction::SetTrue)]
+    pub no_share: bool,
 }
 
 #[derive(Debug, Args)]
@@ -96,12 +159,36 @@ pub struct CacheArgs {
 
 #[derive(Debug, Args)]
 pub struct RedteamArgs {
+    #[command(subcommand)]
+    pub command: Option<RedteamCommand>,
     #[arg(short = 'c', long = "config", value_name = "FILE")]
     pub config: Option<PathBuf>,
     #[arg(long = "stage", value_enum, default_value_t = RedteamStageArg::Run)]
     pub stage: RedteamStageArg,
     #[arg(long = "report", value_name = "FILE")]
     pub report: Option<PathBuf>,
+}
+
+#[derive(Debug, Subcommand)]
+pub enum RedteamCommand {
+    /// Initialize redteam configuration.
+    Init,
+    /// Evaluate redteam tests.
+    Eval,
+    /// Generate redteam tests.
+    Generate,
+    /// Run redteam tests.
+    Run,
+    /// Write a redteam report.
+    Report,
+    /// List redteam plugin and strategy registry evidence.
+    Plugins,
+    /// Discover attack surfaces.
+    Discover,
+    /// Run poisoning workflows.
+    Poison,
+    /// Setup redteam resources.
+    Setup,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
@@ -145,6 +232,12 @@ pub struct ExportArgs {
     pub output: Option<PathBuf>,
 }
 
+#[derive(Debug, Args)]
+pub struct GapCommandArgs {
+    #[arg(trailing_var_arg = true, allow_hyphen_values = true)]
+    pub args: Vec<String>,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, ValueEnum)]
 pub enum ScanFormatArg {
     Json,
@@ -163,6 +256,90 @@ pub fn run_cli(cli: Cli) -> Result<ExitCode, CliError> {
         Some(Command::Cache(args)) => handle_cache_command(args),
         Some(Command::Import(args)) => handle_import_command(args),
         Some(Command::Export(args)) => handle_export_command(args),
+        Some(Command::Share(_)) => Err(handle_explicit_gap_command(
+            "share",
+            "command:share",
+            GapClass::Unsupported,
+            "promptfoo cloud/share is out of scope for local promptfoo-rs; no-upload",
+        )),
+        Some(Command::Auth(_)) => Err(handle_explicit_gap_command(
+            "auth",
+            "command:auth",
+            GapClass::Unsupported,
+            "promptfoo cloud authentication requires an external account; no-upload",
+        )),
+        Some(Command::Config(_)) => Err(handle_explicit_gap_command(
+            "config",
+            "command:config",
+            GapClass::Unsupported,
+            "cloud/global config writes are disabled by default; no-upload",
+        )),
+        Some(Command::Init(_)) => Err(handle_explicit_gap_command(
+            "init",
+            "command:init",
+            GapClass::Later,
+            "interactive project scaffolding is registered for compatibility but not executed silently",
+        )),
+        Some(Command::Debug(_)) => Err(handle_explicit_gap_command(
+            "debug",
+            "command:debug",
+            GapClass::Later,
+            "debug diagnostics require a dedicated compatibility fixture",
+        )),
+        Some(Command::Delete(_)) => Err(handle_explicit_gap_command(
+            "delete",
+            "command:delete",
+            GapClass::Unsupported,
+            "remote deletion is a cloud operation and will not upload or mutate external state",
+        )),
+        Some(Command::Generate(_)) => Err(handle_explicit_gap_command(
+            "generate",
+            "command:generate",
+            GapClass::Later,
+            "generation workflows require task-specific fixtures before native execution",
+        )),
+        Some(Command::Feedback(_)) => Err(handle_explicit_gap_command(
+            "feedback",
+            "command:feedback",
+            GapClass::Unsupported,
+            "feedback submission is a cloud upload path and is disabled",
+        )),
+        Some(Command::List(_)) => Err(handle_explicit_gap_command(
+            "list",
+            "command:list",
+            GapClass::Unsupported,
+            "remote listing is a cloud account operation and is disabled",
+        )),
+        Some(Command::Logs(_)) => Err(handle_explicit_gap_command(
+            "logs",
+            "command:logs",
+            GapClass::Unsupported,
+            "remote log access is a cloud account operation and is disabled",
+        )),
+        Some(Command::Optimize(_)) => Err(handle_explicit_gap_command(
+            "optimize",
+            "command:optimize",
+            GapClass::Later,
+            "prompt optimization requires model-backed fixtures and is not run silently",
+        )),
+        Some(Command::Retry(_)) => Err(handle_explicit_gap_command(
+            "retry",
+            "command:retry",
+            GapClass::Later,
+            "standalone retry is tracked separately from local eval retry flags",
+        )),
+        Some(Command::Validate(_)) => Err(handle_explicit_gap_command(
+            "validate",
+            "command:validate",
+            GapClass::Later,
+            "standalone validation is tracked; eval config loading already fails closed",
+        )),
+        Some(Command::Show(_)) => Err(handle_explicit_gap_command(
+            "show",
+            "command:show",
+            GapClass::Later,
+            "show is registered as a compatibility gap until source-backed behavior is implemented",
+        )),
         None => Err(unsupported_command_error(
             "promptfoo-rs",
             "command is required; run promptfoo-rs --help",
@@ -498,12 +675,27 @@ pub struct OutputArtifact {
 }
 
 pub fn run_eval_cli(args: EvalCliArgs) -> Result<CliRunArtifacts, CliError> {
+    if args.share {
+        return Err(handle_explicit_gap_command(
+            "eval --share",
+            "flag:share",
+            GapClass::Unsupported,
+            "sharing eval results uploads data and is disabled by default; use --no-share for local-only runs",
+        ));
+    }
     let config_path = args
         .config
         .clone()
         .ok_or_else(|| CliError::new("config path is required for eval (-c, --config)"))?;
-    let config = load_promptfoo_config(&config_path, &EnvOverlay::default())
+    let env = if let Some(env_file) = args.env_file.as_ref() {
+        EnvOverlay::from_dotenv(env_file)
+            .map_err(|err| CliError::new(format!("env-file {}: {err}", env_file.display())))?
+    } else {
+        EnvOverlay::default()
+    };
+    let config = load_promptfoo_config(&config_path, &env)
         .map_err(|err| CliError::new(format!("config {}: {err}", config_path.display())))?;
+    let config = apply_eval_flag_overrides(&args, config)?;
     let envelope = run_eval(
         config,
         EvalOptions {
@@ -517,9 +709,114 @@ pub fn run_eval_cli(args: EvalCliArgs) -> Result<CliRunArtifacts, CliError> {
         .iter()
         .map(|path| OutputTarget::from_path(path.clone()))
         .collect::<Result<Vec<_>, _>>()?;
-    let outputs = write_requested_outputs(&envelope, &output_targets)
-        .map_err(|err| CliError::new(err.to_string()))?;
+    let outputs = if args.no_write {
+        Vec::new()
+    } else {
+        write_requested_outputs(&envelope, &output_targets)
+            .map_err(|err| CliError::new(err.to_string()))?
+    };
     Ok(CliRunArtifacts { envelope, outputs })
+}
+
+pub fn apply_eval_flag_overrides(
+    args: &EvalArgs,
+    mut config: NormalizedConfig,
+) -> Result<NormalizedConfig, CliError> {
+    if !args.prompts.is_empty() {
+        config.prompts = args
+            .prompts
+            .iter()
+            .map(|prompt| NormalizedPrompt {
+                source: None,
+                body: prompt.clone(),
+            })
+            .collect();
+    }
+    if !args.providers.is_empty() {
+        config.providers = args
+            .providers
+            .iter()
+            .map(|provider| NormalizedProvider {
+                id: provider.clone(),
+                config: serde_json::Value::Null,
+            })
+            .collect();
+    }
+    if !args.tests.is_empty() {
+        config.tests = args
+            .tests
+            .iter()
+            .map(|test| {
+                let mut vars = std::collections::BTreeMap::new();
+                vars.insert("test".to_string(), test.clone());
+                NormalizedTestCase {
+                    vars,
+                    assertions: Vec::new(),
+                }
+            })
+            .collect();
+    }
+    if !args.vars.is_empty() {
+        let vars = parse_cli_vars(&args.vars)?;
+        if config.tests.is_empty() {
+            config.tests.push(NormalizedTestCase {
+                vars,
+                assertions: Vec::new(),
+            });
+        } else {
+            for test in &mut config.tests {
+                for (key, value) in &vars {
+                    test.vars.insert(key.clone(), value.clone());
+                }
+            }
+        }
+    }
+    if let Some(repeat) = args.repeat {
+        let repeat = repeat.max(1);
+        let original = if config.tests.is_empty() {
+            vec![NormalizedTestCase {
+                vars: Default::default(),
+                assertions: Vec::new(),
+            }]
+        } else {
+            config.tests.clone()
+        };
+        let mut repeated = Vec::new();
+        for _ in 0..repeat {
+            repeated.extend(original.clone());
+        }
+        config.tests = repeated;
+    }
+    if !args.filter_sample.is_empty() {
+        let allowed = args
+            .filter_sample
+            .iter()
+            .map(String::as_str)
+            .collect::<BTreeSet<_>>();
+        config.tests = config
+            .tests
+            .into_iter()
+            .enumerate()
+            .filter(|(index, _test)| allowed.contains(format!("case-{index}").as_str()))
+            .map(|(_index, test)| test)
+            .collect();
+    }
+    Ok(config)
+}
+
+fn parse_cli_vars(
+    values: &[String],
+) -> Result<std::collections::BTreeMap<String, String>, CliError> {
+    let mut vars = std::collections::BTreeMap::new();
+    for value in values {
+        let Some((key, val)) = value.split_once('=') else {
+            return Err(CliError::new(format!(
+                "--vars value must use KEY=VALUE syntax: {value}"
+            )));
+        };
+        vars.insert(key.to_string(), val.to_string());
+    }
+    Ok(vars)
 }
 
 pub fn write_requested_outputs(
@@ -607,6 +904,40 @@ fn result_status(status: &str) -> ResultStatus {
 }
 
 pub fn handle_redteam_command(args: RedteamArgs) -> Result<ExitCode, CliError> {
+    if let Some(command) = args.command {
+        match command {
+            RedteamCommand::Plugins => return handle_redteam_plugins_command(),
+            RedteamCommand::Discover => {
+                return Err(handle_explicit_gap_command(
+                    "redteam discover",
+                    "redteam:discover",
+                    GapClass::Later,
+                    "redteam discover is tracked but not run silently without dedicated fixtures",
+                ));
+            }
+            RedteamCommand::Poison => {
+                return Err(handle_explicit_gap_command(
+                    "redteam poison",
+                    "redteam:poison",
+                    GapClass::Later,
+                    "redteam poison requires explicit safety review and fixtures",
+                ));
+            }
+            RedteamCommand::Setup => {
+                return Err(handle_explicit_gap_command(
+                    "redteam setup",
+                    "redteam:setup",
+                    GapClass::Later,
+                    "redteam setup may materialize external resources and is disabled",
+                ));
+            }
+            RedteamCommand::Init
+            | RedteamCommand::Eval
+            | RedteamCommand::Generate
+            | RedteamCommand::Run
+            | RedteamCommand::Report => {}
+        }
+    }
     let Some(config_path) = args.config else {
         return Ok(ExitCode::SUCCESS);
     };
@@ -630,6 +961,23 @@ pub fn handle_redteam_command(args: RedteamArgs) -> Result<ExitCode, CliError> {
             .map_err(|err| CliError::new(format!("redteam report serialization failed: {err}")))?;
         println!("{json}");
     }
+    Ok(ExitCode::SUCCESS)
+}
+
+fn handle_redteam_plugins_command() -> Result<ExitCode, CliError> {
+    let registry = crate::redteam::registry::RedteamRegistry::core_defaults();
+    let json = serde_json::json!({
+        "schema_version": "promptfoo-rs.redteam.plugins.v1",
+        "plugins": registry.plugins,
+        "strategies": registry.strategies,
+        "matrix_item_id": "command:redteam",
+    });
+    println!(
+        "{}",
+        serde_json::to_string(&json).map_err(|err| {
+            CliError::new(format!("redteam plugins serialization failed: {err}"))
+        })?
+    );
     Ok(ExitCode::SUCCESS)
 }
 
@@ -666,6 +1014,35 @@ impl CliError {
 
 pub fn unsupported_command_error(command: &str, reason: &str) -> CliError {
     CliError::new(format!("{command}: {reason}"))
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum GapClass {
+    Unsupported,
+    Later,
+    Blocked,
+}
+
+impl GapClass {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Unsupported => "unsupported",
+            Self::Later => "later",
+            Self::Blocked => "blocked",
+        }
+    }
+}
+
+pub fn handle_explicit_gap_command(
+    command: &str,
+    item_id: &str,
+    class: GapClass,
+    reason: &str,
+) -> CliError {
+    CliError::new(format!(
+        "{command}: {} compatibility gap for {item_id}; reason: {reason}; no-upload; docs: docs/compatibility/matrix.md",
+        class.as_str()
+    ))
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -713,11 +1090,42 @@ impl CliSurface {
                 CliSurfaceItem::implemented("command:mcp"),
                 CliSurfaceItem::implemented("command:code-scans"),
                 CliSurfaceItem::implemented("command:scan-model"),
+                CliSurfaceItem::implemented("command:model-audit"),
                 CliSurfaceItem::implemented("command:import-file"),
                 CliSurfaceItem::implemented("command:export"),
+                CliSurfaceItem::later("command:init"),
+                CliSurfaceItem::unsupported("command:share"),
+                CliSurfaceItem::unsupported("command:auth"),
+                CliSurfaceItem::unsupported("command:config"),
+                CliSurfaceItem::later("command:debug"),
+                CliSurfaceItem::unsupported("command:delete"),
+                CliSurfaceItem::later("command:generate"),
+                CliSurfaceItem::unsupported("command:feedback"),
+                CliSurfaceItem::unsupported("command:list"),
+                CliSurfaceItem::unsupported("command:logs"),
+                CliSurfaceItem::later("command:optimize"),
+                CliSurfaceItem::later("command:retry"),
+                CliSurfaceItem::later("command:validate"),
+                CliSurfaceItem::later("command:show"),
                 CliSurfaceItem::implemented("flag:config"),
+                CliSurfaceItem::implemented("flag:prompts"),
+                CliSurfaceItem::implemented("flag:providers"),
+                CliSurfaceItem::implemented("flag:tests"),
+                CliSurfaceItem::implemented("flag:vars"),
                 CliSurfaceItem::implemented("flag:output"),
                 CliSurfaceItem::implemented("flag:max-concurrency"),
+                CliSurfaceItem::implemented("flag:repeat"),
+                CliSurfaceItem::implemented("flag:delay"),
+                CliSurfaceItem::implemented("flag:no-cache"),
+                CliSurfaceItem::implemented("flag:resume"),
+                CliSurfaceItem::implemented("flag:retry-errors"),
+                CliSurfaceItem::implemented("flag:filter-sample"),
+                CliSurfaceItem::implemented("flag:env-file"),
+                CliSurfaceItem::implemented("flag:no-write"),
+                CliSurfaceItem::implemented("flag:table"),
+                CliSurfaceItem::implemented("flag:no-table"),
+                CliSurfaceItem::unsupported("flag:share"),
+                CliSurfaceItem::implemented("flag:no-share"),
             ],
         }
     }
@@ -733,6 +1141,14 @@ pub struct CliSurfaceItem {
 impl CliSurfaceItem {
     fn implemented(stable_id: &str) -> Self {
         Self::new(stable_id, CliItemStatus::Implemented)
+    }
+
+    fn unsupported(stable_id: &str) -> Self {
+        Self::new(stable_id, CliItemStatus::Unsupported)
+    }
+
+    fn later(stable_id: &str) -> Self {
+        Self::new(stable_id, CliItemStatus::Later)
     }
 
     fn new(stable_id: &str, status: CliItemStatus) -> Self {

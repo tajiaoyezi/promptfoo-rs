@@ -91,6 +91,156 @@
       "unresolved_reason": null
     },
     {
+      "stable_id": "command:model-audit",
+      "category": "command",
+      "name": "model-audit",
+      "source_reference": "upstream src/commands/modelscan.ts; task-17.2 upstream help parity",
+      "level_hint": "P1",
+      "status": "discovered",
+      "owner_hint": "scan-engine",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "command:init",
+      "category": "command",
+      "name": "init",
+      "source_reference": "upstream src/commands/init.ts; task-17.2 upstream help parity",
+      "level_hint": "P1",
+      "status": "unresolved",
+      "owner_hint": "cli",
+      "unresolved_reason": "later: interactive scaffolding requires dedicated compatibility fixtures before native execution"
+    },
+    {
+      "stable_id": "command:share",
+      "category": "command",
+      "name": "share",
+      "source_reference": "upstream src/commands/share.ts; task-17.2 upstream help parity",
+      "level_hint": "P2",
+      "status": "unresolved",
+      "owner_hint": "cloud-share",
+      "unresolved_reason": "unsupported: promptfoo cloud/share upload path is out of PRD scope and must remain no-upload by default"
+    },
+    {
+      "stable_id": "command:auth",
+      "category": "command",
+      "name": "auth",
+      "source_reference": "upstream src/commands/auth.ts; task-17.2 upstream help parity",
+      "level_hint": "P2",
+      "status": "unresolved",
+      "owner_hint": "cloud-auth",
+      "unresolved_reason": "unsupported: cloud authentication requires an external account and is not performed by local promptfoo-rs"
+    },
+    {
+      "stable_id": "command:config",
+      "category": "command",
+      "name": "config",
+      "source_reference": "upstream src/commands/config.ts; task-17.2 upstream help parity",
+      "level_hint": "P2",
+      "status": "unresolved",
+      "owner_hint": "cloud-auth",
+      "unresolved_reason": "unsupported: cloud/global config writes are disabled by default to preserve no-upload behavior"
+    },
+    {
+      "stable_id": "command:debug",
+      "category": "command",
+      "name": "debug",
+      "source_reference": "upstream src/commands/debug.ts; task-17.2 upstream help parity",
+      "level_hint": "P1",
+      "status": "unresolved",
+      "owner_hint": "cli",
+      "unresolved_reason": "later: diagnostics require snapshot fixtures before native execution"
+    },
+    {
+      "stable_id": "command:delete",
+      "category": "command",
+      "name": "delete",
+      "source_reference": "upstream src/commands/delete.ts; task-17.2 upstream help parity",
+      "level_hint": "P2",
+      "status": "unresolved",
+      "owner_hint": "cloud-share",
+      "unresolved_reason": "unsupported: remote deletion is a cloud mutation path and is disabled"
+    },
+    {
+      "stable_id": "command:generate",
+      "category": "command",
+      "name": "generate",
+      "source_reference": "upstream src/commands/generate; task-17.2 upstream help parity",
+      "level_hint": "P1",
+      "status": "unresolved",
+      "owner_hint": "cli",
+      "unresolved_reason": "later: generation workflows require mock/model fixtures before native execution"
+    },
+    {
+      "stable_id": "command:feedback",
+      "category": "command",
+      "name": "feedback",
+      "source_reference": "upstream src/commands/feedback.ts; task-17.2 upstream help parity",
+      "level_hint": "P2",
+      "status": "unresolved",
+      "owner_hint": "cloud-share",
+      "unresolved_reason": "unsupported: feedback submission uploads data and is disabled"
+    },
+    {
+      "stable_id": "command:list",
+      "category": "command",
+      "name": "list",
+      "source_reference": "upstream src/commands/list.ts; task-17.2 upstream help parity",
+      "level_hint": "P2",
+      "status": "unresolved",
+      "owner_hint": "cloud-share",
+      "unresolved_reason": "unsupported: remote listing requires cloud account access and is disabled"
+    },
+    {
+      "stable_id": "command:logs",
+      "category": "command",
+      "name": "logs",
+      "source_reference": "upstream src/commands/logs.ts; task-17.2 upstream help parity",
+      "level_hint": "P2",
+      "status": "unresolved",
+      "owner_hint": "cloud-share",
+      "unresolved_reason": "unsupported: remote log access requires cloud account access and is disabled"
+    },
+    {
+      "stable_id": "command:optimize",
+      "category": "command",
+      "name": "optimize",
+      "source_reference": "upstream src/commands/optimize.ts; task-17.2 upstream help parity",
+      "level_hint": "P1",
+      "status": "unresolved",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": "later: prompt optimization requires model-backed fixtures before native execution"
+    },
+    {
+      "stable_id": "command:retry",
+      "category": "command",
+      "name": "retry",
+      "source_reference": "upstream src/commands/retry.ts; task-17.2 upstream help parity",
+      "level_hint": "P1",
+      "status": "unresolved",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": "later: standalone retry is tracked separately from eval retry flags"
+    },
+    {
+      "stable_id": "command:validate",
+      "category": "command",
+      "name": "validate",
+      "source_reference": "upstream src/commands/validate.ts; task-17.2 upstream help parity",
+      "level_hint": "P1",
+      "status": "unresolved",
+      "owner_hint": "config",
+      "unresolved_reason": "later: standalone config validation requires dedicated snapshots"
+    },
+    {
+      "stable_id": "command:show",
+      "category": "command",
+      "name": "show",
+      "source_reference": "upstream src/commands/show.ts; task-17.2 upstream help parity",
+      "level_hint": "P1",
+      "status": "unresolved",
+      "owner_hint": "cli",
+      "unresolved_reason": "later: show command is registered until source-backed behavior is implemented"
+    },
+    {
       "stable_id": "flag:config",
       "category": "flag",
       "name": "--config",
@@ -118,6 +268,166 @@
       "level_hint": "P0",
       "status": "discovered",
       "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:prompts",
+      "category": "flag",
+      "name": "--prompts",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:providers",
+      "category": "flag",
+      "name": "--providers",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:tests",
+      "category": "flag",
+      "name": "--tests",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:vars",
+      "category": "flag",
+      "name": "--vars",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:repeat",
+      "category": "flag",
+      "name": "--repeat",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:delay",
+      "category": "flag",
+      "name": "--delay",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:no-cache",
+      "category": "flag",
+      "name": "--no-cache",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "cache",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:resume",
+      "category": "flag",
+      "name": "--resume",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:retry-errors",
+      "category": "flag",
+      "name": "--retry-errors",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:filter-sample",
+      "category": "flag",
+      "name": "--filter-sample",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "eval-runner",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:env-file",
+      "category": "flag",
+      "name": "--env-file",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "config",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:no-write",
+      "category": "flag",
+      "name": "--no-write",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "output-writers",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:table",
+      "category": "flag",
+      "name": "--table",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "cli",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:no-table",
+      "category": "flag",
+      "name": "--no-table",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "cli",
+      "unresolved_reason": null
+    },
+    {
+      "stable_id": "flag:share",
+      "category": "flag",
+      "name": "--share",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P2",
+      "status": "unresolved",
+      "owner_hint": "cloud-share",
+      "unresolved_reason": "unsupported: sharing eval results uploads data and is disabled by default"
+    },
+    {
+      "stable_id": "flag:no-share",
+      "category": "flag",
+      "name": "--no-share",
+      "source_reference": "upstream eval --help; task-17.2 eval flag parity",
+      "level_hint": "P0",
+      "status": "discovered",
+      "owner_hint": "cloud-share",
       "unresolved_reason": null
     },
     {
