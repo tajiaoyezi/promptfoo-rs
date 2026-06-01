@@ -1,6 +1,6 @@
 # Task 24.2: current-latest-source-inventory-reextract
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 24 — current-latest-perfect-refactor
@@ -67,19 +67,19 @@ The extractor must consume the task 24.1 current-latest lock and source snapshot
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-011): inventory rows are extracted from the locked current-latest source target, not from frozen baseline files or floating upstream refs.
-- [ ] **AC2** (ADR-009): commands, flags, config features, providers, assertions, redteam plugins/strategies, outputs, viewer, Node API, examples, and documented workflows have stable IDs and source references.
-- [ ] **AC3** (PRD §Compatibility Matrix): every current-latest row has P0/P1/P2 level, implementation status, verification owner, and fixture/blocker/waiver reason.
-- [ ] **AC4** (task-20.2): any unclassified row or row without evidence keeps `perfect_refactor_claim_allowed=false`.
+- [x] **AC1** (ADR-011): inventory rows are extracted from the locked current-latest source target, not from frozen baseline files or floating upstream refs.
+- [x] **AC2** (ADR-009): commands, flags, config features, providers, assertions, redteam plugins/strategies, outputs, viewer, Node API, examples, and documented workflows have stable IDs and source references.
+- [x] **AC3** (PRD §Compatibility Matrix): every current-latest row has P0/P1/P2 level, implementation status, verification owner, and fixture/blocker/waiver reason.
+- [x] **AC4** (task-20.2): any unclassified row or row without evidence keeps `perfect_refactor_claim_allowed=false`.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-24.2.1 | TEST-24.2.1 | tests/current_latest_source_inventory.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-24.2.1 | TEST-24.2.2 | tests/current_latest_source_inventory.rs | install, lint, typecheck, unit-test, coverage, build | Not Started |
-| AC3 | SCEN-24.2.1 | TEST-24.2.3 | tests/current_latest_source_inventory.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Not Started |
-| AC4 | SCEN-24.2.1 | TEST-24.2.4 | tests/current_latest_source_inventory.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Not Started |
+| AC1 | SCEN-24.2.1 | TEST-24.2.1 | tests/current_latest_source_inventory.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-24.2.1 | TEST-24.2.2 | tests/current_latest_source_inventory.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-24.2.1 | TEST-24.2.3 | tests/current_latest_source_inventory.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-24.2.1 | TEST-24.2.4 | tests/current_latest_source_inventory.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -101,9 +101,31 @@ The extractor must consume the task 24.1 current-latest lock and source snapshot
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-01
+- **改动文件**：
+  - `tests/current_latest_source_inventory.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `compatibility/inventory/current-latest-source-inventory.json`
+  - `compatibility/matrix/current-latest-matrix.json`
+  - `docs/compatibility/matrix.md`
+  - `docs/compatibility/target-policy.md`
+  - `docs/specs/tasks/task-24.2-current-latest-source-inventory-reextract.md`
+  - `docs/specs/phases/phase-24-current-latest-perfect-refactor.md`
+  - `docs/s2v-adapter.md`
+- **commit 列表**：
+  - `f697924` `test(compatibility): add current latest source inventory RED tests`
+  - `f7e45b1` `feat(compatibility): extract current latest source inventory`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS — helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-24.2.1 ~ TEST-24.2.4 通过。
+  - integration: PASS — helper 执行 `bash scripts/release/integration.sh` 通过。
+  - e2e: PASS — helper 执行 `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — helper 执行 `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — helper 执行 `bash scripts/release/runtime-smoke.sh` 通过；`current-latest-source-inventory.json` status=`ready-with-blockers`，row_count=3912，unclassified_rows=318；`current-latest-matrix.json` status=`ready-with-blockers`，row_count=3912，`perfect_refactor_claim_allowed=false`；`release-candidate.json` 暴露 current-latest inventory/matrix gate 状态。
+- **剩余风险 / 未做项**：本 task 只关闭 current-latest source accounting 的 silent omission 风险，不实现所有 3912 行功能。当前 318 个 unclassified current-latest source rows 仍按 ADR-011 / task-20.2 阻断 perfect-refactor claim；完整功能 fixture/golden corpus 与大规模质量 gate 留给 task 24.3 / 24.4。
+- **下游 task 影响**：task 24.3 可消费 `compatibility/matrix/current-latest-matrix.json` 和 `target/release-gates/current-latest-source-inventory.json` 扩展 P0/P1 corpus；task 24.4 必须聚合 current-latest inventory/matrix gate，并在 unclassified 或缺 evidence 时继续禁止 perfect-refactor claim。

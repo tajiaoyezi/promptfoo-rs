@@ -21,7 +21,7 @@
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
 | 24.1 | current-latest-upstream-authority-lock | ../tasks/task-24.1-current-latest-upstream-authority-lock.md | Done | 将 npm latest、GitHub HEAD、GitHub latest release 观测写成 immutable current-latest target packet |
-| 24.2 | current-latest-source-inventory-reextract | ../tasks/task-24.2-current-latest-source-inventory-reextract.md | Ready | 从锁定 target 重新抽取完整功能 inventory，并把 silent omission 变成 blocker |
+| 24.2 | current-latest-source-inventory-reextract | ../tasks/task-24.2-current-latest-source-inventory-reextract.md | Done | 从锁定 target 重新抽取完整功能 inventory，并把 silent omission 变成 blocker |
 | 24.3 | current-latest-full-function-golden-corpus | ../tasks/task-24.3-current-latest-full-function-golden-corpus.md | Ready | 为 current-latest P0/P1 能力扩展 fixtures、snapshots 和 golden diff corpus |
 | 24.4 | current-latest-exhaustive-quality-gate | ../tasks/task-24.4-current-latest-exhaustive-quality-gate.md | Ready | 增加大规模回归、stress、property、release quality gate，并限制 claim 为“无已知 release-blocking 缺陷” |
 

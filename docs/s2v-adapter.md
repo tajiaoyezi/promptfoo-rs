@@ -214,7 +214,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 22.1 | release | docs/specs/tasks/task-22.1-authority-unblock-packet-gate.md | Done | Phase 22 order 1 | N/A (solo) |
 | 23.1 | compatibility-target | docs/specs/tasks/task-23.1-dynamic-github-latest-release-observation.md | Done | Phase 23 order 1 | N/A (solo) |
 | 24.1 | compatibility-target | docs/specs/tasks/task-24.1-current-latest-upstream-authority-lock.md | Done | Phase 24 order 1 | N/A (solo) |
-| 24.2 | compatibility-inventory | docs/specs/tasks/task-24.2-current-latest-source-inventory-reextract.md | Ready | Phase 24 order 2 | N/A (solo) |
+| 24.2 | compatibility-inventory | docs/specs/tasks/task-24.2-current-latest-source-inventory-reextract.md | Done | Phase 24 order 2 | N/A (solo) |
 | 24.3 | compatibility-harness | docs/specs/tasks/task-24.3-current-latest-full-function-golden-corpus.md | Ready | Phase 24 order 3 | N/A (solo) |
 | 24.4 | release-quality | docs/specs/tasks/task-24.4-current-latest-exhaustive-quality-gate.md | Ready | Phase 24 order 4 | N/A (solo) |
 
