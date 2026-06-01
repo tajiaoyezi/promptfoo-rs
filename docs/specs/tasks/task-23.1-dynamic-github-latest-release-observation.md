@@ -1,6 +1,6 @@
 # Task 23.1: dynamic-github-latest-release-observation
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 23 — dynamic-upstream-release-observation
@@ -68,19 +68,19 @@ Task 21.1 created `upstream-distribution-target.json`, but the shell gate still 
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (task-21.1): script output records the latest release ref from `UPSTREAM_GITHUB_RELEASE_FILE` fixture, not the hard-coded `refs/tags/code-scan-action-0.1.7`.
-- [ ] **AC2** (ADR-007): generated `github.source` includes the dynamic `refs/tags/<latest>` query and omits the old hard-coded release ref when a different latest release fixture is provided.
-- [ ] **AC3** (ADR-009): a dynamic non-core latest release keeps `github_latest_release_is_core_package=false` and `current_repository_perfect_claim_allowed=false`.
-- [ ] **AC4** (task-22.1): runtime smoke, docs, audit, and BLOCKED notes keep perfect-refactor external/current blockers visible after dynamic release observation.
+- [x] **AC1** (task-21.1): script output records the latest release ref from `UPSTREAM_GITHUB_RELEASE_FILE` fixture, not the hard-coded `refs/tags/code-scan-action-0.1.7`.
+- [x] **AC2** (ADR-007): generated `github.source` includes the dynamic `refs/tags/<latest>` query and omits the old hard-coded release ref when a different latest release fixture is provided.
+- [x] **AC3** (ADR-009): a dynamic non-core latest release keeps `github_latest_release_is_core_package=false` and `current_repository_perfect_claim_allowed=false`.
+- [x] **AC4** (task-22.1): runtime smoke, docs, audit, and BLOCKED notes keep perfect-refactor external/current blockers visible after dynamic release observation.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-23.1.1 | TEST-23.1.1 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-23.1.1 | TEST-23.1.2 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC3 | SCEN-23.1.1 | TEST-23.1.3 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, coverage, build | Not Started |
-| AC4 | SCEN-23.1.1 | TEST-23.1.4 | tests/upstream_distribution_target_gate.rs | install, lint, typecheck, unit-test, e2e, runtime-smoke, build | Not Started |
+| AC1 | SCEN-23.1.1 | TEST-23.1.1 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-23.1.1 | TEST-23.1.2 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-23.1.1 | TEST-23.1.3 | tests/upstream_distribution_target_gate.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-23.1.1 | TEST-23.1.4 | tests/upstream_distribution_target_gate.rs | install, lint, typecheck, unit-test, e2e, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -102,9 +102,22 @@ Task 21.1 created `upstream-distribution-target.json`, but the shell gate still 
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-01
+- **改动文件**：`docs/prds/promptfoo-rs.prd.md`、`docs/s2v-adapter.md`、`docs/specs/phases/phase-23-dynamic-upstream-release-observation.md`、`docs/specs/tasks/task-23.1-dynamic-github-latest-release-observation.md`、`docs/superpowers/plans/2026-06-01-dynamic-upstream-release-observation.md`、`test/features/perfect-refactor-parity.feature`、`tests/upstream_distribution_target_gate.rs`、`scripts/release/upstream-distribution-target.sh`、`docs/compatibility/target-policy.md`、`docs/compatibility/matrix.md`、`docs/audits/promptfoo-current-perfect-refactor-audit-2026-05-31.md`、`BLOCKED-task-22.1-perfect-refactor-external-authority.md`
+- **commit 列表**：
+  - `c360e99 docs(spec): add phase 23 dynamic upstream release observation`
+  - `a1f6809 test(compatibility): add SCEN-23.1.1 dynamic release observation RED test`
+  - `97344b1 feat(compatibility): observe dynamic upstream latest release`
+  - 本次 docs 回填提交：`docs(spec): complete task 23.1 dynamic release observation`
+- **§9 Verification 结果**：
+  - install: PASS — `s2v_verify_full "$(s2v_extract_verify_keys "$TASK_SPEC")"`
+  - lint: PASS — `s2v_verify_full "$(s2v_extract_verify_keys "$TASK_SPEC")"`
+  - typecheck: PASS — `s2v_verify_full "$(s2v_extract_verify_keys "$TASK_SPEC")"`
+  - unit-test: PASS — `cargo test --workspace` included `tests/upstream_distribution_target_gate.rs` with 5/5 tests passing.
+  - integration: PASS — adapter integration gate passed.
+  - e2e: PASS — adapter e2e gate passed.
+  - coverage: PASS — adapter coverage gate passed; `s2v_coverage_threshold_guard` passed.
+  - build: PASS — adapter build gate passed.
+  - runtime-smoke: PASS — runtime smoke regenerated release-gate artifacts.
+- **剩余风险 / 未做项**：dynamic latest release observation only refreshes public GitHub release evidence. It does not resolve source accounting blockers, provider/product external authority blockers, publication credentials/legal-brand blockers, or same-ref current-upstream rebaseline evidence. `perfect_refactor_claim_allowed` remains false by design.
+- **下游 task 影响**：future current-upstream rebaseline work can rely on `upstream-distribution-target.json.github.source` reflecting the actual latest release ref queried at smoke time, but it must still produce same-ref inventory, matrix, fixture, golden corpus, and release evidence before any current perfect-refactor claim.

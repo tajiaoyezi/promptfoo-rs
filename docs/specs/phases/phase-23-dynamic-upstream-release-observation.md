@@ -20,7 +20,7 @@ Phase 21/22 已经把 npm core package、GitHub HEAD、GitHub release channel �
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 23.1 | dynamic-github-latest-release-observation | ../tasks/task-23.1-dynamic-github-latest-release-observation.md | Ready | 动态解析 GitHub latest release tag，写入 upstream distribution target source evidence，并保持 current perfect-refactor claim fail-closed |
+| 23.1 | dynamic-github-latest-release-observation | ../tasks/task-23.1-dynamic-github-latest-release-observation.md | Done | 动态解析 GitHub latest release tag，写入 upstream distribution target source evidence，并保持 current perfect-refactor claim fail-closed |
 
 ## 5. Dependencies
 
