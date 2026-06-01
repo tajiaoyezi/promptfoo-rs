@@ -152,6 +152,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 21 | upstream-distribution-target-disambiguation | docs/specs/phases/phase-21-upstream-distribution-target-disambiguation.md | Done | 1 | N/A (solo) |
 | 22 | perfect-refactor-unblock-packet | docs/specs/phases/phase-22-perfect-refactor-unblock-packet.md | Done | 1 | N/A (solo) |
 | 23 | dynamic-upstream-release-observation | docs/specs/phases/phase-23-dynamic-upstream-release-observation.md | Done | 1 | N/A (solo) |
+| 24 | current-latest-perfect-refactor | docs/specs/phases/phase-24-current-latest-perfect-refactor.md | Ready | 4 | N/A (solo) |
 
 ## Task 总索引
 
@@ -212,6 +213,10 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 21.1 | compatibility-target | docs/specs/tasks/task-21.1-upstream-distribution-target-gate.md | Done | Phase 21 order 1 | N/A (solo) |
 | 22.1 | release | docs/specs/tasks/task-22.1-authority-unblock-packet-gate.md | Done | Phase 22 order 1 | N/A (solo) |
 | 23.1 | compatibility-target | docs/specs/tasks/task-23.1-dynamic-github-latest-release-observation.md | Done | Phase 23 order 1 | N/A (solo) |
+| 24.1 | compatibility-target | docs/specs/tasks/task-24.1-current-latest-upstream-authority-lock.md | Ready | Phase 24 order 1 | N/A (solo) |
+| 24.2 | compatibility-inventory | docs/specs/tasks/task-24.2-current-latest-source-inventory-reextract.md | Ready | Phase 24 order 2 | N/A (solo) |
+| 24.3 | compatibility-harness | docs/specs/tasks/task-24.3-current-latest-full-function-golden-corpus.md | Ready | Phase 24 order 3 | N/A (solo) |
+| 24.4 | release-quality | docs/specs/tasks/task-24.4-current-latest-exhaustive-quality-gate.md | Ready | Phase 24 order 4 | N/A (solo) |
 
 ## ADR 索引
 
@@ -227,6 +232,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | ADR-008 | Binary first multi channel release | Accepted | docs/decisions/adr-008-binary-first-multi-channel-release.md |
 | ADR-009 | P0 P1 P2 compatibility matrix | Accepted | docs/decisions/adr-009-p0-p1-p2-compatibility-matrix.md |
 | ADR-010 | Node API wrapper contract boundary | Accepted | docs/decisions/adr-010-node-api-wrapper-contract-boundary.md |
+| ADR-011 | Current Latest Full Refactor Target | Accepted | docs/decisions/adr-011-current-latest-full-refactor-target.md |
 
 ## BDD Feature 索引
 
@@ -247,4 +253,4 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 8.2 | test/features/scan-engine.feature |
 | 9.1 | test/features/script-bridge.feature |
 | 10.1 | test/features/web-viewer.feature |
-| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5, 18.1, 18.2, 18.3, 18.4, 19.1, 19.2, 19.3, 19.4, 20.1, 20.2, 21.1, 22.1, 23.1 | test/features/perfect-refactor-parity.feature |
+| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5, 18.1, 18.2, 18.3, 18.4, 19.1, 19.2, 19.3, 19.4, 20.1, 20.2, 21.1, 22.1, 23.1, 24.1, 24.2, 24.3, 24.4 | test/features/perfect-refactor-parity.feature |

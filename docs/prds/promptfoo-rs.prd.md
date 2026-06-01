@@ -147,6 +147,24 @@ AI eval、LLM regression testing、redteam、MCP、Agent 安全测试正在变�
 
 ---
 
+## Current Latest Rebaseline Addendum｜当前最新重基线补充
+
+2026-06-01 用户明确“完美重构”目标应基于原始 promptfoo 项目当前最新版本的完整功能，并要求大量测试来尽可能排除潜在缺陷。该目标新增一条 current-latest rebaseline track，不删除原有 frozen baseline track。
+
+**当前最新目标定义**：
+- “当前最新”必须被锁定为 task runtime 观测到的 immutable target packet；不得把浮动 `latest`、`main`、`master`、`HEAD` 字符串直接当作完成证据。
+- 观测包必须同时记录 npm latest stable package、GitHub default branch HEAD、GitHub latest release channel、采集命令、完整 SHA、artifact URL / integrity 和采集时间。
+- 2026-06-01 本地观测为：npm `promptfoo@latest=0.121.13` / `4860e990c7e9a2f8f677173fb92cf9867b34d03f`，GitHub default branch HEAD `1d09dfeb5f0766905409117f923dd5c4b0838d9f`，GitHub latest release `code-scan-action-0.1.7` / `1c743afe0e4807882e858c4f322fc064fa5f0770`。
+
+**质量声明边界**：
+- 项目不得承诺数学意义上的“无任何潜在 bug”；有限测试无法证明所有未来输入、平台、provider、网络和并发条件下不存在缺陷。
+- 可发布声明必须改写为：“在声明的 S2V verification gates、current-latest golden diff、source inventory coverage、stress/regression/property tests、external authority 和 publication evidence 下，无已知 release-blocking 缺陷。”
+- 若真实 provider credentials、账号、私有服务、法律/品牌授权或发布渠道证据缺失，则必须继续显示为 blocker 或 formal waiver，不能用 mock/recorded fixtures 伪装成 live parity。
+
+依据：用户 2026-06-01 澄清、ADR-007、ADR-009、ADR-011。
+
+---
+
 ## Compatibility Matrix｜兼容矩阵
 
 **兼容等级定义**：
@@ -236,6 +254,7 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 21 | upstream-distribution-target-disambiguation | 区分 npm core package 最新发布、GitHub repository HEAD、GitHub latest release tag 与 frozen baseline 的关系，防止把 non-core release 或 unreleased HEAD 漂移误读为 current promptfoo 完成或缺口 | `src/compatibility/inventory.rs` + `scripts/release/upstream-distribution-target.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `docs/compatibility/` + `docs/audits/` + `tests/` | 20 | 否 |
 | 22 | perfect-refactor-unblock-packet | 将 Phase 21 后仍阻止 perfect-refactor claim 的 source/external/current/publication blockers 聚合成最小用户/维护者决策包，明确哪些项无法由 agent 自动解决 | `src/release.rs` + `scripts/release/perfect-refactor-unblock-packet.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `docs/release.md` + `docs/compatibility/` + `docs/audits/` + `tests/` | 21 | 否 |
 | 23 | dynamic-upstream-release-observation | 修正 upstream distribution target gate 的 GitHub latest release 观测方式：不再把 `code-scan-action-0.1.7` 当固定 latest，而是从 GitHub latest release metadata 动态解析 release tag 并写入 source evidence | `scripts/release/upstream-distribution-target.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `tests/upstream_distribution_target_gate.rs` + `docs/compatibility/target-policy.md` + `docs/compatibility/matrix.md` + `docs/audits/` | 22 | 否 |
+| 24 | current-latest-perfect-refactor | 依据用户澄清，把目标切到原始 promptfoo 当前最新完整功能：锁定 current-latest target、重抽 source inventory、扩展 250+ 或全量 golden corpus，并新增大规模质量 gate | `docs/compatibility/current-latest.lock.md` + `compatibility/inventory/` + `compatibility/matrix/` + `compatibility/fixtures/current-latest/` + `compatibility/artifacts/current-latest/` + `src/compatibility/` + `src/release.rs` + `scripts/release/` + `tests/` | 23 | 否 |
 
 > Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
 >

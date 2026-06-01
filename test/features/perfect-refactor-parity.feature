@@ -24,6 +24,19 @@
 #   - docs/specs/tasks/task-18.2-p0-provider-module-fixture-burndown.md
 #   - docs/specs/tasks/task-18.3-current-upstream-rebaseline-gate.md
 #   - docs/specs/tasks/task-18.4-publication-authority-release-gate.md
+#   - docs/specs/tasks/task-19.1-viewer-config-source-reclassification.md
+#   - docs/specs/tasks/task-19.2-core-config-source-fixture-burndown.md
+#   - docs/specs/tasks/task-19.3-provider-request-response-fixture-burndown.md
+#   - docs/specs/tasks/task-19.4-external-authority-blocker-waiver-gate.md
+#   - docs/specs/tasks/task-20.1-source-provider-accounting-reconciliation.md
+#   - docs/specs/tasks/task-20.2-perfect-refactor-claim-contract.md
+#   - docs/specs/tasks/task-21.1-upstream-distribution-target-gate.md
+#   - docs/specs/tasks/task-22.1-authority-unblock-packet-gate.md
+#   - docs/specs/tasks/task-23.1-dynamic-github-latest-release-observation.md
+#   - docs/specs/tasks/task-24.1-current-latest-upstream-authority-lock.md
+#   - docs/specs/tasks/task-24.2-current-latest-source-inventory-reextract.md
+#   - docs/specs/tasks/task-24.3-current-latest-full-function-golden-corpus.md
+#   - docs/specs/tasks/task-24.4-current-latest-exhaustive-quality-gate.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -197,3 +210,27 @@ Feature: perfect refactor parity
     When upstream distribution target evidence is generated
     Then TEST-23.1.1 proves the observed release ref comes from latest release metadata instead of a hard-coded tag
     And TEST-23.1.2 proves release-channel classification still keeps current perfect refactor blocked when the dynamic latest release is not the npm core package
+
+  Scenario: SCEN-24.1.1 - current latest target lock is immutable
+    Given the user requires refactoring against the original promptfoo current latest complete functionality
+    When current latest target evidence is generated
+    Then TEST-24.1.1 proves npm latest GitHub HEAD and GitHub latest release channel are recorded with full SHAs
+    And TEST-24.1.2 proves floating latest main master and HEAD strings are rejected as completion proof
+
+  Scenario: SCEN-24.2.1 - current latest source inventory has no silent omissions
+    Given a locked current latest target packet exists
+    When current latest source inventory is re-extracted
+    Then TEST-24.2.2 proves every command flag provider assertion redteam output config viewer Node API example and docs row has a stable source reference
+    And TEST-24.2.4 proves unclassified rows keep perfect refactor blocked
+
+  Scenario: SCEN-24.3.1 - current latest full function golden corpus is large and complete
+    Given current latest source inventory rows have P0 P1 or P2 levels
+    When current latest golden corpus verification runs
+    Then TEST-24.3.1 proves every P0 row has executable upstream and rs artifacts
+    And TEST-24.3.4 proves the corpus has at least 250 fixture cases or full inventory coverage when fewer rows exist
+
+  Scenario: SCEN-24.4.1 - exhaustive quality gate limits bug claims to evidence
+    Given current latest target inventory and golden corpus artifacts exist
+    When current latest quality gate runs
+    Then TEST-24.4.1 proves adapter golden corpus source coverage regression stress property runtime smoke and release blockers are aggregated
+    And TEST-24.4.2 proves wording that claims no possible bugs is rejected
