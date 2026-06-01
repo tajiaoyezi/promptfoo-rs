@@ -56,3 +56,8 @@
   - `target/release-gates/perfect-refactor-claim.json` remains `perfect_refactor_claim_allowed=false`, `local_stable_allowed=true`, `published=false`, `publication_ready=credential-blocked`, `source_p0_accounting_blocker_count=22`, `external_authority_blocker_count=21`.
   - `target/release-gates/perfect-refactor-unblock-packet.json` remains `status=blocked`, `auto_resolvable=false`, `required_user_decision_count=29`, `current_upstream_rebaseline_required=true`.
 - Decision: no new Ready task is justified from this evidence. The only valid next implementation work requires user-provided external authority evidence, publication credentials/approval, approved waivers, or a same-ref current-upstream rebaseline scope.
+
+## Phase 23 progress note — 2026-06-01
+
+- Task 23.1 is implementable without external credentials because it only improves public release-observation freshness: `upstream-distribution-target.sh` now resolves a dynamic latest release ref from GitHub latest release metadata instead of relying on the stale hard-coded `refs/tags/code-scan-action-0.1.7` query.
+- This is not an external-authority blocker resolution. The perfect-refactor claim must remain false until source accounting, provider/product authority, publication authority, and current-upstream same-ref rebaseline evidence are supplied or explicitly waived under a new S2V task/ADR.

@@ -6,8 +6,25 @@ OUT="$GATE_DIR/upstream-distribution-target.json"
 mkdir -p "$GATE_DIR"
 
 npm_tmp="$(mktemp)"
+release_tmp="$(mktemp)"
 ls_tmp="$(mktemp)"
-trap 'rm -f "$npm_tmp" "$ls_tmp"' EXIT
+trap 'rm -f "$npm_tmp" "$release_tmp" "$ls_tmp"' EXIT
+
+resolve_latest_release_tag() {
+  node - "$1" <<'NODE'
+const fs = require('fs');
+const path = process.argv[2];
+const value = JSON.parse(fs.readFileSync(path, 'utf8'));
+const tag = value.tagName || value.tag_name;
+if (!tag || typeof tag !== 'string') {
+  throw new Error('GitHub latest release metadata missing tagName/tag_name');
+}
+if (tag.trim() !== tag || /[\s\0^~:?*\[\\]/.test(tag) || tag.includes('..')) {
+  throw new Error(`GitHub latest release tag is not a safe ref name: ${tag}`);
+}
+process.stdout.write(tag);
+NODE
+}
 
 if [ -n "${UPSTREAM_NPM_VIEW_FILE:-}" ]; then
   cp "$UPSTREAM_NPM_VIEW_FILE" "$npm_tmp"
@@ -15,16 +32,60 @@ else
   npm view promptfoo version gitHead dist.tarball dist.integrity time.modified --json > "$npm_tmp"
 fi
 
+if [ -n "${UPSTREAM_GITHUB_RELEASE_FILE:-}" ]; then
+  cp "$UPSTREAM_GITHUB_RELEASE_FILE" "$release_tmp"
+else
+  node <<'NODE' > "$release_tmp"
+const https = require('https');
+
+const request = https.get(
+  'https://api.github.com/repos/promptfoo/promptfoo/releases/latest',
+  {
+    headers: {
+      accept: 'application/vnd.github+json',
+      'user-agent': 'promptfoo-rs-release-gate',
+    },
+    timeout: 30000,
+  },
+  (response) => {
+    let body = '';
+    response.setEncoding('utf8');
+    response.on('data', (chunk) => {
+      body += chunk;
+    });
+    response.on('end', () => {
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        console.error(`GitHub latest release lookup failed: ${response.statusCode}`);
+        process.exit(1);
+      }
+      process.stdout.write(body);
+    });
+  },
+);
+
+request.on('timeout', () => {
+  request.destroy(new Error('GitHub latest release lookup timed out'));
+});
+request.on('error', (error) => {
+  console.error(error.message);
+  process.exit(1);
+});
+NODE
+fi
+
+latest_release_tag="$(resolve_latest_release_tag "$release_tmp")"
+latest_release_ref="refs/tags/$latest_release_tag"
+
 if [ -n "${UPSTREAM_LS_REMOTE_FILE:-}" ]; then
   cp "$UPSTREAM_LS_REMOTE_FILE" "$ls_tmp"
 else
   git ls-remote https://github.com/promptfoo/promptfoo.git \
-    HEAD refs/tags/0.121.13 refs/tags/code-scan-action-0.1.7 > "$ls_tmp"
+    HEAD refs/tags/0.121.13 "$latest_release_ref" > "$ls_tmp"
 fi
 
-node - "$npm_tmp" "$ls_tmp" "$OUT" <<'NODE'
+node - "$npm_tmp" "$ls_tmp" "$OUT" "$latest_release_ref" <<'NODE'
 const fs = require('fs');
-const [npmPath, lsRemotePath, outputPath] = process.argv.slice(2);
+const [npmPath, lsRemotePath, outputPath, latestReleaseRef] = process.argv.slice(2);
 const frozenSha = '4860e990c7e9a2f8f677173fb92cf9867b34d03f';
 const frozenVersion = '0.121.13';
 const npmIntegrity = 'sha512-DBPSixUophzcD7S7lML6SqVwnVtrhK5A3HsZ03IG9Xrw0t24r5imG7nLj+YMb0vlAjbdFtE7yFG+rsqDpfYp6g==';
@@ -70,7 +131,7 @@ function parseNpm(json) {
   };
 }
 
-function parseLsRemote(output) {
+function parseLsRemote(output, latestReleaseRef) {
   let currentHead = null;
   let frozenTagCommit = null;
   let observedReleaseRef = null;
@@ -80,13 +141,14 @@ function parseLsRemote(output) {
     if (!fullSha(sha)) throw new Error(`ls-remote ref ${ref || '<missing>'} did not contain a full sha`);
     if (ref === 'HEAD') currentHead = sha;
     else if (ref === 'refs/tags/0.121.13') frozenTagCommit = sha;
-    else if (ref && ref.startsWith('refs/tags/')) {
-      observedReleaseRef = ref;
+    else if (ref === latestReleaseRef || ref === `${latestReleaseRef}^{}`) {
+      observedReleaseRef = latestReleaseRef;
       observedReleaseCommit = sha;
     }
   }
   if (!currentHead) throw new Error('ls-remote output missing HEAD');
   if (!frozenTagCommit) throw new Error('ls-remote output missing refs/tags/0.121.13');
+  if (!observedReleaseRef) throw new Error(`ls-remote output missing ${latestReleaseRef}`);
   return {
     current_head: currentHead,
     frozen_tag_ref: 'refs/tags/0.121.13',
@@ -94,8 +156,10 @@ function parseLsRemote(output) {
     observed_release_ref: observedReleaseRef,
     observed_release_commit: observedReleaseCommit,
     observed_at: `unix:${Math.floor(Date.now() / 1000)}`,
-    source: 'git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/0.121.13 refs/tags/code-scan-action-0.1.7',
-    evidence_refs: {},
+    source: `git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/0.121.13 ${latestReleaseRef}`,
+    evidence_refs: {
+      latest_release_ref: latestReleaseRef,
+    },
   };
 }
 
@@ -127,7 +191,7 @@ function reason(npm, github, frozen, npmMatchesFrozen, headMatchesNpm, latestIsC
 }
 
 const npm = parseNpm(fs.readFileSync(npmPath, 'utf8'));
-const github = parseLsRemote(fs.readFileSync(lsRemotePath, 'utf8'));
+const github = parseLsRemote(fs.readFileSync(lsRemotePath, 'utf8'), latestReleaseRef);
 const frozen = {
   package_version: frozenVersion,
   git_ref: 'refs/tags/0.121.13',
