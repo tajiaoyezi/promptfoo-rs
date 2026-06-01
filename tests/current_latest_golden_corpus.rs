@@ -91,7 +91,10 @@ fn test_24_3_1_every_p0_row_gets_fixture_and_golden_artifacts() {
     let report = build_current_latest_golden_corpus(&matrix_path, &fixtures_root, &artifacts_root)
         .expect("current latest corpus should build");
 
-    assert_eq!(report.schema, "promptfoo-rs.current-latest-golden-corpus.v1");
+    assert_eq!(
+        report.schema,
+        "promptfoo-rs.current-latest-golden-corpus.v1"
+    );
     assert_eq!(report.p0_total, 2);
     assert_eq!(report.p0_fixture_coverage_count, 2);
     assert_eq!(report.p0_artifact_coverage_count, 2);
@@ -99,12 +102,25 @@ fn test_24_3_1_every_p0_row_gets_fixture_and_golden_artifacts() {
         .rows
         .iter()
         .filter(|row| row.level == "P0")
-        .all(|row| row.executable_fixture && row.artifact_paths.iter().all(|path| Path::new(path).exists())));
+        .all(|row| row.executable_fixture
+            && row
+                .artifact_paths
+                .iter()
+                .all(|path| Path::new(path).exists())));
     assert!(report.rows.iter().any(|row| {
         row.item_id == "config:runtime"
-            && row.artifact_paths.iter().any(|path| path.ends_with("raw/upstream.json"))
-            && row.artifact_paths.iter().any(|path| path.ends_with("normalized/rs.json"))
-            && row.artifact_paths.iter().any(|path| path.ends_with("diff/findings.json"))
+            && row
+                .artifact_paths
+                .iter()
+                .any(|path| path.ends_with("raw/upstream.json"))
+            && row
+                .artifact_paths
+                .iter()
+                .any(|path| path.ends_with("normalized/rs.json"))
+            && row
+                .artifact_paths
+                .iter()
+                .any(|path| path.ends_with("diff/findings.json"))
     }));
 
     let _ = std::fs::remove_dir_all(root);
@@ -148,7 +164,9 @@ fn test_24_3_2_p0_bug_or_unclassified_diff_blocks_current_latest_claim() {
     let blockers: Vec<GoldenDiffFinding> = evaluate_current_latest_release_blockers(&report);
 
     assert!(!report.perfect_refactor_claim_allowed, "{report:#?}");
-    assert!(blockers.iter().any(|finding| finding.class == DiffClass::Bug));
+    assert!(blockers
+        .iter()
+        .any(|finding| finding.class == DiffClass::Bug));
     assert!(blockers
         .iter()
         .any(|finding| finding.class == DiffClass::Unclassified));
@@ -198,7 +216,10 @@ fn test_24_3_3_p1_and_p2_rows_have_snapshot_or_registration_evidence() {
     assert_eq!(report.p2_registration_coverage_count, 1);
     assert!(report.rows.iter().any(|row| {
         row.item_id == "assertion:contains"
-            && row.snapshot_path.as_deref().is_some_and(|path| Path::new(path).exists())
+            && row
+                .snapshot_path
+                .as_deref()
+                .is_some_and(|path| Path::new(path).exists())
     }));
 
     let _ = std::fs::remove_dir_all(root);
@@ -242,7 +263,10 @@ fn test_24_3_4_corpus_scale_and_runtime_smoke_gate_are_wired() {
     assert!(script.contains("CURRENT_LATEST_FIXTURES_ROOT"), "{script}");
     let runtime = std::fs::read_to_string("scripts/release/runtime-smoke.sh")
         .expect("runtime smoke script should exist");
-    assert!(runtime.contains("current-latest-golden-corpus.sh"), "{runtime}");
+    assert!(
+        runtime.contains("current-latest-golden-corpus.sh"),
+        "{runtime}"
+    );
 
     let _ = std::fs::remove_dir_all(root);
 }
@@ -286,7 +310,10 @@ fn test_24_3_5_script_writes_current_latest_corpus_report() {
         &std::fs::read_to_string(report_path).expect("report should be readable"),
     )
     .expect("report should parse");
-    assert_eq!(report["schema"], "promptfoo-rs.current-latest-golden-corpus.v1");
+    assert_eq!(
+        report["schema"],
+        "promptfoo-rs.current-latest-golden-corpus.v1"
+    );
     assert_eq!(report["p0_fixture_coverage_count"], 1);
 
     let _ = std::fs::remove_dir_all(root);

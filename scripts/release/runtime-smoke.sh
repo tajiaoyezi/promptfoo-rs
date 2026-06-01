@@ -22,6 +22,7 @@ bash scripts/release/longtail-classification.sh
 bash scripts/release/current-upstream-policy.sh
 bash scripts/release/current-latest-target-lock.sh
 bash scripts/release/current-latest-source-inventory.sh
+bash scripts/release/current-latest-golden-corpus.sh
 bash scripts/release/upstream-distribution-target.sh
 bash scripts/release/real-upstream-smoke.sh
 bash scripts/release/real-upstream-corpus.sh
@@ -156,6 +157,11 @@ current_latest_source_inventory_unclassified_count="$(node -e "const r = JSON.pa
 current_latest_matrix_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-matrix.json', 'utf8')); console.log(r.status)")"
 current_latest_matrix_row_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-matrix.json', 'utf8')); console.log((r.rows || []).length)")"
 current_latest_matrix_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-matrix.json', 'utf8')); console.log(r.perfect_refactor_claim_allowed ? 'true' : 'false')")"
+current_latest_golden_corpus_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.status)")"
+current_latest_golden_corpus_fixture_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.fixture_case_count)")"
+current_latest_golden_corpus_p0_total="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.p0_total)")"
+current_latest_golden_corpus_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.blocker_count)")"
+current_latest_golden_corpus_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.perfect_refactor_claim_allowed ? 'true' : 'false')")"
 upstream_distribution_target_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.status)")"
 upstream_distribution_npm_core_matches_frozen="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.npm_core_matches_frozen_baseline ? 'true' : 'false')")"
 upstream_distribution_repository_head_matches_npm="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.repository_head_matches_npm_core ? 'true' : 'false')")"
@@ -437,6 +443,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "current_latest_target": "$current_latest_target_status",
     "current_latest_source_inventory": "$current_latest_source_inventory_status",
     "current_latest_matrix": "$current_latest_matrix_status",
+    "current_latest_golden_corpus": "$current_latest_golden_corpus_status",
     "upstream_distribution_target": "$upstream_distribution_target_status",
     "real_upstream_smoke": "$real_upstream_smoke_status",
     "real_upstream_corpus": "$real_upstream_corpus_status"
@@ -466,6 +473,14 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
       "row_count": $current_latest_matrix_row_count,
       "perfect_refactor_claim_allowed": $current_latest_matrix_claim_allowed,
       "artifact": "target/release-gates/current-latest-matrix.json"
+    },
+    "golden_corpus": {
+      "status": "$current_latest_golden_corpus_status",
+      "fixture_case_count": $current_latest_golden_corpus_fixture_count,
+      "p0_total": $current_latest_golden_corpus_p0_total,
+      "blocker_count": $current_latest_golden_corpus_blocker_count,
+      "perfect_refactor_claim_allowed": $current_latest_golden_corpus_claim_allowed,
+      "artifact": "target/release-gates/current-latest-golden-corpus.json"
     }
   },
   "distribution_target": {
@@ -497,6 +512,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/current-latest-target.json",
     "target/release-gates/current-latest-source-inventory.json",
     "target/release-gates/current-latest-matrix.json",
+    "target/release-gates/current-latest-golden-corpus.json",
     "target/release-gates/upstream-distribution-target.json",
     "target/release-gates/installability.json",
     "target/release-gates/publication-authority.json",
@@ -522,6 +538,7 @@ validate_report_json "$GATE_DIR/perfect-refactor-unblock-packet.json"
 validate_report_json "$GATE_DIR/current-latest-target.json"
 validate_report_json "$GATE_DIR/current-latest-source-inventory.json"
 validate_report_json "$GATE_DIR/current-latest-matrix.json"
+validate_report_json "$GATE_DIR/current-latest-golden-corpus.json"
 validate_report_json "$GATE_DIR/upstream-distribution-target.json"
 validate_report_json "$GATE_DIR/release-candidate.json"
 

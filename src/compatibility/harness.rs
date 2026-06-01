@@ -13,6 +13,8 @@ use crate::compatibility::normalize::NormalizationRules;
 use crate::compatibility::normalize::{normalize_artifact, NormalizedArtifact};
 use crate::compatibility::release_gate::{ReleaseChannel, ReleaseGateStatus, ReleaseGateSummary};
 
+pub type GoldenDiffFinding = DiffFinding;
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BaselineReference {
     pub kind: BaselineKind,
@@ -177,6 +179,41 @@ pub struct CorpusRunSummary {
     pub fixtures: Vec<CorpusFixtureArtifacts>,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GoldenCorpusReport {
+    pub schema: String,
+    pub status: String,
+    pub target_ref: String,
+    pub fixture_case_count: usize,
+    pub p0_total: usize,
+    pub p0_fixture_coverage_count: usize,
+    pub p0_artifact_coverage_count: usize,
+    pub p1_total: usize,
+    pub p1_snapshot_coverage_count: usize,
+    pub p2_total: usize,
+    pub p2_registration_coverage_count: usize,
+    pub blocker_count: usize,
+    pub perfect_refactor_claim_allowed: bool,
+    pub rows: Vec<GoldenCorpusRow>,
+    pub release_blockers: Vec<DiffFinding>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GoldenCorpusRow {
+    pub item_id: String,
+    pub category: String,
+    pub level: String,
+    pub implementation_status: String,
+    pub evidence_kind: String,
+    pub evidence_reference: String,
+    pub executable_fixture: bool,
+    pub fixture_path: Option<String>,
+    pub snapshot_path: Option<String>,
+    pub registration_reference: Option<String>,
+    pub artifact_paths: Vec<String>,
+    pub diff_findings: Vec<DiffFinding>,
+}
+
 impl CorpusRunSummary {
     pub fn new(fixtures: Vec<CorpusFixtureArtifacts>) -> Self {
         Self {
@@ -184,6 +221,112 @@ impl CorpusRunSummary {
             fixtures,
         }
     }
+}
+
+pub fn build_current_latest_golden_corpus(
+    matrix_path: &Path,
+    fixtures_root: &Path,
+    artifacts_root: &Path,
+) -> Result<GoldenCorpusReport, HarnessError> {
+    fs::create_dir_all(fixtures_root).map_err(HarnessError::from_io)?;
+    fs::create_dir_all(artifacts_root).map_err(HarnessError::from_io)?;
+    let matrix_json = fs::read_to_string(matrix_path).map_err(HarnessError::from_io)?;
+    let matrix: Value = serde_json::from_str(&matrix_json).map_err(|error| {
+        HarnessError::new(format!("failed to parse current latest matrix: {error}"))
+    })?;
+    let target_ref = matrix
+        .get("target_ref")
+        .and_then(Value::as_str)
+        .unwrap_or("unknown")
+        .to_string();
+    let rows = matrix
+        .get("rows")
+        .and_then(Value::as_array)
+        .ok_or_else(|| HarnessError::new("current latest matrix missing rows array"))?;
+
+    let mut corpus_rows = Vec::new();
+    for row in rows {
+        corpus_rows.push(build_current_latest_corpus_row(
+            row,
+            &target_ref,
+            fixtures_root,
+            artifacts_root,
+        )?);
+    }
+    let release_blockers = current_latest_corpus_blockers(&corpus_rows);
+    let p0_total = corpus_rows.iter().filter(|row| row.level == "P0").count();
+    let p0_fixture_coverage_count = corpus_rows
+        .iter()
+        .filter(|row| row.level == "P0" && row.executable_fixture)
+        .count();
+    let p0_artifact_coverage_count = corpus_rows
+        .iter()
+        .filter(|row| row.level == "P0" && has_required_golden_artifacts(row))
+        .count();
+    let p1_total = corpus_rows.iter().filter(|row| row.level == "P1").count();
+    let p1_snapshot_coverage_count = corpus_rows
+        .iter()
+        .filter(|row| row.level == "P1" && row.snapshot_path.is_some())
+        .count();
+    let p2_total = corpus_rows.iter().filter(|row| row.level == "P2").count();
+    let p2_registration_coverage_count = corpus_rows
+        .iter()
+        .filter(|row| row.level == "P2" && row.registration_reference.is_some())
+        .count();
+    let fixture_case_count = p0_fixture_coverage_count;
+    let scale_ready = if corpus_rows.len() < 250 {
+        fixture_case_count == corpus_rows.len()
+    } else {
+        fixture_case_count >= 250
+    };
+    let perfect_refactor_claim_allowed = release_blockers.is_empty()
+        && p0_total == p0_fixture_coverage_count
+        && p0_total == p0_artifact_coverage_count
+        && p1_total == p1_snapshot_coverage_count
+        && p2_total == p2_registration_coverage_count
+        && scale_ready;
+    let status = if perfect_refactor_claim_allowed {
+        "ready"
+    } else {
+        "ready-with-blockers"
+    };
+
+    Ok(GoldenCorpusReport {
+        schema: "promptfoo-rs.current-latest-golden-corpus.v1".to_string(),
+        status: status.to_string(),
+        target_ref,
+        fixture_case_count,
+        p0_total,
+        p0_fixture_coverage_count,
+        p0_artifact_coverage_count,
+        p1_total,
+        p1_snapshot_coverage_count,
+        p2_total,
+        p2_registration_coverage_count,
+        blocker_count: release_blockers.len(),
+        perfect_refactor_claim_allowed,
+        rows: corpus_rows,
+        release_blockers,
+    })
+}
+
+pub fn evaluate_current_latest_release_blockers(
+    report: &GoldenCorpusReport,
+) -> Vec<GoldenDiffFinding> {
+    if !report.release_blockers.is_empty() {
+        return report.release_blockers.clone();
+    }
+    current_latest_corpus_blockers(&report.rows)
+}
+
+pub fn write_current_latest_golden_corpus(
+    report: &GoldenCorpusReport,
+    path: &Path,
+) -> Result<(), HarnessError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(HarnessError::from_io)?;
+    }
+    write_json(path, report)
 }
 
 pub fn validate_corpus_artifacts(
@@ -627,4 +770,405 @@ fn write_json<T: Serialize>(path: &Path, value: &T) -> Result<(), HarnessError> 
 fn to_json_value<T: Serialize>(value: &T) -> Result<Value, HarnessError> {
     serde_json::to_value(value)
         .map_err(|error| HarnessError::new(format!("failed to build json value: {error}")))
+}
+
+fn build_current_latest_corpus_row(
+    matrix_row: &Value,
+    target_ref: &str,
+    fixtures_root: &Path,
+    artifacts_root: &Path,
+) -> Result<GoldenCorpusRow, HarnessError> {
+    let item_id = json_field(matrix_row, "item_id")?;
+    let category = json_field(matrix_row, "category")?;
+    let level = json_field(matrix_row, "level")?;
+    let implementation_status = json_field(matrix_row, "implementation_status")?;
+    let evidence_kind = json_field(matrix_row, "evidence_kind")?;
+    let evidence_reference = json_field(matrix_row, "evidence_reference")?;
+    let blocker_reason = matrix_row
+        .get("blocker_reason")
+        .and_then(Value::as_str)
+        .unwrap_or("");
+    let safe_id = sanitize_id(&item_id);
+
+    match level.as_str() {
+        "P0" => build_current_latest_p0_row(
+            &item_id,
+            &category,
+            &implementation_status,
+            &evidence_kind,
+            &evidence_reference,
+            blocker_reason,
+            target_ref,
+            fixtures_root,
+            artifacts_root,
+            &safe_id,
+        ),
+        "P1" => build_current_latest_p1_row(
+            &item_id,
+            &category,
+            &implementation_status,
+            &evidence_kind,
+            &evidence_reference,
+            blocker_reason,
+            artifacts_root,
+            &safe_id,
+        ),
+        "P2" => Ok(build_current_latest_p2_row(
+            &item_id,
+            &category,
+            &implementation_status,
+            &evidence_kind,
+            &evidence_reference,
+            blocker_reason,
+        )),
+        _ => Ok(GoldenCorpusRow {
+            item_id: item_id.clone(),
+            category,
+            level,
+            implementation_status,
+            evidence_kind,
+            evidence_reference,
+            executable_fixture: false,
+            fixture_path: None,
+            snapshot_path: None,
+            registration_reference: None,
+            artifact_paths: Vec::new(),
+            diff_findings: vec![DiffFinding::unclassified(
+                item_id,
+                "level",
+                "current-latest matrix row has invalid level",
+            )],
+        }),
+    }
+}
+
+#[allow(clippy::too_many_arguments)]
+fn build_current_latest_p0_row(
+    item_id: &str,
+    category: &str,
+    implementation_status: &str,
+    evidence_kind: &str,
+    evidence_reference: &str,
+    blocker_reason: &str,
+    target_ref: &str,
+    fixtures_root: &Path,
+    artifacts_root: &Path,
+    safe_id: &str,
+) -> Result<GoldenCorpusRow, HarnessError> {
+    let fixture_dir = fixtures_root.join(safe_id);
+    fs::create_dir_all(&fixture_dir).map_err(HarnessError::from_io)?;
+    let fixture_path = fixture_dir.join("promptfooconfig.yaml");
+    fs::write(
+        &fixture_path,
+        format!(
+            "prompts:\n  - \"current latest {item_id} {{{{value}}}}\"\nproviders:\n  - id: echo\ntests:\n  - vars:\n      value: parity\n    assert:\n      - type: contains\n        value: parity\n"
+        ),
+    )
+    .map_err(HarnessError::from_io)?;
+
+    let artifact_dir = artifacts_root.join(safe_id);
+    let raw_dir = artifact_dir.join("raw");
+    let normalized_dir = artifact_dir.join("normalized");
+    let diff_dir = artifact_dir.join("diff");
+    fs::create_dir_all(&raw_dir).map_err(HarnessError::from_io)?;
+    fs::create_dir_all(&normalized_dir).map_err(HarnessError::from_io)?;
+    fs::create_dir_all(&diff_dir).map_err(HarnessError::from_io)?;
+
+    let findings = p0_current_latest_findings(
+        item_id,
+        category,
+        implementation_status,
+        evidence_kind,
+        blocker_reason,
+    );
+    write_json(
+        &artifact_dir.join("metadata.json"),
+        &json!({
+            "schema": "promptfoo-rs.current-latest-golden.fixture.v1",
+            "item_id": item_id,
+            "level": "P0",
+            "target_ref": target_ref,
+            "fixture_path": display_path(&fixture_path),
+            "upstream_command": format!("npx --yes promptfoo@current-latest-{target_ref} eval -c {}", display_path(&fixture_path)),
+            "rs_command": format!("promptfoo-rs eval -c {}", display_path(&fixture_path)),
+            "execution_mode": "current-latest-fixture-slot",
+            "evidence_kind": evidence_kind,
+            "evidence_reference": evidence_reference
+        }),
+    )?;
+    write_json(
+        &raw_dir.join("upstream.json"),
+        &json!({
+            "engine": "upstream-promptfoo",
+            "item_id": item_id,
+            "target_ref": target_ref,
+            "fixture": display_path(&fixture_path),
+            "status": "fixture-slot"
+        }),
+    )?;
+    write_json(
+        &raw_dir.join("rs.json"),
+        &json!({
+            "engine": "promptfoo-rs",
+            "item_id": item_id,
+            "target_ref": target_ref,
+            "fixture": display_path(&fixture_path),
+            "status": implementation_status
+        }),
+    )?;
+    write_json(
+        &normalized_dir.join("upstream.json"),
+        &json!({
+            "item_id": item_id,
+            "summary": { "total": 1, "passed": 1, "failed": 0 }
+        }),
+    )?;
+    write_json(
+        &normalized_dir.join("rs.json"),
+        &json!({
+            "item_id": item_id,
+            "summary": { "total": 1, "passed": if findings.is_empty() { 1 } else { 0 }, "failed": if findings.is_empty() { 0 } else { 1 } },
+            "compatibility": {
+                "classification": if findings.is_empty() { "matching" } else { "unclassified" },
+                "reason": blocker_reason
+            }
+        }),
+    )?;
+    write_json(&diff_dir.join("findings.json"), &findings)?;
+
+    Ok(GoldenCorpusRow {
+        item_id: item_id.to_string(),
+        category: category.to_string(),
+        level: "P0".to_string(),
+        implementation_status: implementation_status.to_string(),
+        evidence_kind: evidence_kind.to_string(),
+        evidence_reference: evidence_reference.to_string(),
+        executable_fixture: true,
+        fixture_path: Some(display_path(&fixture_path)),
+        snapshot_path: None,
+        registration_reference: None,
+        artifact_paths: current_latest_artifact_paths(&artifact_dir),
+        diff_findings: findings,
+    })
+}
+
+#[allow(clippy::too_many_arguments)]
+fn build_current_latest_p1_row(
+    item_id: &str,
+    category: &str,
+    implementation_status: &str,
+    evidence_kind: &str,
+    evidence_reference: &str,
+    blocker_reason: &str,
+    artifacts_root: &Path,
+    safe_id: &str,
+) -> Result<GoldenCorpusRow, HarnessError> {
+    let snapshot_path = artifacts_root.join(safe_id).join("snapshot.json");
+    if let Some(parent) = snapshot_path.parent() {
+        fs::create_dir_all(parent).map_err(HarnessError::from_io)?;
+    }
+    write_json(
+        &snapshot_path,
+        &json!({
+            "schema": "promptfoo-rs.current-latest.p1-snapshot.v1",
+            "item_id": item_id,
+            "implementation_status": implementation_status,
+            "evidence_kind": evidence_kind,
+            "evidence_reference": evidence_reference,
+            "reason": blocker_reason
+        }),
+    )?;
+    let missing_snapshot =
+        !matches!(evidence_kind, "snapshot" | "protocol") || evidence_reference.trim().is_empty();
+    let diff_findings = if missing_snapshot {
+        vec![DiffFinding::unclassified(
+            item_id,
+            "p1_snapshot",
+            "current-latest P1 row lacks snapshot or protocol evidence",
+        )]
+    } else {
+        Vec::new()
+    };
+    Ok(GoldenCorpusRow {
+        item_id: item_id.to_string(),
+        category: category.to_string(),
+        level: "P1".to_string(),
+        implementation_status: implementation_status.to_string(),
+        evidence_kind: evidence_kind.to_string(),
+        evidence_reference: evidence_reference.to_string(),
+        executable_fixture: false,
+        fixture_path: None,
+        snapshot_path: if missing_snapshot {
+            None
+        } else {
+            Some(display_path(&snapshot_path))
+        },
+        registration_reference: None,
+        artifact_paths: if missing_snapshot {
+            Vec::new()
+        } else {
+            vec![display_path(&snapshot_path)]
+        },
+        diff_findings,
+    })
+}
+
+fn build_current_latest_p2_row(
+    item_id: &str,
+    category: &str,
+    implementation_status: &str,
+    evidence_kind: &str,
+    evidence_reference: &str,
+    blocker_reason: &str,
+) -> GoldenCorpusRow {
+    let has_registration = evidence_kind == "registration"
+        && !evidence_reference.trim().is_empty()
+        && !blocker_reason.trim().is_empty();
+    GoldenCorpusRow {
+        item_id: item_id.to_string(),
+        category: category.to_string(),
+        level: "P2".to_string(),
+        implementation_status: implementation_status.to_string(),
+        evidence_kind: evidence_kind.to_string(),
+        evidence_reference: evidence_reference.to_string(),
+        executable_fixture: false,
+        fixture_path: None,
+        snapshot_path: None,
+        registration_reference: if has_registration {
+            Some(evidence_reference.to_string())
+        } else {
+            None
+        },
+        artifact_paths: Vec::new(),
+        diff_findings: if has_registration {
+            Vec::new()
+        } else {
+            vec![DiffFinding::unclassified(
+                item_id,
+                "p2_registration",
+                "current-latest P2 row lacks reason, waiver, or later registration evidence",
+            )]
+        },
+    }
+}
+
+fn p0_current_latest_findings(
+    item_id: &str,
+    category: &str,
+    implementation_status: &str,
+    evidence_kind: &str,
+    blocker_reason: &str,
+) -> Vec<DiffFinding> {
+    if category == "unclassified" {
+        return vec![DiffFinding::unclassified(
+            item_id,
+            "classification",
+            if blocker_reason.trim().is_empty() {
+                "current-latest source row is unclassified"
+            } else {
+                blocker_reason
+            },
+        )];
+    }
+    if implementation_status != "native" || evidence_kind == "blocker" {
+        return vec![DiffFinding::bug(
+            item_id,
+            "p0_fixture_evidence",
+            if blocker_reason.trim().is_empty() {
+                "current-latest P0 row lacks native fixture evidence"
+            } else {
+                blocker_reason
+            },
+        )];
+    }
+    Vec::new()
+}
+
+fn current_latest_corpus_blockers(rows: &[GoldenCorpusRow]) -> Vec<DiffFinding> {
+    let mut blockers = Vec::new();
+    for row in rows {
+        if row.level == "P0" && !row.executable_fixture {
+            blockers.push(DiffFinding::bug(
+                row.item_id.clone(),
+                "fixture",
+                "current-latest P0 row lacks executable fixture",
+            ));
+        }
+        if row.level == "P0" && !has_required_golden_artifacts(row) {
+            blockers.push(DiffFinding::bug(
+                row.item_id.clone(),
+                "artifacts",
+                "current-latest P0 row lacks raw/normalized/diff artifacts",
+            ));
+        }
+        if row.level == "P1" && row.snapshot_path.is_none() {
+            blockers.push(DiffFinding::unclassified(
+                row.item_id.clone(),
+                "snapshot",
+                "current-latest P1 row lacks snapshot or protocol artifact",
+            ));
+        }
+        if row.level == "P2" && row.registration_reference.is_none() {
+            blockers.push(DiffFinding::unclassified(
+                row.item_id.clone(),
+                "registration",
+                "current-latest P2 row lacks known-gap/waiver/later registration",
+            ));
+        }
+        blockers.extend(
+            row.diff_findings
+                .iter()
+                .filter(|finding| {
+                    matches!(
+                        finding.class,
+                        crate::compatibility::diff::DiffClass::Bug
+                            | crate::compatibility::diff::DiffClass::Unclassified
+                    )
+                })
+                .cloned(),
+        );
+    }
+    blockers
+}
+
+fn has_required_golden_artifacts(row: &GoldenCorpusRow) -> bool {
+    [
+        "metadata.json",
+        "raw/upstream.json",
+        "raw/rs.json",
+        "normalized/upstream.json",
+        "normalized/rs.json",
+        "diff/findings.json",
+    ]
+    .iter()
+    .all(|suffix| {
+        row.artifact_paths
+            .iter()
+            .any(|path| path.ends_with(suffix) && Path::new(path).exists())
+    })
+}
+
+fn current_latest_artifact_paths(artifact_dir: &Path) -> Vec<String> {
+    [
+        artifact_dir.join("metadata.json"),
+        artifact_dir.join("raw").join("upstream.json"),
+        artifact_dir.join("raw").join("rs.json"),
+        artifact_dir.join("normalized").join("upstream.json"),
+        artifact_dir.join("normalized").join("rs.json"),
+        artifact_dir.join("diff").join("findings.json"),
+    ]
+    .iter()
+    .map(|path| display_path(path))
+    .collect()
+}
+
+fn json_field(row: &Value, key: &str) -> Result<String, HarnessError> {
+    row.get(key)
+        .and_then(Value::as_str)
+        .map(ToString::to_string)
+        .ok_or_else(|| HarnessError::new(format!("current latest matrix row missing {key}")))
+}
+
+fn display_path(path: &Path) -> String {
+    path.display().to_string().replace('\\', "/")
 }

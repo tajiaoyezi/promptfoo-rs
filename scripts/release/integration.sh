@@ -14,6 +14,7 @@ cargo test \
   --test provider_request_response_fixture_burndown \
   --test external_authority_blocker_waiver_gate \
   --test real_p0_golden_corpus_runner \
+  --test current_latest_golden_corpus \
   --test real_upstream_smoke_gate \
   --test viewer_node_packaging_release \
   --test performance_security_observability_gates \
