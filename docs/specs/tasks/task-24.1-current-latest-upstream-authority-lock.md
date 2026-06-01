@@ -1,6 +1,6 @@
 # Task 24.1: current-latest-upstream-authority-lock
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 24 — current-latest-perfect-refactor
@@ -105,9 +105,38 @@ The new lock command must fetch or read fixture inputs for npm latest metadata, 
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-01
+- **改动文件**：
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/decisions/adr-011-current-latest-full-refactor-target.md`
+  - `docs/specs/phases/phase-24-current-latest-perfect-refactor.md`
+  - `docs/specs/tasks/task-24.1-current-latest-upstream-authority-lock.md`
+  - `docs/specs/tasks/task-24.2-current-latest-source-inventory-reextract.md`
+  - `docs/specs/tasks/task-24.3-current-latest-full-function-golden-corpus.md`
+  - `docs/specs/tasks/task-24.4-current-latest-exhaustive-quality-gate.md`
+  - `docs/superpowers/plans/2026-06-01-current-latest-perfect-refactor.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_target_lock.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-target-lock.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `compatibility/inventory/current-latest-target.json`
+  - `docs/compatibility/current-latest.lock.md`
+- **commit 列表**：
+  - `8358620` `docs(spec): add current latest perfect refactor phase`
+  - `d7252bc` `test(compatibility): add current latest target lock RED tests`
+  - `db079cb` `feat(compatibility): lock current latest upstream target`
+  - 本次 docs 回填提交：`docs(spec): complete task 24.1 current latest target lock`
+- **§9 Verification 结果**：
+  - install: PASS — `s2v_verify_full "$(s2v_extract_verify_keys "$TASK_SPEC")"` 执行 adapter Install 通过。
+  - lint: PASS — adapter Lint 通过。
+  - typecheck: PASS — `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — `cargo test --workspace` included `tests/current_latest_target_lock.rs` with TEST-24.1.1 ~ TEST-24.1.4 passing; viewer/npm tests passed.
+  - integration: PASS — adapter Integration tests 通过。
+  - e2e: PASS — adapter E2E tests 通过。
+  - build: PASS — adapter Build 通过。
+  - coverage: PASS — adapter Coverage gate 通过；`s2v_coverage_threshold_guard` passed。
+  - runtime-smoke: PASS — runtime smoke now runs `current-latest-target-lock.sh`, validates `target/release-gates/current-latest-target.json`, and includes `current_latest_target` in `release-candidate.json`.
+- **剩余风险 / 未做项**：Task 24.1 only resolves target-selection ambiguity by locking npm latest, GitHub HEAD, and GitHub latest release evidence. It intentionally keeps `current_latest_claim_allowed=false` until task 24.2 source inventory, task 24.3 golden corpus, task 24.4 quality gates, and external/publication authority evidence are complete or formally waived. First full verification attempt exceeded the 5-minute tool timeout during real-upstream corpus; lingering child processes were cleaned and the same §9 verification was rerun with a longer timeout and passed.
+- **下游 task 影响**：task 24.2 can now consume `compatibility/inventory/current-latest-target.json` and `target/release-gates/current-latest-target.json` as the immutable current-latest target packet. task 24.3 and 24.4 must preserve the distinction between target lock readiness and perfect-refactor completion.
