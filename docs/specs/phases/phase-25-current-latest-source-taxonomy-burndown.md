@@ -1,6 +1,6 @@
 # Phase 25: current-latest-source-taxonomy-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ Phase 24 proved the project cannot claim current-latest perfect refactor readine
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 25.1 | current-latest-source-taxonomy-burndown | ../tasks/task-25.1-current-latest-source-taxonomy-burndown.md | Ready | 将 current-latest source/matrix 的 unclassified rows 降为 0，并保留真实 P0/external/publication blockers |
+| 25.1 | current-latest-source-taxonomy-burndown | ../tasks/task-25.1-current-latest-source-taxonomy-burndown.md | In Progress | 将 current-latest source/matrix 的 unclassified rows 降为 0，并保留真实 P0/external/publication blockers |
 
 ## 5. Dependencies
 

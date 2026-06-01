@@ -1,6 +1,6 @@
 # Task 25.1: current-latest-source-taxonomy-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 25 — current-latest-source-taxonomy-burndown
