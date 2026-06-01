@@ -638,6 +638,85 @@ pub struct PerfectRefactorClaimBlocker {
     pub required_decision: String,
 }
 
+pub type ReleaseBlocker = PerfectRefactorClaimBlocker;
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct CurrentLatestQualityInputs {
+    pub adapter_verification_status: String,
+    pub source_inventory_status: String,
+    pub source_inventory_unclassified_count: usize,
+    pub matrix_status: String,
+    pub matrix_unclassified_count: usize,
+    pub golden_corpus_status: String,
+    pub golden_corpus_blocker_count: usize,
+    pub regression_status: String,
+    pub stress_status: String,
+    pub property_status: String,
+    pub runtime_smoke_status: String,
+    pub external_authority_status: String,
+    pub external_authority_blocker_count: usize,
+    pub publication_ready: PublicationReadiness,
+    pub current_target_status: String,
+    pub current_target_claim_allowed: bool,
+    pub local_stable_allowed: bool,
+    pub requested_claim_wording: String,
+    pub source_artifacts: Vec<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CurrentLatestQualityReport {
+    pub schema: String,
+    pub gate_statuses: BTreeMap<String, String>,
+    pub local_stable_allowed: bool,
+    pub local_current_latest_ready: bool,
+    pub perfect_refactor_claim_allowed: bool,
+    pub allowed_claim_wording: String,
+    pub forbidden_claim_examples: Vec<String>,
+    pub blockers: Vec<ReleaseBlocker>,
+    pub source_artifacts: Vec<String>,
+}
+
+pub fn build_current_latest_quality_report(
+    _inputs: CurrentLatestQualityInputs,
+) -> CurrentLatestQualityReport {
+    CurrentLatestQualityReport {
+        schema: "promptfoo-rs.current-latest-quality.v1".to_string(),
+        gate_statuses: BTreeMap::new(),
+        local_stable_allowed: false,
+        local_current_latest_ready: false,
+        perfect_refactor_claim_allowed: false,
+        allowed_claim_wording: String::new(),
+        forbidden_claim_examples: Vec::new(),
+        blockers: Vec::new(),
+        source_artifacts: Vec::new(),
+    }
+}
+
+pub fn evaluate_current_latest_claim(
+    _report: &CurrentLatestQualityReport,
+    _claim: &PerfectRefactorClaimContract,
+) -> Result<(), ReleaseBlocker> {
+    Ok(())
+}
+
+pub fn write_current_latest_quality_report(
+    report: &CurrentLatestQualityReport,
+    path: &Path,
+) -> Result<(), ReleaseError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|error| ReleaseError::Io {
+            path: parent.to_path_buf(),
+            message: error.to_string(),
+        })?;
+    }
+    let json = serde_json::to_string_pretty(report)
+        .map_err(|error| ReleaseError::Serialize(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(|error| ReleaseError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PerfectRefactorClaimDecision {
     pub ready: bool,
