@@ -1,6 +1,6 @@
 # Phase 24: current-latest-perfect-refactor
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -49,7 +49,12 @@ All task 24.1-24.4 specs are Done, phase §6 smoke passes with `s2v_verify_full 
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **保留边界**：<TBD-after-impl>
+- **完成日期**：2026-06-01
+- **Phase smoke**：PASS — `s2v_preflight_phase docs/specs/phases/phase-24-current-latest-perfect-refactor.md` 通过；`s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全 9 项通过。
+- **Artifact evidence**：
+  - `target/release-gates/current-latest-target.json`：current-latest target packet 已生成，target selection blocker resolved；repository HEAD / npm latest / GitHub latest release channel 边界保留。
+  - `target/release-gates/current-latest-source-inventory.json` 与 `target/release-gates/current-latest-matrix.json`：row_count=3912，unclassified_rows=318，status=`ready-with-blockers`。
+  - `target/release-gates/current-latest-golden-corpus.json`：fixture_case_count=432，P0 artifact coverage 432/432，P1 snapshot coverage 2087/2087，P2 registration coverage 1393/1393，blocker_count=432。
+  - `target/release-gates/current-latest-quality.json`：status=`ready-with-blockers`，local_current_latest_ready=false，perfect_refactor_claim_allowed=false，blocker_count=6，allowed_claim_wording=`no known release-blocking defects under declared gates`。
+  - `target/release-gates/release-candidate.json`：包含 `current_latest_quality` gate 与 current-latest target/inventory/matrix/golden corpus evidence。
+- **保留边界**：Phase 24 完成的是 current-latest 目标锁定、完整 accounting、golden corpus 扩展和质量 claim 约束，不等于公开 perfect-refactor 完成。当前仍保留 318 个 unclassified current-latest source/matrix rows、432 个 current-latest golden corpus blockers、21 个 external authority blockers，以及 publication `credential-blocked`；因此 `perfect_refactor_claim_allowed=false` 是正确结果。

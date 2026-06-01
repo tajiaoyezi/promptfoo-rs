@@ -152,7 +152,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 21 | upstream-distribution-target-disambiguation | docs/specs/phases/phase-21-upstream-distribution-target-disambiguation.md | Done | 1 | N/A (solo) |
 | 22 | perfect-refactor-unblock-packet | docs/specs/phases/phase-22-perfect-refactor-unblock-packet.md | Done | 1 | N/A (solo) |
 | 23 | dynamic-upstream-release-observation | docs/specs/phases/phase-23-dynamic-upstream-release-observation.md | Done | 1 | N/A (solo) |
-| 24 | current-latest-perfect-refactor | docs/specs/phases/phase-24-current-latest-perfect-refactor.md | In Progress | 4 | N/A (solo) |
+| 24 | current-latest-perfect-refactor | docs/specs/phases/phase-24-current-latest-perfect-refactor.md | Done | 4 | N/A (solo) |
 
 ## Task 总索引
 
