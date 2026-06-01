@@ -632,6 +632,195 @@ pub fn write_current_latest_target_lock(
         .map_err(CurrentLatestTargetError::Write)
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CurrentLatestInventoryRow {
+    pub stable_id: String,
+    pub category: String,
+    pub name: String,
+    pub source_reference: String,
+    pub source_file: String,
+    pub level: String,
+    pub implementation_status: String,
+    pub verification_owner: String,
+    pub evidence_kind: String,
+    pub evidence_reference: String,
+    pub blocker_reason: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CurrentLatestInventoryReport {
+    pub schema: String,
+    pub status: String,
+    pub target: CurrentLatestTargetLock,
+    pub extraction_mode: String,
+    pub source_root: String,
+    pub extraction_timestamp: String,
+    pub source_counts: SourceInventoryCounts,
+    pub rows: Vec<CurrentLatestInventoryRow>,
+    pub categories: Vec<String>,
+    pub unclassified_rows: Vec<String>,
+    pub rows_missing_evidence: Vec<String>,
+    pub perfect_refactor_claim_allowed: bool,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CurrentLatestMatrixRow {
+    pub item_id: String,
+    pub category: String,
+    pub source_reference: String,
+    pub level: String,
+    pub implementation_status: String,
+    pub verification_owner: String,
+    pub evidence_kind: String,
+    pub evidence_reference: String,
+    pub blocker_reason: Option<String>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CurrentLatestMatrixReport {
+    pub schema: String,
+    pub status: String,
+    pub target_ref: String,
+    pub rows: Vec<CurrentLatestMatrixRow>,
+    pub unclassified_rows: Vec<String>,
+    pub rows_missing_evidence: Vec<String>,
+    pub perfect_refactor_claim_allowed: bool,
+}
+
+pub fn extract_current_latest_inventory(
+    lock: &CurrentLatestTargetLock,
+    source_root: &Path,
+) -> Result<CurrentLatestInventoryReport, InventoryError> {
+    validate_current_latest_lock_for_source_inventory(lock)?;
+    if !source_root.is_dir() {
+        return Err(InventoryError::Validation(format!(
+            "current latest source root does not exist or is not a directory: {}",
+            source_root.display()
+        )));
+    }
+
+    let mut files = Vec::new();
+    collect_current_latest_files(source_root, source_root, &mut files)?;
+    files.sort();
+
+    let mut counts = SourceInventoryCounts::default();
+    let mut rows = BTreeMap::new();
+
+    for file in files {
+        for category in current_latest_file_categories(&file) {
+            increment_current_latest_count(&mut counts, category);
+            insert_current_latest_file_row(&mut rows, lock, category, &file);
+        }
+
+        let content_path = source_root.join(&file);
+        let content = fs::read_to_string(&content_path).unwrap_or_default();
+        for flag in extract_flag_tokens(&content) {
+            insert_current_latest_flag_row(&mut rows, lock, &file, &flag);
+        }
+    }
+
+    let rows = rows.into_values().collect::<Vec<_>>();
+    let categories = current_latest_categories(&rows);
+    let unclassified_rows = current_latest_unclassified_rows(&rows);
+    let rows_missing_evidence = current_latest_rows_missing_evidence(&rows);
+    let status = if !unclassified_rows.is_empty() || !rows_missing_evidence.is_empty() {
+        "ready-with-blockers"
+    } else {
+        "ready"
+    };
+
+    Ok(CurrentLatestInventoryReport {
+        schema: "promptfoo-rs.current-latest-source-inventory.v1".to_string(),
+        status: status.to_string(),
+        target: lock.clone(),
+        extraction_mode: "current-latest-locked-source-tree".to_string(),
+        source_root: source_root.display().to_string(),
+        extraction_timestamp: current_unix_timestamp(),
+        source_counts: counts,
+        rows,
+        categories,
+        unclassified_rows,
+        rows_missing_evidence,
+        perfect_refactor_claim_allowed: false,
+    })
+}
+
+pub fn reconcile_current_latest_matrix(
+    inventory: &CurrentLatestInventoryReport,
+    existing_matrix: &CapabilityMatrix,
+) -> CurrentLatestMatrixReport {
+    let explicit_rows = existing_matrix
+        .rows
+        .iter()
+        .map(|row| (row.capability.as_str(), row))
+        .collect::<BTreeMap<_, _>>();
+    let rows = inventory
+        .rows
+        .iter()
+        .map(|row| {
+            explicit_rows
+                .get(row.stable_id.as_str())
+                .map(|explicit| current_latest_matrix_row_from_explicit(row, explicit))
+                .unwrap_or_else(|| current_latest_matrix_row_from_inventory(row))
+        })
+        .collect::<Vec<_>>();
+    let unclassified_rows = rows
+        .iter()
+        .filter(|row| row.category == "unclassified")
+        .map(|row| row.item_id.clone())
+        .collect::<Vec<_>>();
+    let rows_missing_evidence = rows
+        .iter()
+        .filter(|row| {
+            row.evidence_kind.trim().is_empty() || row.evidence_reference.trim().is_empty()
+        })
+        .map(|row| row.item_id.clone())
+        .collect::<Vec<_>>();
+    let has_non_native_or_blocked = rows.iter().any(|row| {
+        row.implementation_status != "native"
+            || row.evidence_kind == "blocker"
+            || row.blocker_reason.is_some()
+    });
+    let perfect_refactor_claim_allowed = unclassified_rows.is_empty()
+        && rows_missing_evidence.is_empty()
+        && !has_non_native_or_blocked;
+    let status = if unclassified_rows.is_empty() && rows_missing_evidence.is_empty() {
+        "ready"
+    } else {
+        "ready-with-blockers"
+    };
+
+    CurrentLatestMatrixReport {
+        schema: "promptfoo-rs.current-latest-matrix.v1".to_string(),
+        status: status.to_string(),
+        target_ref: inventory.target.github.default_branch_head.clone(),
+        rows,
+        unclassified_rows,
+        rows_missing_evidence,
+        perfect_refactor_claim_allowed,
+    }
+}
+
+pub fn write_current_latest_inventory_artifacts(
+    inventory: &CurrentLatestInventoryReport,
+    matrix: &CurrentLatestMatrixReport,
+    inventory_path: &Path,
+    matrix_path: &Path,
+) -> Result<(), InventoryError> {
+    if let Some(parent) = inventory_path.parent() {
+        fs::create_dir_all(parent).map_err(InventoryError::Write)?;
+    }
+    if let Some(parent) = matrix_path.parent() {
+        fs::create_dir_all(parent).map_err(InventoryError::Write)?;
+    }
+    let inventory_json = serde_json::to_string_pretty(inventory)
+        .map_err(|error| InventoryError::Parse(error.to_string()))?;
+    let matrix_json = serde_json::to_string_pretty(matrix)
+        .map_err(|error| InventoryError::Parse(error.to_string()))?;
+    fs::write(inventory_path, format!("{inventory_json}\n")).map_err(InventoryError::Write)?;
+    fs::write(matrix_path, format!("{matrix_json}\n")).map_err(InventoryError::Write)
+}
+
 #[derive(Debug)]
 pub enum DistributionTargetError {
     Read(std::io::Error),
@@ -2087,6 +2276,443 @@ fn current_latest_lock_markdown(lock: &CurrentLatestTargetLock) -> String {
             .collect::<Vec<_>>()
             .join("\n")
     )
+}
+
+fn validate_current_latest_lock_for_source_inventory(
+    lock: &CurrentLatestTargetLock,
+) -> Result<(), InventoryError> {
+    if lock.schema != "promptfoo-rs.current-latest-target.v1" {
+        return Err(InventoryError::Validation(format!(
+            "unexpected current latest target schema: {}",
+            lock.schema
+        )));
+    }
+    for value in [
+        lock.npm_latest.package_version.as_str(),
+        lock.npm_latest.git_head.as_str(),
+        lock.github.default_branch_head.as_str(),
+        lock.github.npm_tag_commit.as_str(),
+        lock.github.latest_release_commit.as_str(),
+    ] {
+        let lower = value.to_ascii_lowercase();
+        if matches!(
+            lower.as_str(),
+            "latest" | "main" | "master" | "head" | "refs/heads/main" | "refs/heads/master"
+        ) {
+            return Err(InventoryError::Validation(format!(
+                "floating current latest source reference is not allowed: {value}"
+            )));
+        }
+    }
+    if !is_full_sha(&lock.npm_latest.git_head)
+        || !is_full_sha(&lock.github.default_branch_head)
+        || !is_full_sha(&lock.github.npm_tag_commit)
+        || !is_full_sha(&lock.github.latest_release_commit)
+    {
+        return Err(InventoryError::Validation(
+            "current latest lock requires full source SHAs".to_string(),
+        ));
+    }
+    Ok(())
+}
+
+fn collect_current_latest_files(
+    root: &Path,
+    current: &Path,
+    files: &mut Vec<String>,
+) -> Result<(), InventoryError> {
+    for entry in fs::read_dir(current).map_err(InventoryError::Read)? {
+        let entry = entry.map_err(InventoryError::Read)?;
+        let path = entry.path();
+        let name = entry.file_name();
+        let name = name.to_string_lossy();
+        if entry.file_type().map_err(InventoryError::Read)?.is_dir() {
+            if matches!(
+                name.as_ref(),
+                ".git" | "node_modules" | "target" | ".turbo" | ".next" | "dist" | "build"
+            ) {
+                continue;
+            }
+            collect_current_latest_files(root, &path, files)?;
+            continue;
+        }
+        if !entry.file_type().map_err(InventoryError::Read)?.is_file() {
+            continue;
+        }
+        let relative = path
+            .strip_prefix(root)
+            .map_err(|error| InventoryError::Parse(error.to_string()))?;
+        files.push(normalize_source_path(&relative.to_string_lossy()));
+    }
+    Ok(())
+}
+
+fn current_latest_file_categories(file: &str) -> Vec<&'static str> {
+    let mut categories = Vec::new();
+    if is_command_related_file(file) {
+        categories.push("command");
+    }
+    if is_provider_file(file) {
+        categories.push("provider");
+    }
+    if is_assertion_file(file) {
+        categories.push("assertion");
+    }
+    if is_redteam_plugin_file(file) {
+        categories.push("redteam-plugin");
+    }
+    if is_redteam_strategy_file(file) {
+        categories.push("redteam-strategy");
+    }
+    if is_output_file(file) {
+        categories.push("output");
+    }
+    if is_config_file(file) {
+        categories.push("config");
+    }
+    if is_viewer_file(file) {
+        categories.push("viewer");
+    }
+    if is_node_api_file(file) {
+        categories.push("node-api");
+    }
+    if is_example_file(file) {
+        categories.push("example");
+    }
+    if is_docs_file(file) {
+        categories.push("docs");
+    }
+    if categories.is_empty() && file.starts_with("src/") && is_ts_or_js_file(file) {
+        categories.push("unclassified");
+    }
+    categories
+}
+
+fn increment_current_latest_count(counts: &mut SourceInventoryCounts, category: &str) {
+    match category {
+        "command" => counts.command_related_files += 1,
+        "provider" => counts.provider_files += 1,
+        "assertion" => counts.assertion_files += 1,
+        "redteam-plugin" => counts.redteam_plugin_files += 1,
+        "redteam-strategy" => counts.redteam_strategy_files += 1,
+        "output" => counts.output_files += 1,
+        "config" => counts.config_files += 1,
+        "viewer" => counts.viewer_app_files += 1,
+        "example" => counts.example_files += 1,
+        _ => {}
+    }
+}
+
+fn insert_current_latest_file_row(
+    rows: &mut BTreeMap<String, CurrentLatestInventoryRow>,
+    lock: &CurrentLatestTargetLock,
+    category: &str,
+    file: &str,
+) {
+    let name = slug(&file_without_extension(file));
+    let stable_id = InventoryItem::stable_id(category, &name);
+    rows.entry(stable_id.clone()).or_insert_with(|| {
+        let (level, implementation_status, verification_owner, evidence_kind, reason) =
+            current_latest_default_metadata(category, &stable_id, file);
+        CurrentLatestInventoryRow {
+            stable_id: stable_id.clone(),
+            category: category.to_string(),
+            name,
+            source_reference: current_latest_source_reference(lock, file, None),
+            source_file: file.to_string(),
+            level,
+            implementation_status,
+            verification_owner,
+            evidence_kind,
+            evidence_reference: default_evidence_reference(category, &stable_id),
+            blocker_reason: reason,
+        }
+    });
+}
+
+fn insert_current_latest_flag_row(
+    rows: &mut BTreeMap<String, CurrentLatestInventoryRow>,
+    lock: &CurrentLatestTargetLock,
+    file: &str,
+    flag: &str,
+) {
+    let name = slug(flag);
+    let stable_id = InventoryItem::stable_id("flag", &name);
+    rows.entry(stable_id.clone())
+        .or_insert_with(|| CurrentLatestInventoryRow {
+            stable_id: stable_id.clone(),
+            category: "flag".to_string(),
+            name,
+            source_reference: current_latest_source_reference(
+                lock,
+                file,
+                Some(&format!("--{flag}")),
+            ),
+            source_file: file.to_string(),
+            level: "P1".to_string(),
+            implementation_status: "later".to_string(),
+            verification_owner: "cli".to_string(),
+            evidence_kind: "snapshot".to_string(),
+            evidence_reference: format!("snapshot:{stable_id}"),
+            blocker_reason: Some(format!(
+                "current-latest flag --{flag} requires CLI parity snapshot or fixture evidence"
+            )),
+        });
+}
+
+fn current_latest_default_metadata(
+    category: &str,
+    stable_id: &str,
+    file: &str,
+) -> (String, String, String, String, Option<String>) {
+    match category {
+        "command" => current_latest_metadata(
+            "P1",
+            "later",
+            "cli",
+            "snapshot",
+            stable_id,
+            "current-latest command requires CLI behavior snapshot or fixture evidence",
+        ),
+        "provider" if is_p0_provider_file(file) => current_latest_metadata(
+            "P0",
+            "blocked",
+            "provider-runtime",
+            "blocker",
+            stable_id,
+            "current-latest P0 provider requires native or bridge fixture evidence",
+        ),
+        "provider" => current_latest_metadata(
+            "P2",
+            "later",
+            "provider-runtime",
+            "registration",
+            stable_id,
+            "current-latest long-tail provider is registered until fixture evidence promotes it",
+        ),
+        "assertion" => current_latest_metadata(
+            "P1",
+            "later",
+            "assertion-engine",
+            "snapshot",
+            stable_id,
+            "current-latest assertion requires snapshot evidence",
+        ),
+        "redteam-plugin" | "redteam-strategy" => current_latest_metadata(
+            "P1",
+            "later",
+            "redteam-engine",
+            "snapshot",
+            stable_id,
+            "current-latest redteam surface requires snapshot evidence",
+        ),
+        "output" => current_latest_metadata(
+            "P1",
+            "later",
+            "reporting",
+            "snapshot",
+            stable_id,
+            "current-latest output surface requires output contract snapshot",
+        ),
+        "config" => current_latest_metadata(
+            "P0",
+            "blocked",
+            "config-loader",
+            "blocker",
+            stable_id,
+            "current-latest config surface requires fixture evidence",
+        ),
+        "viewer" => current_latest_metadata(
+            "P1",
+            "later",
+            "web-viewer",
+            "snapshot",
+            stable_id,
+            "current-latest viewer surface requires data-contract or browser snapshot",
+        ),
+        "node-api" => current_latest_metadata(
+            "P1",
+            "later",
+            "node-api-wrapper",
+            "snapshot",
+            stable_id,
+            "current-latest Node API surface requires wrapper contract snapshot",
+        ),
+        "example" => current_latest_metadata(
+            "P2",
+            "later",
+            "compatibility",
+            "registration",
+            stable_id,
+            "current-latest example is registered unless promoted into P0/P1 corpus",
+        ),
+        "docs" => current_latest_metadata(
+            "P2",
+            "later",
+            "compatibility",
+            "registration",
+            stable_id,
+            "current-latest documented workflow is registered until mapped to executable evidence",
+        ),
+        _ => current_latest_metadata(
+            "P0",
+            "blocked",
+            "compatibility",
+            "blocker",
+            stable_id,
+            "current-latest source row is unclassified and must be mapped before any perfect-refactor claim",
+        ),
+    }
+}
+
+fn current_latest_metadata(
+    level: &str,
+    implementation_status: &str,
+    owner: &str,
+    evidence_kind: &str,
+    stable_id: &str,
+    reason: &str,
+) -> (String, String, String, String, Option<String>) {
+    (
+        level.to_string(),
+        implementation_status.to_string(),
+        owner.to_string(),
+        evidence_kind.to_string(),
+        Some(format!("{reason}; item: {stable_id}")),
+    )
+}
+
+fn default_evidence_reference(category: &str, stable_id: &str) -> String {
+    match category {
+        "provider" | "config" | "unclassified" => format!("blocker:{stable_id}"),
+        "example" | "docs" => format!("registration:{stable_id}"),
+        _ => format!("snapshot:{stable_id}"),
+    }
+}
+
+fn current_latest_matrix_row_from_inventory(
+    row: &CurrentLatestInventoryRow,
+) -> CurrentLatestMatrixRow {
+    CurrentLatestMatrixRow {
+        item_id: row.stable_id.clone(),
+        category: row.category.clone(),
+        source_reference: row.source_reference.clone(),
+        level: row.level.clone(),
+        implementation_status: row.implementation_status.clone(),
+        verification_owner: row.verification_owner.clone(),
+        evidence_kind: row.evidence_kind.clone(),
+        evidence_reference: row.evidence_reference.clone(),
+        blocker_reason: row.blocker_reason.clone(),
+    }
+}
+
+fn current_latest_matrix_row_from_explicit(
+    inventory_row: &CurrentLatestInventoryRow,
+    matrix_row: &super::matrix::CapabilityRow,
+) -> CurrentLatestMatrixRow {
+    CurrentLatestMatrixRow {
+        item_id: inventory_row.stable_id.clone(),
+        category: inventory_row.category.clone(),
+        source_reference: inventory_row.source_reference.clone(),
+        level: matrix_row.level.clone(),
+        implementation_status: matrix_row.target_status.clone(),
+        verification_owner: matrix_row.owner.clone(),
+        evidence_kind: matrix_evidence_kind(&matrix_row.verification),
+        evidence_reference: matrix_row.verification.clone(),
+        blocker_reason: if matrix_row.target_status == "blocked"
+            || matrix_row.verification.starts_with("blocker:")
+        {
+            Some(matrix_row.notes.clone())
+        } else {
+            None
+        },
+    }
+}
+
+fn matrix_evidence_kind(verification: &str) -> String {
+    verification
+        .split_once(':')
+        .map(|(prefix, _)| prefix.to_string())
+        .filter(|prefix| !prefix.is_empty())
+        .unwrap_or_else(|| "manual".to_string())
+}
+
+fn current_latest_categories(rows: &[CurrentLatestInventoryRow]) -> Vec<String> {
+    rows.iter()
+        .map(|row| row.category.clone())
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .collect()
+}
+
+fn current_latest_unclassified_rows(rows: &[CurrentLatestInventoryRow]) -> Vec<String> {
+    rows.iter()
+        .filter(|row| row.category == "unclassified")
+        .map(|row| row.stable_id.clone())
+        .collect()
+}
+
+fn current_latest_rows_missing_evidence(rows: &[CurrentLatestInventoryRow]) -> Vec<String> {
+    rows.iter()
+        .filter(|row| {
+            row.evidence_kind.trim().is_empty() || row.evidence_reference.trim().is_empty()
+        })
+        .map(|row| row.stable_id.clone())
+        .collect()
+}
+
+fn current_latest_source_reference(
+    lock: &CurrentLatestTargetLock,
+    file: &str,
+    fragment: Option<&str>,
+) -> String {
+    let mut reference = format!(
+        "promptfoo@current-latest:{}:{file}",
+        lock.github.default_branch_head
+    );
+    if let Some(fragment) = fragment {
+        reference.push('#');
+        reference.push_str(fragment);
+    }
+    reference
+}
+
+fn extract_flag_tokens(content: &str) -> BTreeSet<String> {
+    let bytes = content.as_bytes();
+    let mut flags = BTreeSet::new();
+    let mut index = 0;
+    while index + 2 <= bytes.len() {
+        if bytes[index] != b'-' || bytes.get(index + 1) != Some(&b'-') {
+            index += 1;
+            continue;
+        }
+        let start = index + 2;
+        let mut end = start;
+        while end < bytes.len()
+            && (bytes[end].is_ascii_alphanumeric() || matches!(bytes[end], b'-' | b'_'))
+        {
+            end += 1;
+        }
+        if end > start {
+            flags.insert(String::from_utf8_lossy(&bytes[start..end]).to_string());
+        }
+        index = end.max(index + 1);
+    }
+    flags
+}
+
+fn is_node_api_file(file: &str) -> bool {
+    (file == "src/index.ts"
+        || file == "src/index.js"
+        || file.starts_with("src/node/")
+        || file.starts_with("npm/src/")
+        || file.starts_with("packages/node/"))
+        && is_ts_or_js_file(file)
+}
+
+fn is_docs_file(file: &str) -> bool {
+    let lower = file.to_ascii_lowercase();
+    file.starts_with("docs/") && (lower.ends_with(".md") || lower.ends_with(".mdx"))
 }
 
 fn required_current_evidence() -> Vec<String> {

@@ -69,15 +69,39 @@ fn write_representative_source(root: &Path) {
         "src/commands/eval.ts",
         "export const flags = ['--max-concurrency', '--output'];",
     );
-    write_file(root, "src/providers/openai/chat.ts", "export class OpenAiChat {}");
-    write_file(root, "src/assertions/equals.ts", "export const equals = true;");
+    write_file(
+        root,
+        "src/providers/openai/chat.ts",
+        "export class OpenAiChat {}",
+    );
+    write_file(
+        root,
+        "src/assertions/equals.ts",
+        "export const equals = true;",
+    );
     write_file(root, "src/redteam/plugins/harmful.ts", "export default {};");
-    write_file(root, "src/redteam/strategies/jailbreak.ts", "export default {};");
-    write_file(root, "src/util/output.ts", "export function writeJsonl() {}");
+    write_file(
+        root,
+        "src/redteam/strategies/jailbreak.ts",
+        "export default {};",
+    );
+    write_file(
+        root,
+        "src/util/output.ts",
+        "export function writeJsonl() {}",
+    );
     write_file(root, "src/config/default.ts", "export const config = {};");
-    write_file(root, "src/app/page.tsx", "export default function Page() { return null; }");
+    write_file(
+        root,
+        "src/app/page.tsx",
+        "export default function Page() { return null; }",
+    );
     write_file(root, "src/index.ts", "export function evaluate() {}");
-    write_file(root, "examples/basic/promptfooconfig.yaml", "prompts: ['hello']");
+    write_file(
+        root,
+        "examples/basic/promptfooconfig.yaml",
+        "prompts: ['hello']",
+    );
     write_file(root, "docs/providers/openai.md", "# OpenAI provider");
 }
 
@@ -104,7 +128,10 @@ fn test_24_2_1_inventory_uses_locked_current_latest_head_not_frozen_source() {
     let report = extract_current_latest_inventory(&lock, &root)
         .expect("current latest source inventory should extract");
 
-    assert_eq!(report.schema, "promptfoo-rs.current-latest-source-inventory.v1");
+    assert_eq!(
+        report.schema,
+        "promptfoo-rs.current-latest-source-inventory.v1"
+    );
     assert_eq!(
         report.target.github.default_branch_head,
         "1d09dfeb5f0766905409117f923dd5c4b0838d9f"
@@ -199,12 +226,15 @@ fn test_24_2_3_matrix_reconciliation_adds_level_status_owner_and_evidence() {
 }
 
 #[test]
-fn test_24_2_4_unclassified_or_missing_evidence_blocks_perfect_claim_and_scripts_write_artifacts()
-{
+fn test_24_2_4_unclassified_or_missing_evidence_blocks_perfect_claim_and_scripts_write_artifacts() {
     /* TEST-24.2.4 */
     let root = fixture_dir("unclassified");
     write_representative_source(&root);
-    write_file(root.as_path(), "src/experimental/newSurface.ts", "export const x = 1;");
+    write_file(
+        root.as_path(),
+        "src/experimental/newSurface.ts",
+        "export const x = 1;",
+    );
 
     let lock = current_latest_lock();
     let inventory = extract_current_latest_inventory(&lock, &root)
@@ -262,7 +292,9 @@ fn test_24_2_4_unclassified_or_missing_evidence_blocks_perfect_claim_and_scripts
         String::from_utf8_lossy(&script_output.stdout),
         String::from_utf8_lossy(&script_output.stderr)
     );
-    assert!(gate_dir.join("current-latest-source-inventory.json").exists());
+    assert!(gate_dir
+        .join("current-latest-source-inventory.json")
+        .exists());
     assert!(gate_dir.join("current-latest-matrix.json").exists());
 
     let _ = std::fs::remove_dir_all(root);

@@ -21,6 +21,7 @@ bash scripts/release/source-inventory-evidence.sh
 bash scripts/release/longtail-classification.sh
 bash scripts/release/current-upstream-policy.sh
 bash scripts/release/current-latest-target-lock.sh
+bash scripts/release/current-latest-source-inventory.sh
 bash scripts/release/upstream-distribution-target.sh
 bash scripts/release/real-upstream-smoke.sh
 bash scripts/release/real-upstream-corpus.sh
@@ -149,6 +150,12 @@ current_latest_target_blocker_resolved="$(node -e "const r = JSON.parse(require(
 current_latest_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-target.json', 'utf8')); console.log(r.current_latest_claim_allowed ? 'true' : 'false')")"
 current_latest_github_head="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-target.json', 'utf8')); console.log(r.github.default_branch_head)")"
 current_latest_release_channel="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-target.json', 'utf8')); console.log(r.github.latest_release_channel)")"
+current_latest_source_inventory_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-source-inventory.json', 'utf8')); console.log(r.status)")"
+current_latest_source_inventory_row_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-source-inventory.json', 'utf8')); console.log((r.rows || []).length)")"
+current_latest_source_inventory_unclassified_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-source-inventory.json', 'utf8')); console.log((r.unclassified_rows || []).length)")"
+current_latest_matrix_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-matrix.json', 'utf8')); console.log(r.status)")"
+current_latest_matrix_row_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-matrix.json', 'utf8')); console.log((r.rows || []).length)")"
+current_latest_matrix_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-matrix.json', 'utf8')); console.log(r.perfect_refactor_claim_allowed ? 'true' : 'false')")"
 upstream_distribution_target_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.status)")"
 upstream_distribution_npm_core_matches_frozen="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.npm_core_matches_frozen_baseline ? 'true' : 'false')")"
 upstream_distribution_repository_head_matches_npm="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.repository_head_matches_npm_core ? 'true' : 'false')")"
@@ -428,6 +435,8 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "external_authority": "$external_authority_status",
     "current_upstream_policy": "$current_upstream_policy_status",
     "current_latest_target": "$current_latest_target_status",
+    "current_latest_source_inventory": "$current_latest_source_inventory_status",
+    "current_latest_matrix": "$current_latest_matrix_status",
     "upstream_distribution_target": "$upstream_distribution_target_status",
     "real_upstream_smoke": "$real_upstream_smoke_status",
     "real_upstream_corpus": "$real_upstream_corpus_status"
@@ -445,7 +454,19 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "current_latest_claim_allowed": $current_latest_claim_allowed,
     "github_default_branch_head": "$current_latest_github_head",
     "github_latest_release_channel": "$current_latest_release_channel",
-    "target_artifact": "target/release-gates/current-latest-target.json"
+    "target_artifact": "target/release-gates/current-latest-target.json",
+    "source_inventory": {
+      "status": "$current_latest_source_inventory_status",
+      "row_count": $current_latest_source_inventory_row_count,
+      "unclassified_row_count": $current_latest_source_inventory_unclassified_count,
+      "artifact": "target/release-gates/current-latest-source-inventory.json"
+    },
+    "matrix": {
+      "status": "$current_latest_matrix_status",
+      "row_count": $current_latest_matrix_row_count,
+      "perfect_refactor_claim_allowed": $current_latest_matrix_claim_allowed,
+      "artifact": "target/release-gates/current-latest-matrix.json"
+    }
   },
   "distribution_target": {
     "status": "$upstream_distribution_target_status",
@@ -474,6 +495,8 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/perfect-refactor-unblock-packet.json",
     "target/release-gates/current-upstream-policy.json",
     "target/release-gates/current-latest-target.json",
+    "target/release-gates/current-latest-source-inventory.json",
+    "target/release-gates/current-latest-matrix.json",
     "target/release-gates/upstream-distribution-target.json",
     "target/release-gates/installability.json",
     "target/release-gates/publication-authority.json",
@@ -497,6 +520,8 @@ validate_report_json "$GATE_DIR/external-authority-blockers.json"
 validate_report_json "$GATE_DIR/perfect-refactor-claim.json"
 validate_report_json "$GATE_DIR/perfect-refactor-unblock-packet.json"
 validate_report_json "$GATE_DIR/current-latest-target.json"
+validate_report_json "$GATE_DIR/current-latest-source-inventory.json"
+validate_report_json "$GATE_DIR/current-latest-matrix.json"
 validate_report_json "$GATE_DIR/upstream-distribution-target.json"
 validate_report_json "$GATE_DIR/release-candidate.json"
 
