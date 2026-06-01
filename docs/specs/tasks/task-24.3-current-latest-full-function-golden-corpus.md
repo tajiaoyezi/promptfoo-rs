@@ -1,6 +1,6 @@
 # Task 24.3: current-latest-full-function-golden-corpus
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 24 — current-latest-perfect-refactor
@@ -67,19 +67,19 @@ The current-latest corpus generator must read the current-latest matrix from tas
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Compatibility Harness Design): 100% current-latest P0 rows have executable fixtures and upstream/rs normalized artifacts.
-- [ ] **AC2** (ADR-007): P0 `bug` and unclassified diffs block the current-latest perfect-refactor claim.
-- [ ] **AC3** (ADR-009): 100% current-latest P1 rows have snapshot or protocol evidence; P2 rows have explicit reason/waiver/later evidence.
-- [ ] **AC4** (user 2026-06-01): corpus scale is materially larger than the frozen baseline gate: at least 250 fixture cases or 100% of current-latest inventory rows when the inventory has fewer than 250 rows.
+- [x] **AC1** (PRD §Compatibility Harness Design): 100% current-latest P0 rows have executable fixtures and upstream/rs normalized artifacts.
+- [x] **AC2** (ADR-007): P0 `bug` and unclassified diffs block the current-latest perfect-refactor claim.
+- [x] **AC3** (ADR-009): 100% current-latest P1 rows have snapshot or protocol evidence; P2 rows have explicit reason/waiver/later evidence.
+- [x] **AC4** (user 2026-06-01): corpus scale is materially larger than the frozen baseline gate: at least 250 fixture cases or 100% of current-latest inventory rows when the inventory has fewer than 250 rows.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-24.3.1 | TEST-24.3.1 | tests/current_latest_golden_corpus.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-24.3.1 | TEST-24.3.2 | tests/current_latest_golden_corpus.rs | install, lint, typecheck, unit-test, coverage, build | Not Started |
-| AC3 | SCEN-24.3.1 | TEST-24.3.3 | tests/current_latest_golden_corpus.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Not Started |
-| AC4 | SCEN-24.3.1 | TEST-24.3.4 | tests/current_latest_golden_corpus.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Not Started |
+| AC1 | SCEN-24.3.1 | TEST-24.3.1 | tests/current_latest_golden_corpus.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-24.3.1 | TEST-24.3.2 | tests/current_latest_golden_corpus.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-24.3.1 | TEST-24.3.3 | tests/current_latest_golden_corpus.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-24.3.1 | TEST-24.3.4 | tests/current_latest_golden_corpus.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -101,9 +101,31 @@ The current-latest corpus generator must read the current-latest matrix from tas
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-01
+- **改动文件**：
+  - `tests/current_latest_golden_corpus.rs`
+  - `src/compatibility/harness.rs`
+  - `scripts/release/current-latest-golden-corpus.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `scripts/release/integration.sh`
+  - `scripts/release/coverage.sh`
+  - `docs/compatibility/matrix.md`
+  - `docs/compatibility/target-policy.md`
+  - `docs/specs/tasks/task-24.3-current-latest-full-function-golden-corpus.md`
+  - `docs/specs/phases/phase-24-current-latest-perfect-refactor.md`
+  - `docs/s2v-adapter.md`
+- **commit 列表**：
+  - `c9e47c2` `test(compatibility): add current latest golden corpus RED tests`
+  - `6728b32` `feat(compatibility): add current latest golden corpus gate`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS — helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-24.3.1 ~ TEST-24.3.4 通过。
+  - integration: PASS — helper 执行 `bash scripts/release/integration.sh` 通过，包含 `current_latest_golden_corpus`。
+  - e2e: PASS — helper 执行 `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — helper 执行 `bash scripts/release/coverage.sh` 通过；coverage traceability gate 包含 TEST-24.3.1 ~ TEST-24.3.4；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — helper 执行 `bash scripts/release/runtime-smoke.sh` 通过；`current-latest-golden-corpus.json` status=`ready-with-blockers`，fixture_case_count=432，p0_total=432，p0_fixture_coverage_count=432，p0_artifact_coverage_count=432，p1_snapshot_coverage_count=2087/2087，p2_registration_coverage_count=1393/1393，blocker_count=432，`perfect_refactor_claim_allowed=false`；`release-candidate.json` 暴露 current-latest golden corpus gate 状态。
+- **剩余风险 / 未做项**：本 task 生成 current-latest P0 fixture/artifact slots、P1 snapshot evidence、P2 registration evidence，并把 432 个 P0 blocker 继续保留为 release-blocking evidence。它不把 blocker row 伪装成 native parity，也不使用真实 paid provider calls；current-latest perfect-refactor claim 仍为 false，等待 task 24.4 聚合质量 gate 与后续 blocker/authority/waiver 决策。
+- **下游 task 影响**：task 24.4 必须消费 `target/release-gates/current-latest-golden-corpus.json`，把 432 个 P0 corpus blockers、existing source/matrix blockers、stress/property/regression gates 和 forbidden zero-bug wording 一并纳入最终质量 claim。
