@@ -1,0 +1,39 @@
+{
+  "schema": "promptfoo-rs.current-latest-target.v1",
+  "status": "locked-with-drift",
+  "npm_latest": {
+    "package_name": "promptfoo",
+    "package_version": "0.121.13",
+    "git_head": "4860e990c7e9a2f8f677173fb92cf9867b34d03f",
+    "tarball": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.13.tgz",
+    "integrity": "sha512-DBPSixUophzcD7S7lML6SqVwnVtrhK5A3HsZ03IG9Xrw0t24r5imG7nLj+YMb0vlAjbdFtE7yFG+rsqDpfYp6g==",
+    "modified": "2026-05-28T23:59:40.582Z",
+    "source": "npm view promptfoo version gitHead dist.tarball dist.integrity time.modified --json"
+  },
+  "github": {
+    "default_branch_head": "1d09dfeb5f0766905409117f923dd5c4b0838d9f",
+    "npm_tag_ref": "refs/tags/0.121.13",
+    "npm_tag_commit": "4860e990c7e9a2f8f677173fb92cf9867b34d03f",
+    "latest_release_ref": "refs/tags/code-scan-action-0.1.7",
+    "latest_release_commit": "1c743afe0e4807882e858c4f322fc064fa5f0770",
+    "latest_release_name": "code-scan-action: 0.1.7",
+    "latest_release_url": "https://github.com/promptfoo/promptfoo/releases/tag/code-scan-action-0.1.7",
+    "latest_release_published_at": "2026-05-29T03:02:57Z",
+    "latest_release_channel": "github-action",
+    "latest_release_is_core_package": false,
+    "source": "git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/<npm-version> refs/tags/<latest-release>",
+    "observed_at": "2026-06-01T00:00:00+08:00"
+  },
+  "target_selection_blocker_resolved": true,
+  "current_latest_claim_allowed": false,
+  "downstream_required_evidence": [
+    "current_latest_source_inventory",
+    "current_latest_matrix",
+    "current_latest_golden_corpus",
+    "current_latest_quality_gate",
+    "external_authority_or_waivers",
+    "publication_authority_or_waivers"
+  ],
+  "reason": "npm latest package 0.121.13 records gitHead 4860e990c7e9a2f8f677173fb92cf9867b34d03f; GitHub default branch HEAD 1d09dfeb5f0766905409117f923dd5c4b0838d9f differs from npm latest gitHead 4860e990c7e9a2f8f677173fb92cf9867b34d03f; GitHub latest release refs/tags/code-scan-action-0.1.7 is classified as github-action, not core package release evidence; downstream source inventory, golden corpus, quality, external authority, and publication evidence are still required",
+  "observed_at": "2026-06-01T00:00:00+08:00"
+}

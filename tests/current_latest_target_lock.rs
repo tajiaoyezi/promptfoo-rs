@@ -47,12 +47,9 @@ const FLOATING_NPM_VIEW: &str = r#"{
 #[test]
 fn test_24_1_1_lock_records_npm_github_head_and_release_channel() {
     /* TEST-24.1.1 */
-    let lock = CurrentLatestTargetLock::from_observations(
-        NPM_VIEW,
-        GITHUB_LATEST_RELEASE,
-        LS_REMOTE,
-    )
-    .expect("current latest target lock should parse");
+    let lock =
+        CurrentLatestTargetLock::from_observations(NPM_VIEW, GITHUB_LATEST_RELEASE, LS_REMOTE)
+            .expect("current latest target lock should parse");
 
     assert_eq!(lock.schema, "promptfoo-rs.current-latest-target.v1");
     assert_eq!(lock.npm_latest.package_version, "0.121.13");
@@ -95,12 +92,9 @@ fn test_24_1_2_lock_rejects_floating_latest_as_completion_proof() {
 #[test]
 fn test_24_1_3_non_core_release_channel_does_not_allow_perfect_claim() {
     /* TEST-24.1.3 */
-    let lock = CurrentLatestTargetLock::from_observations(
-        NPM_VIEW,
-        GITHUB_LATEST_RELEASE,
-        LS_REMOTE,
-    )
-    .expect("current latest target lock should parse");
+    let lock =
+        CurrentLatestTargetLock::from_observations(NPM_VIEW, GITHUB_LATEST_RELEASE, LS_REMOTE)
+            .expect("current latest target lock should parse");
 
     assert_eq!(lock.status, "locked-with-drift");
     assert_eq!(lock.github.latest_release_channel, "github-action");
@@ -117,12 +111,9 @@ fn test_24_1_3_non_core_release_channel_does_not_allow_perfect_claim() {
 #[test]
 fn test_24_1_4_runtime_smoke_wires_current_latest_lock_artifacts() {
     /* TEST-24.1.4 */
-    let lock = CurrentLatestTargetLock::from_observations(
-        NPM_VIEW,
-        GITHUB_LATEST_RELEASE,
-        LS_REMOTE,
-    )
-    .expect("current latest target lock should parse");
+    let lock =
+        CurrentLatestTargetLock::from_observations(NPM_VIEW, GITHUB_LATEST_RELEASE, LS_REMOTE)
+            .expect("current latest target lock should parse");
     let fixture_dir = std::env::temp_dir().join(format!(
         "promptfoo-rs-current-latest-target-{}",
         std::process::id()

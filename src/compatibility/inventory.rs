@@ -407,6 +407,231 @@ pub struct UpstreamDistributionTarget {
     pub observed_at: String,
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CurrentLatestGithubEvidence {
+    pub default_branch_head: String,
+    pub npm_tag_ref: String,
+    pub npm_tag_commit: String,
+    pub latest_release_ref: String,
+    pub latest_release_commit: String,
+    pub latest_release_name: String,
+    pub latest_release_url: String,
+    pub latest_release_published_at: String,
+    pub latest_release_channel: String,
+    pub latest_release_is_core_package: bool,
+    pub source: String,
+    pub observed_at: String,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CurrentLatestTargetLock {
+    pub schema: String,
+    pub status: String,
+    pub npm_latest: NpmPackageObservation,
+    pub github: CurrentLatestGithubEvidence,
+    pub target_selection_blocker_resolved: bool,
+    pub current_latest_claim_allowed: bool,
+    pub downstream_required_evidence: Vec<String>,
+    pub reason: String,
+    pub observed_at: String,
+}
+
+#[derive(Debug)]
+pub enum CurrentLatestTargetError {
+    Read(std::io::Error),
+    Write(std::io::Error),
+    Parse(String),
+}
+
+impl std::fmt::Display for CurrentLatestTargetError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Read(error) => write!(
+                formatter,
+                "failed to read current latest target input: {error}"
+            ),
+            Self::Write(error) => write!(
+                formatter,
+                "failed to write current latest target output: {error}"
+            ),
+            Self::Parse(error) => write!(
+                formatter,
+                "failed to parse current latest target input: {error}"
+            ),
+        }
+    }
+}
+
+impl std::error::Error for CurrentLatestTargetError {}
+
+impl CurrentLatestTargetLock {
+    pub fn from_observations(
+        npm_json: &str,
+        latest_release_json: &str,
+        ls_remote_output: &str,
+    ) -> Result<Self, CurrentLatestTargetError> {
+        let npm_latest = parse_npm_package_observation(npm_json)
+            .map_err(|error| CurrentLatestTargetError::Parse(error.to_string()))?;
+        reject_floating_completion_value(&npm_latest.package_version)?;
+        reject_floating_completion_value(&npm_latest.git_head)?;
+
+        let release: serde_json::Value = serde_json::from_str(latest_release_json)
+            .map_err(|error| CurrentLatestTargetError::Parse(error.to_string()))?;
+        let latest_tag = nested_or_flat_string(&release, &["tagName"], "tag_name")
+            .or_else(|| json_string(&release, "tagName"))
+            .ok_or_else(|| {
+                CurrentLatestTargetError::Parse(
+                    "GitHub latest release metadata missing tagName/tag_name".to_string(),
+                )
+            })?;
+        validate_safe_tag(&latest_tag)?;
+        let latest_release_ref = format!("refs/tags/{latest_tag}");
+        let release_commit =
+            nested_or_flat_string(&release, &["targetCommitish"], "target_commitish")
+                .or_else(|| json_string(&release, "targetCommitish"))
+                .ok_or_else(|| {
+                    CurrentLatestTargetError::Parse(
+                        "GitHub latest release metadata missing targetCommitish/target_commitish"
+                            .to_string(),
+                    )
+                })?;
+        if !is_full_sha(&release_commit) {
+            return Err(CurrentLatestTargetError::Parse(
+                "GitHub latest release target commit must be a full 40 character SHA".to_string(),
+            ));
+        }
+        let release_name = nested_or_flat_string(&release, &["name"], "name")
+            .unwrap_or_else(|| latest_tag.clone());
+        let release_url = nested_or_flat_string(&release, &["htmlUrl"], "html_url")
+            .or_else(|| json_string(&release, "htmlUrl"))
+            .unwrap_or_else(|| {
+                format!("https://github.com/promptfoo/promptfoo/releases/tag/{latest_tag}")
+            });
+        let published_at = nested_or_flat_string(&release, &["publishedAt"], "published_at")
+            .or_else(|| json_string(&release, "publishedAt"))
+            .unwrap_or_else(|| "unknown".to_string());
+
+        let npm_tag_ref = format!("refs/tags/{}", npm_latest.package_version);
+        let mut default_branch_head = None;
+        let mut npm_tag_commit = None;
+        let mut latest_release_commit = None;
+        for line in ls_remote_output
+            .lines()
+            .map(str::trim)
+            .filter(|line| !line.is_empty())
+        {
+            let mut parts = line.split_whitespace();
+            let sha = parts.next().ok_or_else(|| {
+                CurrentLatestTargetError::Parse("missing ls-remote sha".to_string())
+            })?;
+            let reference = parts.next().ok_or_else(|| {
+                CurrentLatestTargetError::Parse("missing ls-remote ref".to_string())
+            })?;
+            if !is_full_sha(sha) {
+                return Err(CurrentLatestTargetError::Parse(format!(
+                    "ls-remote ref {reference} did not contain a full sha"
+                )));
+            }
+            if reference == "HEAD" {
+                default_branch_head = Some(sha.to_string());
+            } else if reference == npm_tag_ref || reference == format!("{npm_tag_ref}^{{}}") {
+                npm_tag_commit = Some(sha.to_string());
+            } else if reference == latest_release_ref
+                || reference == format!("{latest_release_ref}^{{}}")
+            {
+                latest_release_commit = Some(sha.to_string());
+            }
+        }
+        let default_branch_head = default_branch_head.ok_or_else(|| {
+            CurrentLatestTargetError::Parse("ls-remote output missing HEAD".to_string())
+        })?;
+        let npm_tag_commit = npm_tag_commit.ok_or_else(|| {
+            CurrentLatestTargetError::Parse(format!("ls-remote output missing {npm_tag_ref}"))
+        })?;
+        let latest_release_commit = latest_release_commit.ok_or_else(|| {
+            CurrentLatestTargetError::Parse(format!(
+                "ls-remote output missing {latest_release_ref}"
+            ))
+        })?;
+        if latest_release_commit != release_commit {
+            return Err(CurrentLatestTargetError::Parse(format!(
+                "GitHub release metadata commit {release_commit} differs from ls-remote {latest_release_commit}"
+            )));
+        }
+
+        let latest_release_channel =
+            classify_github_release_channel(Some(latest_release_ref.as_str()));
+        let latest_release_is_core_package = latest_release_channel == "core-package"
+            && latest_release_commit == npm_latest.git_head;
+        let downstream_required_evidence = [
+            "current_latest_source_inventory",
+            "current_latest_matrix",
+            "current_latest_golden_corpus",
+            "current_latest_quality_gate",
+            "external_authority_or_waivers",
+            "publication_authority_or_waivers",
+        ]
+        .into_iter()
+        .map(str::to_string)
+        .collect::<Vec<_>>();
+        let default_branch_matches_npm = default_branch_head == npm_latest.git_head;
+        let status = if default_branch_matches_npm && latest_release_is_core_package {
+            "locked"
+        } else {
+            "locked-with-drift"
+        };
+        let reason = current_latest_target_reason(
+            &npm_latest,
+            &default_branch_head,
+            &latest_release_ref,
+            &latest_release_channel,
+        );
+
+        Ok(Self {
+            schema: "promptfoo-rs.current-latest-target.v1".to_string(),
+            status: status.to_string(),
+            npm_latest,
+            github: CurrentLatestGithubEvidence {
+                default_branch_head,
+                npm_tag_ref,
+                npm_tag_commit,
+                latest_release_ref,
+                latest_release_commit,
+                latest_release_name: release_name,
+                latest_release_url: release_url,
+                latest_release_published_at: published_at,
+                latest_release_channel,
+                latest_release_is_core_package,
+                source: "git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/<npm-version> refs/tags/<latest-release>".to_string(),
+                observed_at: current_unix_timestamp(),
+            },
+            target_selection_blocker_resolved: true,
+            current_latest_claim_allowed: false,
+            downstream_required_evidence,
+            reason,
+            observed_at: current_unix_timestamp(),
+        })
+    }
+}
+
+pub fn write_current_latest_target_lock(
+    lock: &CurrentLatestTargetLock,
+    json_path: &Path,
+    markdown_path: &Path,
+) -> Result<(), CurrentLatestTargetError> {
+    if let Some(parent) = json_path.parent() {
+        fs::create_dir_all(parent).map_err(CurrentLatestTargetError::Write)?;
+    }
+    if let Some(parent) = markdown_path.parent() {
+        fs::create_dir_all(parent).map_err(CurrentLatestTargetError::Write)?;
+    }
+    let json = serde_json::to_string_pretty(lock)
+        .map_err(|error| CurrentLatestTargetError::Parse(error.to_string()))?;
+    fs::write(json_path, format!("{json}\n")).map_err(CurrentLatestTargetError::Write)?;
+    fs::write(markdown_path, current_latest_lock_markdown(lock))
+        .map_err(CurrentLatestTargetError::Write)
+}
+
 #[derive(Debug)]
 pub enum DistributionTargetError {
     Read(std::io::Error),
@@ -1768,6 +1993,99 @@ fn distribution_target_reason(
     format!(
         "npm core package {} ({}) differs from frozen baseline {}",
         npm.package_version, npm.git_head, frozen.git_commit
+    )
+}
+
+fn reject_floating_completion_value(value: &str) -> Result<(), CurrentLatestTargetError> {
+    let lower = value.to_ascii_lowercase();
+    if matches!(
+        lower.as_str(),
+        "latest" | "main" | "master" | "head" | "refs/heads/main" | "refs/heads/master"
+    ) {
+        return Err(CurrentLatestTargetError::Parse(format!(
+            "floating current-latest completion proof is not allowed: {value}"
+        )));
+    }
+    Ok(())
+}
+
+fn validate_safe_tag(tag: &str) -> Result<(), CurrentLatestTargetError> {
+    if tag.trim() != tag
+        || tag.is_empty()
+        || tag.contains("..")
+        || tag.chars().any(|ch| {
+            ch.is_whitespace() || matches!(ch, '\0' | '^' | '~' | ':' | '?' | '*' | '[' | '\\')
+        })
+    {
+        return Err(CurrentLatestTargetError::Parse(format!(
+            "GitHub latest release tag is not a safe ref name: {tag}"
+        )));
+    }
+    Ok(())
+}
+
+fn current_latest_target_reason(
+    npm: &NpmPackageObservation,
+    default_branch_head: &str,
+    latest_release_ref: &str,
+    latest_release_channel: &str,
+) -> String {
+    let mut parts = vec![format!(
+        "npm latest package {} records gitHead {}",
+        npm.package_version, npm.git_head
+    )];
+    if default_branch_head != npm.git_head {
+        parts.push(format!(
+            "GitHub default branch HEAD {default_branch_head} differs from npm latest gitHead {}",
+            npm.git_head
+        ));
+    }
+    if latest_release_channel != "core-package" {
+        parts.push(format!(
+            "GitHub latest release {latest_release_ref} is classified as {latest_release_channel}, not core package release evidence",
+        ));
+    }
+    parts.push(
+        "downstream source inventory, golden corpus, quality, external authority, and publication evidence are still required"
+            .to_string(),
+    );
+    parts.join("; ")
+}
+
+fn current_latest_lock_markdown(lock: &CurrentLatestTargetLock) -> String {
+    format!(
+        "# Current Latest Target Lock\n\n\
+        - **Schema**: `{}`\n\
+        - **Status**: `{}`\n\
+        - **Observed At**: `{}`\n\
+        - **npm latest**: `promptfoo@{}` / `{}`\n\
+        - **npm tarball**: `{}`\n\
+        - **npm integrity**: `{}`\n\
+        - **GitHub default branch HEAD**: `{}`\n\
+        - **GitHub latest release**: `{}` / `{}` / channel `{}`\n\
+        - **Target selection blocker resolved**: `{}`\n\
+        - **Current latest claim allowed**: `{}`\n\n\
+        ## Reason\n\n{}\n\n\
+        ## Downstream Required Evidence\n\n{}\n",
+        lock.schema,
+        lock.status,
+        lock.observed_at,
+        lock.npm_latest.package_version,
+        lock.npm_latest.git_head,
+        lock.npm_latest.tarball,
+        lock.npm_latest.integrity,
+        lock.github.default_branch_head,
+        lock.github.latest_release_ref,
+        lock.github.latest_release_commit,
+        lock.github.latest_release_channel,
+        lock.target_selection_blocker_resolved,
+        lock.current_latest_claim_allowed,
+        lock.reason,
+        lock.downstream_required_evidence
+            .iter()
+            .map(|item| format!("- `{item}`"))
+            .collect::<Vec<_>>()
+            .join("\n")
     )
 }
 
