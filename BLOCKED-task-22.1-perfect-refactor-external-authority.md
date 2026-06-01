@@ -107,3 +107,27 @@
   - `target/release-gates/external-authority-blockers.json` remains `status=blocked`, `blocker_count=21`; `publication-authority.json` remains `publication_ready=credential-blocked`, `credential_blocked=true`, `legal_brand_blocked=true`, with 6 unpublished public channels.
   - `source-inventory-evidence.json` remains `status=ready-with-blockers`, `p0_accounting_blocker_count=22`; `longtail-classification.json` remains `status=ready-with-blockers`, `p0_release_blocker_count=15`.
 - Blocking conclusion: the same blocker has now repeated for three resumed goal turns. There is no remaining code-only or spec-inference task that can honestly advance `perfect_refactor_claim_allowed=true` without user-supplied external evidence, credentials, legal/brand approval, formal waivers, or an explicit current-upstream same-ref rebaseline scope.
+
+## Post-blocked fresh audit 1 — 2026-06-01
+
+- The goal was resumed after being marked blocked, so the blocked audit count restarts at 1 of 3 for this fresh run.
+- Fresh commands / sources:
+  - `git status --short --branch`
+  - `git rev-parse HEAD origin/master`
+  - `git grep -n -E "^\*\*Status\*\*: (Draft|Ready|In Progress)|<TBD-by-user>|<TBD-after-impl>|\| Ready \|" -- docs/specs/tasks docs/specs/phases docs/s2v-adapter.md`
+  - `npm view promptfoo version gitHead dist.tarball dist.integrity time.modified --json`
+  - `git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/0.121.13 refs/tags/code-scan-action-0.1.7`
+  - GitHub latest release metadata fetch: `https://api.github.com/repos/promptfoo/promptfoo/releases/latest`
+  - Public GitHub Releases page: `https://github.com/promptfoo/promptfoo/releases`
+  - Artifact inspection for `upstream-distribution-target.json`, `perfect-refactor-claim.json`, `perfect-refactor-unblock-packet.json`, `external-authority-blockers.json`, `publication-authority.json`, `source-inventory-evidence.json`, `longtail-classification.json`
+- Fresh evidence:
+  - `master` was clean and synced before this audit update: `HEAD == origin/master == abef6acf01c9dbc42282a72af2b6ffd9871cc6c7`.
+  - No task/phase/adapter implementation entry remains `Draft`, `Ready`, `In Progress`, `<TBD-by-user>`, `<TBD-after-impl>`, or `| Ready |`.
+  - npm core remains `promptfoo@0.121.13` with `gitHead=4860e990c7e9a2f8f677173fb92cf9867b34d03f`, tarball `https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.13.tgz`, and unchanged sha512 integrity.
+  - GitHub latest release metadata and GitHub Releases page still show `code-scan-action-0.1.7` as the latest release, with commit `1c743afe0e4807882e858c4f322fc064fa5f0770`, not a core npm package release.
+  - GitHub repository `HEAD` remains `0b93733d48727be67e34433cb0fb1ad21026863a`, which differs from the npm core gitHead / frozen baseline.
+  - `target/release-gates/upstream-distribution-target.json` remains `status=ready-with-drift`, dynamic latest release ref `refs/tags/code-scan-action-0.1.7`, `github_latest_release_is_core_package=false`, and `current_repository_perfect_claim_allowed=false`.
+  - `target/release-gates/perfect-refactor-claim.json` remains `perfect_refactor_claim_allowed=false`, `local_stable_allowed=true`, `published=false`, `publication_ready=credential-blocked`, `source_p0_accounting_blocker_count=22`, `external_authority_blocker_count=21`.
+  - `target/release-gates/perfect-refactor-unblock-packet.json` remains `status=blocked`, `auto_resolvable=false`, `required_user_decision_count=29`, `current_upstream_rebaseline_required=true`.
+  - `external-authority-blockers.json`, `publication-authority.json`, `source-inventory-evidence.json`, and `longtail-classification.json` still report the same provider/product/credential, publication, source accounting, and longtail blockers.
+- Decision: no new code-only Ready task can be inferred in this fresh resumed run. The minimal unblocking input remains one of: user-provided external authority evidence, publication credentials/legal-brand approval, explicit formal waivers, or a new user-approved current-upstream same-ref rebaseline scope.
