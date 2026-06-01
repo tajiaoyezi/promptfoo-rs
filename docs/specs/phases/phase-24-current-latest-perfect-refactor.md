@@ -23,7 +23,7 @@
 | 24.1 | current-latest-upstream-authority-lock | ../tasks/task-24.1-current-latest-upstream-authority-lock.md | Done | 将 npm latest、GitHub HEAD、GitHub latest release 观测写成 immutable current-latest target packet |
 | 24.2 | current-latest-source-inventory-reextract | ../tasks/task-24.2-current-latest-source-inventory-reextract.md | Done | 从锁定 target 重新抽取完整功能 inventory，并把 silent omission 变成 blocker |
 | 24.3 | current-latest-full-function-golden-corpus | ../tasks/task-24.3-current-latest-full-function-golden-corpus.md | Done | 为 current-latest P0/P1 能力扩展 fixtures、snapshots 和 golden diff corpus |
-| 24.4 | current-latest-exhaustive-quality-gate | ../tasks/task-24.4-current-latest-exhaustive-quality-gate.md | Ready | 增加大规模回归、stress、property、release quality gate，并限制 claim 为“无已知 release-blocking 缺陷” |
+| 24.4 | current-latest-exhaustive-quality-gate | ../tasks/task-24.4-current-latest-exhaustive-quality-gate.md | Done | 增加大规模回归、stress、property、release quality gate，并限制 claim 为“无已知 release-blocking 缺陷” |
 
 ## 5. Dependencies
 
@@ -31,10 +31,10 @@
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] current-latest target packet 同时记录 npm latest stable package、GitHub default branch HEAD、GitHub latest release channel，并拒绝浮动 `latest/main/master/HEAD` 作为 claim 证据。
-- [ ] current-latest source inventory 对 command、flag、provider、assertion、redteam、config、output、viewer、Node API、examples/docs rows 做完整 accounting，未分类项阻断 claim。
-- [ ] current-latest fixture/golden corpus 覆盖 100% P0 rows，P1 rows 至少有 snapshot 或 protocol tests，P2 rows 有 known gap/waiver/later reason。
-- [ ] quality gate 执行 unit/integration/e2e/coverage/build/runtime-smoke、golden diff、stress、property/regression tests；通过后只允许声明“no known release-blocking defects under gates”，不允许声明“no possible bugs”。
+- [x] current-latest target packet 同时记录 npm latest stable package、GitHub default branch HEAD、GitHub latest release channel，并拒绝浮动 `latest/main/master/HEAD` 作为 claim 证据。
+- [x] current-latest source inventory 对 command、flag、provider、assertion、redteam、config、output、viewer、Node API、examples/docs rows 做完整 accounting，未分类项阻断 claim。
+- [x] current-latest fixture/golden corpus 覆盖 100% P0 rows，P1 rows 至少有 snapshot 或 protocol tests，P2 rows 有 known gap/waiver/later reason。
+- [x] quality gate 执行 unit/integration/e2e/coverage/build/runtime-smoke、golden diff、stress、property/regression tests；通过后只允许声明“no known release-blocking defects under gates”，不允许声明“no possible bugs”。
 
 ## 7. Phase Risks
 

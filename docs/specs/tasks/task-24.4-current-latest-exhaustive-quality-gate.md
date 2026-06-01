@@ -1,6 +1,6 @@
 # Task 24.4: current-latest-exhaustive-quality-gate
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 24 — current-latest-perfect-refactor
@@ -70,19 +70,19 @@ The quality gate must aggregate adapter verification, current-latest golden corp
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (user 2026-06-01): quality report aggregates adapter verification, golden corpus, source inventory coverage, deterministic regression, stress, property-style checks, runtime smoke, and release blockers.
-- [ ] **AC2** (ADR-011): claim wording is limited to “no known release-blocking defects under declared gates”; “no potential bugs” / “zero possible bugs” wording fails the gate.
-- [ ] **AC3** (PRD §Success Metrics): current-latest perfect-refactor claim remains false if any P0/P1 evidence, stress/regression/property test, external authority, publication authority, or current target evidence is missing.
-- [ ] **AC4** (ADR-007): when all local current-latest gates pass but external/publication authority remains absent, the report allows local readiness but blocks public perfect-refactor completion.
+- [x] **AC1** (user 2026-06-01): quality report aggregates adapter verification, golden corpus, source inventory coverage, deterministic regression, stress, property-style checks, runtime smoke, and release blockers.
+- [x] **AC2** (ADR-011): claim wording is limited to “no known release-blocking defects under declared gates”; “no potential bugs” / “zero possible bugs” wording fails the gate.
+- [x] **AC3** (PRD §Success Metrics): current-latest perfect-refactor claim remains false if any P0/P1 evidence, stress/regression/property test, external authority, publication authority, or current target evidence is missing.
+- [x] **AC4** (ADR-007): when all local current-latest gates pass but external/publication authority remains absent, the report allows local readiness but blocks public perfect-refactor completion.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-24.4.1 | TEST-24.4.1 | tests/current_latest_quality_gate.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-24.4.1 | TEST-24.4.2 | tests/current_latest_quality_gate.rs | install, lint, typecheck, unit-test, coverage, build | Not Started |
-| AC3 | SCEN-24.4.1 | TEST-24.4.3 | tests/current_latest_quality_gate.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Not Started |
-| AC4 | SCEN-24.4.1 | TEST-24.4.4 | tests/current_latest_quality_gate.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Not Started |
+| AC1 | SCEN-24.4.1 | TEST-24.4.1 | tests/current_latest_quality_gate.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-24.4.1 | TEST-24.4.2 | tests/current_latest_quality_gate.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-24.4.1 | TEST-24.4.3 | tests/current_latest_quality_gate.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-24.4.1 | TEST-24.4.4 | tests/current_latest_quality_gate.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -104,9 +104,34 @@ The quality gate must aggregate adapter verification, current-latest golden corp
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-01
+- **改动文件**：
+  - `src/release.rs`
+  - `tests/current_latest_quality_gate.rs`
+  - `scripts/release/current-latest-quality-gate.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `scripts/release/integration.sh`
+  - `scripts/release/coverage.sh`
+  - `docs/release.md`
+  - `docs/compatibility/matrix.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `docs/specs/tasks/task-24.4-current-latest-exhaustive-quality-gate.md`
+  - `docs/specs/phases/phase-24-current-latest-perfect-refactor.md`
+  - `docs/s2v-adapter.md`
+- **commit 列表**：
+  - `5103ced` `docs(spec): task-24.4 enters implementation`
+  - `a9c0a0e` `test(release): add current latest quality gate RED tests`
+  - `4761804` `feat(release): add current latest quality gate`
+  - 本次 docs 回填提交：`docs(spec): complete task 24.4 current latest quality gate`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS — helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-24.4.1 ~ TEST-24.4.4 通过。
+  - integration: PASS — helper 执行 `bash scripts/release/integration.sh` 通过，包含 `current_latest_quality_gate`。
+  - e2e: PASS — helper 执行 `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — helper 执行 `bash scripts/release/coverage.sh` 通过，coverage traceability gate 覆盖 TEST-24.4.1 ~ TEST-24.4.4；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — helper 执行 `bash scripts/release/runtime-smoke.sh` 通过；`current-latest-quality.json` status=`ready-with-blockers`，`local_current_latest_ready=false`，`perfect_refactor_claim_allowed=false`，blocker_count=6；`release-candidate.json` 暴露 `current_latest_quality` gate。
+- **剩余风险 / 未做项**：当前 quality gate 明确禁止“no potential bugs”/“zero possible bugs”类不可证明承诺，只允许 “no known release-blocking defects under declared gates”。当前 current-latest 仍有 318 个 unclassified source/matrix rows、432 个 golden corpus blockers、21 个 external authority blockers，以及 publication `credential-blocked`，因此 perfect-refactor claim 必须保持 false。
+- **下游 task 影响**：Phase 24 可以进入 phase smoke 收尾；若后续要让 current-latest perfect-refactor claim 变 true，需要新增 task 或正式 waiver 消费 `current-latest-quality.json` 中列出的 source/matrix/golden/current-target/external/publication blockers。
