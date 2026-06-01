@@ -83,3 +83,27 @@
   - `target/release-gates/external-authority-blockers.json` still lists 21 blockers: 15 provider product/account/credential authority blockers plus 6 publication blockers.
   - `target/release-gates/publication-authority.json` remains `publication_ready=credential-blocked`, `credential_blocked=true`, `legal_brand_blocked=true`, with all public channels `published=false` and `published_evidence=null`.
 - Decision: Phase 23 exhausted the only newly discovered code-only improvement. No additional Ready task can be inferred without violating PRD §Compatibility Matrix / §Release, ADR-008, ADR-009, task 19.4, task 20.2, task 22.1, and task 23.1 boundaries. The remaining options are still user-provided external authority evidence, publication credentials/legal-brand approval, explicit approved waivers, or a new user-approved current-upstream same-ref rebaseline scope.
+
+## Resume audit 3 — 2026-06-01 blocked threshold reached
+
+- Resumed blocked audit count: 3 of 3 for the same external evidence / publication / current-upstream blocker after the goal was reactivated.
+- Fresh commands:
+  - `git status --short --branch`
+  - `git rev-parse HEAD origin/master`
+  - `git grep -n -E "^\*\*Status\*\*: (Draft|Ready|In Progress)|<TBD-by-user>|<TBD-after-impl>|\| Ready \|" -- docs/specs/tasks docs/specs/phases docs/s2v-adapter.md`
+  - `npm view promptfoo version gitHead dist.tarball dist.integrity time.modified --json`
+  - `git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/0.121.13 refs/tags/code-scan-action-0.1.7`
+  - GitHub latest release metadata fetch: `https://api.github.com/repos/promptfoo/promptfoo/releases/latest`
+  - Artifact inspection for `upstream-distribution-target.json`, `perfect-refactor-claim.json`, `perfect-refactor-unblock-packet.json`, `external-authority-blockers.json`, `publication-authority.json`, `source-inventory-evidence.json`, `longtail-classification.json`
+- Fresh evidence:
+  - `master` is clean and synced before this audit update: `HEAD == origin/master == e343e2fcbd08ea3fdecabcc063b8c1e47070af9f`.
+  - No task/phase/adapter implementation entry remains `Draft`, `Ready`, `In Progress`, `<TBD-by-user>`, `<TBD-after-impl>`, or `| Ready |`.
+  - npm core remains `promptfoo@0.121.13` with `gitHead=4860e990c7e9a2f8f677173fb92cf9867b34d03f`, tarball `https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.13.tgz`, and unchanged sha512 integrity.
+  - GitHub latest release metadata still returns `tag_name=code-scan-action-0.1.7`, `target_commitish=1c743afe0e4807882e858c4f322fc064fa5f0770`, `published_at=2026-05-29T03:02:57Z`.
+  - GitHub repository `HEAD` remains `0b93733d48727be67e34433cb0fb1ad21026863a`, which differs from the npm core gitHead / frozen baseline.
+  - `target/release-gates/upstream-distribution-target.json` remains `status=ready-with-drift`, dynamic latest release ref `refs/tags/code-scan-action-0.1.7`, `github_latest_release_is_core_package=false`, and `current_repository_perfect_claim_allowed=false`.
+  - `target/release-gates/perfect-refactor-claim.json` remains `perfect_refactor_claim_allowed=false`, `local_stable_allowed=true`, `published=false`, `publication_ready=credential-blocked`, `source_p0_accounting_blocker_count=22`, `external_authority_blocker_count=21`.
+  - `target/release-gates/perfect-refactor-unblock-packet.json` remains `status=blocked`, `auto_resolvable=false`, `required_user_decision_count=29`, `current_upstream_rebaseline_required=true`.
+  - `target/release-gates/external-authority-blockers.json` remains `status=blocked`, `blocker_count=21`; `publication-authority.json` remains `publication_ready=credential-blocked`, `credential_blocked=true`, `legal_brand_blocked=true`, with 6 unpublished public channels.
+  - `source-inventory-evidence.json` remains `status=ready-with-blockers`, `p0_accounting_blocker_count=22`; `longtail-classification.json` remains `status=ready-with-blockers`, `p0_release_blocker_count=15`.
+- Blocking conclusion: the same blocker has now repeated for three resumed goal turns. There is no remaining code-only or spec-inference task that can honestly advance `perfect_refactor_claim_allowed=true` without user-supplied external evidence, credentials, legal/brand approval, formal waivers, or an explicit current-upstream same-ref rebaseline scope.
