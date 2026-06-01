@@ -99,7 +99,7 @@ function isConfig(file) {
 }
 
 function isViewer(file) {
-  return file.startsWith('src/app/');
+  return file.startsWith('src/app/') || file.startsWith('src/server/') || file.startsWith('src/openapi/');
 }
 
 function isNodeApi(file) {
@@ -128,6 +128,115 @@ function isP0Provider(file) {
   );
 }
 
+function isEvalRuntime(file) {
+  return (
+    isTsOrJs(file) &&
+    (['src/evaluate.ts', 'src/evaluator.ts', 'src/evaluatorHelpers.ts', 'src/testCase.ts'].includes(file) ||
+      file.startsWith('src/scheduler/') ||
+      file.startsWith('src/testCase/') ||
+      file.startsWith('src/optimizer/'))
+  );
+}
+
+function isCacheStore(file) {
+  return (
+    isTsOrJs(file) &&
+    (file === 'src/cache.ts' || file.startsWith('src/database/') || file.startsWith('src/storage/'))
+  );
+}
+
+function isPromptProcessing(file) {
+  return (
+    isTsOrJs(file) &&
+    (file.startsWith('src/prompts/') ||
+      file.startsWith('src/external/prompts/') ||
+      file.startsWith('src/optimizer/'))
+  );
+}
+
+function isAssertionSupport(file) {
+  return (
+    isTsOrJs(file) &&
+    (file.startsWith('src/matchers/') ||
+      file.startsWith('src/external/matchers/') ||
+      file.startsWith('src/external/assertions/') ||
+      ['src/remoteGrading.ts', 'src/remoteScoring.ts', 'src/guardrails.ts'].includes(file))
+  );
+}
+
+function isRedteamSupport(file) {
+  return file.startsWith('src/redteam/') && isTsOrJs(file);
+}
+
+function isSchema(file) {
+  return (
+    isTsOrJs(file) &&
+    (file === 'src/contracts.ts' ||
+      file.startsWith('src/types/') ||
+      file.startsWith('src/contracts/') ||
+      file.startsWith('src/models/') ||
+      file.startsWith('src/validators/'))
+  );
+}
+
+function isScriptBridge(file) {
+  return isTsOrJs(file) && (file.startsWith('src/python/') || file.startsWith('src/ruby/'));
+}
+
+function isImportExport(file) {
+  return isTsOrJs(file) && (file.startsWith('src/importers/') || file.startsWith('src/util/exportToFile/'));
+}
+
+function isIntegration(file) {
+  return (
+    isTsOrJs(file) &&
+    (file.startsWith('src/integrations/') || ['src/googleSheets.ts', 'src/microsoftSharepoint.ts'].includes(file))
+  );
+}
+
+function isCloudShare(file) {
+  return (
+    isTsOrJs(file) &&
+    ([
+      'src/share.ts',
+      'src/feedback.ts',
+      'src/onboarding.ts',
+      'src/suggestions.ts',
+      'src/telemetry.ts',
+      'src/telemetryEvents.ts',
+      'src/updates.ts',
+    ].includes(file) ||
+      file.startsWith('src/updates/'))
+  );
+}
+
+function isBlobStore(file) {
+  return file.startsWith('src/blobs/') && isTsOrJs(file);
+}
+
+function isRuntimeSupport(file) {
+  return (
+    isTsOrJs(file) &&
+    (file.startsWith('src/util/') ||
+      file.startsWith('src/constants/') ||
+      file.startsWith('src/__mocks__/') ||
+      [
+        'src/cliState.ts',
+        'src/constants.ts',
+        'src/entrypoint.ts',
+        'src/envars.ts',
+        'src/envOverrides.ts',
+        'src/esm.ts',
+        'src/logger.ts',
+        'src/logger.browser.ts',
+        'src/mainUtils.ts',
+        'src/migrate.ts',
+        'src/table.ts',
+        'src/version.ts',
+      ].includes(file))
+  );
+}
+
 function categoriesFor(file) {
   const categories = [];
   if (isCommand(file)) categories.push('command');
@@ -141,6 +250,18 @@ function categoriesFor(file) {
   if (isNodeApi(file)) categories.push('node-api');
   if (isExample(file)) categories.push('example');
   if (isDocs(file)) categories.push('docs');
+  if (categories.length === 0 && isEvalRuntime(file)) categories.push('eval-runner');
+  if (categories.length === 0 && isCacheStore(file)) categories.push('cache-store');
+  if (categories.length === 0 && isPromptProcessing(file)) categories.push('prompt-processing');
+  if (categories.length === 0 && isAssertionSupport(file)) categories.push('assertion-support');
+  if (categories.length === 0 && isRedteamSupport(file)) categories.push('redteam-support');
+  if (categories.length === 0 && isSchema(file)) categories.push('schema');
+  if (categories.length === 0 && isScriptBridge(file)) categories.push('script-bridge');
+  if (categories.length === 0 && isImportExport(file)) categories.push('import-export');
+  if (categories.length === 0 && isIntegration(file)) categories.push('integration');
+  if (categories.length === 0 && isCloudShare(file)) categories.push('cloud-share');
+  if (categories.length === 0 && isBlobStore(file)) categories.push('blob-store');
+  if (categories.length === 0 && isRuntimeSupport(file)) categories.push('runtime-support');
   if (categories.length === 0 && file.startsWith('src/') && isTsOrJs(file)) {
     categories.push('unclassified');
   }
@@ -156,16 +277,28 @@ function metadata(category, id, file) {
   if (category === 'redteam-plugin' || category === 'redteam-strategy') return ['P1', 'later', 'redteam-engine', 'snapshot', `current-latest redteam surface requires snapshot evidence; item: ${id}`];
   if (category === 'output') return ['P1', 'later', 'reporting', 'snapshot', `current-latest output surface requires output contract snapshot; item: ${id}`];
   if (category === 'config') return ['P0', 'blocked', 'config-loader', 'blocker', `current-latest config surface requires fixture evidence; item: ${id}`];
+  if (category === 'eval-runner') return ['P0', 'blocked', 'eval-runner', 'blocker', `current-latest eval runtime requires fixture evidence; item: ${id}`];
+  if (category === 'cache-store') return ['P0', 'blocked', 'cache-resume-store', 'blocker', `current-latest cache and result store surface requires fixture evidence; item: ${id}`];
+  if (category === 'prompt-processing') return ['P0', 'blocked', 'config-loader', 'blocker', `current-latest prompt processing surface requires fixture evidence; item: ${id}`];
+  if (category === 'script-bridge') return ['P0', 'blocked', 'script-bridge', 'blocker', `current-latest script bridge surface requires authorized subprocess fixture evidence; item: ${id}`];
   if (category === 'viewer') return ['P1', 'later', 'web-viewer', 'snapshot', `current-latest viewer surface requires data-contract or browser snapshot; item: ${id}`];
+  if (category === 'assertion-support') return ['P1', 'later', 'assertion-engine', 'snapshot', `current-latest assertion support surface requires matcher or grading snapshot evidence; item: ${id}`];
+  if (category === 'redteam-support') return ['P1', 'later', 'redteam-engine', 'snapshot', `current-latest redteam support surface requires registry or behavior snapshot evidence; item: ${id}`];
+  if (category === 'schema') return ['P1', 'later', 'protocol', 'snapshot', `current-latest schema/model/contract surface requires protocol snapshot evidence; item: ${id}`];
+  if (category === 'import-export') return ['P1', 'later', 'output-writers', 'snapshot', `current-latest import/export surface requires conversion snapshot evidence; item: ${id}`];
+  if (category === 'blob-store') return ['P1', 'later', 'eval-runner', 'snapshot', `current-latest blob and media storage surface requires data-contract snapshot evidence; item: ${id}`];
+  if (category === 'runtime-support') return ['P1', 'later', 'runtime', 'snapshot', `current-latest runtime support surface requires deterministic snapshot evidence; item: ${id}`];
   if (category === 'node-api') return ['P1', 'later', 'node-api-wrapper', 'snapshot', `current-latest Node API surface requires wrapper contract snapshot; item: ${id}`];
   if (category === 'example') return ['P2', 'later', 'compatibility', 'registration', `current-latest example is registered unless promoted into P0/P1 corpus; item: ${id}`];
   if (category === 'docs') return ['P2', 'later', 'compatibility', 'registration', `current-latest documented workflow is registered until mapped to executable evidence; item: ${id}`];
+  if (category === 'integration') return ['P2', 'later', 'compatibility', 'registration', `current-latest external integration is registered until promoted with fixture or authority evidence; item: ${id}`];
+  if (category === 'cloud-share') return ['P2', 'unsupported', 'compatibility', 'registration', `current-latest cloud/share surface remains local-first unsupported unless legal brand and service authority are provided; item: ${id}`];
   return ['P0', 'blocked', 'compatibility', 'blocker', `current-latest source row is unclassified and must be mapped before any perfect-refactor claim; item: ${id}`];
 }
 
 function evidenceReference(category, id) {
-  if (category === 'provider' || category === 'config' || category === 'unclassified') return `blocker:${id}`;
-  if (category === 'example' || category === 'docs') return `registration:${id}`;
+  if (['provider', 'config', 'eval-runner', 'cache-store', 'prompt-processing', 'script-bridge', 'unclassified'].includes(category)) return `blocker:${id}`;
+  if (['example', 'docs', 'integration', 'cloud-share'].includes(category)) return `registration:${id}`;
   return `snapshot:${id}`;
 }
 

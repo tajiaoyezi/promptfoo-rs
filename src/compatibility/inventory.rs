@@ -2071,6 +2071,8 @@ fn is_redteam_strategy_file(file: &str) -> bool {
 
 fn is_viewer_file(file: &str) -> bool {
     file.starts_with("src/app/")
+        || file.starts_with("src/server/")
+        || file.starts_with("src/openapi/")
 }
 
 fn is_example_file(file: &str) -> bool {
@@ -2098,6 +2100,109 @@ fn is_p0_provider_file(file: &str) -> bool {
     ]
     .iter()
     .any(|prefix| file.starts_with(prefix))
+}
+
+fn is_eval_runtime_file(file: &str) -> bool {
+    is_ts_or_js_file(file)
+        && (matches!(
+            file,
+            "src/evaluate.ts"
+                | "src/evaluator.ts"
+                | "src/evaluatorHelpers.ts"
+                | "src/testCase.ts"
+        ) || file.starts_with("src/scheduler/")
+            || file.starts_with("src/testCase/")
+            || file.starts_with("src/optimizer/"))
+}
+
+fn is_cache_store_file(file: &str) -> bool {
+    is_ts_or_js_file(file)
+        && (file == "src/cache.ts"
+            || file.starts_with("src/database/")
+            || file.starts_with("src/storage/"))
+}
+
+fn is_prompt_processing_file(file: &str) -> bool {
+    is_ts_or_js_file(file)
+        && (file.starts_with("src/prompts/")
+            || file.starts_with("src/external/prompts/")
+            || file.starts_with("src/optimizer/"))
+}
+
+fn is_assertion_support_file(file: &str) -> bool {
+    is_ts_or_js_file(file)
+        && (file.starts_with("src/matchers/")
+            || file.starts_with("src/external/matchers/")
+            || file.starts_with("src/external/assertions/")
+            || matches!(file, "src/remoteGrading.ts" | "src/remoteScoring.ts" | "src/guardrails.ts"))
+}
+
+fn is_redteam_support_file(file: &str) -> bool {
+    file.starts_with("src/redteam/") && is_ts_or_js_file(file)
+}
+
+fn is_schema_file(file: &str) -> bool {
+    is_ts_or_js_file(file)
+        && (file == "src/contracts.ts"
+            || file.starts_with("src/types/")
+            || file.starts_with("src/contracts/")
+            || file.starts_with("src/models/")
+            || file.starts_with("src/validators/"))
+}
+
+fn is_script_bridge_file(file: &str) -> bool {
+    is_ts_or_js_file(file) && (file.starts_with("src/python/") || file.starts_with("src/ruby/"))
+}
+
+fn is_import_export_file(file: &str) -> bool {
+    is_ts_or_js_file(file)
+        && (file.starts_with("src/importers/") || file.starts_with("src/util/exportToFile/"))
+}
+
+fn is_integration_file(file: &str) -> bool {
+    is_ts_or_js_file(file)
+        && (file.starts_with("src/integrations/")
+            || matches!(file, "src/googleSheets.ts" | "src/microsoftSharepoint.ts"))
+}
+
+fn is_cloud_share_file(file: &str) -> bool {
+    is_ts_or_js_file(file)
+        && (matches!(
+            file,
+            "src/share.ts"
+                | "src/feedback.ts"
+                | "src/onboarding.ts"
+                | "src/suggestions.ts"
+                | "src/telemetry.ts"
+                | "src/telemetryEvents.ts"
+                | "src/updates.ts"
+        ) || file.starts_with("src/updates/"))
+}
+
+fn is_blob_store_file(file: &str) -> bool {
+    file.starts_with("src/blobs/") && is_ts_or_js_file(file)
+}
+
+fn is_runtime_support_file(file: &str) -> bool {
+    is_ts_or_js_file(file)
+        && (file.starts_with("src/util/")
+            || file.starts_with("src/constants/")
+            || file.starts_with("src/__mocks__/")
+            || matches!(
+                file,
+                "src/cliState.ts"
+                    | "src/constants.ts"
+                    | "src/entrypoint.ts"
+                    | "src/envars.ts"
+                    | "src/envOverrides.ts"
+                    | "src/esm.ts"
+                    | "src/logger.ts"
+                    | "src/logger.browser.ts"
+                    | "src/mainUtils.ts"
+                    | "src/migrate.ts"
+                    | "src/table.ts"
+                    | "src/version.ts"
+            ))
 }
 
 fn is_ts_or_js_file(file: &str) -> bool {
@@ -2382,6 +2487,42 @@ fn current_latest_file_categories(file: &str) -> Vec<&'static str> {
     if is_docs_file(file) {
         categories.push("docs");
     }
+    if categories.is_empty() && is_eval_runtime_file(file) {
+        categories.push("eval-runner");
+    }
+    if categories.is_empty() && is_cache_store_file(file) {
+        categories.push("cache-store");
+    }
+    if categories.is_empty() && is_prompt_processing_file(file) {
+        categories.push("prompt-processing");
+    }
+    if categories.is_empty() && is_assertion_support_file(file) {
+        categories.push("assertion-support");
+    }
+    if categories.is_empty() && is_redteam_support_file(file) {
+        categories.push("redteam-support");
+    }
+    if categories.is_empty() && is_schema_file(file) {
+        categories.push("schema");
+    }
+    if categories.is_empty() && is_script_bridge_file(file) {
+        categories.push("script-bridge");
+    }
+    if categories.is_empty() && is_import_export_file(file) {
+        categories.push("import-export");
+    }
+    if categories.is_empty() && is_integration_file(file) {
+        categories.push("integration");
+    }
+    if categories.is_empty() && is_cloud_share_file(file) {
+        categories.push("cloud-share");
+    }
+    if categories.is_empty() && is_blob_store_file(file) {
+        categories.push("blob-store");
+    }
+    if categories.is_empty() && is_runtime_support_file(file) {
+        categories.push("runtime-support");
+    }
     if categories.is_empty() && file.starts_with("src/") && is_ts_or_js_file(file) {
         categories.push("unclassified");
     }
@@ -2522,6 +2663,38 @@ fn current_latest_default_metadata(
             stable_id,
             "current-latest config surface requires fixture evidence",
         ),
+        "eval-runner" => current_latest_metadata(
+            "P0",
+            "blocked",
+            "eval-runner",
+            "blocker",
+            stable_id,
+            "current-latest eval runtime requires fixture evidence",
+        ),
+        "cache-store" => current_latest_metadata(
+            "P0",
+            "blocked",
+            "cache-resume-store",
+            "blocker",
+            stable_id,
+            "current-latest cache and result store surface requires fixture evidence",
+        ),
+        "prompt-processing" => current_latest_metadata(
+            "P0",
+            "blocked",
+            "config-loader",
+            "blocker",
+            stable_id,
+            "current-latest prompt processing surface requires fixture evidence",
+        ),
+        "script-bridge" => current_latest_metadata(
+            "P0",
+            "blocked",
+            "script-bridge",
+            "blocker",
+            stable_id,
+            "current-latest script bridge surface requires authorized subprocess fixture evidence",
+        ),
         "viewer" => current_latest_metadata(
             "P1",
             "later",
@@ -2529,6 +2702,54 @@ fn current_latest_default_metadata(
             "snapshot",
             stable_id,
             "current-latest viewer surface requires data-contract or browser snapshot",
+        ),
+        "assertion-support" => current_latest_metadata(
+            "P1",
+            "later",
+            "assertion-engine",
+            "snapshot",
+            stable_id,
+            "current-latest assertion support surface requires matcher or grading snapshot evidence",
+        ),
+        "redteam-support" => current_latest_metadata(
+            "P1",
+            "later",
+            "redteam-engine",
+            "snapshot",
+            stable_id,
+            "current-latest redteam support surface requires registry or behavior snapshot evidence",
+        ),
+        "schema" => current_latest_metadata(
+            "P1",
+            "later",
+            "protocol",
+            "snapshot",
+            stable_id,
+            "current-latest schema/model/contract surface requires protocol snapshot evidence",
+        ),
+        "import-export" => current_latest_metadata(
+            "P1",
+            "later",
+            "output-writers",
+            "snapshot",
+            stable_id,
+            "current-latest import/export surface requires conversion snapshot evidence",
+        ),
+        "blob-store" => current_latest_metadata(
+            "P1",
+            "later",
+            "eval-runner",
+            "snapshot",
+            stable_id,
+            "current-latest blob and media storage surface requires data-contract snapshot evidence",
+        ),
+        "runtime-support" => current_latest_metadata(
+            "P1",
+            "later",
+            "runtime",
+            "snapshot",
+            stable_id,
+            "current-latest runtime support surface requires deterministic snapshot evidence",
         ),
         "node-api" => current_latest_metadata(
             "P1",
@@ -2553,6 +2774,22 @@ fn current_latest_default_metadata(
             "registration",
             stable_id,
             "current-latest documented workflow is registered until mapped to executable evidence",
+        ),
+        "integration" => current_latest_metadata(
+            "P2",
+            "later",
+            "compatibility",
+            "registration",
+            stable_id,
+            "current-latest external integration is registered until promoted with fixture or authority evidence",
+        ),
+        "cloud-share" => current_latest_metadata(
+            "P2",
+            "unsupported",
+            "compatibility",
+            "registration",
+            stable_id,
+            "current-latest cloud/share surface remains local-first unsupported unless legal brand and service authority are provided",
         ),
         _ => current_latest_metadata(
             "P0",
@@ -2584,8 +2821,11 @@ fn current_latest_metadata(
 
 fn default_evidence_reference(category: &str, stable_id: &str) -> String {
     match category {
-        "provider" | "config" | "unclassified" => format!("blocker:{stable_id}"),
-        "example" | "docs" => format!("registration:{stable_id}"),
+        "provider" | "config" | "eval-runner" | "cache-store" | "prompt-processing"
+        | "script-bridge" | "unclassified" => format!("blocker:{stable_id}"),
+        "example" | "docs" | "integration" | "cloud-share" => {
+            format!("registration:{stable_id}")
+        }
         _ => format!("snapshot:{stable_id}"),
     }
 }
