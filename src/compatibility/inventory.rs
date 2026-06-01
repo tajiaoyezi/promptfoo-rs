@@ -2106,10 +2106,7 @@ fn is_eval_runtime_file(file: &str) -> bool {
     is_ts_or_js_file(file)
         && (matches!(
             file,
-            "src/evaluate.ts"
-                | "src/evaluator.ts"
-                | "src/evaluatorHelpers.ts"
-                | "src/testCase.ts"
+            "src/evaluate.ts" | "src/evaluator.ts" | "src/evaluatorHelpers.ts" | "src/testCase.ts"
         ) || file.starts_with("src/scheduler/")
             || file.starts_with("src/testCase/")
             || file.starts_with("src/optimizer/"))
@@ -2134,7 +2131,10 @@ fn is_assertion_support_file(file: &str) -> bool {
         && (file.starts_with("src/matchers/")
             || file.starts_with("src/external/matchers/")
             || file.starts_with("src/external/assertions/")
-            || matches!(file, "src/remoteGrading.ts" | "src/remoteScoring.ts" | "src/guardrails.ts"))
+            || matches!(
+                file,
+                "src/remoteGrading.ts" | "src/remoteScoring.ts" | "src/guardrails.ts"
+            ))
 }
 
 fn is_redteam_support_file(file: &str) -> bool {
