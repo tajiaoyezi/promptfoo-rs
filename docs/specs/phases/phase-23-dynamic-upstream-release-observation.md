@@ -1,6 +1,6 @@
 # Phase 23: dynamic-upstream-release-observation
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,10 +28,10 @@ Phase 21/22 已经把 npm core package、GitHub HEAD、GitHub release channel �
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `upstream-distribution-target.sh` 从 `UPSTREAM_GITHUB_RELEASE_FILE` fixture 或 GitHub latest release metadata 动态解析 latest release tag。
-- [ ] `upstream-distribution-target.json.github.source` 记录实际查询的 latest release ref，而不是固定 `refs/tags/code-scan-action-0.1.7`。
-- [ ] 当动态 latest release 不是 npm core package release，`github_latest_release_is_core_package=false` 且 `current_repository_perfect_claim_allowed=false` 保持不变。
-- [ ] runtime smoke、target-policy、matrix、audit 和 BLOCKED 留痕说明该 phase 只刷新 release observation，不解除 external/publication/current blockers。
+- [x] `upstream-distribution-target.sh` 从 `UPSTREAM_GITHUB_RELEASE_FILE` fixture 或 GitHub latest release metadata 动态解析 latest release tag。
+- [x] `upstream-distribution-target.json.github.source` 记录实际查询的 latest release ref，而不是固定 `refs/tags/code-scan-action-0.1.7`。
+- [x] 当动态 latest release 不是 npm core package release，`github_latest_release_is_core_package=false` 且 `current_repository_perfect_claim_allowed=false` 保持不变。
+- [x] runtime smoke、target-policy、matrix、audit 和 BLOCKED 留痕说明该 phase 只刷新 release observation，不解除 external/publication/current blockers。
 
 ## 7. Phase Risks
 
@@ -45,7 +45,7 @@ task 23.1 Done 后，执行 phase §6 smoke：`s2v_verify_full "install lint typ
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **保留边界**：<TBD-after-impl>
+- **完成日期**：2026-06-01
+- **Phase smoke**：PASS — `s2v_preflight_phase docs/specs/phases/phase-23-dynamic-upstream-release-observation.md` passed, then `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` passed all 9 keys.
+- **Artifact evidence**：latest runtime smoke generated `target/release-gates/upstream-distribution-target.json` with `status=ready-with-drift`, npm core `0.121.13` / `4860e990c7e9a2f8f677173fb92cf9867b34d03f`, GitHub HEAD `0b93733d48727be67e34433cb0fb1ad21026863a`, dynamic latest release ref `refs/tags/code-scan-action-0.1.7`, `github_latest_release_channel=github-action`, `github_latest_release_is_core_package=false`, and `current_repository_perfect_claim_allowed=false`. `perfect-refactor-claim.json` remains `perfect_refactor_claim_allowed=false`; `perfect-refactor-unblock-packet.json` remains `status=blocked`, `auto_resolvable=false`, `required_user_decision_count=29`, and `current_upstream_rebaseline_required=true`.
+- **保留边界**：Phase 23 only refreshes dynamic latest release observation. It does not change the frozen compatibility target, waive external authority blockers, publish artifacts, or satisfy current-upstream same-ref rebaseline evidence.
