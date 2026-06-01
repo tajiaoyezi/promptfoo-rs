@@ -41,3 +41,18 @@
   - `target/release-gates/source-inventory-evidence.json`
   - `target/release-gates/upstream-distribution-target.json`
   - `target/release-gates/publication-authority.json`
+
+## Resume audit — 2026-06-01
+
+- Resumed blocked audit count: 1 of 3 for the same external evidence blocker after the goal was reactivated.
+- Fresh commands:
+  - `npm view promptfoo version gitHead dist.tarball dist.integrity time.modified --json`
+  - `git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/0.121.13 refs/tags/code-scan-action-0.1.7`
+  - `bash scripts/release/runtime-smoke.sh`
+- Fresh evidence:
+  - npm core remains `promptfoo@0.121.13` with `gitHead=4860e990c7e9a2f8f677173fb92cf9867b34d03f` and the frozen sha512 integrity.
+  - GitHub repository `HEAD` is now `0b93733d48727be67e34433cb0fb1ad21026863a`, which still differs from the npm core gitHead / frozen baseline.
+  - `target/release-gates/upstream-distribution-target.json` remains `status=ready-with-drift`, `npm_core_matches_frozen_baseline=true`, `repository_head_matches_npm_core=false`, `github_latest_release_is_core_package=false`, `current_repository_perfect_claim_allowed=false`.
+  - `target/release-gates/perfect-refactor-claim.json` remains `perfect_refactor_claim_allowed=false`, `local_stable_allowed=true`, `published=false`, `publication_ready=credential-blocked`, `source_p0_accounting_blocker_count=22`, `external_authority_blocker_count=21`.
+  - `target/release-gates/perfect-refactor-unblock-packet.json` remains `status=blocked`, `auto_resolvable=false`, `required_user_decision_count=29`, `current_upstream_rebaseline_required=true`.
+- Decision: no new Ready task is justified from this evidence. The only valid next implementation work requires user-provided external authority evidence, publication credentials/approval, approved waivers, or a same-ref current-upstream rebaseline scope.
