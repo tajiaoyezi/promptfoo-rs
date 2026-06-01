@@ -37,6 +37,7 @@
 #   - docs/specs/tasks/task-24.2-current-latest-source-inventory-reextract.md
 #   - docs/specs/tasks/task-24.3-current-latest-full-function-golden-corpus.md
 #   - docs/specs/tasks/task-24.4-current-latest-exhaustive-quality-gate.md
+#   - docs/specs/tasks/task-25.1-current-latest-source-taxonomy-burndown.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -236,3 +237,11 @@ Feature: perfect refactor parity
     And TEST-24.4.2 proves wording that claims no possible bugs is rejected
     And TEST-24.4.3 proves the perfect refactor claim remains false while any current target external publication or corpus evidence is missing
     And TEST-24.4.4 proves local readiness can pass while public perfect-refactor completion remains blocked by external or publication authority
+
+  Scenario: SCEN-25.1.1 - current latest source taxonomy has no unknown rows
+    Given Phase 24 quality evidence reports current-latest source inventory and matrix unclassified rows
+    When the current-latest source taxonomy burndown runs against the locked target packet
+    Then TEST-25.1.1 proves representative previously unknown source families become classified capability rows
+    And TEST-25.1.2 proves P0 P1 and P2 levels keep their required evidence semantics
+    And TEST-25.1.3 proves source inventory and matrix artifacts have no unclassified rows
+    And TEST-25.1.4 proves remaining perfect-refactor blockers stay explicit instead of being hidden by taxonomy cleanup

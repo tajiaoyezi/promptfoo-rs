@@ -153,6 +153,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 22 | perfect-refactor-unblock-packet | docs/specs/phases/phase-22-perfect-refactor-unblock-packet.md | Done | 1 | N/A (solo) |
 | 23 | dynamic-upstream-release-observation | docs/specs/phases/phase-23-dynamic-upstream-release-observation.md | Done | 1 | N/A (solo) |
 | 24 | current-latest-perfect-refactor | docs/specs/phases/phase-24-current-latest-perfect-refactor.md | Done | 4 | N/A (solo) |
+| 25 | current-latest-source-taxonomy-burndown | docs/specs/phases/phase-25-current-latest-source-taxonomy-burndown.md | Ready | 1 | N/A (solo) |
 
 ## Task 总索引
 
@@ -217,6 +218,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 24.2 | compatibility-inventory | docs/specs/tasks/task-24.2-current-latest-source-inventory-reextract.md | Done | Phase 24 order 2 | N/A (solo) |
 | 24.3 | compatibility-harness | docs/specs/tasks/task-24.3-current-latest-full-function-golden-corpus.md | Done | Phase 24 order 3 | N/A (solo) |
 | 24.4 | release-quality | docs/specs/tasks/task-24.4-current-latest-exhaustive-quality-gate.md | Done | Phase 24 order 4 | N/A (solo) |
+| 25.1 | compatibility-inventory | docs/specs/tasks/task-25.1-current-latest-source-taxonomy-burndown.md | Ready | Phase 25 order 1 | N/A (solo) |
 
 ## ADR 索引
 
@@ -253,4 +255,4 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 8.2 | test/features/scan-engine.feature |
 | 9.1 | test/features/script-bridge.feature |
 | 10.1 | test/features/web-viewer.feature |
-| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5, 18.1, 18.2, 18.3, 18.4, 19.1, 19.2, 19.3, 19.4, 20.1, 20.2, 21.1, 22.1, 23.1, 24.1, 24.2, 24.3, 24.4 | test/features/perfect-refactor-parity.feature |
+| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5, 18.1, 18.2, 18.3, 18.4, 19.1, 19.2, 19.3, 19.4, 20.1, 20.2, 21.1, 22.1, 23.1, 24.1, 24.2, 24.3, 24.4, 25.1 | test/features/perfect-refactor-parity.feature |

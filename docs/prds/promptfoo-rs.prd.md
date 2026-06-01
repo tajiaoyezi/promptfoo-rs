@@ -255,6 +255,7 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 22 | perfect-refactor-unblock-packet | 将 Phase 21 后仍阻止 perfect-refactor claim 的 source/external/current/publication blockers 聚合成最小用户/维护者决策包，明确哪些项无法由 agent 自动解决 | `src/release.rs` + `scripts/release/perfect-refactor-unblock-packet.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `docs/release.md` + `docs/compatibility/` + `docs/audits/` + `tests/` | 21 | 否 |
 | 23 | dynamic-upstream-release-observation | 修正 upstream distribution target gate 的 GitHub latest release 观测方式：不再把 `code-scan-action-0.1.7` 当固定 latest，而是从 GitHub latest release metadata 动态解析 release tag 并写入 source evidence | `scripts/release/upstream-distribution-target.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `tests/upstream_distribution_target_gate.rs` + `docs/compatibility/target-policy.md` + `docs/compatibility/matrix.md` + `docs/audits/` | 22 | 否 |
 | 24 | current-latest-perfect-refactor | 依据用户澄清，把目标切到原始 promptfoo 当前最新完整功能：锁定 current-latest target、重抽 source inventory、扩展 250+ 或全量 golden corpus，并新增大规模质量 gate | `docs/compatibility/current-latest.lock.md` + `compatibility/inventory/` + `compatibility/matrix/` + `compatibility/fixtures/current-latest/` + `compatibility/artifacts/current-latest/` + `src/compatibility/` + `src/release.rs` + `scripts/release/` + `tests/` | 23 | 否 |
+| 25 | current-latest-source-taxonomy-burndown | 消费 Phase 24 质量门暴露的 318 个 current-latest unclassified source/matrix rows：按 PRD 模块边界和 ADR-009 分级规则给出 deterministic taxonomy、owner、evidence kind，并保留真实 P0/external/publication blockers | `src/compatibility/inventory.rs` + `scripts/release/current-latest-source-inventory.sh` + `scripts/release/current-latest-golden-corpus.sh` + `scripts/release/current-latest-quality-gate.sh` + `target/release-gates/` + `tests/current_latest_source_taxonomy_burndown.rs` + `test/features/perfect-refactor-parity.feature` | 24 | 否 |
 
 > Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
 >
@@ -273,6 +274,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 22 是 2026-05-31 Phase 21 后的 unblock handoff 链路，依据 task 20.2 / 21.1 仍保留的 source、external-authority、publication-authority 和 current-upstream blockers。它不把外部授权、真实凭据、法律/品牌确认或公开发布证据伪造成完成，而是生成机器可审计的最小决策包，让 perfect-refactor claim 的剩余条件可交接、可验证、可阻塞。
 >
 > Phase 23 是 2026-06-01 恢复审计发现的 upstream evidence freshness 链路，依据 task 21.1 的 “GitHub latest release tag” 语义和 BLOCKED-task-22.1 的 resumed audit。它不解除 current-upstream blocker，而是让 latest release 观测不再依赖硬编码 tag，避免过期 release-channel evidence 影响 perfect-refactor blocker 判断。
+>
+> Phase 25 是 2026-06-02 Phase 24 smoke 后的 current-latest taxonomy burndown 链路，依据 `target/release-gates/current-latest-quality.json` 中 source-inventory/matrix/golden blockers。它不把 P0 fixture、external authority 或 publication blocker 改名为完成，而是先消除 318 个 unknown rows，让后续 native/bridge/external burndown 有可审计 owner 和 evidence kind。
 
 ---
 
