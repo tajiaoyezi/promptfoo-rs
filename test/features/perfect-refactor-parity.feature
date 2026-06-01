@@ -234,3 +234,5 @@ Feature: perfect refactor parity
     When current latest quality gate runs
     Then TEST-24.4.1 proves adapter golden corpus source coverage regression stress property runtime smoke and release blockers are aggregated
     And TEST-24.4.2 proves wording that claims no possible bugs is rejected
+    And TEST-24.4.3 proves the perfect refactor claim remains false while any current target external publication or corpus evidence is missing
+    And TEST-24.4.4 proves local readiness can pass while public perfect-refactor completion remains blocked by external or publication authority

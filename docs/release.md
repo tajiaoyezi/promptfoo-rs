@@ -81,6 +81,12 @@ Task 22.1 adds `target/release-gates/perfect-refactor-unblock-packet.json` and l
 
 Every unblock item records `required_actor`, `required_evidence`, `source_artifact`, `release_impact`, and `auto_resolvable=false`. Dry-run installability, local fixture coverage, and frozen-baseline local stable readiness do not satisfy these items. The packet must remain `status=blocked` and `auto_resolvable=false` while credentials, account/product authority, current-upstream same-ref evidence, legal/brand approval, or external publication URL/digest evidence are absent.
 
+## Current Latest Quality Gate
+
+Task 24.4 adds `target/release-gates/current-latest-quality.json` and links it from `target/release-gates/release-candidate.json.current_latest_quality`. The report aggregates adapter verification, current-latest source inventory, current-latest matrix, golden corpus, deterministic regression/stress/property checks, runtime smoke, external authority, publication authority, and claim wording.
+
+The only permitted quality wording is `no known release-blocking defects under declared gates`. The gate rejects phrases such as `no potential bugs`, `zero possible bugs`, and `bug-free`; local current-latest readiness can become true only when all local current-latest gates pass, while public perfect-refactor completion remains blocked until external authority and publication authority are ready.
+
 ## S2V Release Checklist
 
 1. Run the compatibility release gate.

@@ -677,26 +677,330 @@ pub struct CurrentLatestQualityReport {
 }
 
 pub fn build_current_latest_quality_report(
-    _inputs: CurrentLatestQualityInputs,
+    inputs: CurrentLatestQualityInputs,
 ) -> CurrentLatestQualityReport {
+    let allowed_claim_wording =
+        "no known release-blocking defects under declared gates".to_string();
+    let forbidden_claim_examples = vec![
+        "no potential bugs".to_string(),
+        "zero possible bugs".to_string(),
+        "bug-free".to_string(),
+        "no possible bugs".to_string(),
+    ];
+    let mut gate_statuses = BTreeMap::new();
+    gate_statuses.insert(
+        "adapter".to_string(),
+        inputs.adapter_verification_status.clone(),
+    );
+    gate_statuses.insert(
+        "source_inventory".to_string(),
+        inputs.source_inventory_status.clone(),
+    );
+    gate_statuses.insert(
+        "current_latest_matrix".to_string(),
+        inputs.matrix_status.clone(),
+    );
+    gate_statuses.insert(
+        "golden_corpus".to_string(),
+        inputs.golden_corpus_status.clone(),
+    );
+    gate_statuses.insert("regression".to_string(), inputs.regression_status.clone());
+    gate_statuses.insert("stress".to_string(), inputs.stress_status.clone());
+    gate_statuses.insert("property".to_string(), inputs.property_status.clone());
+    gate_statuses.insert(
+        "runtime_smoke".to_string(),
+        inputs.runtime_smoke_status.clone(),
+    );
+    gate_statuses.insert(
+        "current_target".to_string(),
+        inputs.current_target_status.clone(),
+    );
+    gate_statuses.insert(
+        "external_authority".to_string(),
+        inputs.external_authority_status.clone(),
+    );
+    gate_statuses.insert(
+        "publication_authority".to_string(),
+        publication_readiness_status(inputs.publication_ready).to_string(),
+    );
+
+    let mut blockers = Vec::new();
+    if !is_ready_status(&inputs.adapter_verification_status) {
+        blockers.push(quality_blocker(
+            "current-latest:adapter-verification",
+            "adapter",
+            "target/release-gates/release-candidate.json",
+            format!(
+                "adapter verification status is {}",
+                inputs.adapter_verification_status
+            ),
+            "Run and pass all adapter verification commands before making a quality claim",
+        ));
+    }
+    if !is_ready_status(&inputs.source_inventory_status)
+        || inputs.source_inventory_unclassified_count > 0
+    {
+        blockers.push(quality_blocker(
+            "current-latest:source-inventory",
+            "source-inventory",
+            quality_source_artifact(
+                &inputs.source_artifacts,
+                "current-latest-source-inventory.json",
+            ),
+            format!(
+                "source inventory status={} unclassified_rows={}",
+                inputs.source_inventory_status, inputs.source_inventory_unclassified_count
+            ),
+            "Classify every current-latest source row and attach fixture, snapshot, blocker, or waiver evidence",
+        ));
+    }
+    if !is_ready_status(&inputs.matrix_status) || inputs.matrix_unclassified_count > 0 {
+        blockers.push(quality_blocker(
+            "current-latest:matrix",
+            "current-latest-matrix",
+            quality_source_artifact(&inputs.source_artifacts, "current-latest-matrix.json"),
+            format!(
+                "current-latest matrix status={} unclassified_rows={}",
+                inputs.matrix_status, inputs.matrix_unclassified_count
+            ),
+            "Reconcile every current-latest matrix row to P0/P1/P2 evidence before claiming completeness",
+        ));
+    }
+    if !is_ready_status(&inputs.golden_corpus_status) || inputs.golden_corpus_blocker_count > 0 {
+        blockers.push(quality_blocker(
+            "current-latest:golden-corpus",
+            "golden-corpus",
+            quality_source_artifact(
+                &inputs.source_artifacts,
+                "current-latest-golden-corpus.json",
+            ),
+            format!(
+                "golden corpus status={} blocker_count={}",
+                inputs.golden_corpus_status, inputs.golden_corpus_blocker_count
+            ),
+            "Resolve P0 golden diff blockers and missing P1/P2 evidence before claiming current-latest parity",
+        ));
+    }
+    push_status_blocker(
+        &mut blockers,
+        "current-latest:regression",
+        "regression",
+        "target/release-gates/current-latest-quality.json",
+        &inputs.regression_status,
+        "Run deterministic regression tests and fix any failing release-critical regression",
+    );
+    push_status_blocker(
+        &mut blockers,
+        "current-latest:stress",
+        "stress",
+        "target/release-gates/current-latest-quality.json",
+        &inputs.stress_status,
+        "Run deterministic stress tests and fix any failing release-critical stress case",
+    );
+    push_status_blocker(
+        &mut blockers,
+        "current-latest:property",
+        "property",
+        "target/release-gates/current-latest-quality.json",
+        &inputs.property_status,
+        "Run deterministic property-style tests and fix any failing invariant",
+    );
+    push_status_blocker(
+        &mut blockers,
+        "current-latest:runtime-smoke",
+        "runtime-smoke",
+        "target/release-gates/release-candidate.json",
+        &inputs.runtime_smoke_status,
+        "Run runtime smoke and fix any release candidate failure",
+    );
+    if !is_ready_status(&inputs.current_target_status) || !inputs.current_target_claim_allowed {
+        blockers.push(quality_blocker(
+            "current-latest:target",
+            "current-target",
+            quality_source_artifact(&inputs.source_artifacts, "current-latest-target.json"),
+            format!(
+                "current target status={} claim_allowed={}",
+                inputs.current_target_status, inputs.current_target_claim_allowed
+            ),
+            "Provide a locked current-latest target packet shared by source, matrix, corpus, and release evidence",
+        ));
+    }
+    if !is_ready_status(&inputs.external_authority_status)
+        || inputs.external_authority_blocker_count > 0
+    {
+        blockers.push(quality_blocker(
+            "current-latest:external-authority",
+            "external-authority",
+            quality_source_artifact(&inputs.source_artifacts, "external-authority-blockers.json"),
+            format!(
+                "external authority status={} blocker_count={}",
+                inputs.external_authority_status, inputs.external_authority_blocker_count
+            ),
+            "Resolve live provider, account, private service, legal, or brand authority gaps with external evidence or formal waivers",
+        ));
+    }
+    if inputs.publication_ready != PublicationReadiness::Ready {
+        blockers.push(quality_blocker(
+            "current-latest:publication-authority",
+            "publication-authority",
+            quality_source_artifact(&inputs.source_artifacts, "publication-authority.json"),
+            format!(
+                "publication authority status={}",
+                publication_readiness_status(inputs.publication_ready)
+            ),
+            "Provide authorized publication credentials, legal/brand approval, and external URL/digest evidence",
+        ));
+    }
+    if forbidden_quality_claim(&inputs.requested_claim_wording) {
+        blockers.push(quality_blocker(
+            "current-latest:claim-wording",
+            "claim-wording",
+            quality_source_artifact(&inputs.source_artifacts, "perfect-refactor-claim.json"),
+            format!(
+                "forbidden claim wording: {}",
+                inputs.requested_claim_wording
+            ),
+            "Use only: no known release-blocking defects under declared gates",
+        ));
+    }
+
+    let local_current_latest_ready = inputs.local_stable_allowed
+        && is_ready_status(&inputs.adapter_verification_status)
+        && is_ready_status(&inputs.source_inventory_status)
+        && inputs.source_inventory_unclassified_count == 0
+        && is_ready_status(&inputs.matrix_status)
+        && inputs.matrix_unclassified_count == 0
+        && is_ready_status(&inputs.golden_corpus_status)
+        && inputs.golden_corpus_blocker_count == 0
+        && is_ready_status(&inputs.regression_status)
+        && is_ready_status(&inputs.stress_status)
+        && is_ready_status(&inputs.property_status)
+        && is_ready_status(&inputs.runtime_smoke_status)
+        && is_ready_status(&inputs.current_target_status)
+        && inputs.current_target_claim_allowed
+        && !forbidden_quality_claim(&inputs.requested_claim_wording);
+    let public_authority_ready = is_ready_status(&inputs.external_authority_status)
+        && inputs.external_authority_blocker_count == 0
+        && inputs.publication_ready == PublicationReadiness::Ready;
+    let perfect_refactor_claim_allowed = local_current_latest_ready
+        && public_authority_ready
+        && blockers.is_empty()
+        && inputs.requested_claim_wording == allowed_claim_wording;
+
     CurrentLatestQualityReport {
         schema: "promptfoo-rs.current-latest-quality.v1".to_string(),
-        gate_statuses: BTreeMap::new(),
-        local_stable_allowed: false,
-        local_current_latest_ready: false,
-        perfect_refactor_claim_allowed: false,
-        allowed_claim_wording: String::new(),
-        forbidden_claim_examples: Vec::new(),
-        blockers: Vec::new(),
-        source_artifacts: Vec::new(),
+        gate_statuses,
+        local_stable_allowed: inputs.local_stable_allowed,
+        local_current_latest_ready,
+        perfect_refactor_claim_allowed,
+        allowed_claim_wording,
+        forbidden_claim_examples,
+        blockers,
+        source_artifacts: inputs.source_artifacts,
     }
 }
 
 pub fn evaluate_current_latest_claim(
-    _report: &CurrentLatestQualityReport,
-    _claim: &PerfectRefactorClaimContract,
+    report: &CurrentLatestQualityReport,
+    claim: &PerfectRefactorClaimContract,
 ) -> Result<(), ReleaseBlocker> {
+    if let Some(blocker) = report.blockers.first() {
+        return Err(blocker.clone());
+    }
+    if !report.perfect_refactor_claim_allowed {
+        return Err(quality_blocker(
+            "current-latest:claim-disabled",
+            "current-latest-quality",
+            "target/release-gates/current-latest-quality.json",
+            "current-latest quality report does not allow perfect-refactor claim",
+            "Resolve every local, current target, external authority, publication, and wording blocker",
+        ));
+    }
+    if !claim.perfect_refactor_claim_allowed {
+        return Err(claim.blockers.first().cloned().unwrap_or_else(|| {
+            quality_blocker(
+                "perfect-refactor:claim-disabled",
+                "perfect-refactor-claim",
+                "target/release-gates/perfect-refactor-claim.json",
+                "perfect-refactor claim contract does not allow the claim",
+                "Resolve the upstream perfect-refactor claim contract blockers",
+            )
+        }));
+    }
     Ok(())
+}
+
+fn push_status_blocker(
+    blockers: &mut Vec<ReleaseBlocker>,
+    item_id: &str,
+    category: &str,
+    source_artifact: &str,
+    status: &str,
+    required_decision: &str,
+) {
+    if !is_ready_status(status) {
+        blockers.push(quality_blocker(
+            item_id,
+            category,
+            source_artifact,
+            format!("{category} status is {status}"),
+            required_decision,
+        ));
+    }
+}
+
+fn quality_blocker(
+    item_id: &str,
+    category: &str,
+    source_artifact: impl Into<String>,
+    reason: impl Into<String>,
+    required_decision: &str,
+) -> ReleaseBlocker {
+    ReleaseBlocker {
+        item_id: item_id.to_string(),
+        category: category.to_string(),
+        source_artifact: source_artifact.into(),
+        reason: reason.into(),
+        required_decision: required_decision.to_string(),
+    }
+}
+
+fn quality_source_artifact(source_artifacts: &[String], needle: &str) -> String {
+    source_artifacts
+        .iter()
+        .find(|artifact| artifact.ends_with(needle))
+        .cloned()
+        .unwrap_or_else(|| format!("target/release-gates/{needle}"))
+}
+
+fn is_ready_status(status: &str) -> bool {
+    status.eq_ignore_ascii_case("ready")
+}
+
+fn publication_readiness_status(status: PublicationReadiness) -> &'static str {
+    match status {
+        PublicationReadiness::Ready => "ready",
+        PublicationReadiness::CredentialBlocked => "credential-blocked",
+        PublicationReadiness::Blocked => "blocked",
+    }
+}
+
+fn forbidden_quality_claim(wording: &str) -> bool {
+    let normalized = wording.to_lowercase();
+    [
+        "no potential bug",
+        "no potential bugs",
+        "zero possible bug",
+        "zero possible bugs",
+        "no possible bug",
+        "no possible bugs",
+        "zero bugs",
+        "no bugs",
+        "bug-free",
+        "bug free",
+    ]
+    .iter()
+    .any(|forbidden| normalized.contains(forbidden))
 }
 
 pub fn write_current_latest_quality_report(

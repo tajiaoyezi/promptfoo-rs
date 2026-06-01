@@ -79,8 +79,9 @@ fn test_24_4_1_quality_report_aggregates_current_latest_release_gates() {
 #[test]
 fn test_24_4_2_claim_wording_rejects_impossible_bug_promises() {
     /* TEST-24.4.2 */
-    let allowed =
-        build_current_latest_quality_report(ready_inputs("no known release-blocking defects under declared gates"));
+    let allowed = build_current_latest_quality_report(ready_inputs(
+        "no known release-blocking defects under declared gates",
+    ));
     assert!(
         !allowed
             .blockers

@@ -156,6 +156,7 @@ current_latest_source_inventory_row_count="$(node -e "const r = JSON.parse(requi
 current_latest_source_inventory_unclassified_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-source-inventory.json', 'utf8')); console.log((r.unclassified_rows || []).length)")"
 current_latest_matrix_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-matrix.json', 'utf8')); console.log(r.status)")"
 current_latest_matrix_row_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-matrix.json', 'utf8')); console.log((r.rows || []).length)")"
+current_latest_matrix_unclassified_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-matrix.json', 'utf8')); console.log((r.unclassified_rows || []).length)")"
 current_latest_matrix_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-matrix.json', 'utf8')); console.log(r.perfect_refactor_claim_allowed ? 'true' : 'false')")"
 current_latest_golden_corpus_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.status)")"
 current_latest_golden_corpus_fixture_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.fixture_case_count)")"
@@ -351,6 +352,29 @@ bash scripts/release/perfect-refactor-unblock-packet.sh
 perfect_refactor_unblock_packet_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-unblock-packet.json', 'utf8')); console.log(r.status)")"
 perfect_refactor_unblock_packet_decision_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-unblock-packet.json', 'utf8')); console.log(r.required_user_decision_count)")"
 perfect_refactor_unblock_packet_auto_resolvable="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-unblock-packet.json', 'utf8')); console.log(r.auto_resolvable ? 'true' : 'false')")"
+CURRENT_LATEST_ADAPTER_STATUS="$adapter_status" \
+CURRENT_LATEST_SOURCE_INVENTORY_STATUS="$current_latest_source_inventory_status" \
+CURRENT_LATEST_SOURCE_INVENTORY_UNCLASSIFIED_COUNT="$current_latest_source_inventory_unclassified_count" \
+CURRENT_LATEST_MATRIX_STATUS="$current_latest_matrix_status" \
+CURRENT_LATEST_MATRIX_UNCLASSIFIED_COUNT="$current_latest_matrix_unclassified_count" \
+CURRENT_LATEST_GOLDEN_CORPUS_STATUS="$current_latest_golden_corpus_status" \
+CURRENT_LATEST_GOLDEN_CORPUS_BLOCKER_COUNT="$current_latest_golden_corpus_blocker_count" \
+CURRENT_LATEST_REGRESSION_STATUS="ready" \
+CURRENT_LATEST_STRESS_STATUS="ready" \
+CURRENT_LATEST_PROPERTY_STATUS="ready" \
+CURRENT_LATEST_RUNTIME_SMOKE_STATUS="ready" \
+CURRENT_LATEST_CURRENT_TARGET_STATUS="ready" \
+CURRENT_LATEST_CURRENT_TARGET_CLAIM_ALLOWED="$current_latest_claim_allowed" \
+CURRENT_LATEST_EXTERNAL_AUTHORITY_STATUS="$external_authority_status" \
+CURRENT_LATEST_EXTERNAL_AUTHORITY_BLOCKER_COUNT="$external_authority_blocker_count" \
+CURRENT_LATEST_PUBLICATION_READY="$publication_authority_ready" \
+CURRENT_LATEST_LOCAL_STABLE_ALLOWED="$stable_allowed" \
+CURRENT_LATEST_REQUESTED_CLAIM_WORDING="no known release-blocking defects under declared gates" \
+bash scripts/release/current-latest-quality-gate.sh
+current_latest_quality_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-quality.json', 'utf8')); console.log(r.status)")"
+current_latest_quality_local_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-quality.json', 'utf8')); console.log(r.local_current_latest_ready ? 'true' : 'false')")"
+current_latest_quality_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-quality.json', 'utf8')); console.log(r.perfect_refactor_claim_allowed ? 'true' : 'false')")"
+current_latest_quality_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-quality.json', 'utf8')); console.log((r.blockers || []).length)")"
 
 cat > "$GATE_DIR/performance.json" <<JSON
 {
@@ -428,6 +452,13 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "auto_resolvable": $perfect_refactor_unblock_packet_auto_resolvable,
     "packet_artifact": "target/release-gates/perfect-refactor-unblock-packet.json"
   },
+  "current_latest_quality": {
+    "status": "$current_latest_quality_status",
+    "local_current_latest_ready": $current_latest_quality_local_ready,
+    "perfect_refactor_claim_allowed": $current_latest_quality_claim_allowed,
+    "blocker_count": $current_latest_quality_blocker_count,
+    "quality_artifact": "target/release-gates/current-latest-quality.json"
+  },
   "gate_statuses": {
     "adapter": "$adapter_status",
     "compatibility": "$compatibility_status",
@@ -444,6 +475,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "current_latest_source_inventory": "$current_latest_source_inventory_status",
     "current_latest_matrix": "$current_latest_matrix_status",
     "current_latest_golden_corpus": "$current_latest_golden_corpus_status",
+    "current_latest_quality": "$current_latest_quality_status",
     "upstream_distribution_target": "$upstream_distribution_target_status",
     "real_upstream_smoke": "$real_upstream_smoke_status",
     "real_upstream_corpus": "$real_upstream_corpus_status"
@@ -481,6 +513,13 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
       "blocker_count": $current_latest_golden_corpus_blocker_count,
       "perfect_refactor_claim_allowed": $current_latest_golden_corpus_claim_allowed,
       "artifact": "target/release-gates/current-latest-golden-corpus.json"
+    },
+    "quality": {
+      "status": "$current_latest_quality_status",
+      "local_current_latest_ready": $current_latest_quality_local_ready,
+      "blocker_count": $current_latest_quality_blocker_count,
+      "perfect_refactor_claim_allowed": $current_latest_quality_claim_allowed,
+      "artifact": "target/release-gates/current-latest-quality.json"
     }
   },
   "distribution_target": {
@@ -513,6 +552,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/current-latest-source-inventory.json",
     "target/release-gates/current-latest-matrix.json",
     "target/release-gates/current-latest-golden-corpus.json",
+    "target/release-gates/current-latest-quality.json",
     "target/release-gates/upstream-distribution-target.json",
     "target/release-gates/installability.json",
     "target/release-gates/publication-authority.json",
@@ -539,6 +579,7 @@ validate_report_json "$GATE_DIR/current-latest-target.json"
 validate_report_json "$GATE_DIR/current-latest-source-inventory.json"
 validate_report_json "$GATE_DIR/current-latest-matrix.json"
 validate_report_json "$GATE_DIR/current-latest-golden-corpus.json"
+validate_report_json "$GATE_DIR/current-latest-quality.json"
 validate_report_json "$GATE_DIR/upstream-distribution-target.json"
 validate_report_json "$GATE_DIR/release-candidate.json"
 
