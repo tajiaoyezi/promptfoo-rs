@@ -235,6 +235,7 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 20 | cross-ledger-perfect-claim-closure | 关闭 Phase 19 后 source accounting/provider burndown/release claim 的跨 artifact 口径差异：fixture-covered provider rows 不再重复计入 source blocker，并新增 perfect-refactor claim contract | `src/compatibility/` + `src/release.rs` + `scripts/release/` + `target/release-gates/` + `docs/compatibility/` + `docs/audits/` + `tests/` | 19 | 否 |
 | 21 | upstream-distribution-target-disambiguation | 区分 npm core package 最新发布、GitHub repository HEAD、GitHub latest release tag 与 frozen baseline 的关系，防止把 non-core release 或 unreleased HEAD 漂移误读为 current promptfoo 完成或缺口 | `src/compatibility/inventory.rs` + `scripts/release/upstream-distribution-target.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `docs/compatibility/` + `docs/audits/` + `tests/` | 20 | 否 |
 | 22 | perfect-refactor-unblock-packet | 将 Phase 21 后仍阻止 perfect-refactor claim 的 source/external/current/publication blockers 聚合成最小用户/维护者决策包，明确哪些项无法由 agent 自动解决 | `src/release.rs` + `scripts/release/perfect-refactor-unblock-packet.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `docs/release.md` + `docs/compatibility/` + `docs/audits/` + `tests/` | 21 | 否 |
+| 23 | dynamic-upstream-release-observation | 修正 upstream distribution target gate 的 GitHub latest release 观测方式：不再把 `code-scan-action-0.1.7` 当固定 latest，而是从 GitHub latest release metadata 动态解析 release tag 并写入 source evidence | `scripts/release/upstream-distribution-target.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `tests/upstream_distribution_target_gate.rs` + `docs/compatibility/target-policy.md` + `docs/compatibility/matrix.md` + `docs/audits/` | 22 | 否 |
 
 > Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
 >
@@ -251,6 +252,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 21 是 2026-05-31 Phase 20 smoke 后的 upstream target disambiguation 链路，依据 task 18.3 / task 20.2 仍保留的 current-upstream blocker。它把 npm core package latest、GitHub repo HEAD、GitHub latest release tag 和 frozen baseline 拆成独立证据，避免把 non-core release drift 或 unreleased HEAD 漂移误读成 promptfoo core package rebaseline。
 >
 > Phase 22 是 2026-05-31 Phase 21 后的 unblock handoff 链路，依据 task 20.2 / 21.1 仍保留的 source、external-authority、publication-authority 和 current-upstream blockers。它不把外部授权、真实凭据、法律/品牌确认或公开发布证据伪造成完成，而是生成机器可审计的最小决策包，让 perfect-refactor claim 的剩余条件可交接、可验证、可阻塞。
+>
+> Phase 23 是 2026-06-01 恢复审计发现的 upstream evidence freshness 链路，依据 task 21.1 的 “GitHub latest release tag” 语义和 BLOCKED-task-22.1 的 resumed audit。它不解除 current-upstream blocker，而是让 latest release 观测不再依赖硬编码 tag，避免过期 release-channel evidence 影响 perfect-refactor blocker 判断。
 
 ---
 

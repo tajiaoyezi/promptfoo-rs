@@ -191,3 +191,9 @@ Feature: perfect refactor parity
     Then TEST-22.1.1 proves perfect_refactor_claim_allowed remains false while blockers remain
     And TEST-22.1.2 proves provider blockers represented by external authority are not duplicated as source-only decisions
     And TEST-22.1.5 proves runtime smoke and docs expose the packet as a blocker handoff artifact
+
+  Scenario: SCEN-23.1.1 - upstream latest release observation is dynamic
+    Given GitHub latest release metadata can change independently from the frozen npm core package
+    When upstream distribution target evidence is generated
+    Then TEST-23.1.1 proves the observed release ref comes from latest release metadata instead of a hard-coded tag
+    And TEST-23.1.2 proves release-channel classification still keeps current perfect refactor blocked when the dynamic latest release is not the npm core package

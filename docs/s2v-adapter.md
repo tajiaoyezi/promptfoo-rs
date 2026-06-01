@@ -151,6 +151,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 20 | cross-ledger-perfect-claim-closure | docs/specs/phases/phase-20-cross-ledger-perfect-claim-closure.md | Done | 2 | N/A (solo) |
 | 21 | upstream-distribution-target-disambiguation | docs/specs/phases/phase-21-upstream-distribution-target-disambiguation.md | Done | 1 | N/A (solo) |
 | 22 | perfect-refactor-unblock-packet | docs/specs/phases/phase-22-perfect-refactor-unblock-packet.md | Done | 1 | N/A (solo) |
+| 23 | dynamic-upstream-release-observation | docs/specs/phases/phase-23-dynamic-upstream-release-observation.md | Ready | 1 | N/A (solo) |
 
 ## Task 总索引
 
@@ -210,6 +211,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 20.2 | release | docs/specs/tasks/task-20.2-perfect-refactor-claim-contract.md | Done | Phase 20 order 2 | N/A (solo) |
 | 21.1 | compatibility-target | docs/specs/tasks/task-21.1-upstream-distribution-target-gate.md | Done | Phase 21 order 1 | N/A (solo) |
 | 22.1 | release | docs/specs/tasks/task-22.1-authority-unblock-packet-gate.md | Done | Phase 22 order 1 | N/A (solo) |
+| 23.1 | compatibility-target | docs/specs/tasks/task-23.1-dynamic-github-latest-release-observation.md | Ready | Phase 23 order 1 | N/A (solo) |
 
 ## ADR 索引
 
@@ -245,4 +247,4 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 8.2 | test/features/scan-engine.feature |
 | 9.1 | test/features/script-bridge.feature |
 | 10.1 | test/features/web-viewer.feature |
-| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5, 18.1, 18.2, 18.3, 18.4, 19.1, 19.2, 19.3, 19.4, 20.1, 20.2, 21.1, 22.1 | test/features/perfect-refactor-parity.feature |
+| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5, 18.1, 18.2, 18.3, 18.4, 19.1, 19.2, 19.3, 19.4, 20.1, 20.2, 21.1, 22.1, 23.1 | test/features/perfect-refactor-parity.feature |
