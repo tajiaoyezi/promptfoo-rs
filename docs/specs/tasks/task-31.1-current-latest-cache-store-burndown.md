@@ -1,6 +1,6 @@
 # Task 31.1: current-latest-cache-store-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 31 - current-latest-cache-store-burndown

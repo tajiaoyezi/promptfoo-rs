@@ -1,6 +1,6 @@
 # Phase 31: current-latest-cache-store-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ After Phase 30, phase-smoke artifacts report 52 current-latest P0 golden blocker
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 31.1 | current-latest-cache-store-burndown | ../tasks/task-31.1-current-latest-cache-store-burndown.md | Ready | 将 current-latest 9 个 cache-store blockers 拆为 6 个 fixture-covered rows、2 个 P1 snapshot rows 和 1 个保留 P0 blocker |
+| 31.1 | current-latest-cache-store-burndown | ../tasks/task-31.1-current-latest-cache-store-burndown.md | In Progress | 将 current-latest 9 个 cache-store blockers 拆为 6 个 fixture-covered rows、2 个 P1 snapshot rows 和 1 个保留 P0 blocker |
 
 ## 5. Dependencies
 
