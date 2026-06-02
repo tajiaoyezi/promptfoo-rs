@@ -70,6 +70,7 @@ fn write_taxonomy_source(root: &Path) {
         "src/database/index.ts",
         "src/storage/index.ts",
         "src/scheduler/index.ts",
+        "src/scheduler/providerWrapper.ts",
         "src/prompts/processors/python.ts",
         "src/prompts/index.ts",
         "src/matchers/llmGrading.ts",
@@ -154,8 +155,8 @@ fn test_25_1_2_taxonomy_preserves_p0_p1_p2_evidence_semantics() {
     let eval_row = inventory
         .rows
         .iter()
-        .find(|row| row.source_file == "src/evaluate.ts")
-        .expect("eval runtime row should exist");
+        .find(|row| row.source_file == "src/scheduler/providerWrapper.ts")
+        .expect("unproven eval runtime row should exist");
     assert_eq!(eval_row.category, "eval-runner");
     assert_eq!(eval_row.level, "P0");
     assert_eq!(eval_row.evidence_kind, "blocker");
@@ -163,7 +164,7 @@ fn test_25_1_2_taxonomy_preserves_p0_p1_p2_evidence_semantics() {
         .blocker_reason
         .as_deref()
         .unwrap_or_default()
-        .contains("fixture evidence"));
+        .contains("dedicated current-latest eval-runner evidence"));
 
     let schema_row = inventory
         .rows
