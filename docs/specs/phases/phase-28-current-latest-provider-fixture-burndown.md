@@ -1,6 +1,6 @@
 # Phase 28: current-latest-provider-fixture-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 

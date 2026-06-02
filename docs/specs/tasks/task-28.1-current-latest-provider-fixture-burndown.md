@@ -1,6 +1,6 @@
 # Task 28.1: current-latest-provider-fixture-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 28 - current-latest-provider-fixture-burndown
