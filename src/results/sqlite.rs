@@ -186,6 +186,10 @@ impl SqliteResultStore {
             Ok(records)
         })
     }
+
+    pub fn delete_eval(&self, _eval_id: &str) -> Result<u64, StoreError> {
+        Ok(0)
+    }
 }
 
 async fn open_pool(path: &Path, create_if_missing: bool) -> Result<sqlx::SqlitePool, StoreError> {
