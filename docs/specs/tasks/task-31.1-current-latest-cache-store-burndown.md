@@ -1,6 +1,6 @@
 # Task 31.1: current-latest-cache-store-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 31 - current-latest-cache-store-burndown
@@ -79,21 +79,21 @@ Current-latest `category=cache-store` rows must be classified by stable id and s
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-003 / task 3.2 / task 5.1 / task 13.2): 6 current-latest cache/database/storage rows have P0 native fixture evidence and do not produce golden release blockers.
-- [ ] **AC2** (ADR-009): 2 current-latest database testing/signal helper rows are P1 snapshot evidence and do not weaken P0 persistence semantics.
-- [ ] **AC3** (ADR-003 / ADR-011): current-latest eval deletion remains an explicit P0 cache-store blocker.
-- [ ] **AC4** (ADR-009): Rust extractor and shell extractor emit equivalent cache-store classification, evidence kind, evidence reference, and owner values.
-- [ ] **AC5** (ADR-011 / task 24.4): source/matrix/golden/quality artifacts show cache-store blockers reduced to 1 and total blockers reduced to 44 under the tracked-lock Phase 30 smoke target, while perfect-refactor completion remains false.
+- [x] **AC1** (ADR-003 / task 3.2 / task 5.1 / task 13.2): 6 current-latest cache/database/storage rows have P0 native fixture evidence and do not produce golden release blockers.
+- [x] **AC2** (ADR-009): 2 current-latest database testing/signal helper rows are P1 snapshot evidence and do not weaken P0 persistence semantics.
+- [x] **AC3** (ADR-003 / ADR-011): current-latest eval deletion remains an explicit P0 cache-store blocker.
+- [x] **AC4** (ADR-009): Rust extractor and shell extractor emit equivalent cache-store classification, evidence kind, evidence reference, and owner values.
+- [x] **AC5** (ADR-011 / task 24.4): source/matrix/golden/quality artifacts show cache-store blockers reduced to 1 and total blockers reduced to 44 under the tracked-lock Phase 30 smoke target, while perfect-refactor completion remains false.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-31.1.1 | TEST-31.1.1 | tests/current_latest_cache_store_burndown.rs | install, lint, typecheck, unit-test, integration, build | Ready |
-| AC2 | SCEN-31.1.1 | TEST-31.1.2 | tests/current_latest_cache_store_burndown.rs | install, typecheck, unit-test, coverage, build | Ready |
-| AC3 | SCEN-31.1.1 | TEST-31.1.3 | tests/current_latest_cache_store_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Ready |
-| AC4 | SCEN-31.1.1 | TEST-31.1.4 | tests/current_latest_cache_store_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Ready |
-| AC5 | SCEN-31.1.1 | TEST-31.1.5 | tests/current_latest_cache_store_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, runtime-smoke, build | Ready |
+| AC1 | SCEN-31.1.1 | TEST-31.1.1 | tests/current_latest_cache_store_burndown.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-31.1.1 | TEST-31.1.2 | tests/current_latest_cache_store_burndown.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-31.1.1 | TEST-31.1.3 | tests/current_latest_cache_store_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-31.1.1 | TEST-31.1.4 | tests/current_latest_cache_store_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC5 | SCEN-31.1.1 | TEST-31.1.5 | tests/current_latest_cache_store_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -115,9 +115,34 @@ Current-latest `category=cache-store` rows must be classified by stable id and s
 
 ## 10. Completion Notes
 
-- **完成日期**：待实施
-- **改动文件**：待实施
-- **commit 列表**：待实施
-- **§9 Verification 结果**：待实施
-- **剩余风险 / 未做项**：待实施
-- **下游 task 影响**：待实施
+- **完成日期**：2026-06-02
+- **改动文件**：
+  - `docs/specs/phases/phase-31-current-latest-cache-store-burndown.md`
+  - `docs/specs/tasks/task-31.1-current-latest-cache-store-burndown.md`
+  - `docs/s2v-adapter.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/compatibility/matrix.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_cache_store_burndown.rs`
+  - `tests/upstream_distribution_target_gate.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+- **commit 列表**：
+  - `77f5c77` `docs(spec): add phase 31 current latest cache store burndown`
+  - `28a39c6` `test(distribution-target): serialize shared release artifact tests`
+  - `ab935a5` `docs(spec): task-31.1 enters implementation`
+  - `d42031f` `test(cache-store): add current latest cache store burndown RED tests`
+  - `4674f58` `feat(cache-store): classify current latest cache store evidence`
+  - 本次 docs 回填提交：`docs(spec): complete task 31.1 current latest cache store burndown`
+- **§9 Verification 结果**：
+  - install: PASS - helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS - helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS - helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS - helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-31.1.1 ~ TEST-31.1.5 通过。
+  - integration: PASS - helper 执行 adapter Integration tests 通过。
+  - e2e: PASS - helper 执行 adapter E2E tests 通过。
+  - coverage: PASS - helper 执行 adapter Coverage，通过覆盖率阈值守卫。
+  - build: PASS - helper 执行 adapter Build 通过。
+  - runtime-smoke: PASS - helper 执行 adapter Runtime smoke 通过；包含 50 个真实 upstream corpus fixture，`real-upstream-corpus.summary.status=ready`，`observed_p0_fixture_count=50`。`current-latest-golden-corpus.json` 为 `ready-with-blockers`、`blocker_count=44`、分组 `cache-store=1, config=7, eval-runner=7, prompt-processing=6, provider=16, script-bridge=7`，`perfect_refactor_claim_allowed=false`。
+- **剩余风险 / 未做项**：仍保留 1 个 P0 cache-store blocker（`src/database/evalDeletion.ts`），以及 config=7、eval-runner=7、prompt-processing=6、provider external-authority=16、script-bridge=7、current-target drift、external-authority、publication-authority 等非本 task 范围 blockers；不承诺“无任何潜在 bug”。
+- **下游 task 影响**：后续 current-latest burndown 可从 44 个总 blockers 继续推进；eval deletion semantics 需要专用 lifecycle/deletion fixture 和 golden diff，不能由本 task 的 cache/resume/result-store fixture 间接视为 native。

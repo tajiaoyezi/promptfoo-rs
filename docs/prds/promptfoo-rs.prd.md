@@ -294,6 +294,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Task 30.1 完成后，current-latest 证据记录 prompt-processing 行为为 4 fixture / 3 snapshot / 6 blocker，且 `perfect_refactor_claim_allowed=false`。live task §9 target `96e556507e4bbee5110d94286d500c4605ccc38b` 的总 blocker 数为 53；最终 Phase 30 smoke 使用 tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 deterministic fixture fallback，总 blocker 数为 52。剩余 JSON/Markdown/Jinja/JS/Python/executable prompt processor 行仍需后续专用 fixture 与安全边界验证。
 >
 > Phase 31 是 2026-06-02 Phase 30 后的 current-latest cache-store burndown 链路，依据 Phase 30 §9 中仍保留的 9 个 cache-store blockers、task 3.2 的 cache/resume/retry fixture、task 5.1 的 JSONL/SQLite result-store schema、task 13.2 的 eval output/cache parity、PRD §Technical Approach、ADR-003、ADR-009、ADR-011。它只把已有 deterministic fixture 可证明的 cache/database/storage local rows 计为 fixture evidence，database testing/signal helper 降为 P1 snapshot，eval deletion 继续保持 P0 blocker。
+>
+> Task 31.1 完成后，current-latest 证据记录 cache-store 行为为 6 fixture / 2 snapshot / 1 blocker；tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 `current-latest-golden-corpus.blocker_count=44`，分组为 `cache-store=1, config=7, eval-runner=7, prompt-processing=6, provider=16, script-bridge=7`，且 `perfect_refactor_claim_allowed=false`。§9 runtime-smoke 包含 50 个真实 upstream P0 corpus fixture 并保持 `real-upstream-corpus.summary.status=ready`；剩余 eval deletion、external authority、script bridge、processor、config、publication/current-target blockers 仍需后续 task 或外部决策。
 
 ---
 
