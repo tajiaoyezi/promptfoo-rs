@@ -2183,6 +2183,10 @@ fn is_blob_store_file(file: &str) -> bool {
     file.starts_with("src/blobs/") && is_ts_or_js_file(file)
 }
 
+fn is_observability_file(file: &str) -> bool {
+    file.starts_with("src/tracing/") && is_ts_or_js_file(file)
+}
+
 fn is_runtime_support_file(file: &str) -> bool {
     is_ts_or_js_file(file)
         && (file.starts_with("src/util/")
@@ -2520,6 +2524,9 @@ fn current_latest_file_categories(file: &str) -> Vec<&'static str> {
     if categories.is_empty() && is_blob_store_file(file) {
         categories.push("blob-store");
     }
+    if categories.is_empty() && is_observability_file(file) {
+        categories.push("observability");
+    }
     if categories.is_empty() && is_runtime_support_file(file) {
         categories.push("runtime-support");
     }
@@ -2750,6 +2757,14 @@ fn current_latest_default_metadata(
             "snapshot",
             stable_id,
             "current-latest runtime support surface requires deterministic snapshot evidence",
+        ),
+        "observability" => current_latest_metadata(
+            "P1",
+            "later",
+            "observability",
+            "snapshot",
+            stable_id,
+            "current-latest tracing and observability surface requires telemetry snapshot evidence",
         ),
         "node-api" => current_latest_metadata(
             "P1",

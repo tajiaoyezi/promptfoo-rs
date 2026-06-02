@@ -214,6 +214,10 @@ function isBlobStore(file) {
   return file.startsWith('src/blobs/') && isTsOrJs(file);
 }
 
+function isObservability(file) {
+  return file.startsWith('src/tracing/') && isTsOrJs(file);
+}
+
 function isRuntimeSupport(file) {
   return (
     isTsOrJs(file) &&
@@ -261,6 +265,7 @@ function categoriesFor(file) {
   if (categories.length === 0 && isIntegration(file)) categories.push('integration');
   if (categories.length === 0 && isCloudShare(file)) categories.push('cloud-share');
   if (categories.length === 0 && isBlobStore(file)) categories.push('blob-store');
+  if (categories.length === 0 && isObservability(file)) categories.push('observability');
   if (categories.length === 0 && isRuntimeSupport(file)) categories.push('runtime-support');
   if (categories.length === 0 && file.startsWith('src/') && isTsOrJs(file)) {
     categories.push('unclassified');
@@ -288,6 +293,7 @@ function metadata(category, id, file) {
   if (category === 'import-export') return ['P1', 'later', 'output-writers', 'snapshot', `current-latest import/export surface requires conversion snapshot evidence; item: ${id}`];
   if (category === 'blob-store') return ['P1', 'later', 'eval-runner', 'snapshot', `current-latest blob and media storage surface requires data-contract snapshot evidence; item: ${id}`];
   if (category === 'runtime-support') return ['P1', 'later', 'runtime', 'snapshot', `current-latest runtime support surface requires deterministic snapshot evidence; item: ${id}`];
+  if (category === 'observability') return ['P1', 'later', 'observability', 'snapshot', `current-latest tracing and observability surface requires telemetry snapshot evidence; item: ${id}`];
   if (category === 'node-api') return ['P1', 'later', 'node-api-wrapper', 'snapshot', `current-latest Node API surface requires wrapper contract snapshot; item: ${id}`];
   if (category === 'example') return ['P2', 'later', 'compatibility', 'registration', `current-latest example is registered unless promoted into P0/P1 corpus; item: ${id}`];
   if (category === 'docs') return ['P2', 'later', 'compatibility', 'registration', `current-latest documented workflow is registered until mapped to executable evidence; item: ${id}`];
