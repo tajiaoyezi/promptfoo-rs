@@ -38,6 +38,7 @@
 #   - docs/specs/tasks/task-24.3-current-latest-full-function-golden-corpus.md
 #   - docs/specs/tasks/task-24.4-current-latest-exhaustive-quality-gate.md
 #   - docs/specs/tasks/task-25.1-current-latest-source-taxonomy-burndown.md
+#   - docs/specs/tasks/task-26.1-current-latest-viewer-config-reclassification.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -245,3 +246,11 @@ Feature: perfect refactor parity
     And TEST-25.1.2 proves P0 P1 and P2 levels keep their required evidence semantics
     And TEST-25.1.3 proves source inventory and matrix artifacts have no unclassified rows
     And TEST-25.1.4 proves remaining perfect-refactor blockers stay explicit instead of being hidden by taxonomy cleanup
+
+  Scenario: SCEN-26.1.1 - current latest viewer config rows are not duplicate P0 config blockers
+    Given Phase 25 current-latest artifacts classify every source row
+    When the current-latest viewer config reclassification runs
+    Then TEST-26.1.1 proves src/app config-named rows remain viewer evidence without duplicate config blockers
+    And TEST-26.1.2 proves non-app config rows remain P0 config fixture or blocker rows
+    And TEST-26.1.3 proves source matrix golden and quality artifacts keep complete row accounting
+    And TEST-26.1.4 proves perfect-refactor completion remains false while real blockers remain
