@@ -1,6 +1,6 @@
 # Task 36.1: current-latest-ruby-bridge-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 36 - current-latest-ruby-bridge-burndown

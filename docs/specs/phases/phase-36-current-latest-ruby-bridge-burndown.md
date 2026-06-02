@@ -1,6 +1,6 @@
 # Phase 36: current-latest-ruby-bridge-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ Phase 35 leaves 25 current-latest P0 golden blockers: config=7, provider=16, scr
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 36.1 | current-latest-ruby-bridge-burndown | ../tasks/task-36.1-current-latest-ruby-bridge-burndown.md | Ready | 实现 Ruby bridge deterministic subprocess evidence 并将 2 个 Ruby script-bridge blockers 转为 native fixture evidence |
+| 36.1 | current-latest-ruby-bridge-burndown | ../tasks/task-36.1-current-latest-ruby-bridge-burndown.md | In Progress | 实现 Ruby bridge deterministic subprocess evidence 并将 2 个 Ruby script-bridge blockers 转为 native fixture evidence |
 
 ## 5. Dependencies
 
