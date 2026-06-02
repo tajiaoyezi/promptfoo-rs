@@ -1,6 +1,6 @@
 # Phase 28: current-latest-provider-fixture-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,10 +28,10 @@ After Phase 27, release artifacts still report 38 current-latest provider blocke
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] current-latest OpenAI-compatible、HTTP、Ollama、Anthropic mockable provider rows no longer appear as generic P0 provider blockers and carry `fixture:` evidence references.
-- [ ] current-latest Codex、Agents、Assistant、Billing、ChatKit、Realtime、Claude Code auth provider rows remain explicit P0 external-authority blockers.
-- [ ] `current-latest-golden-corpus.json` provider blocker count drops from 38 to 16, and total blocker count drops from 92 to 70.
-- [ ] `current-latest-quality.json` still keeps `perfect_refactor_claim_allowed=false` while eval-runner, prompt-processing, cache-store, config, script-bridge, current-target, external-authority, and publication blockers remain.
+- [x] current-latest OpenAI-compatible、HTTP、Ollama、Anthropic mockable provider rows no longer appear as generic P0 provider blockers and carry `fixture:` evidence references.
+- [x] current-latest Codex、Agents、Assistant、Billing、ChatKit、Realtime、Claude Code auth provider rows remain explicit P0 external-authority blockers.
+- [x] `current-latest-golden-corpus.json` provider blocker count drops from 38 to 16, and total blocker count drops from 92 to 70.
+- [x] `current-latest-quality.json` still keeps `perfect_refactor_claim_allowed=false` while eval-runner, prompt-processing, cache-store, config, script-bridge, current-target, external-authority, and publication blockers remain.
 
 ## 7. Phase Risks
 
@@ -45,7 +45,11 @@ Task 28.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：待实施
-- **Phase smoke**：待实施
-- **Artifact evidence**：待实施
-- **保留边界**：待实施
+- **完成日期**：2026-06-02
+- **Phase smoke**：PASS — `s2v_preflight_phase "docs/specs/phases/phase-28-current-latest-provider-fixture-burndown.md"` 通过；`s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全 9 项通过。
+- **Artifact evidence**：
+  - `target/release-gates/current-latest-source-inventory.json`：status=`ready`，rows=3858，provider native fixture=22，provider external-authority blockers=16。
+  - `target/release-gates/current-latest-matrix.json`：status=`ready`，rows=3858，provider native fixture=22，provider external-authority blockers=16。
+  - `target/release-gates/current-latest-golden-corpus.json`：status=`ready-with-blockers`，blocker_count=70，provider_blockers=16，remaining P0 groups eval-runner=18、prompt-processing=13、cache-store=9、config=7、script-bridge=7、provider=16。
+  - `target/release-gates/current-latest-quality.json`：status=`ready-with-blockers`，local_current_latest_ready=false，perfect_refactor_claim_allowed=false；剩余 blockers 为 golden-corpus、current-target、external-authority、publication-authority。
+- **保留边界**：Phase 28 完成的是 current-latest provider generic blocker burndown，不等于 current-latest perfect-refactor 完成。后续仍需处理 70 个 P0 golden blockers，或取得/正式 waiver external authority、publication authority 和 current-target claim evidence。
