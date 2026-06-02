@@ -315,3 +315,12 @@ Feature: perfect refactor parity
     And TEST-32.1.2 proves JavaScript Python and executable processor rows remain P0 script-bridge blockers
     And TEST-32.1.3 proves Rust and shell extractors emit equivalent local prompt processor evidence
     And TEST-32.1.4 proves prompt-processing golden blockers drop to remaining script-backed blocker rows while perfect-refactor completion remains false
+
+  # Maps to: docs/specs/tasks/task-33.1-current-latest-eval-deletion-burndown.md
+  Scenario: SCEN-33.1.1 - current latest eval deletion removes only selected local eval records
+    Given Phase 32 current-latest artifacts have 1 cache-store eval deletion blocker
+    When the current-latest eval deletion burndown runs
+    Then TEST-33.1.1 proves eval deletion removes selected SQLite result rows and assertion rows
+    And TEST-33.1.2 proves missing eval deletion is a non-destructive no-op
+    And TEST-33.1.3 proves the current-latest eval deletion row has P0 native fixture evidence and no cache-store blocker remains
+    And TEST-33.1.4 proves Rust and shell extractors emit equivalent eval deletion evidence and total blockers drop to 40 while perfect-refactor completion remains false
