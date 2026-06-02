@@ -1,6 +1,6 @@
 # Phase 27: current-latest-core-config-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ After Phase 26, false viewer config blockers are gone, but release artifacts sti
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 27.1 | current-latest-core-config-burndown | ../tasks/task-27.1-current-latest-core-config-burndown.md | Ready | 将 current-latest 18 个 non-app config blockers 分解为 8 个 local fixture-covered rows、3 个 P1 auxiliary rows、7 个 explicit external blockers |
+| 27.1 | current-latest-core-config-burndown | ../tasks/task-27.1-current-latest-core-config-burndown.md | In Progress | 将 current-latest 18 个 non-app config blockers 分解为 8 个 local fixture-covered rows、3 个 P1 auxiliary rows、7 个 explicit external blockers |
 
 ## 5. Dependencies
 

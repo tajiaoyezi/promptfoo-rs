@@ -1,6 +1,6 @@
 # Task 27.1: current-latest-core-config-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 27 — current-latest-core-config-burndown
