@@ -247,6 +247,71 @@ function isEvalRuntime(file) {
   );
 }
 
+function currentLatestEvalRunnerFixtureIds(id) {
+  const mapping = {
+    'eval-runner:src-evaluate': ['p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
+    'eval-runner:src-evaluator': ['p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
+    'eval-runner:src-evaluatorhelpers': ['p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
+    'eval-runner:src-scheduler-index': [
+      'p0-eval-concurrency-limit',
+      'p0-eval-delay',
+      'p0-eval-partial-failure',
+    ],
+    'eval-runner:src-scheduler-providercallqueue': [
+      'p0-eval-concurrency-limit',
+      'p0-eval-delay',
+      'p0-eval-partial-failure',
+    ],
+    'eval-runner:src-scheduler-slotqueue': [
+      'p0-eval-concurrency-limit',
+      'p0-eval-delay',
+      'p0-eval-partial-failure',
+    ],
+    'eval-runner:src-scheduler-types': [
+      'p0-eval-concurrency-limit',
+      'p0-eval-delay',
+      'p0-eval-partial-failure',
+    ],
+    'eval-runner:src-scheduler-retrypolicy': ['p0-eval-retry-timeout'],
+  };
+  return mapping[id] || [];
+}
+
+function isCurrentLatestEvalRunnerFixture(id, file) {
+  return isEvalRuntime(file) && currentLatestEvalRunnerFixtureIds(id).length > 0;
+}
+
+function isCurrentLatestEvalRunnerSnapshot(file) {
+  return [
+    'src/optimizer/promptOptimizer.ts',
+    'src/scheduler/events.ts',
+    'src/testCase/synthesis.ts',
+  ].includes(file);
+}
+
+function currentLatestEvalRunnerBlockerReason(id, file) {
+  const lower = id.toLowerCase();
+  let reason;
+  if (lower.includes('adaptiveconcurrency')) {
+    reason = 'adaptive concurrency requires dedicated current-latest scheduler fixture evidence';
+  } else if (lower.includes('headerparser')) {
+    reason = 'provider rate-limit header parsing requires dedicated current-latest eval-runner evidence';
+  } else if (lower.includes('providercallexecutioncontext')) {
+    reason = 'provider call execution context requires dedicated current-latest eval-runner evidence';
+  } else if (lower.includes('providerratelimitstate')) {
+    reason = 'provider rate-limit state requires dedicated current-latest eval-runner evidence';
+  } else if (lower.includes('providerwrapper')) {
+    reason = 'provider wrapper behavior requires dedicated current-latest eval-runner evidence';
+  } else if (lower.includes('ratelimitkey')) {
+    reason = 'provider rate-limit key derivation requires dedicated current-latest eval-runner evidence';
+  } else if (lower.includes('ratelimitregistry')) {
+    reason = 'provider rate-limit registry behavior requires dedicated current-latest eval-runner evidence';
+  } else {
+    reason = 'dedicated current-latest eval-runner evidence is required';
+  }
+  return `dedicated current-latest eval-runner evidence is required before this row can be claimed native: ${reason}; source: ${file}`;
+}
+
 function isCacheStore(file) {
   return (
     isTsOrJs(file) &&
@@ -397,7 +462,9 @@ function metadata(category, id, file) {
   if (category === 'config' && isCurrentLatestAuxiliaryConfig(file)) return ['P1', 'later', currentLatestAuxiliaryConfigOwner(file), 'snapshot', `current-latest auxiliary command or scan config source is registered under P1 snapshot evidence; item: ${id}`];
   if (category === 'config' && isCurrentLatestExternalConfig(file)) return ['P0', 'blocked', 'external-authority', 'blocker', `explicit current-latest external cloud/server/telemetry/global config blocker; not counted as local runtime parity without product authority credentials or service contract evidence; item: ${id}`];
   if (category === 'config') return ['P0', 'blocked', 'config-loader', 'blocker', `current-latest config surface requires fixture evidence; item: ${id}`];
-  if (category === 'eval-runner') return ['P0', 'blocked', 'eval-runner', 'blocker', `current-latest eval runtime requires fixture evidence; item: ${id}`];
+  if (category === 'eval-runner' && isCurrentLatestEvalRunnerFixture(id, file)) return ['P0', 'native', 'eval-runner', 'fixture', `current-latest eval/evaluator/scheduler source is covered by existing deterministic eval runner fixture evidence; item: ${id}`];
+  if (category === 'eval-runner' && isCurrentLatestEvalRunnerSnapshot(file)) return ['P1', 'later', 'eval-runner', 'snapshot', `current-latest optimizer/event/synthesis eval-runner source is registered under P1 snapshot evidence until dedicated parity work proves native behavior; item: ${id}`];
+  if (category === 'eval-runner') return ['P0', 'blocked', 'eval-runner', 'blocker', `${currentLatestEvalRunnerBlockerReason(id, file)}; item: ${id}`];
   if (category === 'cache-store') return ['P0', 'blocked', 'cache-resume-store', 'blocker', `current-latest cache and result store surface requires fixture evidence; item: ${id}`];
   if (category === 'prompt-processing') return ['P0', 'blocked', 'config-loader', 'blocker', `current-latest prompt processing surface requires fixture evidence; item: ${id}`];
   if (category === 'script-bridge') return ['P0', 'blocked', 'script-bridge', 'blocker', `current-latest script bridge surface requires authorized subprocess fixture evidence; item: ${id}`];

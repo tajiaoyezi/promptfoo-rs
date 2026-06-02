@@ -2227,6 +2227,63 @@ fn is_eval_runtime_file(file: &str) -> bool {
             || file.starts_with("src/optimizer/"))
 }
 
+fn current_latest_eval_runner_fixture_ids(stable_id: &str) -> &'static [&'static str] {
+    match stable_id {
+        "eval-runner:src-evaluate"
+        | "eval-runner:src-evaluator"
+        | "eval-runner:src-evaluatorhelpers" => &[
+            "p0-eval-basic",
+            "p0-eval-output-json",
+            "p0-eval-retry-timeout",
+        ],
+        "eval-runner:src-scheduler-index"
+        | "eval-runner:src-scheduler-providercallqueue"
+        | "eval-runner:src-scheduler-slotqueue"
+        | "eval-runner:src-scheduler-types" => &[
+            "p0-eval-concurrency-limit",
+            "p0-eval-delay",
+            "p0-eval-partial-failure",
+        ],
+        "eval-runner:src-scheduler-retrypolicy" => &["p0-eval-retry-timeout"],
+        _ => &[],
+    }
+}
+
+fn is_current_latest_eval_runner_fixture(stable_id: &str, file: &str) -> bool {
+    is_eval_runtime_file(file) && !current_latest_eval_runner_fixture_ids(stable_id).is_empty()
+}
+
+fn is_current_latest_eval_runner_snapshot(file: &str) -> bool {
+    matches!(
+        file,
+        "src/optimizer/promptOptimizer.ts"
+            | "src/scheduler/events.ts"
+            | "src/testCase/synthesis.ts"
+    )
+}
+
+fn current_latest_eval_runner_blocker_reason(stable_id: &str, file: &str) -> String {
+    let lower = stable_id.to_ascii_lowercase();
+    let reason = if lower.contains("adaptiveconcurrency") {
+        "adaptive concurrency requires dedicated current-latest scheduler fixture evidence"
+    } else if lower.contains("headerparser") {
+        "provider rate-limit header parsing requires dedicated current-latest eval-runner evidence"
+    } else if lower.contains("providercallexecutioncontext") {
+        "provider call execution context requires dedicated current-latest eval-runner evidence"
+    } else if lower.contains("providerratelimitstate") {
+        "provider rate-limit state requires dedicated current-latest eval-runner evidence"
+    } else if lower.contains("providerwrapper") {
+        "provider wrapper behavior requires dedicated current-latest eval-runner evidence"
+    } else if lower.contains("ratelimitkey") {
+        "provider rate-limit key derivation requires dedicated current-latest eval-runner evidence"
+    } else if lower.contains("ratelimitregistry") {
+        "provider rate-limit registry behavior requires dedicated current-latest eval-runner evidence"
+    } else {
+        "dedicated current-latest eval-runner evidence is required"
+    };
+    format!("dedicated current-latest eval-runner evidence is required before this row can be claimed native: {reason}; source: {file}")
+}
+
 fn is_cache_store_file(file: &str) -> bool {
     is_ts_or_js_file(file)
         && (file == "src/cache.ts"
@@ -2836,13 +2893,31 @@ fn current_latest_default_metadata(
             stable_id,
             "current-latest config surface requires fixture evidence",
         ),
+        "eval-runner" if is_current_latest_eval_runner_fixture(stable_id, file) => {
+            current_latest_metadata(
+                "P0",
+                "native",
+                "eval-runner",
+                "fixture",
+                stable_id,
+                "current-latest eval/evaluator/scheduler source is covered by existing deterministic eval runner fixture evidence",
+            )
+        }
+        "eval-runner" if is_current_latest_eval_runner_snapshot(file) => current_latest_metadata(
+            "P1",
+            "later",
+            "eval-runner",
+            "snapshot",
+            stable_id,
+            "current-latest optimizer/event/synthesis eval-runner source is registered under P1 snapshot evidence until dedicated parity work proves native behavior",
+        ),
         "eval-runner" => current_latest_metadata(
             "P0",
             "blocked",
             "eval-runner",
             "blocker",
             stable_id,
-            "current-latest eval runtime requires fixture evidence",
+            &current_latest_eval_runner_blocker_reason(stable_id, file),
         ),
         "cache-store" => current_latest_metadata(
             "P0",
