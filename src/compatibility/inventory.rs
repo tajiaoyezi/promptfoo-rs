@@ -2106,7 +2106,7 @@ fn is_current_latest_runtime_config_file(file: &str) -> bool {
 }
 
 fn is_current_latest_redteam_config_file(file: &str) -> bool {
-    file.to_ascii_lowercase() == "src/redteam/plugins/policy/evals/promptfooconfig.yaml"
+    file.eq_ignore_ascii_case("src/redteam/plugins/policy/evals/promptfooconfig.yaml")
 }
 
 fn is_current_latest_auxiliary_config_file(file: &str) -> bool {
