@@ -41,6 +41,7 @@
 #   - docs/specs/tasks/task-26.1-current-latest-viewer-config-reclassification.md
 #   - docs/specs/tasks/task-27.1-current-latest-core-config-burndown.md
 #   - docs/specs/tasks/task-28.1-current-latest-provider-fixture-burndown.md
+#   - docs/specs/tasks/task-29.1-current-latest-eval-runner-burndown.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -272,3 +273,13 @@ Feature: perfect refactor parity
     And TEST-28.1.2 proves product credential account and private-service provider rows remain explicit external blockers
     And TEST-28.1.3 proves Rust and shell extractors emit equivalent provider evidence
     And TEST-28.1.4 proves provider golden blockers drop to external-only rows while perfect-refactor completion remains false
+
+  # Maps to: docs/specs/tasks/task-29.1-current-latest-eval-runner-burndown.md
+  Scenario: SCEN-29.1.1 - current latest eval runner blockers split fixtures snapshots and real blockers
+    Given Phase 28 current-latest artifacts have 18 eval-runner blockers
+    When the current-latest eval-runner burndown runs
+    Then TEST-29.1.1 proves fixture-covered eval-runner rows have P0 native fixture evidence
+    And TEST-29.1.2 proves optimizer event and synthesis rows are P1 snapshot evidence
+    And TEST-29.1.3 proves adaptive rate-limit and provider-wrapper rows remain P0 blockers
+    And TEST-29.1.4 proves Rust and shell extractors emit equivalent eval-runner evidence
+    And TEST-29.1.5 proves eval-runner golden blockers drop to remaining blocker rows while perfect-refactor completion remains false
