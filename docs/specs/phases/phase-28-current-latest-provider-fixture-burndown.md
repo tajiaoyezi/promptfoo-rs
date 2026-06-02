@@ -20,7 +20,7 @@ After Phase 27, release artifacts still report 38 current-latest provider blocke
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 28.1 | current-latest-provider-fixture-burndown | ../tasks/task-28.1-current-latest-provider-fixture-burndown.md | Ready | 将 current-latest 38 个 provider blockers 分解为 22 个 fixture-covered rows 和 16 个 explicit external authority blockers |
+| 28.1 | current-latest-provider-fixture-burndown | ../tasks/task-28.1-current-latest-provider-fixture-burndown.md | Done | 将 current-latest 38 个 provider blockers 分解为 22 个 fixture-covered rows 和 16 个 explicit external authority blockers |
 
 ## 5. Dependencies
 

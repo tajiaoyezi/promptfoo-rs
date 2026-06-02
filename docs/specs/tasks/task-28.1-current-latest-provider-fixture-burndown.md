@@ -1,6 +1,6 @@
 # Task 28.1: current-latest-provider-fixture-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 28 - current-latest-provider-fixture-burndown
@@ -78,19 +78,19 @@ Current-latest `category=provider` rows must be classified by stable id and sour
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Provider P0 / task 19.3): 22 current-latest mockable provider rows have P0 native fixture evidence and do not produce golden release blockers.
-- [ ] **AC2** (PRD §Security / task 19.4): 16 current-latest provider rows requiring credentials/account/private-service/product authority remain explicit external-authority P0 blockers.
-- [ ] **AC3** (ADR-009): Rust extractor and shell extractor emit equivalent provider classification, evidence kind, evidence reference, and owner values.
-- [ ] **AC4** (ADR-011 / task 24.4): source/matrix/golden/quality artifacts show provider blockers reduced to 16 and total blockers reduced to 70, while perfect-refactor completion remains false.
+- [x] **AC1** (PRD §Provider P0 / task 19.3): 22 current-latest mockable provider rows have P0 native fixture evidence and do not produce golden release blockers.
+- [x] **AC2** (PRD §Security / task 19.4): 16 current-latest provider rows requiring credentials/account/private-service/product authority remain explicit external-authority P0 blockers.
+- [x] **AC3** (ADR-009): Rust extractor and shell extractor emit equivalent provider classification, evidence kind, evidence reference, and owner values.
+- [x] **AC4** (ADR-011 / task 24.4): source/matrix/golden/quality artifacts show provider blockers reduced to 16 and total blockers reduced to 70, while perfect-refactor completion remains false.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-28.1.1 | TEST-28.1.1 | tests/current_latest_provider_fixture_burndown.rs | install, lint, typecheck, unit-test, integration, build | Ready |
-| AC2 | SCEN-28.1.1 | TEST-28.1.2 | tests/current_latest_provider_fixture_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Ready |
-| AC3 | SCEN-28.1.1 | TEST-28.1.3 | tests/current_latest_provider_fixture_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Ready |
-| AC4 | SCEN-28.1.1 | TEST-28.1.4 | tests/current_latest_provider_fixture_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, runtime-smoke, build | Ready |
+| AC1 | SCEN-28.1.1 | TEST-28.1.1 | tests/current_latest_provider_fixture_burndown.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-28.1.1 | TEST-28.1.2 | tests/current_latest_provider_fixture_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC3 | SCEN-28.1.1 | TEST-28.1.3 | tests/current_latest_provider_fixture_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-28.1.1 | TEST-28.1.4 | tests/current_latest_provider_fixture_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -112,9 +112,32 @@ Current-latest `category=provider` rows must be classified by stable id and sour
 
 ## 10. Completion Notes
 
-- **完成日期**：待实施
-- **改动文件**：待实施
-- **commit 列表**：待实施
-- **§9 Verification 结果**：待实施
-- **剩余风险 / 未做项**：待实施
-- **下游 task 影响**：待实施
+- **完成日期**：2026-06-02
+- **改动文件**：
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-28-current-latest-provider-fixture-burndown.md`
+  - `docs/specs/tasks/task-28.1-current-latest-provider-fixture-burndown.md`
+  - `docs/compatibility/matrix.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_provider_fixture_burndown.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+- **commit 列表**：
+  - `0ec6884` `docs(spec): add phase 28 current latest provider burndown`
+  - `d347412` `docs(spec): task-28.1 enters implementation`
+  - `e78b9b8` `test(providers): add current latest provider burndown RED tests`
+  - `dd6ee14` `feat(providers): classify current latest provider evidence`
+  - 本次 docs 回填提交：`docs(spec): complete task 28.1 current latest provider burndown`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS — helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-28.1.1 ~ TEST-28.1.4 通过。
+  - integration: PASS — helper 执行 `bash scripts/release/integration.sh` 通过。
+  - e2e: PASS — helper 执行 `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — helper 执行 `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — helper 执行 `bash scripts/release/runtime-smoke.sh` 通过；真实 artifact 复核显示 `current-latest-source-inventory.json` rows=3858、provider native fixture=22、provider external blockers=16，`current-latest-golden-corpus.json` status=`ready-with-blockers`、blocker_count=70、provider_blockers=16，`current-latest-quality.json` status=`ready-with-blockers`、local_current_latest_ready=false、perfect_refactor_claim_allowed=false。
+- **剩余风险 / 未做项**：本 task 只燃尽 current-latest provider generic blockers；仍有 70 个 current-latest P0 golden blockers（provider=16、eval-runner=18、prompt-processing=13、cache-store=9、config=7、script-bridge=7）、current-target claim boundary、external authority blockers，以及 publication `credential-blocked`。这些继续阻止“完美重构完成”声明。
+- **下游 task 影响**：后续可优先处理 eval-runner=18、prompt-processing=13、cache-store=9 或 script-bridge=7 blockers；16 个 provider blockers 现为 explicit external authority rows，不能由本地代码或 mock fixture 伪造成完成。
