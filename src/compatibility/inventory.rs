@@ -2088,7 +2088,13 @@ fn is_output_file(file: &str) -> bool {
 }
 
 fn is_config_file(file: &str) -> bool {
-    file.starts_with("src/") && file.to_ascii_lowercase().contains("config")
+    file.starts_with("src/")
+        && file.to_ascii_lowercase().contains("config")
+        && !is_current_latest_viewer_config_file(file)
+}
+
+fn is_current_latest_viewer_config_file(file: &str) -> bool {
+    file.starts_with("src/app/") && file.to_ascii_lowercase().contains("config")
 }
 
 fn is_p0_provider_file(file: &str) -> bool {

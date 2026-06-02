@@ -97,7 +97,10 @@ fn test_26_1_1_app_config_rows_remain_viewer_evidence_without_config_blockers() 
             .iter()
             .filter(|row| row.source_file == *source)
             .collect::<Vec<_>>();
-        assert!(!rows.is_empty(), "missing rows for {source}: {inventory:#?}");
+        assert!(
+            !rows.is_empty(),
+            "missing rows for {source}: {inventory:#?}"
+        );
         assert!(
             rows.iter().all(|row| row.category != "config"),
             "src/app viewer config source must not create duplicate P0 config row: {rows:#?}"
@@ -200,15 +203,20 @@ fn test_26_1_4_golden_and_quality_keep_real_blockers_visible() {
         "non-app core config blocker should remain visible: {blockers:#?}"
     );
     assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
-    assert_eq!(quality["perfect_refactor_claim_allowed"], Value::Bool(false));
+    assert_eq!(
+        quality["perfect_refactor_claim_allowed"],
+        Value::Bool(false)
+    );
     assert!(
         quality["blockers"]
             .as_array()
             .expect("quality blockers should be an array")
             .iter()
-            .any(|blocker| blocker["category"] == Value::String("golden-corpus".to_string())
-                || blocker["category"] == Value::String("current-target".to_string())
-                || blocker["category"] == Value::String("publication-authority".to_string())),
+            .any(
+                |blocker| blocker["category"] == Value::String("golden-corpus".to_string())
+                    || blocker["category"] == Value::String("current-target".to_string())
+                    || blocker["category"] == Value::String("publication-authority".to_string())
+            ),
         "quality gate must keep real blockers visible: {quality:#?}"
     );
 
@@ -295,11 +303,17 @@ fn assert_json_has_non_app_config_rows(report: &Value, sources: &[&str]) {
 }
 
 fn rows_for_source<'a>(report: &'a Value, source: &str) -> Vec<&'a Value> {
+    let source_reference_suffix = format!(":{source}");
     report["rows"]
         .as_array()
         .expect("report rows should be an array")
         .iter()
-        .filter(|row| row["source_file"] == Value::String(source.to_string()))
+        .filter(|row| {
+            row["source_file"] == Value::String(source.to_string())
+                || row["source_reference"]
+                    .as_str()
+                    .is_some_and(|reference| reference.ends_with(&source_reference_suffix))
+        })
         .collect()
 }
 

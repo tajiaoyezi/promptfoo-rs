@@ -95,7 +95,11 @@ function isOutput(file) {
 }
 
 function isConfig(file) {
-  return file.startsWith('src/') && /config/i.test(file);
+  return file.startsWith('src/') && /config/i.test(file) && !isCurrentLatestViewerConfig(file);
+}
+
+function isCurrentLatestViewerConfig(file) {
+  return file.startsWith('src/app/') && /config/i.test(file);
 }
 
 function isViewer(file) {
