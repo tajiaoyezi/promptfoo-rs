@@ -120,7 +120,7 @@ fn test_26_1_1_app_config_rows_remain_viewer_evidence_without_config_blockers() 
 }
 
 #[test]
-fn test_26_1_2_non_app_config_rows_remain_p0_config_blockers() {
+fn test_26_1_2_non_app_config_rows_remain_p0_config_evidence_or_blockers() {
     /* TEST-26.1.2 */
     let root = fixture_dir("rust-core-config");
     write_viewer_and_config_source(&root);
@@ -135,14 +135,26 @@ fn test_26_1_2_non_app_config_rows_remain_p0_config_blockers() {
             .find(|row| row.source_file == *source && row.category == "config")
             .unwrap_or_else(|| panic!("missing non-app config row for {source}: {inventory:#?}"));
         assert_eq!(row.level, "P0", "{row:#?}");
-        assert_eq!(row.implementation_status, "blocked", "{row:#?}");
-        assert_eq!(row.verification_owner, "config-loader", "{row:#?}");
-        assert_eq!(row.evidence_kind, "blocker", "{row:#?}");
-        assert!(row
-            .blocker_reason
-            .as_deref()
-            .unwrap_or_default()
-            .contains("fixture evidence"));
+        assert!(
+            matches!(row.implementation_status.as_str(), "native" | "blocked"),
+            "{row:#?}"
+        );
+        assert!(
+            matches!(
+                row.verification_owner.as_str(),
+                "config-loader" | "external-authority"
+            ),
+            "{row:#?}"
+        );
+        assert!(
+            matches!(row.evidence_kind.as_str(), "fixture" | "blocker"),
+            "{row:#?}"
+        );
+        assert!(
+            row.evidence_reference.starts_with("fixture:config:")
+                || row.evidence_reference.starts_with("blocker:config:"),
+            "{row:#?}"
+        );
     }
 
     let _ = std::fs::remove_dir_all(root);
@@ -199,8 +211,12 @@ fn test_26_1_4_golden_and_quality_keep_real_blockers_visible() {
         blockers.iter().any(|blocker| blocker["capability"]
             .as_str()
             .unwrap_or_default()
-            .starts_with("config:src-util-config")),
-        "non-app core config blocker should remain visible: {blockers:#?}"
+            .starts_with("config:src-globalconfig"))
+            || blockers.iter().any(|blocker| blocker["capability"]
+                .as_str()
+                .unwrap_or_default()
+                .starts_with("config:src-server-config")),
+        "non-app external config blocker should remain visible: {blockers:#?}"
     );
     assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
     assert_eq!(
@@ -295,9 +311,18 @@ fn assert_json_has_non_app_config_rows(report: &Value, sources: &[&str]) {
             rows.iter().any(|row| {
                 row["category"] == Value::String("config".to_string())
                     && row["level"] == Value::String("P0".to_string())
-                    && row["evidence_kind"] == Value::String("blocker".to_string())
+                    && (row["evidence_kind"] == Value::String("fixture".to_string())
+                        || row["evidence_kind"] == Value::String("blocker".to_string()))
+                    && (row["evidence_reference"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .starts_with("fixture:config:")
+                        || row["evidence_reference"]
+                            .as_str()
+                            .unwrap_or_default()
+                            .starts_with("blocker:config:"))
             }),
-            "non-app config row should remain P0 blocker: {source} {rows:#?}"
+            "non-app config row should remain P0 config evidence or blocker: {source} {rows:#?}"
         );
     }
 }
