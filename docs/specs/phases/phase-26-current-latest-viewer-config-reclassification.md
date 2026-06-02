@@ -1,6 +1,6 @@
 # Phase 26: current-latest-viewer-config-reclassification
 
-**Status**: Ready
+**Status**: In Progress
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ Phase 25 proved all current-latest rows are classified, but `current-latest-gold
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 26.1 | current-latest-viewer-config-reclassification | ../tasks/task-26.1-current-latest-viewer-config-reclassification.md | Ready | 将 current-latest `src/app/**` config duplicate P0 blockers 纠正为 viewer evidence，同时保留 non-app core config P0 blockers |
+| 26.1 | current-latest-viewer-config-reclassification | ../tasks/task-26.1-current-latest-viewer-config-reclassification.md | In Progress | 将 current-latest `src/app/**` config duplicate P0 blockers 纠正为 viewer evidence，同时保留 non-app core config P0 blockers |
 
 ## 5. Dependencies
 

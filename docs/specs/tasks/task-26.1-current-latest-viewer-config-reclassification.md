@@ -1,6 +1,6 @@
 # Task 26.1: current-latest-viewer-config-reclassification
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 26 — current-latest-viewer-config-reclassification

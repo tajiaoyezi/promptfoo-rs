@@ -154,7 +154,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 23 | dynamic-upstream-release-observation | docs/specs/phases/phase-23-dynamic-upstream-release-observation.md | Done | 1 | N/A (solo) |
 | 24 | current-latest-perfect-refactor | docs/specs/phases/phase-24-current-latest-perfect-refactor.md | Done | 4 | N/A (solo) |
 | 25 | current-latest-source-taxonomy-burndown | docs/specs/phases/phase-25-current-latest-source-taxonomy-burndown.md | Done | 1 | N/A (solo) |
-| 26 | current-latest-viewer-config-reclassification | docs/specs/phases/phase-26-current-latest-viewer-config-reclassification.md | Ready | 1 | N/A (solo) |
+| 26 | current-latest-viewer-config-reclassification | docs/specs/phases/phase-26-current-latest-viewer-config-reclassification.md | In Progress | 1 | N/A (solo) |
 
 ## Task 总索引
 
@@ -220,7 +220,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 24.3 | compatibility-harness | docs/specs/tasks/task-24.3-current-latest-full-function-golden-corpus.md | Done | Phase 24 order 3 | N/A (solo) |
 | 24.4 | release-quality | docs/specs/tasks/task-24.4-current-latest-exhaustive-quality-gate.md | Done | Phase 24 order 4 | N/A (solo) |
 | 25.1 | compatibility-inventory | docs/specs/tasks/task-25.1-current-latest-source-taxonomy-burndown.md | Done | Phase 25 order 1 | N/A (solo) |
-| 26.1 | compatibility-inventory | docs/specs/tasks/task-26.1-current-latest-viewer-config-reclassification.md | Ready | Phase 26 order 1 | N/A (solo) |
+| 26.1 | compatibility-inventory | docs/specs/tasks/task-26.1-current-latest-viewer-config-reclassification.md | In Progress | Phase 26 order 1 | N/A (solo) |
 
 ## ADR 索引
 
