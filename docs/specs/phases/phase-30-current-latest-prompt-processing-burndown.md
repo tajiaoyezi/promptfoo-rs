@@ -1,6 +1,6 @@
 # Phase 30: current-latest-prompt-processing-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,10 +28,10 @@ After Phase 29, phase-smoke artifacts report 60 current-latest P0 golden blocker
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] current-latest prompt index/string/text/utils rows already covered by local deterministic config/eval fixtures no longer appear as generic P0 prompt-processing blockers and carry `fixture:` evidence references.
-- [ ] current-latest prompt constants, grading helpers, and external Ragas prompt helper are recorded as P1 snapshot evidence rather than P0 native parity.
-- [ ] current-latest JSON, Markdown, Jinja, JavaScript, Python, and executable prompt processors remain explicit P0 prompt-processing blockers.
-- [ ] `current-latest-golden-corpus.json` prompt-processing blocker count drops from 13 to 6, total blocker count drops from 60 to 53 under the current Phase 29 smoke target, and `perfect_refactor_claim_allowed=false` remains.
+- [x] current-latest prompt index/string/text/utils rows already covered by local deterministic config/eval fixtures no longer appear as generic P0 prompt-processing blockers and carry `fixture:` evidence references.
+- [x] current-latest prompt constants, grading helpers, and external Ragas prompt helper are recorded as P1 snapshot evidence rather than P0 native parity.
+- [x] current-latest JSON, Markdown, Jinja, JavaScript, Python, and executable prompt processors remain explicit P0 prompt-processing blockers.
+- [x] `current-latest-golden-corpus.json` prompt-processing blocker count drops from 13 to 6, total blocker count is 53 under the live Phase 29 smoke target and 52 under the deterministic tracked-lock phase smoke target, and `perfect_refactor_claim_allowed=false` remains.
 
 ## 7. Phase Risks
 
@@ -45,7 +45,7 @@ Task 30.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：待实施
-- **Phase smoke**：待实施
-- **Artifact evidence**：待实施
-- **保留边界**：待实施
+- **完成日期**：2026-06-02
+- **Phase smoke**：PASS - `s2v_preflight_phase docs/specs/phases/phase-30-current-latest-prompt-processing-burndown.md` 通过；`s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全套通过。Phase smoke 过程中发现 live GitHub latest release API 403 会让 release target scripts 不稳定，已用 RED commit `c86d46f` 和 GREEN commit `af9f124` 将 runtime smoke 改为在未显式传 env 时从锁定 target 生成 fixture env。
+- **Artifact evidence**：最终 phase smoke 使用 tracked current-latest target `1d09dfeb5f0766905409117f923dd5c4b0838d9f`；`current-latest-golden-corpus.json` 为 `ready-with-blockers`、`blocker_count=52`、分组 `cache-store=9, config=7, eval-runner=7, prompt-processing=6, provider=16, script-bridge=7`；`current-latest-matrix.json` 记录 prompt-processing `4 native fixture / 3 later snapshot / 6 blocked blocker`；`current-latest-quality.json` 为 `ready-with-blockers`、`local_current_latest_ready=false`、`perfect_refactor_claim_allowed=false`。task 30.1 §9 live target 观测为 `96e556507e4bbee5110d94286d500c4605ccc38b` / `blocker_count=53`，差异来自 moving current-latest provider external-authority 行数 16 vs 17。
+- **保留边界**：Phase 30 只消减 prompt-processing generic blockers，不处理 JSON/Markdown/Jinja/JS/Python/executable processor native parity、cache-store、config external、eval-runner adaptive/rate-limit、provider external-authority、script-bridge runtime discovery、current-target drift、publication authority 或“无任何潜在 bug”承诺。
