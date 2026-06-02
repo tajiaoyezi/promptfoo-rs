@@ -292,6 +292,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 30 是 2026-06-02 Phase 29 后的 current-latest prompt-processing burndown 链路，依据 Phase 29 §10 中仍保留的 13 个 prompt-processing blockers、task 2.2 的 config/file prompt fixture、task 2.3 的 eval prompt rendering fixture、task 4.2 的 model-graded prompt evidence、task 9.1 的 script bridge boundary、PRD §Core Capabilities、ADR-009、ADR-011。它只把已有 deterministic fixture 可证明的 prompt index/string/text/utils rows 计为 fixture evidence，constants/grading/Ragas helper 降为 P1 snapshot，JSON/Markdown/Jinja/JS/Python/executable processors 继续保持 P0 blocker。
 >
 > Task 30.1 完成后，current-latest 证据记录 prompt-processing 行为为 4 fixture / 3 snapshot / 6 blocker，且 `perfect_refactor_claim_allowed=false`。live task §9 target `96e556507e4bbee5110d94286d500c4605ccc38b` 的总 blocker 数为 53；最终 Phase 30 smoke 使用 tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 deterministic fixture fallback，总 blocker 数为 52。剩余 JSON/Markdown/Jinja/JS/Python/executable prompt processor 行仍需后续专用 fixture 与安全边界验证。
+>
+> Phase 31 是 2026-06-02 Phase 30 后的 current-latest cache-store burndown 链路，依据 Phase 30 §9 中仍保留的 9 个 cache-store blockers、task 3.2 的 cache/resume/retry fixture、task 5.1 的 JSONL/SQLite result-store schema、task 13.2 的 eval output/cache parity、PRD §Technical Approach、ADR-003、ADR-009、ADR-011。它只把已有 deterministic fixture 可证明的 cache/database/storage local rows 计为 fixture evidence，database testing/signal helper 降为 P1 snapshot，eval deletion 继续保持 P0 blocker。
 
 ---
 

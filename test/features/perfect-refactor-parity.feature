@@ -43,6 +43,7 @@
 #   - docs/specs/tasks/task-28.1-current-latest-provider-fixture-burndown.md
 #   - docs/specs/tasks/task-29.1-current-latest-eval-runner-burndown.md
 #   - docs/specs/tasks/task-30.1-current-latest-prompt-processing-burndown.md
+#   - docs/specs/tasks/task-31.1-current-latest-cache-store-burndown.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -294,3 +295,13 @@ Feature: perfect refactor parity
     And TEST-30.1.3 proves JSON Markdown Jinja JavaScript Python and executable processor rows remain P0 blockers
     And TEST-30.1.4 proves Rust and shell extractors emit equivalent prompt-processing evidence
     And TEST-30.1.5 proves prompt-processing golden blockers drop to remaining blocker rows while perfect-refactor completion remains false
+
+  # Maps to: docs/specs/tasks/task-31.1-current-latest-cache-store-burndown.md
+  Scenario: SCEN-31.1.1 - current latest cache store blockers split fixtures snapshots and real blockers
+    Given Phase 30 current-latest artifacts have 9 cache-store blockers
+    When the current-latest cache-store burndown runs
+    Then TEST-31.1.1 proves fixture-covered cache-store rows have P0 native fixture evidence
+    And TEST-31.1.2 proves database testing and signal helper rows are P1 snapshot evidence
+    And TEST-31.1.3 proves eval deletion remains a P0 blocker
+    And TEST-31.1.4 proves Rust and shell extractors emit equivalent cache-store evidence
+    And TEST-31.1.5 proves cache-store golden blockers drop to remaining blocker rows while perfect-refactor completion remains false
