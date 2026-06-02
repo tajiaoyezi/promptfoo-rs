@@ -1,6 +1,6 @@
 # Task 35.1: current-latest-script-prompt-python-bridge-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 35 - current-latest-script-prompt-python-bridge-burndown
@@ -89,21 +89,21 @@ Script-backed prompt processors must execute only with `ScriptAuthorization::All
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-005 / task 9.1): JavaScript, Python, and executable prompt processors require explicit authorization, exchange JSON stdin/stdout, capture stderr, and enforce env/timeout boundaries through ScriptBridge.
-- [ ] **AC2** (ADR-005 / task 9.1): Python bridge wrapper and worker-pool behavior execute authorized Python subprocess calls with stable JSON parsing, stderr capture, error propagation, and deterministic result ordering.
-- [ ] **AC3** (ADR-009 / ADR-011): three current-latest script-backed prompt processor rows have P0 native fixture evidence with `script-bridge` owner in both Rust and shell artifacts.
-- [ ] **AC4** (ADR-009 / ADR-011): five current-latest Python bridge rows have P0 native fixture evidence, while two Ruby bridge rows remain explicit P0 blockers naming missing Ruby runtime evidence.
-- [ ] **AC5** (PRD §Compatibility Matrix): total current-latest golden blockers drop from 33 to 25, prompt-processing blockers drop to zero, script-bridge blockers are Ruby-only, and perfect-refactor completion remains false.
+- [x] **AC1** (ADR-005 / task 9.1): JavaScript, Python, and executable prompt processors require explicit authorization, exchange JSON stdin/stdout, capture stderr, and enforce env/timeout boundaries through ScriptBridge.
+- [x] **AC2** (ADR-005 / task 9.1): Python bridge wrapper and worker-pool behavior execute authorized Python subprocess calls with stable JSON parsing, stderr capture, error propagation, and deterministic result ordering.
+- [x] **AC3** (ADR-009 / ADR-011): three current-latest script-backed prompt processor rows have P0 native fixture evidence with `script-bridge` owner in both Rust and shell artifacts.
+- [x] **AC4** (ADR-009 / ADR-011): five current-latest Python bridge rows have P0 native fixture evidence, while two Ruby bridge rows remain explicit P0 blockers naming missing Ruby runtime evidence.
+- [x] **AC5** (PRD §Compatibility Matrix): total current-latest golden blockers drop from 33 to 25, prompt-processing blockers drop to zero, script-bridge blockers are Ruby-only, and perfect-refactor completion remains false.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-35.1.1 | TEST-35.1.1 | tests/current_latest_script_prompt_python_bridge_burndown.rs | install, lint, typecheck, unit-test, build | Spec Ready |
-| AC2 | SCEN-35.1.1 | TEST-35.1.2 | tests/current_latest_script_prompt_python_bridge_burndown.rs | install, typecheck, unit-test, integration, build | Spec Ready |
-| AC3 | SCEN-35.1.1 | TEST-35.1.3 | tests/current_latest_script_prompt_python_bridge_burndown.rs | install, lint, typecheck, unit-test, e2e, build | Spec Ready |
-| AC4 | SCEN-35.1.1 | TEST-35.1.4 | tests/current_latest_script_prompt_python_bridge_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Spec Ready |
-| AC5 | SCEN-35.1.1 | TEST-35.1.5 | tests/current_latest_script_prompt_python_bridge_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, coverage, runtime-smoke, build | Spec Ready |
+| AC1 | SCEN-35.1.1 | TEST-35.1.1 | tests/current_latest_script_prompt_python_bridge_burndown.rs | install, lint, typecheck, unit-test, build | Done |
+| AC2 | SCEN-35.1.1 | TEST-35.1.2 | tests/current_latest_script_prompt_python_bridge_burndown.rs | install, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-35.1.1 | TEST-35.1.3 | tests/current_latest_script_prompt_python_bridge_burndown.rs | install, lint, typecheck, unit-test, e2e, build | Done |
+| AC4 | SCEN-35.1.1 | TEST-35.1.4 | tests/current_latest_script_prompt_python_bridge_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC5 | SCEN-35.1.1 | TEST-35.1.5 | tests/current_latest_script_prompt_python_bridge_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, coverage, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -126,9 +126,37 @@ Script-backed prompt processors must execute only with `ScriptAuthorization::All
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-02
+- **改动文件**：
+  - `docs/specs/phases/phase-35-current-latest-script-prompt-python-bridge-burndown.md`
+  - `docs/specs/tasks/task-35.1-current-latest-script-prompt-python-bridge-burndown.md`
+  - `docs/s2v-adapter.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/compatibility/matrix.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `src/script_bridge/mod.rs`
+  - `src/script_bridge/prompt_processor.rs`
+  - `src/script_bridge/python.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+  - `tests/current_latest_script_prompt_python_bridge_burndown.rs`
+  - `tests/current_latest_local_prompt_processor_burndown.rs`
+  - `tests/current_latest_prompt_processing_burndown.rs`
+- **commit 列表**：
+  - `7970f0a` `docs(spec): add phase 35 current latest script bridge burndown`
+  - `fa6dc5c` `docs(spec): task-35.1 enters implementation`
+  - `140e07a` `test(script-bridge): add current latest script prompt Python bridge RED tests`
+  - `cfb9072` `feat(script-bridge): implement current latest script prompt Python evidence`
+  - 本次 docs 回填提交：`docs(spec): complete task 35.1 current latest script bridge burndown`
+- **§9 Verification 结果**：
+  - install: PASS - helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS - helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS - helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS - helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-35.1.1 ~ TEST-35.1.5 与累计 current-latest prompt/script 分类测试均通过。
+  - integration: PASS - helper 执行 adapter Integration tests 通过。
+  - e2e: PASS - helper 执行 adapter E2E tests 通过。
+  - build: PASS - helper 执行 adapter Build 通过。
+  - coverage: PASS - helper 执行 adapter Coverage，通过覆盖率阈值守卫。
+  - runtime-smoke: PASS - helper 执行 adapter Runtime smoke 通过；`current-latest-golden-corpus.json` 为 `ready-with-blockers`、`blocker_count=25`、分组 `config=7, provider=16, script-bridge=2`，`prompt-processing=0`，`perfect_refactor_claim_allowed=false`。
+- **剩余风险 / 未做项**：仍保留 config=7、provider external-authority=16、Ruby script-bridge=2、current-target drift、publication-authority 等 blockers；不承诺“无任何潜在 bug”。本 task 只证明本地 deterministic Node/Python subprocess prompt processor 与 Python bridge contract，不证明 Ruby runtime、真实 provider 服务、账号级权限、private SDK 或公开发布行为。
+- **下游 task 影响**：后续 current-latest burndown 可从 25 个总 blockers 继续推进；Ruby bridge 需要 Ruby runtime fixture 或明确 Waive，config/provider external authority rows 仍需真实权限、产品/服务合同证据或正式 waiver。

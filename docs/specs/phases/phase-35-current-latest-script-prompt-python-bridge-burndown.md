@@ -20,7 +20,7 @@ Phase 34 leaves 33 current-latest P0 golden blockers: config=7, prompt-processin
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 35.1 | current-latest-script-prompt-python-bridge-burndown | ../tasks/task-35.1-current-latest-script-prompt-python-bridge-burndown.md | In Progress | 实现 JS/Python/executable prompt processor 与 Python bridge deterministic subprocess evidence，并保留 Ruby blockers |
+| 35.1 | current-latest-script-prompt-python-bridge-burndown | ../tasks/task-35.1-current-latest-script-prompt-python-bridge-burndown.md | Done | 实现 JS/Python/executable prompt processor 与 Python bridge deterministic subprocess evidence，并保留 Ruby blockers |
 
 ## 5. Dependencies
 

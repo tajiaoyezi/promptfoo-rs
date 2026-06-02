@@ -316,6 +316,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Task 34.1 完成后，current-latest 证据记录 eval-runner 行为为 15 fixture / 3 snapshot / 0 blocker；tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 `current-latest-golden-corpus.blocker_count=33`，分组为 `config=7, prompt-processing=3, provider=16, script-bridge=7`，且 `perfect_refactor_claim_allowed=false`。剩余 blockers 均不属于 eval-runner；需要后续 script bridge / prompt processor、external authority、publication 或 current-target task/决策处理。
 >
 > Phase 35 是 2026-06-02 Phase 34 后的 current-latest script prompt/Python bridge burndown 链路，依据 Phase 34 §9 中仍保留的 3 个 script-backed prompt processor blockers、7 个 script-bridge blockers、task 9.1 的 explicit authorization sandbox、task 32.1 的 blocker split、PRD §Core Capabilities、ADR-005、ADR-009、ADR-011。它只实现本地 deterministic Node/Python subprocess contract，不安装或声称 Ruby parity，也不解除 config/provider external authority、publication、current-target 或“无任何潜在 bug”不可证明承诺。
+>
+> Task 35.1 完成后，current-latest 证据记录 prompt-processing 行为为 10 fixture / 3 snapshot / 0 blocker，script-bridge 行为为 5 fixture / 2 blocker；tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 `current-latest-golden-corpus.blocker_count=25`，分组为 `config=7, provider=16, script-bridge=2`，且 `perfect_refactor_claim_allowed=false`。剩余 script-bridge blockers 仅为 Ruby runtime rows；config/provider external-authority、publication、current-target 和“无任何潜在 bug”承诺仍需外部证据或正式 waiver。
 
 ---
 
