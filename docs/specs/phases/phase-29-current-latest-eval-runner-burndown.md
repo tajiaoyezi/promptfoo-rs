@@ -1,6 +1,6 @@
 # Phase 29: current-latest-eval-runner-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,10 +28,10 @@ After Phase 28, release artifacts still report 18 current-latest eval-runner blo
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] current-latest eval/evaluator/scheduler rows already covered by local deterministic fixtures no longer appear as generic P0 eval-runner blockers and carry `fixture:` evidence references.
-- [ ] current-latest optimizer, scheduler event, and test synthesis rows are recorded as P1 snapshot evidence rather than P0 native parity.
-- [ ] current-latest adaptive concurrency, rate-limit/header parsing, and provider wrapper rows remain explicit P0 eval-runner blockers.
-- [ ] `current-latest-golden-corpus.json` eval-runner blocker count drops from 18 to 7, total blocker count drops from 70 to 59, and `perfect_refactor_claim_allowed=false` remains.
+- [x] current-latest eval/evaluator/scheduler rows already covered by local deterministic fixtures no longer appear as generic P0 eval-runner blockers and carry `fixture:` evidence references.
+- [x] current-latest optimizer, scheduler event, and test synthesis rows are recorded as P1 snapshot evidence rather than P0 native parity.
+- [x] current-latest adaptive concurrency, rate-limit/header parsing, and provider wrapper rows remain explicit P0 eval-runner blockers.
+- [x] `current-latest-golden-corpus.json` eval-runner blocker count drops from 18 to 7, total blocker count is 60 under phase-smoke target `96e556507e4bbee5110d94286d500c4605ccc38b` because provider external-authority blockers are now 17, and `perfect_refactor_claim_allowed=false` remains.
 
 ## 7. Phase Risks
 
@@ -45,7 +45,7 @@ Task 29.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：待实施
-- **Phase smoke**：待实施
-- **Artifact evidence**：待实施
-- **保留边界**：待实施
+- **完成日期**：2026-06-02
+- **Phase smoke**：PASS - `s2v_preflight_phase docs/specs/phases/phase-29-current-latest-eval-runner-burndown.md` 通过；`s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全套通过。
+- **Artifact evidence**：phase smoke 观测 `target/release-gates/current-latest-target.json` default branch target `96e556507e4bbee5110d94286d500c4605ccc38b`；`current-latest-source-inventory.json` 记录 eval-runner 8 fixture / 3 snapshot / 7 blocker；`current-latest-golden-corpus.json` 为 `ready-with-blockers`、`blocker_count=60`、分组 `cache-store=9, config=7, eval-runner=7, prompt-processing=13, provider=17, script-bridge=7`；`current-latest-quality.json` 为 `ready-with-blockers`、`local_current_latest_ready=false`、`perfect_refactor_claim_allowed=false`。
+- **保留边界**：Phase 29 只消减 eval-runner generic blockers，不处理 provider external-authority 新增项、prompt-processing、cache-store、script-bridge、current-target、publication 或“无任何潜在 bug”承诺。`59` 是早先 `1d09df...` 观测包下的总数；当前 latest smoke 必须以 `96e556...` artifact 证据为准。

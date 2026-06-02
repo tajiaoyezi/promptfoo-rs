@@ -85,7 +85,7 @@ Current-latest `category=eval-runner` rows must be classified by stable id and s
 - [x] **AC2** (ADR-009): 3 current-latest optimizer/event/synthesis rows are P1 snapshot evidence and do not weaken P0 eval-runner semantics.
 - [x] **AC3** (ADR-011): 7 current-latest adaptive/rate-limit/provider-wrapper rows remain explicit P0 eval-runner blockers.
 - [x] **AC4** (ADR-009): Rust extractor and shell extractor emit equivalent eval-runner classification, evidence kind, evidence reference, and owner values.
-- [x] **AC5** (ADR-011 / task 24.4): source/matrix/golden/quality artifacts show eval-runner blockers reduced to 7 and total blockers reduced to 59, while perfect-refactor completion remains false.
+- [x] **AC5** (ADR-011 / task 24.4): source/matrix/golden/quality artifacts show eval-runner blockers reduced to 7 and total blockers recorded as 60 under phase-smoke target `96e556507e4bbee5110d94286d500c4605ccc38b` because the moving provider external-authority set is now 17, while perfect-refactor completion remains false.
 
 ## 7. SDD / BDD / TDD Traceability
 
@@ -145,6 +145,6 @@ Current-latest `category=eval-runner` rows must be classified by stable id and s
   - e2e: PASS - helper 执行 adapter E2E tests 通过。
   - coverage: PASS - helper 执行 adapter Coverage，通过覆盖率阈值守卫。
   - build: PASS - helper 执行 adapter Build 通过。
-  - runtime-smoke: PASS - helper 执行 adapter Runtime smoke 通过；`current-latest-golden-corpus.json` 仍为 `ready-with-blockers`，`perfect_refactor_claim_allowed=false`。
-- **剩余风险 / 未做项**：仍保留 7 个 P0 eval-runner blockers（adaptive concurrency、provider rate-limit/header parsing、provider wrapper 等），以及 provider external-authority、prompt-processing、cache-store、script-bridge、current-target、publication 等非本 task 范围 blockers；不承诺“无任何潜在 bug”。
-- **下游 task 影响**：后续 current-latest burndown task 可从 59 个总 blockers 继续推进；任何涉及 adaptive/rate-limit/provider-wrapper native parity 的 task 必须新增专用 fixture 和 RED 测试，不能复用本 task 的 P1 snapshot 或 blocker 记录作为 native 证明。
+  - runtime-smoke: PASS - helper 执行 adapter Runtime smoke 通过；phase smoke 观测 target `96e556507e4bbee5110d94286d500c4605ccc38b`，`current-latest-golden-corpus.json` 为 `ready-with-blockers`、`blocker_count=60`、`perfect_refactor_claim_allowed=false`。
+- **剩余风险 / 未做项**：仍保留 7 个 P0 eval-runner blockers（adaptive concurrency、provider rate-limit/header parsing、provider wrapper 等），以及 provider external-authority（phase smoke 当前为 17 个 provider blockers）、prompt-processing、cache-store、script-bridge、current-target、publication 等非本 task 范围 blockers；不承诺“无任何潜在 bug”。
+- **下游 task 影响**：后续 current-latest burndown task 可从 phase smoke 观测到的 60 个总 blockers 继续推进；任何涉及 adaptive/rate-limit/provider-wrapper native parity 的 task 必须新增专用 fixture 和 RED 测试，不能复用本 task 的 P1 snapshot 或 blocker 记录作为 native 证明。59 是早先 `1d09df...` 观测包下的总数，已被当前 target 的 provider 外部权限新增项取代。
