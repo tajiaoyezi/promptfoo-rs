@@ -20,7 +20,7 @@ After Phase 28, release artifacts still report 18 current-latest eval-runner blo
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 29.1 | current-latest-eval-runner-burndown | ../tasks/task-29.1-current-latest-eval-runner-burndown.md | In Progress | 将 current-latest 18 个 eval-runner blockers 拆为 8 个 fixture-covered rows、3 个 P1 snapshot rows 和 7 个保留 P0 blockers |
+| 29.1 | current-latest-eval-runner-burndown | ../tasks/task-29.1-current-latest-eval-runner-burndown.md | Done | 将 current-latest 18 个 eval-runner blockers 拆为 8 个 fixture-covered rows、3 个 P1 snapshot rows 和 7 个保留 P0 blockers |
 
 ## 5. Dependencies
 

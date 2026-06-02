@@ -1,6 +1,6 @@
 # Task 29.1: current-latest-eval-runner-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 29 - current-latest-eval-runner-burndown
@@ -81,21 +81,21 @@ Current-latest `category=eval-runner` rows must be classified by stable id and s
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Eval runner / task 3.1 / task 13.2): 8 current-latest eval/evaluator/scheduler rows have P0 native fixture evidence and do not produce golden release blockers.
-- [ ] **AC2** (ADR-009): 3 current-latest optimizer/event/synthesis rows are P1 snapshot evidence and do not weaken P0 eval-runner semantics.
-- [ ] **AC3** (ADR-011): 7 current-latest adaptive/rate-limit/provider-wrapper rows remain explicit P0 eval-runner blockers.
-- [ ] **AC4** (ADR-009): Rust extractor and shell extractor emit equivalent eval-runner classification, evidence kind, evidence reference, and owner values.
-- [ ] **AC5** (ADR-011 / task 24.4): source/matrix/golden/quality artifacts show eval-runner blockers reduced to 7 and total blockers reduced to 59, while perfect-refactor completion remains false.
+- [x] **AC1** (PRD §Eval runner / task 3.1 / task 13.2): 8 current-latest eval/evaluator/scheduler rows have P0 native fixture evidence and do not produce golden release blockers.
+- [x] **AC2** (ADR-009): 3 current-latest optimizer/event/synthesis rows are P1 snapshot evidence and do not weaken P0 eval-runner semantics.
+- [x] **AC3** (ADR-011): 7 current-latest adaptive/rate-limit/provider-wrapper rows remain explicit P0 eval-runner blockers.
+- [x] **AC4** (ADR-009): Rust extractor and shell extractor emit equivalent eval-runner classification, evidence kind, evidence reference, and owner values.
+- [x] **AC5** (ADR-011 / task 24.4): source/matrix/golden/quality artifacts show eval-runner blockers reduced to 7 and total blockers reduced to 59, while perfect-refactor completion remains false.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-29.1.1 | TEST-29.1.1 | tests/current_latest_eval_runner_burndown.rs | install, lint, typecheck, unit-test, integration, build | Ready |
-| AC2 | SCEN-29.1.1 | TEST-29.1.2 | tests/current_latest_eval_runner_burndown.rs | install, typecheck, unit-test, coverage, build | Ready |
-| AC3 | SCEN-29.1.1 | TEST-29.1.3 | tests/current_latest_eval_runner_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Ready |
-| AC4 | SCEN-29.1.1 | TEST-29.1.4 | tests/current_latest_eval_runner_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Ready |
-| AC5 | SCEN-29.1.1 | TEST-29.1.5 | tests/current_latest_eval_runner_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, runtime-smoke, build | Ready |
+| AC1 | SCEN-29.1.1 | TEST-29.1.1 | tests/current_latest_eval_runner_burndown.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-29.1.1 | TEST-29.1.2 | tests/current_latest_eval_runner_burndown.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-29.1.1 | TEST-29.1.3 | tests/current_latest_eval_runner_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-29.1.1 | TEST-29.1.4 | tests/current_latest_eval_runner_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC5 | SCEN-29.1.1 | TEST-29.1.5 | tests/current_latest_eval_runner_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -117,9 +117,34 @@ Current-latest `category=eval-runner` rows must be classified by stable id and s
 
 ## 10. Completion Notes
 
-- **完成日期**：待实施
-- **改动文件**：待实施
-- **commit 列表**：待实施
-- **§9 Verification 结果**：待实施
-- **剩余风险 / 未做项**：待实施
-- **下游 task 影响**：待实施
+- **完成日期**：2026-06-02
+- **改动文件**：
+  - `docs/specs/phases/phase-29-current-latest-eval-runner-burndown.md`
+  - `docs/specs/tasks/task-29.1-current-latest-eval-runner-burndown.md`
+  - `docs/s2v-adapter.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_eval_runner_burndown.rs`
+  - `tests/current_latest_source_taxonomy_burndown.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+  - `docs/compatibility/matrix.md`
+- **commit 列表**：
+  - `0b4d52b` `docs(spec): add phase 29 current latest eval runner burndown`
+  - `5b6b0b5` `docs(spec): task-29.1 enters implementation`
+  - `9d8c110` `test(eval-runner): add current latest eval runner burndown RED tests`
+  - `148d502` `feat(eval-runner): classify current latest eval runner evidence`
+  - `83f2abf` `test(eval-runner): keep taxonomy blocker representative current`
+  - 本次 docs 回填提交：`docs(spec): complete task 29.1 current latest eval runner burndown`
+- **§9 Verification 结果**：
+  - install: PASS - helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS - helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS - helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS - helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-29.1.1 ~ TEST-29.1.5 通过，旧 TEST-25.1.2 已更新为仍未证明的 eval-runner blocker 代表行并通过。
+  - integration: PASS - helper 执行 adapter Integration tests 通过。
+  - e2e: PASS - helper 执行 adapter E2E tests 通过。
+  - coverage: PASS - helper 执行 adapter Coverage，通过覆盖率阈值守卫。
+  - build: PASS - helper 执行 adapter Build 通过。
+  - runtime-smoke: PASS - helper 执行 adapter Runtime smoke 通过；`current-latest-golden-corpus.json` 仍为 `ready-with-blockers`，`perfect_refactor_claim_allowed=false`。
+- **剩余风险 / 未做项**：仍保留 7 个 P0 eval-runner blockers（adaptive concurrency、provider rate-limit/header parsing、provider wrapper 等），以及 provider external-authority、prompt-processing、cache-store、script-bridge、current-target、publication 等非本 task 范围 blockers；不承诺“无任何潜在 bug”。
+- **下游 task 影响**：后续 current-latest burndown task 可从 59 个总 blockers 继续推进；任何涉及 adaptive/rate-limit/provider-wrapper native parity 的 task 必须新增专用 fixture 和 RED 测试，不能复用本 task 的 P1 snapshot 或 blocker 记录作为 native 证明。
