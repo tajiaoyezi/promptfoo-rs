@@ -156,15 +156,11 @@ fn test_25_1_2_taxonomy_preserves_p0_p1_p2_evidence_semantics() {
         .rows
         .iter()
         .find(|row| row.source_file == "src/scheduler/providerWrapper.ts")
-        .expect("unproven eval runtime row should exist");
+        .expect("eval runtime row should exist");
     assert_eq!(eval_row.category, "eval-runner");
     assert_eq!(eval_row.level, "P0");
-    assert_eq!(eval_row.evidence_kind, "blocker");
-    assert!(eval_row
-        .blocker_reason
-        .as_deref()
-        .unwrap_or_default()
-        .contains("dedicated current-latest eval-runner evidence"));
+    assert_eq!(eval_row.evidence_kind, "fixture");
+    assert_eq!(eval_row.implementation_status, "native");
 
     let schema_row = inventory
         .rows

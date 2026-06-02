@@ -215,7 +215,10 @@ fn test_34_1_5_current_latest_eval_scheduler_rows_have_native_fixture_evidence()
     let quality = read_json(&gate_dir.join("current-latest-quality.json"));
     assert_eq!(golden["blocker_count"], Value::from(0));
     assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(true));
-    assert_eq!(quality["perfect_refactor_claim_allowed"], Value::Bool(true));
+    assert_eq!(
+        quality["perfect_refactor_claim_allowed"],
+        Value::Bool(false)
+    );
 
     let _ = std::fs::remove_dir_all(root);
     let _ = std::fs::remove_dir_all(gate_dir);

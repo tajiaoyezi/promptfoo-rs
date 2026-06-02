@@ -60,7 +60,7 @@ fn write_eval_runner_source(root: &Path) {
     for relative in fixture_eval_runner_sources()
         .iter()
         .chain(snapshot_eval_runner_sources().iter())
-        .chain(blocked_eval_runner_sources().iter())
+        .chain(rate_limit_eval_runner_sources().iter())
     {
         write_file(root, relative, "export const evalRunner = true;");
     }
@@ -87,7 +87,7 @@ fn snapshot_eval_runner_sources() -> &'static [&'static str] {
     ]
 }
 
-fn blocked_eval_runner_sources() -> &'static [&'static str] {
+fn rate_limit_eval_runner_sources() -> &'static [&'static str] {
     &[
         "src/scheduler/adaptiveConcurrency.ts",
         "src/scheduler/headerParser.ts",
@@ -147,28 +147,23 @@ fn test_29_1_2_optimizer_event_and_synthesis_rows_are_p1_snapshot_evidence() {
 }
 
 #[test]
-fn test_29_1_3_unproven_eval_runner_rows_remain_explicit_blockers() {
+fn test_29_1_3_phase34_scheduler_rows_now_have_native_fixture_evidence() {
     /* TEST-29.1.3 */
-    let root = fixture_dir("rust-blocked");
+    let root = fixture_dir("rust-rate-limit-fixture");
     write_eval_runner_source(&root);
     let inventory = extract_current_latest_inventory(&current_latest_lock(), &root)
         .expect("current latest inventory should extract");
 
-    for source in blocked_eval_runner_sources() {
+    for source in rate_limit_eval_runner_sources() {
         let row = eval_runner_row_for_source(&inventory.rows, source);
         assert_eq!(row.level, "P0", "{row:#?}");
-        assert_eq!(row.implementation_status, "blocked", "{row:#?}");
+        assert_eq!(row.implementation_status, "native", "{row:#?}");
         assert_eq!(row.verification_owner, "eval-runner", "{row:#?}");
-        assert_eq!(row.evidence_kind, "blocker", "{row:#?}");
+        assert_eq!(row.evidence_kind, "fixture", "{row:#?}");
         assert!(
-            row.evidence_reference.starts_with("blocker:eval-runner:"),
+            row.evidence_reference.starts_with("fixture:eval-runner:"),
             "{row:#?}"
         );
-        assert!(row
-            .blocker_reason
-            .as_deref()
-            .unwrap_or_default()
-            .contains("dedicated current-latest eval-runner evidence"));
     }
 
     let _ = std::fs::remove_dir_all(root);
@@ -191,7 +186,7 @@ fn test_29_1_4_script_and_rust_extractors_emit_equivalent_eval_runner_evidence()
 
     assert_eq!(
         eval_runner_rows_with_json(script_rows, "P0", "native", "fixture").len(),
-        8
+        15
     );
     assert_eq!(
         eval_runner_rows_with_json(script_rows, "P1", "later", "snapshot").len(),
@@ -199,7 +194,7 @@ fn test_29_1_4_script_and_rust_extractors_emit_equivalent_eval_runner_evidence()
     );
     assert_eq!(
         eval_runner_rows_with_json(script_rows, "P0", "blocked", "blocker").len(),
-        7
+        0
     );
 
     let rust_rows = inventory
@@ -255,7 +250,7 @@ fn test_29_1_4_script_and_rust_extractors_emit_equivalent_eval_runner_evidence()
 }
 
 #[test]
-fn test_29_1_5_golden_and_quality_keep_remaining_eval_runner_blockers_visible() {
+fn test_29_1_5_golden_and_quality_have_no_eval_runner_blockers_after_phase34() {
     /* TEST-29.1.5 */
     let root = fixture_dir("quality-source");
     write_eval_runner_source(&root);
@@ -279,17 +274,8 @@ fn test_29_1_5_golden_and_quality_keep_remaining_eval_runner_blockers_visible() 
         })
         .collect::<Vec<_>>();
 
-    assert_eq!(eval_runner_blockers.len(), 7, "{eval_runner_blockers:#?}");
-    for blocker in eval_runner_blockers {
-        let capability = blocker["capability"].as_str().unwrap_or_default();
-        assert!(
-            blocked_eval_runner_sources()
-                .iter()
-                .any(|source| capability == stable_eval_runner_id(source)),
-            "unexpected eval-runner blocker {capability}"
-        );
-    }
-    assert_eq!(golden["blocker_count"], Value::from(7));
+    assert!(eval_runner_blockers.is_empty(), "{eval_runner_blockers:#?}");
+    assert_eq!(golden["blocker_count"], Value::from(0));
     assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
     assert_eq!(
         quality["perfect_refactor_claim_allowed"],
@@ -323,28 +309,6 @@ fn eval_runner_rows_with_json<'a>(
                 && row["evidence_kind"] == Value::String(evidence_kind.to_string())
         })
         .collect()
-}
-
-fn stable_eval_runner_id(source: &str) -> String {
-    let without_extension = source.rsplit_once('.').map_or(source, |(left, _)| left);
-    format!("eval-runner:{}", slug(without_extension))
-}
-
-fn slug(value: &str) -> String {
-    value
-        .chars()
-        .map(|ch| {
-            if ch.is_ascii_alphanumeric() {
-                ch.to_ascii_lowercase()
-            } else {
-                '-'
-            }
-        })
-        .collect::<String>()
-        .split('-')
-        .filter(|part| !part.is_empty())
-        .collect::<Vec<_>>()
-        .join("-")
 }
 
 fn run_current_latest_source_inventory_script(root: &Path, gate_dir: &Path) {

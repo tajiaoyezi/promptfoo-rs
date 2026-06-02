@@ -273,6 +273,13 @@ function currentLatestEvalRunnerFixtureIds(id) {
       'p0-eval-partial-failure',
     ],
     'eval-runner:src-scheduler-retrypolicy': ['p0-eval-retry-timeout'],
+    'eval-runner:src-scheduler-adaptiveconcurrency': ['p0-eval-adaptive-concurrency'],
+    'eval-runner:src-scheduler-headerparser': ['p0-eval-rate-limit-headers'],
+    'eval-runner:src-scheduler-providercallexecutioncontext': ['p0-eval-provider-call-context'],
+    'eval-runner:src-scheduler-providerratelimitstate': ['p0-eval-rate-limit-state'],
+    'eval-runner:src-scheduler-providerwrapper': ['p0-eval-provider-wrapper'],
+    'eval-runner:src-scheduler-ratelimitkey': ['p0-eval-rate-limit-key'],
+    'eval-runner:src-scheduler-ratelimitregistry': ['p0-eval-rate-limit-registry'],
   };
   return mapping[id] || [];
 }
