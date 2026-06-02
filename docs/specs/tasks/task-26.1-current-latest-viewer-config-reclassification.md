@@ -1,6 +1,6 @@
 # Task 26.1: current-latest-viewer-config-reclassification
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 26 — current-latest-viewer-config-reclassification
@@ -72,19 +72,19 @@ The current-latest inventory extractor must treat files under `src/app/**` as vi
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Compatibility Matrix / Local Web viewer): current-latest `src/app/**` config-named files produce viewer evidence rows and no duplicate P0 `config` rows.
-- [ ] **AC2** (PRD §Core Capabilities / ADR-009): non-app config rows remain P0 config fixture/blocker rows; no blanket config demotion is allowed.
-- [ ] **AC3** (Phase 25 §9 artifact evidence): source inventory, matrix, golden corpus, and quality artifacts show app viewer config duplicate blockers removed while row accounting remains complete and evidence is non-empty.
-- [ ] **AC4** (task 24.4 claim contract / ADR-011): quality gate still rejects perfect-refactor completion while real current-latest P0 fixture, external authority, current-target, or publication blockers remain.
+- [x] **AC1** (PRD §Compatibility Matrix / Local Web viewer): current-latest `src/app/**` config-named files produce viewer evidence rows and no duplicate P0 `config` rows.
+- [x] **AC2** (PRD §Core Capabilities / ADR-009): non-app config rows remain P0 config fixture/blocker rows; no blanket config demotion is allowed.
+- [x] **AC3** (Phase 25 §9 artifact evidence): source inventory, matrix, golden corpus, and quality artifacts show app viewer config duplicate blockers removed while row accounting remains complete and evidence is non-empty.
+- [x] **AC4** (task 24.4 claim contract / ADR-011): quality gate still rejects perfect-refactor completion while real current-latest P0 fixture, external authority, current-target, or publication blockers remain.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-26.1.1 | TEST-26.1.1 | tests/current_latest_viewer_config_reclassification.rs | install, typecheck, unit-test, integration, build | Ready |
-| AC2 | SCEN-26.1.1 | TEST-26.1.2 | tests/current_latest_viewer_config_reclassification.rs | install, lint, typecheck, unit-test, coverage, build | Ready |
-| AC3 | SCEN-26.1.1 | TEST-26.1.3 | tests/current_latest_viewer_config_reclassification.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Ready |
-| AC4 | SCEN-26.1.1 | TEST-26.1.4 | tests/current_latest_viewer_config_reclassification.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Ready |
+| AC1 | SCEN-26.1.1 | TEST-26.1.1 | tests/current_latest_viewer_config_reclassification.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-26.1.1 | TEST-26.1.2 | tests/current_latest_viewer_config_reclassification.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-26.1.1 | TEST-26.1.3 | tests/current_latest_viewer_config_reclassification.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-26.1.1 | TEST-26.1.4 | tests/current_latest_viewer_config_reclassification.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -106,4 +106,31 @@ The current-latest inventory extractor must treat files under `src/app/**` as vi
 
 ## 10. Completion Notes
 
-- 本 task 完成时按 AGENTS.md §10 schema 回填完成日期、改动文件、commit 列表、§9 Verification 结果、剩余风险和下游 task 影响。
+- **完成日期**：2026-06-02
+- **改动文件**：
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-26-current-latest-viewer-config-reclassification.md`
+  - `docs/specs/tasks/task-26.1-current-latest-viewer-config-reclassification.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_viewer_config_reclassification.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+- **commit 列表**：
+  - `5c112ef` `docs(spec): add phase 26 current latest viewer config reclassification`
+  - `328bff4` `docs(spec): task-26.1 enters implementation`
+  - `3b6e0ba` `test(compatibility): add current latest viewer config RED tests`
+  - `48339c1` `feat(compatibility): reclassify current latest viewer config blockers`
+  - 本次 docs 回填提交：`docs(spec): complete task 26.1 current latest viewer config reclassification`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS — helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-26.1.1 ~ TEST-26.1.4 通过。
+  - integration: PASS — helper 执行 `bash scripts/release/integration.sh` 通过，包含 current-latest viewer config reclassification tests。
+  - e2e: PASS — helper 执行 `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — helper 执行 `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — helper 执行 `bash scripts/release/runtime-smoke.sh` 通过；真实 artifact 复核显示 `current-latest-source-inventory.json` status=`ready`、rows=3858、`src/app/**` config rows=0、`src/app/**` viewer config rows=58、non-app config rows=18，`current-latest-matrix.json` status=`ready`、rows=3858、`src/app/**` config rows=0，`current-latest-golden-corpus.json` status=`ready-with-blockers`、blocker_count=103、`config:src-app*` blockers=0，`current-latest-quality.json` status=`ready-with-blockers`、local_current_latest_ready=false、perfect_refactor_claim_allowed=false。
+- **剩余风险 / 未做项**：本 task 只纠正 current-latest viewer config duplicate P0 blocker；仍有 103 个 current-latest P0 golden blockers（provider=38、config=18、eval-runner=18、prompt-processing=13、cache-store=9、script-bridge=7）、current-target claim boundary、21 个 external authority blockers，以及 publication `credential-blocked`。这些继续阻止“完美重构完成”声明。
+- **下游 task 影响**：后续 task 可优先燃尽剩余 18 个 non-app config P0 blockers，或继续处理 provider/eval/cache/prompt/script bridge fixture blockers；external authority、publication authority 与 current-target claim boundary 仍需独立证据或正式 waiver。
