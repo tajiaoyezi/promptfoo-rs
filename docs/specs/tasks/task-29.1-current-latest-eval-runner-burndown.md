@@ -1,6 +1,6 @@
 # Task 29.1: current-latest-eval-runner-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 29 - current-latest-eval-runner-burndown
