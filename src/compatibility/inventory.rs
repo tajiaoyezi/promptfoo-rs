@@ -2298,6 +2298,64 @@ fn is_prompt_processing_file(file: &str) -> bool {
             || file.starts_with("src/optimizer/"))
 }
 
+fn current_latest_prompt_processing_fixture_ids(stable_id: &str) -> &'static [&'static str] {
+    match stable_id {
+        "prompt-processing:src-prompts-index" | "prompt-processing:src-prompts-utils" => {
+            &["p0-config-file-prompt", "p0-eval-prompt-vars"]
+        }
+        "prompt-processing:src-prompts-processors-string" => &["p0-eval-prompt-vars"],
+        "prompt-processing:src-prompts-processors-text" => &["p0-config-file-prompt"],
+        _ => &[],
+    }
+}
+
+fn is_current_latest_prompt_processing_fixture(stable_id: &str, file: &str) -> bool {
+    is_prompt_processing_file(file)
+        && !current_latest_prompt_processing_fixture_ids(stable_id).is_empty()
+}
+
+fn is_current_latest_prompt_processing_snapshot(file: &str) -> bool {
+    matches!(
+        file,
+        "src/external/prompts/ragas.ts" | "src/prompts/constants.ts" | "src/prompts/grading.ts"
+    )
+}
+
+fn current_latest_prompt_processing_blocker_owner(stable_id: &str, file: &str) -> &'static str {
+    let lower = stable_id.to_ascii_lowercase();
+    if lower.contains("javascript")
+        || lower.contains("python")
+        || lower.contains("executable")
+        || file.contains("/javascript.")
+        || file.contains("/python.")
+        || file.contains("/executable.")
+    {
+        "script-bridge"
+    } else {
+        "config-loader"
+    }
+}
+
+fn current_latest_prompt_processing_blocker_reason(stable_id: &str, file: &str) -> String {
+    let lower = stable_id.to_ascii_lowercase();
+    let reason = if lower.contains("javascript") {
+        "JavaScript prompt processor requires dedicated current-latest script bridge fixture evidence"
+    } else if lower.contains("python") {
+        "Python prompt processor requires dedicated current-latest script bridge fixture evidence"
+    } else if lower.contains("executable") {
+        "executable prompt processor requires dedicated current-latest subprocess fixture evidence"
+    } else if lower.contains("jinja") {
+        "Jinja prompt processor requires dedicated current-latest template rendering fixture evidence"
+    } else if lower.contains("json") {
+        "JSON prompt processor requires dedicated current-latest structured prompt fixture evidence"
+    } else if lower.contains("markdown") {
+        "Markdown prompt processor requires dedicated current-latest markdown fixture evidence"
+    } else {
+        "dedicated current-latest prompt-processing evidence is required"
+    };
+    format!("dedicated current-latest prompt-processing evidence is required before this row can be claimed native: {reason}; source: {file}")
+}
+
 fn is_assertion_support_file(file: &str) -> bool {
     is_ts_or_js_file(file)
         && (file.starts_with("src/matchers/")
@@ -2927,13 +2985,33 @@ fn current_latest_default_metadata(
             stable_id,
             "current-latest cache and result store surface requires fixture evidence",
         ),
+        "prompt-processing" if is_current_latest_prompt_processing_fixture(stable_id, file) => {
+            current_latest_metadata(
+                "P0",
+                "native",
+                "config-loader",
+                "fixture",
+                stable_id,
+                "current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures",
+            )
+        }
+        "prompt-processing" if is_current_latest_prompt_processing_snapshot(file) => {
+            current_latest_metadata(
+                "P1",
+                "later",
+                "config-loader",
+                "snapshot",
+                stable_id,
+                "current-latest static/external prompt helper source is registered under P1 snapshot evidence until dedicated parity work proves native behavior",
+            )
+        }
         "prompt-processing" => current_latest_metadata(
             "P0",
             "blocked",
-            "config-loader",
+            current_latest_prompt_processing_blocker_owner(stable_id, file),
             "blocker",
             stable_id,
-            "current-latest prompt processing surface requires fixture evidence",
+            &current_latest_prompt_processing_blocker_reason(stable_id, file),
         ),
         "script-bridge" => current_latest_metadata(
             "P0",

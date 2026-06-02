@@ -328,6 +328,64 @@ function isPromptProcessing(file) {
   );
 }
 
+function currentLatestPromptProcessingFixtureIds(id) {
+  const mapping = {
+    'prompt-processing:src-prompts-index': ['p0-config-file-prompt', 'p0-eval-prompt-vars'],
+    'prompt-processing:src-prompts-utils': ['p0-config-file-prompt', 'p0-eval-prompt-vars'],
+    'prompt-processing:src-prompts-processors-string': ['p0-eval-prompt-vars'],
+    'prompt-processing:src-prompts-processors-text': ['p0-config-file-prompt'],
+  };
+  return mapping[id] || [];
+}
+
+function isCurrentLatestPromptProcessingFixture(id, file) {
+  return isPromptProcessing(file) && currentLatestPromptProcessingFixtureIds(id).length > 0;
+}
+
+function isCurrentLatestPromptProcessingSnapshot(file) {
+  return [
+    'src/external/prompts/ragas.ts',
+    'src/prompts/constants.ts',
+    'src/prompts/grading.ts',
+  ].includes(file);
+}
+
+function currentLatestPromptProcessingBlockerOwner(id, file) {
+  const lower = id.toLowerCase();
+  if (
+    lower.includes('javascript') ||
+    lower.includes('python') ||
+    lower.includes('executable') ||
+    file.includes('/javascript.') ||
+    file.includes('/python.') ||
+    file.includes('/executable.')
+  ) {
+    return 'script-bridge';
+  }
+  return 'config-loader';
+}
+
+function currentLatestPromptProcessingBlockerReason(id, file) {
+  const lower = id.toLowerCase();
+  let reason;
+  if (lower.includes('javascript')) {
+    reason = 'JavaScript prompt processor requires dedicated current-latest script bridge fixture evidence';
+  } else if (lower.includes('python')) {
+    reason = 'Python prompt processor requires dedicated current-latest script bridge fixture evidence';
+  } else if (lower.includes('executable')) {
+    reason = 'executable prompt processor requires dedicated current-latest subprocess fixture evidence';
+  } else if (lower.includes('jinja')) {
+    reason = 'Jinja prompt processor requires dedicated current-latest template rendering fixture evidence';
+  } else if (lower.includes('json')) {
+    reason = 'JSON prompt processor requires dedicated current-latest structured prompt fixture evidence';
+  } else if (lower.includes('markdown')) {
+    reason = 'Markdown prompt processor requires dedicated current-latest markdown fixture evidence';
+  } else {
+    reason = 'dedicated current-latest prompt-processing evidence is required';
+  }
+  return `dedicated current-latest prompt-processing evidence is required before this row can be claimed native: ${reason}; source: ${file}`;
+}
+
 function isAssertionSupport(file) {
   return (
     isTsOrJs(file) &&
@@ -466,7 +524,9 @@ function metadata(category, id, file) {
   if (category === 'eval-runner' && isCurrentLatestEvalRunnerSnapshot(file)) return ['P1', 'later', 'eval-runner', 'snapshot', `current-latest optimizer/event/synthesis eval-runner source is registered under P1 snapshot evidence until dedicated parity work proves native behavior; item: ${id}`];
   if (category === 'eval-runner') return ['P0', 'blocked', 'eval-runner', 'blocker', `${currentLatestEvalRunnerBlockerReason(id, file)}; item: ${id}`];
   if (category === 'cache-store') return ['P0', 'blocked', 'cache-resume-store', 'blocker', `current-latest cache and result store surface requires fixture evidence; item: ${id}`];
-  if (category === 'prompt-processing') return ['P0', 'blocked', 'config-loader', 'blocker', `current-latest prompt processing surface requires fixture evidence; item: ${id}`];
+  if (category === 'prompt-processing' && isCurrentLatestPromptProcessingFixture(id, file)) return ['P0', 'native', 'config-loader', 'fixture', `current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures; item: ${id}`];
+  if (category === 'prompt-processing' && isCurrentLatestPromptProcessingSnapshot(file)) return ['P1', 'later', 'config-loader', 'snapshot', `current-latest static/external prompt helper source is registered under P1 snapshot evidence until dedicated parity work proves native behavior; item: ${id}`];
+  if (category === 'prompt-processing') return ['P0', 'blocked', currentLatestPromptProcessingBlockerOwner(id, file), 'blocker', `${currentLatestPromptProcessingBlockerReason(id, file)}; item: ${id}`];
   if (category === 'script-bridge') return ['P0', 'blocked', 'script-bridge', 'blocker', `current-latest script bridge surface requires authorized subprocess fixture evidence; item: ${id}`];
   if (category === 'viewer') return ['P1', 'later', 'web-viewer', 'snapshot', `current-latest viewer surface requires data-contract or browser snapshot; item: ${id}`];
   if (category === 'assertion-support') return ['P1', 'later', 'assertion-engine', 'snapshot', `current-latest assertion support surface requires matcher or grading snapshot evidence; item: ${id}`];
