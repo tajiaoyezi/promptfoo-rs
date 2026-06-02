@@ -32,6 +32,12 @@ ff8eafd743cf6d63dd85b790ad8a4c73ede5828d\tHEAD
 1c743afe0e4807882e858c4f322fc064fa5f0770\trefs/tags/code-scan-action-0.1.7
 ";
 
+const LATEST_RELEASE_VIEW: &str = r#"{
+  "tagName": "code-scan-action-0.1.7",
+  "targetCommitish": "1c743afe0e4807882e858c4f322fc064fa5f0770",
+  "name": "code-scan-action: 0.1.7"
+}"#;
+
 const DYNAMIC_LATEST_RELEASE_VIEW: &str = r#"{
   "tagName": "code-scan-action-0.2.0",
   "targetCommitish": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
@@ -125,13 +131,17 @@ fn test_21_1_4_runtime_smoke_wires_distribution_target_artifact() {
     let _ = std::fs::remove_dir_all(&fixture_dir);
     std::fs::create_dir_all(&fixture_dir).expect("fixture dir should create");
     let npm_path = fixture_dir.join("npm-view.json");
+    let latest_release_path = fixture_dir.join("github-latest-release.json");
     let ls_remote_path = fixture_dir.join("ls-remote.txt");
     std::fs::write(&npm_path, NPM_VIEW).expect("npm fixture should write");
+    std::fs::write(&latest_release_path, LATEST_RELEASE_VIEW)
+        .expect("latest release fixture should write");
     std::fs::write(&ls_remote_path, LS_REMOTE).expect("ls-remote fixture should write");
 
     let command = format!(
-        "UPSTREAM_NPM_VIEW_FILE='{}' UPSTREAM_LS_REMOTE_FILE='{}' bash scripts/release/upstream-distribution-target.sh",
+        "UPSTREAM_NPM_VIEW_FILE='{}' UPSTREAM_GITHUB_RELEASE_FILE='{}' UPSTREAM_LS_REMOTE_FILE='{}' bash scripts/release/upstream-distribution-target.sh",
         shell_escape(&npm_path),
+        shell_escape(&latest_release_path),
         shell_escape(&ls_remote_path)
     );
     let script_output = Command::new(git_bash())
