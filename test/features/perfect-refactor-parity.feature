@@ -45,6 +45,8 @@
 #   - docs/specs/tasks/task-30.1-current-latest-prompt-processing-burndown.md
 #   - docs/specs/tasks/task-31.1-current-latest-cache-store-burndown.md
 #   - docs/specs/tasks/task-32.1-current-latest-local-prompt-processor-burndown.md
+#   - docs/specs/tasks/task-33.1-current-latest-eval-deletion-burndown.md
+#   - docs/specs/tasks/task-34.1-current-latest-eval-scheduler-rate-limit-burndown.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -324,3 +326,13 @@ Feature: perfect refactor parity
     And TEST-33.1.2 proves missing eval deletion is a non-destructive no-op
     And TEST-33.1.3 proves the current-latest eval deletion row has P0 native fixture evidence and no cache-store blocker remains
     And TEST-33.1.4 proves Rust and shell extractors emit equivalent eval deletion evidence and total blockers drop to 40 while perfect-refactor completion remains false
+
+  # Maps to: docs/specs/tasks/task-34.1-current-latest-eval-scheduler-rate-limit-burndown.md
+  Scenario: SCEN-34.1.1 - current latest eval scheduler rate-limit rows have local deterministic evidence
+    Given Phase 33 current-latest artifacts have 7 eval-runner scheduler rate-limit blockers
+    When the current-latest eval scheduler rate-limit burndown runs
+    Then TEST-34.1.1 proves provider rate-limit header parsing and key derivation are deterministic
+    And TEST-34.1.2 proves provider rate-limit registry records headers and returns deterministic delay decisions
+    And TEST-34.1.3 proves adaptive concurrency responds within configured bounds
+    And TEST-34.1.4 proves provider call execution context and wrapper expose stable local metadata and header records
+    And TEST-34.1.5 proves Rust and shell extractors emit equivalent eval scheduler evidence and total blockers drop to 33 while perfect-refactor completion remains false
