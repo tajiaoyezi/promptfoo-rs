@@ -84,6 +84,7 @@ fn write_taxonomy_source(root: &Path) {
         "src/server/routes/eval.ts",
         "src/openapi/server.ts",
         "src/blobs/filesystemProvider.ts",
+        "src/tracing/evaluatorTracing.ts",
         "src/python/wrapper.ts",
         "src/ruby/wrapper.ts",
         "src/importers/openaiEvals/convert.ts",
@@ -129,6 +130,7 @@ fn test_25_1_1_representative_previous_unknown_source_families_are_classified() 
         "script-bridge",
         "integration",
         "cloud-share",
+        "observability",
         "runtime-support",
     ] {
         assert!(
@@ -171,6 +173,15 @@ fn test_25_1_2_taxonomy_preserves_p0_p1_p2_evidence_semantics() {
     assert_eq!(schema_row.category, "schema");
     assert_eq!(schema_row.level, "P1");
     assert_eq!(schema_row.evidence_kind, "snapshot");
+
+    let observability_row = inventory
+        .rows
+        .iter()
+        .find(|row| row.source_file == "src/tracing/evaluatorTracing.ts")
+        .expect("observability row should exist");
+    assert_eq!(observability_row.category, "observability");
+    assert_eq!(observability_row.level, "P1");
+    assert_eq!(observability_row.evidence_kind, "snapshot");
 
     let cloud_row = inventory
         .rows
