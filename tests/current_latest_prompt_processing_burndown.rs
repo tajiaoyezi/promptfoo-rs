@@ -69,6 +69,9 @@ fn write_prompt_processing_source(root: &Path) {
 fn fixture_prompt_processing_sources() -> &'static [&'static str] {
     &[
         "src/prompts/index.ts",
+        "src/prompts/processors/jinja.ts",
+        "src/prompts/processors/json.ts",
+        "src/prompts/processors/markdown.ts",
         "src/prompts/processors/string.ts",
         "src/prompts/processors/text.ts",
         "src/prompts/utils.ts",
@@ -87,9 +90,6 @@ fn blocked_prompt_processing_sources() -> &'static [&'static str] {
     &[
         "src/prompts/processors/executable.ts",
         "src/prompts/processors/javascript.ts",
-        "src/prompts/processors/jinja.ts",
-        "src/prompts/processors/json.ts",
-        "src/prompts/processors/markdown.ts",
         "src/prompts/processors/python.ts",
     ]
 }
@@ -155,10 +155,7 @@ fn test_30_1_3_unproven_prompt_processor_rows_remain_explicit_blockers() {
         let row = prompt_processing_row_for_source(&inventory.rows, source);
         assert_eq!(row.level, "P0", "{row:#?}");
         assert_eq!(row.implementation_status, "blocked", "{row:#?}");
-        assert!(matches!(
-            row.verification_owner.as_str(),
-            "config-loader" | "script-bridge"
-        ));
+        assert_eq!(row.verification_owner, "script-bridge", "{row:#?}");
         assert_eq!(row.evidence_kind, "blocker", "{row:#?}");
         assert!(
             row.evidence_reference
@@ -192,7 +189,7 @@ fn test_30_1_4_script_and_rust_extractors_emit_equivalent_prompt_processing_evid
 
     assert_eq!(
         prompt_processing_rows_with_json(script_rows, "P0", "native", "fixture").len(),
-        4
+        7
     );
     assert_eq!(
         prompt_processing_rows_with_json(script_rows, "P1", "later", "snapshot").len(),
@@ -200,7 +197,7 @@ fn test_30_1_4_script_and_rust_extractors_emit_equivalent_prompt_processing_evid
     );
     assert_eq!(
         prompt_processing_rows_with_json(script_rows, "P0", "blocked", "blocker").len(),
-        6
+        3
     );
 
     let rust_rows = inventory
@@ -282,7 +279,7 @@ fn test_30_1_5_golden_and_quality_keep_remaining_prompt_processing_blockers_visi
 
     assert_eq!(
         prompt_processing_blockers.len(),
-        6,
+        3,
         "{prompt_processing_blockers:#?}"
     );
     for blocker in prompt_processing_blockers {
@@ -294,7 +291,7 @@ fn test_30_1_5_golden_and_quality_keep_remaining_prompt_processing_blockers_visi
             "unexpected prompt-processing blocker {capability}"
         );
     }
-    assert_eq!(golden["blocker_count"], Value::from(6));
+    assert_eq!(golden["blocker_count"], Value::from(3));
     assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
     assert_eq!(
         quality["perfect_refactor_claim_allowed"],

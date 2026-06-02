@@ -362,6 +362,11 @@ function isPromptProcessing(file) {
 }
 
 function currentLatestPromptProcessingFixtureIds(id) {
+  const localProcessorFixtures = currentLatestLocalPromptProcessorFixtureIds(id);
+  if (localProcessorFixtures.length > 0) {
+    return localProcessorFixtures;
+  }
+
   const mapping = {
     'prompt-processing:src-prompts-index': ['p0-config-file-prompt', 'p0-eval-prompt-vars'],
     'prompt-processing:src-prompts-utils': ['p0-config-file-prompt', 'p0-eval-prompt-vars'],
@@ -369,6 +374,22 @@ function currentLatestPromptProcessingFixtureIds(id) {
     'prompt-processing:src-prompts-processors-text': ['p0-config-file-prompt'],
   };
   return mapping[id] || [];
+}
+
+function currentLatestLocalPromptProcessorFixtureIds(id) {
+  const mapping = {
+    'prompt-processing:src-prompts-processors-json': ['p0-config-file-prompt'],
+    'prompt-processing:src-prompts-processors-markdown': ['p0-config-file-prompt'],
+    'prompt-processing:src-prompts-processors-jinja': [
+      'p0-config-file-prompt',
+      'p0-eval-prompt-vars',
+    ],
+  };
+  return mapping[id] || [];
+}
+
+function isCurrentLatestLocalPromptProcessorFixture(id, file) {
+  return isPromptProcessing(file) && currentLatestLocalPromptProcessorFixtureIds(id).length > 0;
 }
 
 function isCurrentLatestPromptProcessingFixture(id, file) {
@@ -406,7 +427,7 @@ function currentLatestPromptProcessingBlockerReason(id, file) {
   } else if (lower.includes('python')) {
     reason = 'Python prompt processor requires dedicated current-latest script bridge fixture evidence';
   } else if (lower.includes('executable')) {
-    reason = 'executable prompt processor requires dedicated current-latest subprocess fixture evidence';
+    reason = 'executable prompt processor requires dedicated current-latest script bridge subprocess fixture evidence';
   } else if (lower.includes('jinja')) {
     reason = 'Jinja prompt processor requires dedicated current-latest template rendering fixture evidence';
   } else if (lower.includes('json')) {
@@ -559,7 +580,7 @@ function metadata(category, id, file) {
   if (category === 'cache-store' && isCurrentLatestCacheStoreFixture(id, file)) return ['P0', 'native', 'cache-resume-store', 'fixture', `current-latest cache key, database schema, and local filesystem storage source is covered by existing deterministic cache/resume/result-store fixtures; item: ${id}`];
   if (category === 'cache-store' && isCurrentLatestCacheStoreSnapshot(file)) return ['P1', 'later', 'cache-resume-store', 'snapshot', `current-latest database testing/signal helper source is registered under P1 snapshot evidence until dedicated lifecycle parity work proves native behavior; item: ${id}`];
   if (category === 'cache-store') return ['P0', 'blocked', 'cache-resume-store', 'blocker', `${currentLatestCacheStoreBlockerReason(id, file)}; item: ${id}`];
-  if (category === 'prompt-processing' && isCurrentLatestPromptProcessingFixture(id, file)) return ['P0', 'native', 'config-loader', 'fixture', `current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures; item: ${id}`];
+  if (category === 'prompt-processing' && isCurrentLatestPromptProcessingFixture(id, file)) return ['P0', 'native', 'config-loader', 'fixture', `${isCurrentLatestLocalPromptProcessorFixture(id, file) ? 'current-latest JSON, Markdown, and Jinja prompt processor source is covered by deterministic local config and eval prompt fixtures' : 'current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures'}; item: ${id}`];
   if (category === 'prompt-processing' && isCurrentLatestPromptProcessingSnapshot(file)) return ['P1', 'later', 'config-loader', 'snapshot', `current-latest static/external prompt helper source is registered under P1 snapshot evidence until dedicated parity work proves native behavior; item: ${id}`];
   if (category === 'prompt-processing') return ['P0', 'blocked', currentLatestPromptProcessingBlockerOwner(id, file), 'blocker', `${currentLatestPromptProcessingBlockerReason(id, file)}; item: ${id}`];
   if (category === 'script-bridge') return ['P0', 'blocked', 'script-bridge', 'blocker', `current-latest script bridge surface requires authorized subprocess fixture evidence; item: ${id}`];

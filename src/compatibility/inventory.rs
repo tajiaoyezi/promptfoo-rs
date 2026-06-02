@@ -2335,6 +2335,11 @@ fn is_prompt_processing_file(file: &str) -> bool {
 }
 
 fn current_latest_prompt_processing_fixture_ids(stable_id: &str) -> &'static [&'static str] {
+    let local_processor_fixtures = current_latest_local_prompt_processor_fixture_ids(stable_id);
+    if !local_processor_fixtures.is_empty() {
+        return local_processor_fixtures;
+    }
+
     match stable_id {
         "prompt-processing:src-prompts-index" | "prompt-processing:src-prompts-utils" => {
             &["p0-config-file-prompt", "p0-eval-prompt-vars"]
@@ -2343,6 +2348,22 @@ fn current_latest_prompt_processing_fixture_ids(stable_id: &str) -> &'static [&'
         "prompt-processing:src-prompts-processors-text" => &["p0-config-file-prompt"],
         _ => &[],
     }
+}
+
+fn current_latest_local_prompt_processor_fixture_ids(stable_id: &str) -> &'static [&'static str] {
+    match stable_id {
+        "prompt-processing:src-prompts-processors-json" => &["p0-config-file-prompt"],
+        "prompt-processing:src-prompts-processors-markdown" => &["p0-config-file-prompt"],
+        "prompt-processing:src-prompts-processors-jinja" => {
+            &["p0-config-file-prompt", "p0-eval-prompt-vars"]
+        }
+        _ => &[],
+    }
+}
+
+fn is_current_latest_local_prompt_processor_fixture(stable_id: &str, file: &str) -> bool {
+    is_prompt_processing_file(file)
+        && !current_latest_local_prompt_processor_fixture_ids(stable_id).is_empty()
 }
 
 fn is_current_latest_prompt_processing_fixture(stable_id: &str, file: &str) -> bool {
@@ -2379,7 +2400,7 @@ fn current_latest_prompt_processing_blocker_reason(stable_id: &str, file: &str) 
     } else if lower.contains("python") {
         "Python prompt processor requires dedicated current-latest script bridge fixture evidence"
     } else if lower.contains("executable") {
-        "executable prompt processor requires dedicated current-latest subprocess fixture evidence"
+        "executable prompt processor requires dedicated current-latest script bridge subprocess fixture evidence"
     } else if lower.contains("jinja") {
         "Jinja prompt processor requires dedicated current-latest template rendering fixture evidence"
     } else if lower.contains("json") {
@@ -3046,7 +3067,11 @@ fn current_latest_default_metadata(
                 "config-loader",
                 "fixture",
                 stable_id,
-                "current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures",
+                if is_current_latest_local_prompt_processor_fixture(stable_id, file) {
+                    "current-latest JSON, Markdown, and Jinja prompt processor source is covered by deterministic local config and eval prompt fixtures"
+                } else {
+                    "current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures"
+                },
             )
         }
         "prompt-processing" if is_current_latest_prompt_processing_snapshot(file) => {
