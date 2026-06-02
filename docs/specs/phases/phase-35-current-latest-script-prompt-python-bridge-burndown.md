@@ -1,6 +1,6 @@
 # Phase 35: current-latest-script-prompt-python-bridge-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,11 +28,11 @@ Depends on Phase 24 current-latest artifacts, Phase 32 local prompt processor sp
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] Script-backed JavaScript, Python, and executable prompt processors run only with explicit authorization, exchange deterministic JSON stdin/stdout payloads, capture stderr, apply env allowlist, and reject unauthorized execution.
-- [ ] Python bridge wrapper and worker behavior execute authorized Python subprocess calls with JSON payloads, stderr capture, timeout/error propagation, and deterministic worker-pool result ordering.
-- [ ] Current-latest JavaScript/Python/executable prompt processor rows have P0 native fixture evidence in Rust and shell artifacts, and prompt-processing blockers drop to zero.
-- [ ] Current-latest `src/python/*` script-bridge rows have P0 native fixture evidence in Rust and shell artifacts; `src/ruby/*` rows remain explicit P0 blockers with runtime-authority reasons.
-- [ ] Total current-latest blockers drop from 33 to 25, and `perfect_refactor_claim_allowed=false` remains because config/provider external authority and Ruby blockers still exist.
+- [x] Script-backed JavaScript, Python, and executable prompt processors run only with explicit authorization, exchange deterministic JSON stdin/stdout payloads, capture stderr, apply env allowlist, and reject unauthorized execution.
+- [x] Python bridge wrapper and worker behavior execute authorized Python subprocess calls with JSON payloads, stderr capture, timeout/error propagation, and deterministic worker-pool result ordering.
+- [x] Current-latest JavaScript/Python/executable prompt processor rows have P0 native fixture evidence in Rust and shell artifacts, and prompt-processing blockers drop to zero.
+- [x] Current-latest `src/python/*` script-bridge rows have P0 native fixture evidence in Rust and shell artifacts; `src/ruby/*` rows remain explicit P0 blockers with runtime-authority reasons.
+- [x] Total current-latest blockers drop from 33 to 25, and `perfect_refactor_claim_allowed=false` remains because config/provider external authority and Ruby blockers still exist.
 
 ## 7. Phase Risks
 
@@ -46,7 +46,7 @@ Task 35.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **保留边界**：<TBD-after-impl>
+- **完成日期**：2026-06-02
+- **Phase smoke**：PASS - `s2v_preflight_phase "docs/specs/phases/phase-35-current-latest-script-prompt-python-bridge-burndown.md"` 通过，随后执行 `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全套通过。
+- **Artifact evidence**：`current-latest-golden-corpus.status=ready-with-blockers`、`blocker_count=25`、分组为 `config=7, provider=16, script-bridge=2`；`prompt-processing=0`；`current-latest-matrix` 记录 `prompt-processing native fixture=10 / later snapshot=3`、`script-bridge native fixture=5 / blocked blocker=2`；`current-latest-quality.status=ready-with-blockers`、`local_current_latest_ready=false`、`perfect_refactor_claim_allowed=false`。
+- **保留边界**：本 phase 只移除本地 deterministic JS/Python/executable prompt processor 与 Python bridge blockers；不解除 Ruby runtime gap、config/provider external authority、publication authority、current-target blocker 或“无任何潜在 bug”不可证明承诺。
