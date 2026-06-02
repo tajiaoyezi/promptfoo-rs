@@ -1,6 +1,6 @@
 # Task 33.1: current-latest-eval-deletion-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 33 - current-latest-eval-deletion-burndown
