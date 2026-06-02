@@ -39,6 +39,7 @@
 #   - docs/specs/tasks/task-24.4-current-latest-exhaustive-quality-gate.md
 #   - docs/specs/tasks/task-25.1-current-latest-source-taxonomy-burndown.md
 #   - docs/specs/tasks/task-26.1-current-latest-viewer-config-reclassification.md
+#   - docs/specs/tasks/task-27.1-current-latest-core-config-burndown.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -254,3 +255,11 @@ Feature: perfect refactor parity
     And TEST-26.1.2 proves non-app config rows remain P0 config fixture or blocker rows
     And TEST-26.1.3 proves source matrix golden and quality artifacts keep complete row accounting
     And TEST-26.1.4 proves perfect-refactor completion remains false while real blockers remain
+
+  Scenario: SCEN-27.1.1 - current latest core config blockers are specific decisions
+    Given Phase 26 current-latest artifacts have 18 non-app config blockers
+    When the current-latest core config burndown runs
+    Then TEST-27.1.1 proves runtime and redteam config rows have fixture evidence
+    And TEST-27.1.2 proves auxiliary code scan and MCP config rows are P1 snapshot evidence
+    And TEST-27.1.3 proves cloud server telemetry and global config rows remain explicit external blockers
+    And TEST-27.1.4 proves config golden blockers drop to external-only rows while perfect-refactor completion remains false
