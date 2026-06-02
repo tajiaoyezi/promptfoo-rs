@@ -1,6 +1,6 @@
 # Phase 25: current-latest-source-taxonomy-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ Phase 24 proved the project cannot claim current-latest perfect refactor readine
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 25.1 | current-latest-source-taxonomy-burndown | ../tasks/task-25.1-current-latest-source-taxonomy-burndown.md | In Progress | 将 current-latest source/matrix 的 unclassified rows 降为 0，并保留真实 P0/external/publication blockers |
+| 25.1 | current-latest-source-taxonomy-burndown | ../tasks/task-25.1-current-latest-source-taxonomy-burndown.md | Done | 将 current-latest source/matrix 的 unclassified rows 降为 0，并保留真实 P0/external/publication blockers |
 
 ## 5. Dependencies
 
@@ -28,10 +28,10 @@ Phase 24 proved the project cannot claim current-latest perfect refactor readine
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `target/release-gates/current-latest-source-inventory.json` 与 `current-latest-matrix.json` 的 `unclassified_rows` 均为空，且 row_count 不因删除 unknown rows 下降。
-- [ ] 新 taxonomy 对 `src/util`、`src/redteam`、`src/types`、`src/server`、`src/scheduler`、`src/prompts`、`src/matchers`、`src/database/storage/cache`、script bridge、cloud/share/integration 等 current-latest source families 给出 owner、level 和 evidence kind。
-- [ ] golden corpus 不再因 `category=unclassified` 产生 `Unclassified` blocker；剩余 P0 blocker 必须继续以 `Bug` 或 explicit blocker reason 暴露。
-- [ ] `current-latest-quality.json` 仍禁止 perfect-refactor claim，除非 source/matrix/golden/current-target/external/publication blockers 全部清零或正式 waiver。
+- [x] `target/release-gates/current-latest-source-inventory.json` 与 `current-latest-matrix.json` 的 `unclassified_rows` 均为空，且 row_count 不因删除 unknown rows 下降。
+- [x] 新 taxonomy 对 `src/util`、`src/redteam`、`src/types`、`src/server`、`src/scheduler`、`src/prompts`、`src/matchers`、`src/database/storage/cache`、script bridge、cloud/share/integration 等 current-latest source families 给出 owner、level 和 evidence kind。
+- [x] golden corpus 不再因 `category=unclassified` 产生 `Unclassified` blocker；剩余 P0 blocker 必须继续以 `Bug` 或 explicit blocker reason 暴露。
+- [x] `current-latest-quality.json` 仍禁止 perfect-refactor claim，除非 source/matrix/golden/current-target/external/publication blockers 全部清零或正式 waiver。
 
 ## 7. Phase Risks
 
@@ -45,4 +45,11 @@ Task 25.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-待实施。
+- **完成日期**：2026-06-02
+- **Phase smoke**：PASS — `s2v_verify_full "install lint typecheck unit-test integration e2e build coverage runtime-smoke"` 全 9 项通过；真实 artifact 复核完成。
+- **Artifact evidence**：
+  - `target/release-gates/current-latest-source-inventory.json`：status=`ready`，rows=3916，unclassified_rows=0，rows_missing_evidence=0。
+  - `target/release-gates/current-latest-matrix.json`：status=`ready`，rows=3916，unclassified_rows=0，rows_missing_evidence=0。
+  - `target/release-gates/current-latest-golden-corpus.json`：status=`ready-with-blockers`，p0_total=161，p0_fixture_coverage_count=161，p1_total=2348，p2_total=1407，blocker_count=161，未检出 taxonomy `Unclassified` finding。
+  - `target/release-gates/current-latest-quality.json`：status=`ready-with-blockers`，local_stable_allowed=true，local_current_latest_ready=false，perfect_refactor_claim_allowed=false；剩余 blockers 为 golden-corpus、current-target、external-authority、publication-authority。
+- **保留边界**：Phase 25 完成的是 current-latest unknown taxonomy burndown，不等于 current-latest perfect-refactor 完成。后续仍需消除 161 个 P0 golden blockers，或取得/正式 waiver external authority、publication authority 和 current-target claim evidence。

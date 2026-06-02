@@ -1,6 +1,6 @@
 # Task 25.1: current-latest-source-taxonomy-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 25 — current-latest-source-taxonomy-burndown
@@ -71,19 +71,19 @@ The current-latest source inventory extractor must classify every TypeScript/Jav
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (Phase 24 §9): representative source rows from the 318-row unclassified set are classified into non-`unclassified` categories with level, implementation status, owner, evidence kind, and evidence reference.
-- [ ] **AC2** (ADR-009): classification preserves P0/P1/P2 semantics: eval/config/cache/provider/script runtime rows remain P0 or explicit blockers when fixture evidence is required; viewer/schema/docs/integration/cloud-share long-tail rows become P1/P2 only with reasoned evidence.
-- [ ] **AC3** (ADR-011): running the current-latest source inventory script against the locked target writes source inventory and matrix artifacts with `unclassified_rows=[]` and no missing evidence rows.
-- [ ] **AC4** (task 24.4 claim contract): current-latest golden corpus and quality gate no longer report taxonomy `Unclassified` blockers, but `perfect_refactor_claim_allowed` remains false while real local/external/publication blockers remain.
+- [x] **AC1** (Phase 24 §9): representative source rows from the 318-row unclassified set are classified into non-`unclassified` categories with level, implementation status, owner, evidence kind, and evidence reference.
+- [x] **AC2** (ADR-009): classification preserves P0/P1/P2 semantics: eval/config/cache/provider/script runtime rows remain P0 or explicit blockers when fixture evidence is required; viewer/schema/docs/integration/cloud-share long-tail rows become P1/P2 only with reasoned evidence.
+- [x] **AC3** (ADR-011): running the current-latest source inventory script against the locked target writes source inventory and matrix artifacts with `unclassified_rows=[]` and no missing evidence rows.
+- [x] **AC4** (task 24.4 claim contract): current-latest golden corpus and quality gate no longer report taxonomy `Unclassified` blockers, but `perfect_refactor_claim_allowed` remains false while real local/external/publication blockers remain.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-25.1.1 | TEST-25.1.1 | tests/current_latest_source_taxonomy_burndown.rs | install, typecheck, unit-test, integration, build | Ready |
-| AC2 | SCEN-25.1.1 | TEST-25.1.2 | tests/current_latest_source_taxonomy_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Ready |
-| AC3 | SCEN-25.1.1 | TEST-25.1.3 | tests/current_latest_source_taxonomy_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Ready |
-| AC4 | SCEN-25.1.1 | TEST-25.1.4 | tests/current_latest_source_taxonomy_burndown.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Ready |
+| AC1 | SCEN-25.1.1 | TEST-25.1.1 | tests/current_latest_source_taxonomy_burndown.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-25.1.1 | TEST-25.1.2 | tests/current_latest_source_taxonomy_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-25.1.1 | TEST-25.1.3 | tests/current_latest_source_taxonomy_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-25.1.1 | TEST-25.1.4 | tests/current_latest_source_taxonomy_burndown.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -105,4 +105,34 @@ The current-latest source inventory extractor must classify every TypeScript/Jav
 
 ## 10. Completion Notes
 
-待实施。
+- **完成日期**：2026-06-02
+- **改动文件**：
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-25-current-latest-source-taxonomy-burndown.md`
+  - `docs/specs/tasks/task-25.1-current-latest-source-taxonomy-burndown.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_source_taxonomy_burndown.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+- **commit 列表**：
+  - `ab061d7` `docs(spec): add phase 25 current latest taxonomy burndown`
+  - `513a06e` `docs(spec): task-25.1 enters implementation`
+  - `24bb12c` `test(compatibility): add current latest source taxonomy RED tests`
+  - `6ab69c2` `feat(compatibility): classify current latest source taxonomy`
+  - `1f734a1` `refactor(compatibility): format current latest taxonomy helpers`
+  - `8fd0750` `test(compatibility): add current latest tracing taxonomy RED`
+  - `0b00aa8` `feat(compatibility): classify current latest tracing taxonomy`
+  - 本次 docs 回填提交：`docs(spec): complete task 25.1 current latest taxonomy burndown`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS — helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-25.1.1 ~ TEST-25.1.4 通过。
+  - integration: PASS — helper 执行 `bash scripts/release/integration.sh` 通过，包含 current-latest taxonomy tests。
+  - e2e: PASS — helper 执行 `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — helper 执行 `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — helper 执行 `bash scripts/release/runtime-smoke.sh` 通过；真实 artifact 复核显示 `current-latest-source-inventory.json` status=`ready`、rows=3916、unclassified_rows=0、rows_missing_evidence=0，`current-latest-matrix.json` status=`ready`、unclassified_rows=0、rows_missing_evidence=0，`current-latest-golden-corpus.json` status=`ready-with-blockers`、blocker_count=161、无 taxonomy `Unclassified` finding，`current-latest-quality.json` status=`ready-with-blockers`、local_stable_allowed=true、local_current_latest_ready=false、perfect_refactor_claim_allowed=false。
+- **剩余风险 / 未做项**：本 task 只消除了 source/matrix unknown taxonomy blocker；仍有 161 个 current-latest P0 golden blockers、current-target claim boundary、21 个 external authority blockers，以及 publication `credential-blocked`。这些不能被声明为“完美重构完成”。
+- **下游 task 影响**：后续 task/phase 可直接面向 161 个 P0 golden blockers 做 native/bridge fixture burndown，并继续保留 external authority 与 publication authority 决策包。
