@@ -319,6 +319,39 @@ function isCacheStore(file) {
   );
 }
 
+function isCurrentLatestCacheStoreFixture(id, file) {
+  const ids = [
+    'cache-store:src-cache',
+    'cache-store:src-database-index',
+    'cache-store:src-database-tables',
+    'cache-store:src-storage-index',
+    'cache-store:src-storage-localfilesystemprovider',
+    'cache-store:src-storage-types',
+  ];
+  const files = [
+    'src/cache.ts',
+    'src/database/index.ts',
+    'src/database/tables.ts',
+    'src/storage/index.ts',
+    'src/storage/localFileSystemProvider.ts',
+    'src/storage/types.ts',
+  ];
+  return isCacheStore(file) && (ids.includes(id) || files.includes(file));
+}
+
+function isCurrentLatestCacheStoreSnapshot(file) {
+  return isCacheStore(file) && ['src/database/signal.ts', 'src/database/testing.ts'].includes(file);
+}
+
+function currentLatestCacheStoreBlockerReason(id, file) {
+  const lower = id.toLowerCase();
+  const reason =
+    lower.includes('evaldeletion') || file === 'src/database/evalDeletion.ts'
+      ? 'eval deletion lifecycle semantics require dedicated current-latest cache-store evidence'
+      : 'dedicated current-latest cache-store evidence is required';
+  return `dedicated current-latest cache-store evidence is required before this row can be claimed native: ${reason}; source: ${file}`;
+}
+
 function isPromptProcessing(file) {
   return (
     isTsOrJs(file) &&
@@ -523,7 +556,9 @@ function metadata(category, id, file) {
   if (category === 'eval-runner' && isCurrentLatestEvalRunnerFixture(id, file)) return ['P0', 'native', 'eval-runner', 'fixture', `current-latest eval/evaluator/scheduler source is covered by existing deterministic eval runner fixture evidence; item: ${id}`];
   if (category === 'eval-runner' && isCurrentLatestEvalRunnerSnapshot(file)) return ['P1', 'later', 'eval-runner', 'snapshot', `current-latest optimizer/event/synthesis eval-runner source is registered under P1 snapshot evidence until dedicated parity work proves native behavior; item: ${id}`];
   if (category === 'eval-runner') return ['P0', 'blocked', 'eval-runner', 'blocker', `${currentLatestEvalRunnerBlockerReason(id, file)}; item: ${id}`];
-  if (category === 'cache-store') return ['P0', 'blocked', 'cache-resume-store', 'blocker', `current-latest cache and result store surface requires fixture evidence; item: ${id}`];
+  if (category === 'cache-store' && isCurrentLatestCacheStoreFixture(id, file)) return ['P0', 'native', 'cache-resume-store', 'fixture', `current-latest cache key, database schema, and local filesystem storage source is covered by existing deterministic cache/resume/result-store fixtures; item: ${id}`];
+  if (category === 'cache-store' && isCurrentLatestCacheStoreSnapshot(file)) return ['P1', 'later', 'cache-resume-store', 'snapshot', `current-latest database testing/signal helper source is registered under P1 snapshot evidence until dedicated lifecycle parity work proves native behavior; item: ${id}`];
+  if (category === 'cache-store') return ['P0', 'blocked', 'cache-resume-store', 'blocker', `${currentLatestCacheStoreBlockerReason(id, file)}; item: ${id}`];
   if (category === 'prompt-processing' && isCurrentLatestPromptProcessingFixture(id, file)) return ['P0', 'native', 'config-loader', 'fixture', `current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures; item: ${id}`];
   if (category === 'prompt-processing' && isCurrentLatestPromptProcessingSnapshot(file)) return ['P1', 'later', 'config-loader', 'snapshot', `current-latest static/external prompt helper source is registered under P1 snapshot evidence until dedicated parity work proves native behavior; item: ${id}`];
   if (category === 'prompt-processing') return ['P0', 'blocked', currentLatestPromptProcessingBlockerOwner(id, file), 'blocker', `${currentLatestPromptProcessingBlockerReason(id, file)}; item: ${id}`];

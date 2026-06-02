@@ -2291,6 +2291,42 @@ fn is_cache_store_file(file: &str) -> bool {
             || file.starts_with("src/storage/"))
 }
 
+fn is_current_latest_cache_store_fixture(stable_id: &str, file: &str) -> bool {
+    is_cache_store_file(file)
+        && (matches!(
+            stable_id,
+            "cache-store:src-cache"
+                | "cache-store:src-database-index"
+                | "cache-store:src-database-tables"
+                | "cache-store:src-storage-index"
+                | "cache-store:src-storage-localfilesystemprovider"
+                | "cache-store:src-storage-types"
+        ) || matches!(
+            file,
+            "src/cache.ts"
+                | "src/database/index.ts"
+                | "src/database/tables.ts"
+                | "src/storage/index.ts"
+                | "src/storage/localFileSystemProvider.ts"
+                | "src/storage/types.ts"
+        ))
+}
+
+fn is_current_latest_cache_store_snapshot(file: &str) -> bool {
+    is_cache_store_file(file)
+        && matches!(file, "src/database/signal.ts" | "src/database/testing.ts")
+}
+
+fn current_latest_cache_store_blocker_reason(stable_id: &str, file: &str) -> String {
+    let lower = stable_id.to_ascii_lowercase();
+    let reason = if lower.contains("evaldeletion") || file == "src/database/evalDeletion.ts" {
+        "eval deletion lifecycle semantics require dedicated current-latest cache-store evidence"
+    } else {
+        "dedicated current-latest cache-store evidence is required"
+    };
+    format!("dedicated current-latest cache-store evidence is required before this row can be claimed native: {reason}; source: {file}")
+}
+
 fn is_prompt_processing_file(file: &str) -> bool {
     is_ts_or_js_file(file)
         && (file.starts_with("src/prompts/")
@@ -2977,13 +3013,31 @@ fn current_latest_default_metadata(
             stable_id,
             &current_latest_eval_runner_blocker_reason(stable_id, file),
         ),
+        "cache-store" if is_current_latest_cache_store_fixture(stable_id, file) => {
+            current_latest_metadata(
+                "P0",
+                "native",
+                "cache-resume-store",
+                "fixture",
+                stable_id,
+                "current-latest cache key, database schema, and local filesystem storage source is covered by existing deterministic cache/resume/result-store fixtures",
+            )
+        }
+        "cache-store" if is_current_latest_cache_store_snapshot(file) => current_latest_metadata(
+            "P1",
+            "later",
+            "cache-resume-store",
+            "snapshot",
+            stable_id,
+            "current-latest database testing/signal helper source is registered under P1 snapshot evidence until dedicated lifecycle parity work proves native behavior",
+        ),
         "cache-store" => current_latest_metadata(
             "P0",
             "blocked",
             "cache-resume-store",
             "blocker",
             stable_id,
-            "current-latest cache and result store surface requires fixture evidence",
+            &current_latest_cache_store_blocker_reason(stable_id, file),
         ),
         "prompt-processing" if is_current_latest_prompt_processing_fixture(stable_id, file) => {
             current_latest_metadata(
