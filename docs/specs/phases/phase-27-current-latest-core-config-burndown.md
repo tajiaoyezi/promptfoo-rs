@@ -1,6 +1,6 @@
 # Phase 27: current-latest-core-config-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ After Phase 26, false viewer config blockers are gone, but release artifacts sti
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 27.1 | current-latest-core-config-burndown | ../tasks/task-27.1-current-latest-core-config-burndown.md | In Progress | 将 current-latest 18 个 non-app config blockers 分解为 8 个 local fixture-covered rows、3 个 P1 auxiliary rows、7 个 explicit external blockers |
+| 27.1 | current-latest-core-config-burndown | ../tasks/task-27.1-current-latest-core-config-burndown.md | Done | 将 current-latest 18 个 non-app config blockers 分解为 8 个 local fixture-covered rows、3 个 P1 auxiliary rows、7 个 explicit external blockers |
 
 ## 5. Dependencies
 
@@ -28,10 +28,10 @@ After Phase 26, false viewer config blockers are gone, but release artifacts sti
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] current-latest runtime config rows（`src/commands/config.ts`、`src/configTypes.ts`、`src/util/config/**`、redteam `promptfooconfig.yaml`）不再是 generic P0 blockers，并具备 fixture evidence reference。
-- [ ] current-latest auxiliary config rows（code scan config、MCP config validation）登记为 P1 snapshot evidence，不计入 P0 golden blockers。
-- [ ] current-latest cloud/server/telemetry/global config rows 保持 explicit external P0 blockers，不伪造成 local parity。
-- [ ] `current-latest-golden-corpus.json` 的 config blocker count 从 18 降到 external-only 7，`current-latest-quality.json` 仍保持 perfect_refactor_claim_allowed=false。
+- [x] current-latest runtime config rows（`src/commands/config.ts`、`src/configTypes.ts`、`src/util/config/**`、redteam `promptfooconfig.yaml`）不再是 generic P0 blockers，并具备 fixture evidence reference。
+- [x] current-latest auxiliary config rows（code scan config、MCP config validation）登记为 P1 snapshot evidence，不计入 P0 golden blockers。
+- [x] current-latest cloud/server/telemetry/global config rows 保持 explicit external P0 blockers，不伪造成 local parity。
+- [x] `current-latest-golden-corpus.json` 的 config blocker count 从 18 降到 external-only 7，`current-latest-quality.json` 仍保持 perfect_refactor_claim_allowed=false。
 
 ## 7. Phase Risks
 
@@ -45,4 +45,11 @@ Task 27.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- Task 27.1 完成后按 Phase smoke evidence 回填。
+- **完成日期**：2026-06-02
+- **Phase smoke**：PASS — `s2v_verify_full "install lint typecheck unit-test integration e2e build coverage runtime-smoke"` 全 9 项通过；真实 artifact 复核完成。
+- **Artifact evidence**：
+  - `target/release-gates/current-latest-source-inventory.json`：status=`ready`，rows=3858，config fixture=8，config auxiliary=3，config external=7。
+  - `target/release-gates/current-latest-matrix.json`：status=`ready`，rows=3858，config fixture=8，config auxiliary=3，config external=7。
+  - `target/release-gates/current-latest-golden-corpus.json`：status=`ready-with-blockers`，blocker_count=92，config_blockers=7，remaining P0 groups provider=38、eval-runner=18、prompt-processing=13、cache-store=9、config=7、script-bridge=7。
+  - `target/release-gates/current-latest-quality.json`：status=`ready-with-blockers`，local_current_latest_ready=false，perfect_refactor_claim_allowed=false；剩余 blockers 为 golden-corpus、current-target、external-authority、publication-authority。
+- **保留边界**：Phase 27 完成的是 current-latest core config generic blocker burndown，不等于 current-latest perfect-refactor 完成。后续仍需消除 92 个 P0 golden blockers，或取得/正式 waiver external authority、publication authority 和 current-target claim evidence。

@@ -1,6 +1,6 @@
 # Task 27.1: current-latest-core-config-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 27 — current-latest-core-config-burndown
@@ -73,19 +73,19 @@ Current-latest `category=config` rows must be classified by path. Runtime config
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Core Capabilities): current-latest runtime config rows have fixture evidence, implementation status that does not trigger P0 golden blockers, and config-loader/redteam owner as appropriate.
-- [ ] **AC2** (ADR-009): auxiliary code scan/MCP config rows are P1 snapshot evidence and do not weaken core promptfooconfig P0 semantics.
-- [ ] **AC3** (PRD §Non Goals / ADR-011): cloud/server/telemetry/global config rows remain explicit external P0 blockers with external-authority owner and blocker evidence.
-- [ ] **AC4** (task 24.4 claim contract): source/matrix/golden/quality artifacts show config blockers reduced to 7 external rows, but perfect-refactor completion remains false while other current-latest blockers remain.
+- [x] **AC1** (PRD §Core Capabilities): current-latest runtime config rows have fixture evidence, implementation status that does not trigger P0 golden blockers, and config-loader/redteam owner as appropriate.
+- [x] **AC2** (ADR-009): auxiliary code scan/MCP config rows are P1 snapshot evidence and do not weaken core promptfooconfig P0 semantics.
+- [x] **AC3** (PRD §Non Goals / ADR-011): cloud/server/telemetry/global config rows remain explicit external P0 blockers with external-authority owner and blocker evidence.
+- [x] **AC4** (task 24.4 claim contract): source/matrix/golden/quality artifacts show config blockers reduced to 7 external rows, but perfect-refactor completion remains false while other current-latest blockers remain.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-27.1.1 | TEST-27.1.1 | tests/current_latest_core_config_burndown.rs | install, typecheck, unit-test, integration, build | Ready |
-| AC2 | SCEN-27.1.1 | TEST-27.1.2 | tests/current_latest_core_config_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Ready |
-| AC3 | SCEN-27.1.1 | TEST-27.1.3 | tests/current_latest_core_config_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Ready |
-| AC4 | SCEN-27.1.1 | TEST-27.1.4 | tests/current_latest_core_config_burndown.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Ready |
+| AC1 | SCEN-27.1.1 | TEST-27.1.1 | tests/current_latest_core_config_burndown.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-27.1.1 | TEST-27.1.2 | tests/current_latest_core_config_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-27.1.1 | TEST-27.1.3 | tests/current_latest_core_config_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-27.1.1 | TEST-27.1.4 | tests/current_latest_core_config_burndown.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -107,4 +107,34 @@ Current-latest `category=config` rows must be classified by path. Runtime config
 
 ## 10. Completion Notes
 
-- 本 task 完成时按 AGENTS.md §10 schema 回填完成日期、改动文件、commit 列表、§9 Verification 结果、剩余风险和下游 task 影响。
+- **完成日期**：2026-06-02
+- **改动文件**：
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-27-current-latest-core-config-burndown.md`
+  - `docs/specs/tasks/task-27.1-current-latest-core-config-burndown.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_core_config_burndown.rs`
+  - `tests/current_latest_viewer_config_reclassification.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+- **commit 列表**：
+  - `3b0200d` `docs(spec): add phase 27 current latest core config burndown`
+  - `59f1060` `docs(spec): task-27.1 enters implementation`
+  - `cc394f0` `test(config): add current latest core config burndown RED tests`
+  - `a4f33b9` `feat(config): classify current latest core config evidence`
+  - `a1cbfa7` `refactor(config): satisfy current latest config lint`
+  - `bec1d4f` `refactor(config): align current latest viewer config expectations`
+  - 本次 docs 回填提交：`docs(spec): complete task 27.1 current latest core config burndown`
+- **§9 Verification 结果**：
+  - install: PASS — helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS — helper 执行 `bash scripts/release/lint.sh` 通过；中途发现并修复 clippy `manual_ignore_case_cmp`。
+  - typecheck: PASS — helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS — helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-27.1.1 ~ TEST-27.1.4 通过，Phase 26 viewer config tests 已更新为兼容 Phase 27 的 fixture/external evidence 语义。
+  - integration: PASS — helper 执行 `bash scripts/release/integration.sh` 通过。
+  - e2e: PASS — helper 执行 `bash scripts/release/e2e.sh` 通过。
+  - build: PASS — helper 执行 `cargo build --workspace`、viewer/npm `pnpm build` 通过。
+  - coverage: PASS — helper 执行 `bash scripts/release/coverage.sh` 通过；`s2v_coverage_threshold_guard` 通过。
+  - runtime-smoke: PASS — helper 执行 `bash scripts/release/runtime-smoke.sh` 通过；真实 artifact 复核显示 `current-latest-source-inventory.json` 与 `current-latest-matrix.json` status=`ready`、rows=3858、config fixture=8、config auxiliary=3、config external=7，`current-latest-golden-corpus.json` status=`ready-with-blockers`、blocker_count=92、config_blockers=7，`current-latest-quality.json` status=`ready-with-blockers`、local_current_latest_ready=false、perfect_refactor_claim_allowed=false。
+- **剩余风险 / 未做项**：本 task 只燃尽 current-latest generic config blockers；仍有 92 个 current-latest P0 golden blockers（provider=38、eval-runner=18、prompt-processing=13、cache-store=9、config=7、script-bridge=7）、current-target claim boundary、21 个 external authority blockers，以及 publication `credential-blocked`。这些继续阻止“完美重构完成”声明。
+- **下游 task 影响**：后续可优先处理 provider=38 或 eval-runner=18 blockers；7 个 config blockers 现为 explicit external authority rows，不能由本地代码伪造完成。
