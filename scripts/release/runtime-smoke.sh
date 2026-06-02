@@ -3,6 +3,92 @@ set -euo pipefail
 
 GATE_DIR="target/release-gates"
 mkdir -p "$GATE_DIR"
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+
+prepare_distribution_fixture_env() {
+  local lock_file="$GATE_DIR/current-latest-target.json"
+  if [ ! -f "$lock_file" ]; then
+    lock_file="compatibility/inventory/current-latest-target.json"
+  fi
+  if [ ! -f "$lock_file" ]; then
+    return
+  fi
+
+  node - "$lock_file" "$tmpdir" <<'NODE'
+const fs = require('fs');
+const path = require('path');
+const [lockPath, outDir] = process.argv.slice(2);
+const lock = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
+const npm = lock.npm_latest || {};
+const github = lock.github || {};
+const latestTag = String(github.latest_release_ref || '').replace(/^refs\/tags\//, '');
+const required = [
+  ['npm.package_version', npm.package_version],
+  ['npm.git_head', npm.git_head],
+  ['npm.tarball', npm.tarball],
+  ['npm.integrity', npm.integrity],
+  ['npm.modified', npm.modified],
+  ['github.default_branch_head', github.default_branch_head],
+  ['github.npm_tag_ref', github.npm_tag_ref],
+  ['github.npm_tag_commit', github.npm_tag_commit],
+  ['github.latest_release_ref', github.latest_release_ref],
+  ['github.latest_release_commit', github.latest_release_commit],
+  ['latest release tag', latestTag],
+];
+const missing = required.filter(([, value]) => !value).map(([key]) => key);
+if (missing.length) {
+  throw new Error(`current-latest target fixture is missing: ${missing.join(', ')}`);
+}
+const npmView = {
+  version: npm.package_version,
+  gitHead: npm.git_head,
+  dist: {
+    tarball: npm.tarball,
+    integrity: npm.integrity,
+  },
+  time: {
+    modified: npm.modified,
+  },
+};
+const latestRelease = {
+  tag_name: latestTag,
+  tagName: latestTag,
+  name: github.latest_release_name || latestTag,
+  target_commitish: github.latest_release_commit,
+  targetCommitish: github.latest_release_commit,
+  published_at: github.latest_release_published_at || '',
+  html_url: github.latest_release_url || '',
+};
+const lsRemote = [
+  `${github.default_branch_head}\tHEAD`,
+  `${github.npm_tag_commit}\t${github.npm_tag_ref}`,
+  `${github.latest_release_commit}\t${github.latest_release_ref}`,
+].join('\n') + '\n';
+fs.writeFileSync(path.join(outDir, 'current-latest-npm-view.json'), `${JSON.stringify(npmView, null, 2)}\n`);
+fs.writeFileSync(path.join(outDir, 'current-latest-github-latest-release.json'), `${JSON.stringify(latestRelease, null, 2)}\n`);
+fs.writeFileSync(path.join(outDir, 'current-latest-ls-remote.txt'), lsRemote);
+NODE
+
+  if [ -z "${CURRENT_LATEST_NPM_VIEW_FILE:-}" ]; then
+    export CURRENT_LATEST_NPM_VIEW_FILE="$tmpdir/current-latest-npm-view.json"
+  fi
+  if [ -z "${CURRENT_LATEST_GITHUB_RELEASE_FILE:-}" ]; then
+    export CURRENT_LATEST_GITHUB_RELEASE_FILE="$tmpdir/current-latest-github-latest-release.json"
+  fi
+  if [ -z "${CURRENT_LATEST_LS_REMOTE_FILE:-}" ]; then
+    export CURRENT_LATEST_LS_REMOTE_FILE="$tmpdir/current-latest-ls-remote.txt"
+  fi
+  if [ -z "${UPSTREAM_NPM_VIEW_FILE:-}" ]; then
+    export UPSTREAM_NPM_VIEW_FILE="$tmpdir/current-latest-npm-view.json"
+  fi
+  if [ -z "${UPSTREAM_GITHUB_RELEASE_FILE:-}" ]; then
+    export UPSTREAM_GITHUB_RELEASE_FILE="$tmpdir/current-latest-github-latest-release.json"
+  fi
+  if [ -z "${UPSTREAM_LS_REMOTE_FILE:-}" ]; then
+    export UPSTREAM_LS_REMOTE_FILE="$tmpdir/current-latest-ls-remote.txt"
+  fi
+}
 
 cargo build --quiet --release --bin promptfoo-rs
 BIN="target/release/promptfoo-rs"
@@ -20,6 +106,7 @@ cargo test \
 bash scripts/release/source-inventory-evidence.sh
 bash scripts/release/longtail-classification.sh
 bash scripts/release/current-upstream-policy.sh
+prepare_distribution_fixture_env
 bash scripts/release/current-latest-target-lock.sh
 bash scripts/release/current-latest-source-inventory.sh
 bash scripts/release/current-latest-golden-corpus.sh
@@ -27,9 +114,6 @@ bash scripts/release/upstream-distribution-target.sh
 bash scripts/release/real-upstream-smoke.sh
 bash scripts/release/real-upstream-corpus.sh
 PROMPTFOO_RS_SKIP_RUNTIME_SMOKE=1 bash scripts/release/installability.sh
-
-tmpdir="$(mktemp -d)"
-trap 'rm -rf "$tmpdir"' EXIT
 
 measure_ms() {
   local start end
