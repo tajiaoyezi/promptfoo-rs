@@ -187,8 +187,29 @@ impl SqliteResultStore {
         })
     }
 
-    pub fn delete_eval(&self, _eval_id: &str) -> Result<u64, StoreError> {
-        Ok(0)
+    pub fn delete_eval(&self, eval_id: &str) -> Result<u64, StoreError> {
+        let path = self.path.clone();
+        let eval_id = eval_id.to_string();
+        run_blocking(async move {
+            let pool = open_pool(&path, false).await?;
+            let mut tx = pool.begin().await?;
+            sqlx::query(
+                "DELETE FROM assertion_results
+                 WHERE result_id IN (
+                     SELECT id FROM result_records WHERE eval_id = ?
+                 )",
+            )
+            .bind(&eval_id)
+            .execute(&mut *tx)
+            .await?;
+            let result = sqlx::query("DELETE FROM result_records WHERE eval_id = ?")
+                .bind(&eval_id)
+                .execute(&mut *tx)
+                .await?;
+            tx.commit().await?;
+            pool.close().await;
+            Ok(result.rows_affected())
+        })
     }
 }
 

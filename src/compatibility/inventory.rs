@@ -2296,6 +2296,7 @@ fn is_current_latest_cache_store_fixture(stable_id: &str, file: &str) -> bool {
         && (matches!(
             stable_id,
             "cache-store:src-cache"
+                | "cache-store:src-database-evaldeletion"
                 | "cache-store:src-database-index"
                 | "cache-store:src-database-tables"
                 | "cache-store:src-storage-index"
@@ -2304,6 +2305,7 @@ fn is_current_latest_cache_store_fixture(stable_id: &str, file: &str) -> bool {
         ) || matches!(
             file,
             "src/cache.ts"
+                | "src/database/evalDeletion.ts"
                 | "src/database/index.ts"
                 | "src/database/tables.ts"
                 | "src/storage/index.ts"
@@ -3041,7 +3043,7 @@ fn current_latest_default_metadata(
                 "cache-resume-store",
                 "fixture",
                 stable_id,
-                "current-latest cache key, database schema, and local filesystem storage source is covered by existing deterministic cache/resume/result-store fixtures",
+                "current-latest cache key, database schema, eval deletion lifecycle, and local filesystem storage source is covered by deterministic cache/resume/result-store fixtures",
             )
         }
         "cache-store" if is_current_latest_cache_store_snapshot(file) => current_latest_metadata(

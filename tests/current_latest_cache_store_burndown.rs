@@ -69,6 +69,7 @@ fn write_cache_store_source(root: &Path) {
 fn fixture_cache_store_sources() -> &'static [&'static str] {
     &[
         "src/cache.ts",
+        "src/database/evalDeletion.ts",
         "src/database/index.ts",
         "src/database/tables.ts",
         "src/storage/index.ts",
@@ -82,7 +83,7 @@ fn snapshot_cache_store_sources() -> &'static [&'static str] {
 }
 
 fn blocked_cache_store_sources() -> &'static [&'static str] {
-    &["src/database/evalDeletion.ts"]
+    &[]
 }
 
 #[test]
@@ -133,29 +134,27 @@ fn test_31_1_2_helper_cache_store_rows_are_p1_snapshot_evidence() {
 }
 
 #[test]
-fn test_31_1_3_eval_deletion_remains_explicit_cache_store_blocker() {
+fn test_31_1_3_eval_deletion_is_covered_by_dedicated_lifecycle_fixture() {
     /* TEST-31.1.3 */
-    let root = fixture_dir("rust-blocked");
+    let root = fixture_dir("rust-eval-deletion-fixture");
     write_cache_store_source(&root);
     let inventory = extract_current_latest_inventory(&current_latest_lock(), &root)
         .expect("current latest inventory should extract");
 
-    for source in blocked_cache_store_sources() {
-        let row = cache_store_row_for_source(&inventory.rows, source);
-        assert_eq!(row.level, "P0", "{row:#?}");
-        assert_eq!(row.implementation_status, "blocked", "{row:#?}");
-        assert_eq!(row.verification_owner, "cache-resume-store", "{row:#?}");
-        assert_eq!(row.evidence_kind, "blocker", "{row:#?}");
-        assert!(
-            row.evidence_reference.starts_with("blocker:cache-store:"),
-            "{row:#?}"
-        );
-        assert!(row
-            .blocker_reason
-            .as_deref()
-            .unwrap_or_default()
-            .contains("dedicated current-latest cache-store evidence"));
-    }
+    let row = cache_store_row_for_source(&inventory.rows, "src/database/evalDeletion.ts");
+    assert_eq!(row.level, "P0", "{row:#?}");
+    assert_eq!(row.implementation_status, "native", "{row:#?}");
+    assert_eq!(row.verification_owner, "cache-resume-store", "{row:#?}");
+    assert_eq!(row.evidence_kind, "fixture", "{row:#?}");
+    assert_eq!(
+        row.evidence_reference, "fixture:cache-store:src-database-evaldeletion",
+        "{row:#?}"
+    );
+    assert!(!row
+        .blocker_reason
+        .as_deref()
+        .unwrap_or_default()
+        .contains("dedicated current-latest cache-store evidence is required"));
 
     let _ = std::fs::remove_dir_all(root);
 }
@@ -177,7 +176,7 @@ fn test_31_1_4_script_and_rust_extractors_emit_equivalent_cache_store_evidence()
 
     assert_eq!(
         cache_store_rows_with_json(script_rows, "P0", "native", "fixture").len(),
-        6
+        7
     );
     assert_eq!(
         cache_store_rows_with_json(script_rows, "P1", "later", "snapshot").len(),
@@ -185,7 +184,7 @@ fn test_31_1_4_script_and_rust_extractors_emit_equivalent_cache_store_evidence()
     );
     assert_eq!(
         cache_store_rows_with_json(script_rows, "P0", "blocked", "blocker").len(),
-        1
+        0
     );
 
     let rust_rows = inventory
@@ -241,7 +240,7 @@ fn test_31_1_4_script_and_rust_extractors_emit_equivalent_cache_store_evidence()
 }
 
 #[test]
-fn test_31_1_5_golden_and_quality_keep_remaining_cache_store_blocker_visible() {
+fn test_31_1_5_golden_and_quality_clear_remaining_cache_store_blocker() {
     /* TEST-31.1.5 */
     let root = fixture_dir("quality-source");
     write_cache_store_source(&root);
@@ -265,13 +264,8 @@ fn test_31_1_5_golden_and_quality_keep_remaining_cache_store_blocker_visible() {
         })
         .collect::<Vec<_>>();
 
-    assert_eq!(cache_store_blockers.len(), 1, "{cache_store_blockers:#?}");
-    assert_eq!(
-        cache_store_blockers[0]["capability"],
-        Value::String("cache-store:src-database-evaldeletion".to_string())
-    );
-    assert_eq!(golden["blocker_count"], Value::from(1));
-    assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
+    assert!(cache_store_blockers.is_empty(), "{cache_store_blockers:#?}");
+    assert_eq!(golden["blocker_count"], Value::from(0));
     assert_eq!(
         quality["perfect_refactor_claim_allowed"],
         Value::Bool(false)

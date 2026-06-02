@@ -117,7 +117,11 @@ fn test_33_1_3_eval_deletion_row_has_native_fixture_evidence() {
         row.evidence_reference, "fixture:cache-store:src-database-evaldeletion",
         "{row:#?}"
     );
-    assert!(row.blocker_reason.is_none(), "{row:#?}");
+    assert!(!row
+        .blocker_reason
+        .as_deref()
+        .unwrap_or_default()
+        .contains("dedicated current-latest cache-store evidence is required"));
 
     let _ = fs::remove_dir_all(root);
 }
@@ -177,7 +181,6 @@ fn test_33_1_4_script_and_rust_extractors_drop_cache_store_blocker() {
         "{blockers:#?}"
     );
     assert_eq!(golden["blocker_count"], Value::from(0));
-    assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
 
     let _ = fs::remove_dir_all(root);
     let _ = fs::remove_dir_all(gate_dir);

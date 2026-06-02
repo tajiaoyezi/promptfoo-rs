@@ -322,6 +322,7 @@ function isCacheStore(file) {
 function isCurrentLatestCacheStoreFixture(id, file) {
   const ids = [
     'cache-store:src-cache',
+    'cache-store:src-database-evaldeletion',
     'cache-store:src-database-index',
     'cache-store:src-database-tables',
     'cache-store:src-storage-index',
@@ -330,6 +331,7 @@ function isCurrentLatestCacheStoreFixture(id, file) {
   ];
   const files = [
     'src/cache.ts',
+    'src/database/evalDeletion.ts',
     'src/database/index.ts',
     'src/database/tables.ts',
     'src/storage/index.ts',
@@ -577,7 +579,7 @@ function metadata(category, id, file) {
   if (category === 'eval-runner' && isCurrentLatestEvalRunnerFixture(id, file)) return ['P0', 'native', 'eval-runner', 'fixture', `current-latest eval/evaluator/scheduler source is covered by existing deterministic eval runner fixture evidence; item: ${id}`];
   if (category === 'eval-runner' && isCurrentLatestEvalRunnerSnapshot(file)) return ['P1', 'later', 'eval-runner', 'snapshot', `current-latest optimizer/event/synthesis eval-runner source is registered under P1 snapshot evidence until dedicated parity work proves native behavior; item: ${id}`];
   if (category === 'eval-runner') return ['P0', 'blocked', 'eval-runner', 'blocker', `${currentLatestEvalRunnerBlockerReason(id, file)}; item: ${id}`];
-  if (category === 'cache-store' && isCurrentLatestCacheStoreFixture(id, file)) return ['P0', 'native', 'cache-resume-store', 'fixture', `current-latest cache key, database schema, and local filesystem storage source is covered by existing deterministic cache/resume/result-store fixtures; item: ${id}`];
+  if (category === 'cache-store' && isCurrentLatestCacheStoreFixture(id, file)) return ['P0', 'native', 'cache-resume-store', 'fixture', `current-latest cache key, database schema, eval deletion lifecycle, and local filesystem storage source is covered by deterministic cache/resume/result-store fixtures; item: ${id}`];
   if (category === 'cache-store' && isCurrentLatestCacheStoreSnapshot(file)) return ['P1', 'later', 'cache-resume-store', 'snapshot', `current-latest database testing/signal helper source is registered under P1 snapshot evidence until dedicated lifecycle parity work proves native behavior; item: ${id}`];
   if (category === 'cache-store') return ['P0', 'blocked', 'cache-resume-store', 'blocker', `${currentLatestCacheStoreBlockerReason(id, file)}; item: ${id}`];
   if (category === 'prompt-processing' && isCurrentLatestPromptProcessingFixture(id, file)) return ['P0', 'native', 'config-loader', 'fixture', `${isCurrentLatestLocalPromptProcessorFixture(id, file) ? 'current-latest JSON, Markdown, and Jinja prompt processor source is covered by deterministic local config and eval prompt fixtures' : 'current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures'}; item: ${id}`];
