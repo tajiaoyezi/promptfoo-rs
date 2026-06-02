@@ -40,6 +40,7 @@
 #   - docs/specs/tasks/task-25.1-current-latest-source-taxonomy-burndown.md
 #   - docs/specs/tasks/task-26.1-current-latest-viewer-config-reclassification.md
 #   - docs/specs/tasks/task-27.1-current-latest-core-config-burndown.md
+#   - docs/specs/tasks/task-28.1-current-latest-provider-fixture-burndown.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -263,3 +264,11 @@ Feature: perfect refactor parity
     And TEST-27.1.2 proves auxiliary code scan and MCP config rows are P1 snapshot evidence
     And TEST-27.1.3 proves cloud server telemetry and global config rows remain explicit external blockers
     And TEST-27.1.4 proves config golden blockers drop to external-only rows while perfect-refactor completion remains false
+
+  Scenario: SCEN-28.1.1 - current latest provider blockers split fixture evidence from external authority
+    Given Phase 27 current-latest artifacts have 38 provider blockers
+    When the current-latest provider fixture burndown runs
+    Then TEST-28.1.1 proves fixture-covered provider rows have P0 native fixture evidence
+    And TEST-28.1.2 proves product credential account and private-service provider rows remain explicit external blockers
+    And TEST-28.1.3 proves Rust and shell extractors emit equivalent provider evidence
+    And TEST-28.1.4 proves provider golden blockers drop to external-only rows while perfect-refactor completion remains false
