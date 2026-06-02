@@ -47,6 +47,7 @@
 #   - docs/specs/tasks/task-32.1-current-latest-local-prompt-processor-burndown.md
 #   - docs/specs/tasks/task-33.1-current-latest-eval-deletion-burndown.md
 #   - docs/specs/tasks/task-34.1-current-latest-eval-scheduler-rate-limit-burndown.md
+#   - docs/specs/tasks/task-35.1-current-latest-script-prompt-python-bridge-burndown.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -336,3 +337,13 @@ Feature: perfect refactor parity
     And TEST-34.1.3 proves adaptive concurrency responds within configured bounds
     And TEST-34.1.4 proves provider call execution context and wrapper expose stable local metadata and header records
     And TEST-34.1.5 proves Rust and shell extractors emit equivalent eval scheduler evidence and total blockers drop to 33 while perfect-refactor completion remains false
+
+  # Maps to: docs/specs/tasks/task-35.1-current-latest-script-prompt-python-bridge-burndown.md
+  Scenario: SCEN-35.1.1 - current latest script prompt and Python bridge rows have local subprocess evidence
+    Given Phase 34 current-latest artifacts have script-backed prompt processor and script bridge blockers
+    When the current-latest script prompt Python bridge burndown runs
+    Then TEST-35.1.1 proves JavaScript Python and executable prompt processors require authorization and exchange JSON through ScriptBridge
+    And TEST-35.1.2 proves Python bridge wrapper and worker-pool behavior preserve JSON stderr errors and deterministic ordering
+    And TEST-35.1.3 proves script-backed prompt processor rows have P0 native fixture evidence
+    And TEST-35.1.4 proves Python bridge rows have P0 native fixture evidence while Ruby rows remain blockers
+    And TEST-35.1.5 proves Rust and shell extractors emit equivalent script evidence and total blockers drop to 25 while perfect-refactor completion remains false
