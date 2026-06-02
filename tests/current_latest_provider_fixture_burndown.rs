@@ -222,7 +222,10 @@ fn test_28_1_3_script_and_rust_extractors_emit_equivalent_provider_evidence() {
                         .as_str()
                         .unwrap_or_default()
                         .to_string(),
-                    row["evidence_kind"].as_str().unwrap_or_default().to_string(),
+                    row["evidence_kind"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_string(),
                     row["evidence_reference"]
                         .as_str()
                         .unwrap_or_default()

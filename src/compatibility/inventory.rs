@@ -2146,6 +2146,77 @@ fn is_p0_provider_file(file: &str) -> bool {
     .any(|prefix| file.starts_with(prefix))
 }
 
+fn current_latest_provider_fixture_ids(stable_id: &str) -> &'static [&'static str] {
+    match stable_id {
+        "provider:src-providers-anthropic-defaults"
+        | "provider:src-providers-anthropic-generic"
+        | "provider:src-providers-anthropic-messages"
+        | "provider:src-providers-anthropic-types"
+        | "provider:src-providers-anthropic-util" => &["p0-provider-anthropic-message"],
+        "provider:src-providers-anthropic-completion" => &["p0-provider-anthropic-completion"],
+        "provider:src-providers-http" => &["p0-provider-http-get", "p0-provider-http-post"],
+        "provider:src-providers-httpmultipart" => &["p0-provider-http-multipart"],
+        "provider:src-providers-httptransforms" => &["p0-provider-http-transform"],
+        "provider:src-providers-ollama" => &["p0-provider-ollama-chat"],
+        "provider:src-providers-openai-chat"
+        | "provider:src-providers-openai-index"
+        | "provider:src-providers-openai-types" => &["p0-provider-openai-chat"],
+        "provider:src-providers-openai-completion" => &["p0-provider-openai-completion"],
+        "provider:src-providers-openai-defaults" => {
+            &["p0-provider-openai-env", "p0-provider-openai-headers"]
+        }
+        "provider:src-providers-openai-embedding" => &["p0-provider-openai-embedding"],
+        "provider:src-providers-openai-image" => &["p0-provider-openai-image"],
+        "provider:src-providers-openai-moderation" => &["p0-provider-openai-moderation"],
+        "provider:src-providers-openai-responses" => &["p0-provider-openai-responses"],
+        "provider:src-providers-openai-transcription" => &["p0-provider-openai-transcription"],
+        "provider:src-providers-openai-util" => &[
+            "p0-provider-openai-chat",
+            "p0-provider-openai-env",
+            "p0-provider-openai-headers",
+        ],
+        "provider:src-providers-openai-video" => &["p0-provider-openai-video"],
+        _ => &[],
+    }
+}
+
+fn is_current_latest_fixture_provider(stable_id: &str, file: &str) -> bool {
+    is_p0_provider_file(file) && !current_latest_provider_fixture_ids(stable_id).is_empty()
+}
+
+fn is_current_latest_external_provider(file: &str) -> bool {
+    let lower = file.to_ascii_lowercase();
+    lower == "src/providers/anthropic/claudecodeauth.ts"
+        || lower.starts_with("src/providers/openai/agents")
+        || lower == "src/providers/openai/assistant.ts"
+        || lower == "src/providers/openai/billing.ts"
+        || lower.starts_with("src/providers/openai/chatkit")
+        || lower.starts_with("src/providers/openai/codex")
+        || lower == "src/providers/openai/realtime.ts"
+}
+
+fn current_latest_provider_external_reason(stable_id: &str, file: &str) -> String {
+    let lower = stable_id.to_ascii_lowercase();
+    let reason = if lower.contains("claudecodeauth") {
+        "Anthropic Claude Code auth requires real local credential flow and product authority before current-latest parity can be claimed"
+    } else if lower.contains("codex") {
+        "OpenAI Codex provider modules require external product authority and private SDK/server credential confirmation before current-latest parity can be claimed"
+    } else if lower.contains("billing") {
+        "OpenAI billing module requires account-level credentials and billing authority; no local mock may be treated as live parity"
+    } else if lower.contains("chatkit") {
+        "OpenAI ChatKit modules require product authority and browser/session fixture confirmation before current-latest parity can be claimed"
+    } else if lower.contains("agents") {
+        "OpenAI Agents SDK and tracing modules require dedicated SDK/trace fixtures plus product contract review"
+    } else if lower.contains("realtime") {
+        "OpenAI realtime module requires a dedicated streaming protocol fixture and service contract confirmation"
+    } else if lower.contains("assistant") {
+        "OpenAI Assistants module requires a stateful API fixture and account-authorized behavior review"
+    } else {
+        "Provider module requires external authority before current-latest parity can be claimed"
+    };
+    format!("explicit current-latest external provider blocker: {reason}; source: {file}")
+}
+
 fn is_eval_runtime_file(file: &str) -> bool {
     is_ts_or_js_file(file)
         && (matches!(
@@ -2666,6 +2737,24 @@ fn current_latest_default_metadata(
             "snapshot",
             stable_id,
             "current-latest command requires CLI behavior snapshot or fixture evidence",
+        ),
+        "provider" if is_current_latest_fixture_provider(stable_id, file) => {
+            current_latest_metadata(
+                "P0",
+                "native",
+                "provider-runtime",
+                "fixture",
+                stable_id,
+                "current-latest P0 provider source is covered by existing mock/recorded provider request-response fixture evidence",
+            )
+        }
+        "provider" if is_current_latest_external_provider(file) => current_latest_metadata(
+            "P0",
+            "blocked",
+            "external-authority",
+            "blocker",
+            stable_id,
+            &current_latest_provider_external_reason(stable_id, file),
         ),
         "provider" if is_p0_provider_file(file) => current_latest_metadata(
             "P0",

@@ -161,6 +161,82 @@ function isP0Provider(file) {
   );
 }
 
+function currentLatestProviderFixtureIds(id) {
+  const mapping = {
+    'provider:src-providers-anthropic-completion': ['p0-provider-anthropic-completion'],
+    'provider:src-providers-anthropic-defaults': ['p0-provider-anthropic-message'],
+    'provider:src-providers-anthropic-generic': ['p0-provider-anthropic-message'],
+    'provider:src-providers-anthropic-messages': ['p0-provider-anthropic-message'],
+    'provider:src-providers-anthropic-types': ['p0-provider-anthropic-message'],
+    'provider:src-providers-anthropic-util': ['p0-provider-anthropic-message'],
+    'provider:src-providers-http': ['p0-provider-http-get', 'p0-provider-http-post'],
+    'provider:src-providers-httpmultipart': ['p0-provider-http-multipart'],
+    'provider:src-providers-httptransforms': ['p0-provider-http-transform'],
+    'provider:src-providers-ollama': ['p0-provider-ollama-chat'],
+    'provider:src-providers-openai-chat': ['p0-provider-openai-chat'],
+    'provider:src-providers-openai-completion': ['p0-provider-openai-completion'],
+    'provider:src-providers-openai-defaults': ['p0-provider-openai-env', 'p0-provider-openai-headers'],
+    'provider:src-providers-openai-embedding': ['p0-provider-openai-embedding'],
+    'provider:src-providers-openai-image': ['p0-provider-openai-image'],
+    'provider:src-providers-openai-index': ['p0-provider-openai-chat'],
+    'provider:src-providers-openai-moderation': ['p0-provider-openai-moderation'],
+    'provider:src-providers-openai-responses': ['p0-provider-openai-responses'],
+    'provider:src-providers-openai-transcription': ['p0-provider-openai-transcription'],
+    'provider:src-providers-openai-types': ['p0-provider-openai-chat'],
+    'provider:src-providers-openai-util': [
+      'p0-provider-openai-chat',
+      'p0-provider-openai-env',
+      'p0-provider-openai-headers',
+    ],
+    'provider:src-providers-openai-video': ['p0-provider-openai-video'],
+  };
+  return mapping[id] || [];
+}
+
+function isCurrentLatestFixtureProvider(id, file) {
+  return isP0Provider(file) && currentLatestProviderFixtureIds(id).length > 0;
+}
+
+function isCurrentLatestExternalProvider(file) {
+  const lower = file.toLowerCase();
+  return (
+    lower === 'src/providers/anthropic/claudecodeauth.ts' ||
+    lower.startsWith('src/providers/openai/agents') ||
+    lower === 'src/providers/openai/assistant.ts' ||
+    lower === 'src/providers/openai/billing.ts' ||
+    lower.startsWith('src/providers/openai/chatkit') ||
+    lower.startsWith('src/providers/openai/codex') ||
+    lower === 'src/providers/openai/realtime.ts'
+  );
+}
+
+function currentLatestProviderExternalReason(id, file) {
+  const lower = id.toLowerCase();
+  let reason;
+  if (lower.includes('claudecodeauth')) {
+    reason =
+      'Anthropic Claude Code auth requires real local credential flow and product authority before current-latest parity can be claimed';
+  } else if (lower.includes('codex')) {
+    reason =
+      'OpenAI Codex provider modules require external product authority and private SDK/server credential confirmation before current-latest parity can be claimed';
+  } else if (lower.includes('billing')) {
+    reason =
+      'OpenAI billing module requires account-level credentials and billing authority; no local mock may be treated as live parity';
+  } else if (lower.includes('chatkit')) {
+    reason =
+      'OpenAI ChatKit modules require product authority and browser/session fixture confirmation before current-latest parity can be claimed';
+  } else if (lower.includes('agents')) {
+    reason = 'OpenAI Agents SDK and tracing modules require dedicated SDK/trace fixtures plus product contract review';
+  } else if (lower.includes('realtime')) {
+    reason = 'OpenAI realtime module requires a dedicated streaming protocol fixture and service contract confirmation';
+  } else if (lower.includes('assistant')) {
+    reason = 'OpenAI Assistants module requires a stateful API fixture and account-authorized behavior review';
+  } else {
+    reason = 'Provider module requires external authority before current-latest parity can be claimed';
+  }
+  return `explicit current-latest external provider blocker: ${reason}; source: ${file}`;
+}
+
 function isEvalRuntime(file) {
   return (
     isTsOrJs(file) &&
@@ -309,6 +385,8 @@ function categoriesFor(file) {
 function metadata(category, id, file) {
   if (category === 'command') return ['P1', 'later', 'cli', 'snapshot', `current-latest command requires CLI behavior snapshot or fixture evidence; item: ${id}`];
   if (category === 'flag') return ['P1', 'later', 'cli', 'snapshot', `current-latest flag requires CLI parity snapshot or fixture evidence; item: ${id}`];
+  if (category === 'provider' && isCurrentLatestFixtureProvider(id, file)) return ['P0', 'native', 'provider-runtime', 'fixture', `current-latest P0 provider source is covered by existing mock/recorded provider request-response fixture evidence; item: ${id}`];
+  if (category === 'provider' && isCurrentLatestExternalProvider(file)) return ['P0', 'blocked', 'external-authority', 'blocker', `${currentLatestProviderExternalReason(id, file)}; item: ${id}`];
   if (category === 'provider' && isP0Provider(file)) return ['P0', 'blocked', 'provider-runtime', 'blocker', `current-latest P0 provider requires native or bridge fixture evidence; item: ${id}`];
   if (category === 'provider') return ['P2', 'later', 'provider-runtime', 'registration', `current-latest long-tail provider is registered until fixture evidence promotes it; item: ${id}`];
   if (category === 'assertion') return ['P1', 'later', 'assertion-engine', 'snapshot', `current-latest assertion requires snapshot evidence; item: ${id}`];
