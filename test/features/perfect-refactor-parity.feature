@@ -42,6 +42,7 @@
 #   - docs/specs/tasks/task-27.1-current-latest-core-config-burndown.md
 #   - docs/specs/tasks/task-28.1-current-latest-provider-fixture-burndown.md
 #   - docs/specs/tasks/task-29.1-current-latest-eval-runner-burndown.md
+#   - docs/specs/tasks/task-30.1-current-latest-prompt-processing-burndown.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
