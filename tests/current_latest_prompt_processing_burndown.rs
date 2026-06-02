@@ -144,7 +144,7 @@ fn test_30_1_2_static_and_external_prompt_rows_are_p1_snapshot_evidence() {
 }
 
 #[test]
-fn test_30_1_3_unproven_prompt_processor_rows_remain_explicit_blockers() {
+fn test_30_1_3_phase35_script_prompt_processor_rows_have_native_fixture_evidence() {
     /* TEST-30.1.3 */
     let root = fixture_dir("rust-blocked");
     write_prompt_processing_source(&root);
@@ -154,19 +154,19 @@ fn test_30_1_3_unproven_prompt_processor_rows_remain_explicit_blockers() {
     for source in blocked_prompt_processing_sources() {
         let row = prompt_processing_row_for_source(&inventory.rows, source);
         assert_eq!(row.level, "P0", "{row:#?}");
-        assert_eq!(row.implementation_status, "blocked", "{row:#?}");
+        assert_eq!(row.implementation_status, "native", "{row:#?}");
         assert_eq!(row.verification_owner, "script-bridge", "{row:#?}");
-        assert_eq!(row.evidence_kind, "blocker", "{row:#?}");
+        assert_eq!(row.evidence_kind, "fixture", "{row:#?}");
         assert!(
             row.evidence_reference
-                .starts_with("blocker:prompt-processing:"),
+                .starts_with("fixture:prompt-processing:"),
             "{row:#?}"
         );
         assert!(row
             .blocker_reason
             .as_deref()
             .unwrap_or_default()
-            .contains("dedicated current-latest prompt-processing evidence"));
+            .contains("script bridge"));
     }
 
     let _ = std::fs::remove_dir_all(root);
@@ -189,7 +189,7 @@ fn test_30_1_4_script_and_rust_extractors_emit_equivalent_prompt_processing_evid
 
     assert_eq!(
         prompt_processing_rows_with_json(script_rows, "P0", "native", "fixture").len(),
-        7
+        10
     );
     assert_eq!(
         prompt_processing_rows_with_json(script_rows, "P1", "later", "snapshot").len(),
@@ -197,7 +197,7 @@ fn test_30_1_4_script_and_rust_extractors_emit_equivalent_prompt_processing_evid
     );
     assert_eq!(
         prompt_processing_rows_with_json(script_rows, "P0", "blocked", "blocker").len(),
-        3
+        0
     );
 
     let rust_rows = inventory
@@ -279,19 +279,10 @@ fn test_30_1_5_golden_and_quality_keep_remaining_prompt_processing_blockers_visi
 
     assert_eq!(
         prompt_processing_blockers.len(),
-        3,
+        0,
         "{prompt_processing_blockers:#?}"
     );
-    for blocker in prompt_processing_blockers {
-        let capability = blocker["capability"].as_str().unwrap_or_default();
-        assert!(
-            blocked_prompt_processing_sources()
-                .iter()
-                .any(|source| capability == stable_prompt_processing_id(source)),
-            "unexpected prompt-processing blocker {capability}"
-        );
-    }
-    assert_eq!(golden["blocker_count"], Value::from(3));
+    assert_eq!(golden["blocker_count"], Value::from(0));
     assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
     assert_eq!(
         quality["perfect_refactor_claim_allowed"],
@@ -325,28 +316,6 @@ fn prompt_processing_rows_with_json<'a>(
                 && row["evidence_kind"] == Value::String(evidence_kind.to_string())
         })
         .collect()
-}
-
-fn stable_prompt_processing_id(source: &str) -> String {
-    let without_extension = source.rsplit_once('.').map_or(source, |(left, _)| left);
-    format!("prompt-processing:{}", slug(without_extension))
-}
-
-fn slug(value: &str) -> String {
-    value
-        .chars()
-        .map(|ch| {
-            if ch.is_ascii_alphanumeric() {
-                ch.to_ascii_lowercase()
-            } else {
-                '-'
-            }
-        })
-        .collect::<String>()
-        .split('-')
-        .filter(|part| !part.is_empty())
-        .collect::<Vec<_>>()
-        .join("-")
 }
 
 fn run_current_latest_source_inventory_script(root: &Path, gate_dir: &Path) {

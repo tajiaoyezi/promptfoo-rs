@@ -1,3 +1,5 @@
+pub mod prompt_processor;
+pub mod python;
 pub mod redaction;
 pub mod sandbox;
 
@@ -6,6 +8,10 @@ use std::path::{Path, PathBuf};
 
 use serde::Serialize;
 
+pub use prompt_processor::{
+    PromptProcessorRequest, PromptProcessorResponse, ScriptPromptProcessor,
+};
+pub use python::{PythonBridge, PythonBridgeRequest, PythonBridgeResponse, PythonWorkerPool};
 pub use redaction::{redact_secrets, RedactionPolicy};
 pub use sandbox::{ScriptBridge, ScriptRequest, ScriptResponse, ScriptSandboxOptions};
 

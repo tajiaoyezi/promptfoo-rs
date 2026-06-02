@@ -375,12 +375,31 @@ function currentLatestPromptProcessingFixtureIds(id) {
   if (localProcessorFixtures.length > 0) {
     return localProcessorFixtures;
   }
+  const scriptProcessorFixtures = currentLatestScriptPromptProcessorFixtureIds(id);
+  if (scriptProcessorFixtures.length > 0) {
+    return scriptProcessorFixtures;
+  }
 
   const mapping = {
     'prompt-processing:src-prompts-index': ['p0-config-file-prompt', 'p0-eval-prompt-vars'],
     'prompt-processing:src-prompts-utils': ['p0-config-file-prompt', 'p0-eval-prompt-vars'],
     'prompt-processing:src-prompts-processors-string': ['p0-eval-prompt-vars'],
     'prompt-processing:src-prompts-processors-text': ['p0-config-file-prompt'],
+  };
+  return mapping[id] || [];
+}
+
+function currentLatestScriptPromptProcessorFixtureIds(id) {
+  const mapping = {
+    'prompt-processing:src-prompts-processors-executable': [
+      'p0-script-prompt-executable-processor',
+    ],
+    'prompt-processing:src-prompts-processors-javascript': [
+      'p0-script-prompt-javascript-processor',
+    ],
+    'prompt-processing:src-prompts-processors-python': [
+      'p0-script-prompt-python-processor',
+    ],
   };
   return mapping[id] || [];
 }
@@ -397,12 +416,30 @@ function currentLatestLocalPromptProcessorFixtureIds(id) {
   return mapping[id] || [];
 }
 
+function isCurrentLatestScriptPromptProcessorFixture(id, file) {
+  return isPromptProcessing(file) && currentLatestScriptPromptProcessorFixtureIds(id).length > 0;
+}
+
 function isCurrentLatestLocalPromptProcessorFixture(id, file) {
   return isPromptProcessing(file) && currentLatestLocalPromptProcessorFixtureIds(id).length > 0;
 }
 
 function isCurrentLatestPromptProcessingFixture(id, file) {
   return isPromptProcessing(file) && currentLatestPromptProcessingFixtureIds(id).length > 0;
+}
+
+function currentLatestPromptProcessingFixtureOwner(id, file) {
+  return isCurrentLatestScriptPromptProcessorFixture(id, file) ? 'script-bridge' : 'config-loader';
+}
+
+function currentLatestPromptProcessingFixtureReason(id, file) {
+  if (isCurrentLatestScriptPromptProcessorFixture(id, file)) {
+    return 'current-latest JavaScript, Python, and executable prompt processor source is covered by deterministic authorized script bridge fixtures';
+  }
+  if (isCurrentLatestLocalPromptProcessorFixture(id, file)) {
+    return 'current-latest JSON, Markdown, and Jinja prompt processor source is covered by deterministic local config and eval prompt fixtures';
+  }
+  return 'current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures';
 }
 
 function isCurrentLatestPromptProcessingSnapshot(file) {
@@ -476,6 +513,28 @@ function isSchema(file) {
 
 function isScriptBridge(file) {
   return isTsOrJs(file) && (file.startsWith('src/python/') || file.startsWith('src/ruby/'));
+}
+
+function currentLatestPythonScriptBridgeFixtureIds(id) {
+  const mapping = {
+    'script-bridge:src-python-pythonutils': ['p0-python-bridge-runtime-utils'],
+    'script-bridge:src-python-stderr': ['p0-python-bridge-stderr'],
+    'script-bridge:src-python-worker': ['p0-python-bridge-worker'],
+    'script-bridge:src-python-workerpool': ['p0-python-bridge-worker-pool'],
+    'script-bridge:src-python-wrapper': ['p0-python-bridge-wrapper'],
+  };
+  return mapping[id] || [];
+}
+
+function isCurrentLatestPythonScriptBridgeFixture(id, file) {
+  return file.startsWith('src/python/') && currentLatestPythonScriptBridgeFixtureIds(id).length > 0;
+}
+
+function currentLatestScriptBridgeBlockerReason(id, file) {
+  if (file.startsWith('src/ruby/')) {
+    return `current-latest Ruby script bridge surface requires dedicated Ruby runtime fixture evidence before this row can be claimed native: ${id}; source: ${file}`;
+  }
+  return `current-latest script bridge surface requires authorized subprocess fixture evidence before this row can be claimed native: ${id}; source: ${file}`;
 }
 
 function isImportExport(file) {
@@ -589,10 +648,11 @@ function metadata(category, id, file) {
   if (category === 'cache-store' && isCurrentLatestCacheStoreFixture(id, file)) return ['P0', 'native', 'cache-resume-store', 'fixture', `current-latest cache key, database schema, eval deletion lifecycle, and local filesystem storage source is covered by deterministic cache/resume/result-store fixtures; item: ${id}`];
   if (category === 'cache-store' && isCurrentLatestCacheStoreSnapshot(file)) return ['P1', 'later', 'cache-resume-store', 'snapshot', `current-latest database testing/signal helper source is registered under P1 snapshot evidence until dedicated lifecycle parity work proves native behavior; item: ${id}`];
   if (category === 'cache-store') return ['P0', 'blocked', 'cache-resume-store', 'blocker', `${currentLatestCacheStoreBlockerReason(id, file)}; item: ${id}`];
-  if (category === 'prompt-processing' && isCurrentLatestPromptProcessingFixture(id, file)) return ['P0', 'native', 'config-loader', 'fixture', `${isCurrentLatestLocalPromptProcessorFixture(id, file) ? 'current-latest JSON, Markdown, and Jinja prompt processor source is covered by deterministic local config and eval prompt fixtures' : 'current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures'}; item: ${id}`];
+  if (category === 'prompt-processing' && isCurrentLatestPromptProcessingFixture(id, file)) return ['P0', 'native', currentLatestPromptProcessingFixtureOwner(id, file), 'fixture', `${currentLatestPromptProcessingFixtureReason(id, file)}; item: ${id}`];
   if (category === 'prompt-processing' && isCurrentLatestPromptProcessingSnapshot(file)) return ['P1', 'later', 'config-loader', 'snapshot', `current-latest static/external prompt helper source is registered under P1 snapshot evidence until dedicated parity work proves native behavior; item: ${id}`];
   if (category === 'prompt-processing') return ['P0', 'blocked', currentLatestPromptProcessingBlockerOwner(id, file), 'blocker', `${currentLatestPromptProcessingBlockerReason(id, file)}; item: ${id}`];
-  if (category === 'script-bridge') return ['P0', 'blocked', 'script-bridge', 'blocker', `current-latest script bridge surface requires authorized subprocess fixture evidence; item: ${id}`];
+  if (category === 'script-bridge' && isCurrentLatestPythonScriptBridgeFixture(id, file)) return ['P0', 'native', 'script-bridge', 'fixture', `current-latest Python script bridge source is covered by deterministic authorized Python subprocess fixtures; item: ${id}`];
+  if (category === 'script-bridge') return ['P0', 'blocked', 'script-bridge', 'blocker', `${currentLatestScriptBridgeBlockerReason(id, file)}; item: ${id}`];
   if (category === 'viewer') return ['P1', 'later', 'web-viewer', 'snapshot', `current-latest viewer surface requires data-contract or browser snapshot; item: ${id}`];
   if (category === 'assertion-support') return ['P1', 'later', 'assertion-engine', 'snapshot', `current-latest assertion support surface requires matcher or grading snapshot evidence; item: ${id}`];
   if (category === 'redteam-support') return ['P1', 'later', 'redteam-engine', 'snapshot', `current-latest redteam support surface requires registry or behavior snapshot evidence; item: ${id}`];

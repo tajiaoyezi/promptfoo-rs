@@ -2350,6 +2350,10 @@ fn current_latest_prompt_processing_fixture_ids(stable_id: &str) -> &'static [&'
     if !local_processor_fixtures.is_empty() {
         return local_processor_fixtures;
     }
+    let script_processor_fixtures = current_latest_script_prompt_processor_fixture_ids(stable_id);
+    if !script_processor_fixtures.is_empty() {
+        return script_processor_fixtures;
+    }
 
     match stable_id {
         "prompt-processing:src-prompts-index" | "prompt-processing:src-prompts-utils" => {
@@ -2357,6 +2361,19 @@ fn current_latest_prompt_processing_fixture_ids(stable_id: &str) -> &'static [&'
         }
         "prompt-processing:src-prompts-processors-string" => &["p0-eval-prompt-vars"],
         "prompt-processing:src-prompts-processors-text" => &["p0-config-file-prompt"],
+        _ => &[],
+    }
+}
+
+fn current_latest_script_prompt_processor_fixture_ids(stable_id: &str) -> &'static [&'static str] {
+    match stable_id {
+        "prompt-processing:src-prompts-processors-executable" => {
+            &["p0-script-prompt-executable-processor"]
+        }
+        "prompt-processing:src-prompts-processors-javascript" => {
+            &["p0-script-prompt-javascript-processor"]
+        }
+        "prompt-processing:src-prompts-processors-python" => &["p0-script-prompt-python-processor"],
         _ => &[],
     }
 }
@@ -2372,9 +2389,32 @@ fn current_latest_local_prompt_processor_fixture_ids(stable_id: &str) -> &'stati
     }
 }
 
+fn is_current_latest_script_prompt_processor_fixture(stable_id: &str, file: &str) -> bool {
+    is_prompt_processing_file(file)
+        && !current_latest_script_prompt_processor_fixture_ids(stable_id).is_empty()
+}
+
 fn is_current_latest_local_prompt_processor_fixture(stable_id: &str, file: &str) -> bool {
     is_prompt_processing_file(file)
         && !current_latest_local_prompt_processor_fixture_ids(stable_id).is_empty()
+}
+
+fn current_latest_prompt_processing_fixture_owner(stable_id: &str, file: &str) -> &'static str {
+    if is_current_latest_script_prompt_processor_fixture(stable_id, file) {
+        "script-bridge"
+    } else {
+        "config-loader"
+    }
+}
+
+fn current_latest_prompt_processing_fixture_reason(stable_id: &str, file: &str) -> &'static str {
+    if is_current_latest_script_prompt_processor_fixture(stable_id, file) {
+        "current-latest JavaScript, Python, and executable prompt processor source is covered by deterministic authorized script bridge fixtures"
+    } else if is_current_latest_local_prompt_processor_fixture(stable_id, file) {
+        "current-latest JSON, Markdown, and Jinja prompt processor source is covered by deterministic local config and eval prompt fixtures"
+    } else {
+        "current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures"
+    }
 }
 
 fn is_current_latest_prompt_processing_fixture(stable_id: &str, file: &str) -> bool {
@@ -2450,6 +2490,34 @@ fn is_schema_file(file: &str) -> bool {
 
 fn is_script_bridge_file(file: &str) -> bool {
     is_ts_or_js_file(file) && (file.starts_with("src/python/") || file.starts_with("src/ruby/"))
+}
+
+fn current_latest_python_script_bridge_fixture_ids(stable_id: &str) -> &'static [&'static str] {
+    match stable_id {
+        "script-bridge:src-python-pythonutils" => &["p0-python-bridge-runtime-utils"],
+        "script-bridge:src-python-stderr" => &["p0-python-bridge-stderr"],
+        "script-bridge:src-python-worker" => &["p0-python-bridge-worker"],
+        "script-bridge:src-python-workerpool" => &["p0-python-bridge-worker-pool"],
+        "script-bridge:src-python-wrapper" => &["p0-python-bridge-wrapper"],
+        _ => &[],
+    }
+}
+
+fn is_current_latest_python_script_bridge_fixture(stable_id: &str, file: &str) -> bool {
+    file.starts_with("src/python/")
+        && !current_latest_python_script_bridge_fixture_ids(stable_id).is_empty()
+}
+
+fn current_latest_script_bridge_blocker_reason(stable_id: &str, file: &str) -> String {
+    if file.starts_with("src/ruby/") {
+        format!(
+            "current-latest Ruby script bridge surface requires dedicated Ruby runtime fixture evidence before this row can be claimed native: {stable_id}; source: {file}"
+        )
+    } else {
+        format!(
+            "current-latest script bridge surface requires authorized subprocess fixture evidence before this row can be claimed native: {stable_id}; source: {file}"
+        )
+    }
 }
 
 fn is_import_export_file(file: &str) -> bool {
@@ -3075,14 +3143,10 @@ fn current_latest_default_metadata(
             current_latest_metadata(
                 "P0",
                 "native",
-                "config-loader",
+                current_latest_prompt_processing_fixture_owner(stable_id, file),
                 "fixture",
                 stable_id,
-                if is_current_latest_local_prompt_processor_fixture(stable_id, file) {
-                    "current-latest JSON, Markdown, and Jinja prompt processor source is covered by deterministic local config and eval prompt fixtures"
-                } else {
-                    "current-latest prompt index/string/text/utils source is covered by existing deterministic config and eval prompt fixtures"
-                },
+                current_latest_prompt_processing_fixture_reason(stable_id, file),
             )
         }
         "prompt-processing" if is_current_latest_prompt_processing_snapshot(file) => {
@@ -3103,13 +3167,23 @@ fn current_latest_default_metadata(
             stable_id,
             &current_latest_prompt_processing_blocker_reason(stable_id, file),
         ),
+        "script-bridge" if is_current_latest_python_script_bridge_fixture(stable_id, file) => {
+            current_latest_metadata(
+                "P0",
+                "native",
+                "script-bridge",
+                "fixture",
+                stable_id,
+                "current-latest Python script bridge source is covered by deterministic authorized Python subprocess fixtures",
+            )
+        }
         "script-bridge" => current_latest_metadata(
             "P0",
             "blocked",
             "script-bridge",
             "blocker",
             stable_id,
-            "current-latest script bridge surface requires authorized subprocess fixture evidence",
+            &current_latest_script_bridge_blocker_reason(stable_id, file),
         ),
         "viewer" => current_latest_metadata(
             "P1",

@@ -107,7 +107,7 @@ fn test_32_1_1_local_prompt_processor_rows_have_native_fixture_evidence() {
 }
 
 #[test]
-fn test_32_1_2_script_prompt_processor_rows_remain_script_bridge_blockers() {
+fn test_32_1_2_phase35_script_prompt_processor_rows_have_script_bridge_fixture_evidence() {
     /* TEST-32.1.2 */
     let root = fixture_dir("rust-blocker");
     write_prompt_processor_source(&root);
@@ -117,12 +117,12 @@ fn test_32_1_2_script_prompt_processor_rows_remain_script_bridge_blockers() {
     for source in script_prompt_processor_sources() {
         let row = prompt_processing_row_for_source(&inventory.rows, source);
         assert_eq!(row.level, "P0", "{row:#?}");
-        assert_eq!(row.implementation_status, "blocked", "{row:#?}");
+        assert_eq!(row.implementation_status, "native", "{row:#?}");
         assert_eq!(row.verification_owner, "script-bridge", "{row:#?}");
-        assert_eq!(row.evidence_kind, "blocker", "{row:#?}");
+        assert_eq!(row.evidence_kind, "fixture", "{row:#?}");
         assert!(
             row.evidence_reference
-                .starts_with("blocker:prompt-processing:"),
+                .starts_with("fixture:prompt-processing:"),
             "{row:#?}"
         );
         assert!(row
@@ -152,11 +152,11 @@ fn test_32_1_3_script_and_rust_extractors_emit_equivalent_local_processor_eviden
 
     assert_eq!(
         prompt_processing_rows_with_json(script_rows, "P0", "native", "fixture").len(),
-        3
+        6
     );
     assert_eq!(
         prompt_processing_rows_with_json(script_rows, "P0", "blocked", "blocker").len(),
-        3
+        0
     );
 
     let rust_rows = inventory
@@ -236,25 +236,12 @@ fn test_32_1_4_golden_and_quality_keep_script_processor_blockers_visible() {
         })
         .collect::<Vec<_>>();
 
-    assert_eq!(prompt_processing_blockers.len(), 3);
-    assert_eq!(golden["blocker_count"], Value::from(3));
-    assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
+    assert_eq!(prompt_processing_blockers.len(), 0);
+    assert_eq!(golden["blocker_count"], Value::from(0));
+    assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(true));
     assert_eq!(
         quality["perfect_refactor_claim_allowed"],
         Value::Bool(false)
-    );
-
-    let blocker_capabilities = prompt_processing_blockers
-        .iter()
-        .map(|blocker| blocker["capability"].as_str().unwrap_or_default())
-        .collect::<Vec<_>>();
-    assert_eq!(
-        blocker_capabilities,
-        vec![
-            "prompt-processing:src-prompts-processors-executable",
-            "prompt-processing:src-prompts-processors-javascript",
-            "prompt-processing:src-prompts-processors-python",
-        ]
     );
 
     let _ = std::fs::remove_dir_all(root);
