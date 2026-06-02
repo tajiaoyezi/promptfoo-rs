@@ -1,6 +1,6 @@
 # Task 35.1: current-latest-script-prompt-python-bridge-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 35 - current-latest-script-prompt-python-bridge-burndown

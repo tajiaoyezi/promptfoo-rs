@@ -163,7 +163,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 32 | current-latest-local-prompt-processor-burndown | docs/specs/phases/phase-32-current-latest-local-prompt-processor-burndown.md | Done | 1 | N/A (solo) |
 | 33 | current-latest-eval-deletion-burndown | docs/specs/phases/phase-33-current-latest-eval-deletion-burndown.md | Done | 1 | N/A (solo) |
 | 34 | current-latest-eval-scheduler-rate-limit-burndown | docs/specs/phases/phase-34-current-latest-eval-scheduler-rate-limit-burndown.md | Done | 1 | N/A (solo) |
-| 35 | current-latest-script-prompt-python-bridge-burndown | docs/specs/phases/phase-35-current-latest-script-prompt-python-bridge-burndown.md | Ready | 1 | N/A (solo) |
+| 35 | current-latest-script-prompt-python-bridge-burndown | docs/specs/phases/phase-35-current-latest-script-prompt-python-bridge-burndown.md | In Progress | 1 | N/A (solo) |
 
 ## Task 总索引
 
@@ -238,7 +238,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 32.1 | prompt-processing | docs/specs/tasks/task-32.1-current-latest-local-prompt-processor-burndown.md | Done | Phase 32 order 1 | N/A (solo) |
 | 33.1 | cache-resume-store | docs/specs/tasks/task-33.1-current-latest-eval-deletion-burndown.md | Done | Phase 33 order 1 | N/A (solo) |
 | 34.1 | eval-runner | docs/specs/tasks/task-34.1-current-latest-eval-scheduler-rate-limit-burndown.md | Done | Phase 34 order 1 | N/A (solo) |
-| 35.1 | script-bridge | docs/specs/tasks/task-35.1-current-latest-script-prompt-python-bridge-burndown.md | Ready | Phase 35 order 1 | N/A (solo) |
+| 35.1 | script-bridge | docs/specs/tasks/task-35.1-current-latest-script-prompt-python-bridge-burndown.md | In Progress | Phase 35 order 1 | N/A (solo) |
 
 ## ADR 索引
 
