@@ -1,6 +1,6 @@
 # Phase 34: current-latest-eval-scheduler-rate-limit-burndown
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,11 +28,11 @@ Depends on Phase 24 current-latest artifacts, Phase 29 eval-runner blocker split
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] Provider rate-limit headers parse into deterministic remaining/reset state, and rate-limit keys are stable across provider/model/scope inputs.
-- [ ] Provider rate-limit registry returns deterministic delay decisions and records response headers without requiring real provider calls.
-- [ ] Adaptive concurrency adjusts concurrency deterministically for success, failure, and rate-limit observations while respecting configured min/max bounds.
-- [ ] Provider call execution context and wrapper behavior expose stable metadata, delay decisions, output, error, and observed header records.
-- [ ] The seven current-latest eval-runner scheduler rows have P0 native fixture evidence in both Rust and shell artifacts, eval-runner blockers drop to zero, total blockers drop from 40 to 33, and `perfect_refactor_claim_allowed=false` remains.
+- [x] Provider rate-limit headers parse into deterministic remaining/reset state, and rate-limit keys are stable across provider/model/scope inputs.
+- [x] Provider rate-limit registry returns deterministic delay decisions and records response headers without requiring real provider calls.
+- [x] Adaptive concurrency adjusts concurrency deterministically for success, failure, and rate-limit observations while respecting configured min/max bounds.
+- [x] Provider call execution context and wrapper behavior expose stable metadata, delay decisions, output, error, and observed header records.
+- [x] The seven current-latest eval-runner scheduler rows have P0 native fixture evidence in both Rust and shell artifacts, eval-runner blockers drop to zero, total blockers drop from 40 to 33, and `perfect_refactor_claim_allowed=false` remains.
 
 ## 7. Phase Risks
 
@@ -46,7 +46,7 @@ Task 34.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：待实施
-- **Phase smoke**：待实施
-- **Artifact evidence**：待实施
-- **保留边界**：待实施
+- **完成日期**：2026-06-02
+- **Phase smoke**：PASS - `s2v_preflight_phase "docs/specs/phases/phase-34-current-latest-eval-scheduler-rate-limit-burndown.md"` 通过，随后执行 `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全套通过。
+- **Artifact evidence**：`current-latest-golden-corpus.status=ready-with-blockers`、`blocker_count=33`、`eval-runner=0`，剩余分组为 `config=7, prompt-processing=3, provider=16, script-bridge=7`；`current-latest-quality.status=ready-with-blockers`、`local_current_latest_ready=false`、`perfect_refactor_claim_allowed=false`。
+- **保留边界**：本 phase 只移除本地 deterministic eval scheduler rate-limit/adaptive/provider-wrapper blockers；不解除 config/provider external authority、script bridge runtime discovery、JS/Python/executable prompt processor parity、current-target、publication authority 或“无任何潜在 bug”不可证明承诺。
