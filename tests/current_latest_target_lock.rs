@@ -161,6 +161,7 @@ fn test_24_1_4_runtime_smoke_wires_current_latest_lock_artifacts() {
     let runtime_smoke =
         std::fs::read_to_string("scripts/release/runtime-smoke.sh").expect("runtime smoke exists");
     assert!(runtime_smoke.contains("current-latest-target-lock.sh"));
+    assert!(runtime_smoke.contains("CURRENT_LATEST_GITHUB_RELEASE_FILE"));
     let release_target: Value = serde_json::from_str(
         &std::fs::read_to_string("target/release-gates/current-latest-target.json")
             .expect("release current latest target should exist"),

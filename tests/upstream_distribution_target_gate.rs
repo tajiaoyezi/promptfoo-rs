@@ -167,6 +167,7 @@ fn test_21_1_4_runtime_smoke_wires_distribution_target_artifact() {
     let runtime_smoke =
         std::fs::read_to_string("scripts/release/runtime-smoke.sh").expect("runtime smoke exists");
     assert!(runtime_smoke.contains("upstream-distribution-target.sh"));
+    assert!(runtime_smoke.contains("UPSTREAM_GITHUB_RELEASE_FILE"));
     assert!(runtime_smoke.contains("\"distribution_target\""));
 
     for docs_path in [
