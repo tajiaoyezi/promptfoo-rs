@@ -1,6 +1,6 @@
 # Phase 33: current-latest-eval-deletion-burndown
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,10 +28,10 @@ Depends on Phase 24 current-latest artifacts, Phase 31 cache-store split, Phase 
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] SQLite result-store eval deletion removes matching eval records and their assertion rows while preserving unrelated eval records.
-- [ ] Missing eval deletion is deterministic and non-destructive.
-- [ ] The current-latest eval deletion row has P0 native fixture evidence in both Rust and shell artifacts, and cache-store blockers drop to zero.
-- [ ] `current-latest-golden-corpus.json` total blocker count drops from 41 to 40 under the tracked-lock phase smoke target, and `perfect_refactor_claim_allowed=false` remains.
+- [x] SQLite result-store eval deletion removes matching eval records and their assertion rows while preserving unrelated eval records.
+- [x] Missing eval deletion is deterministic and non-destructive.
+- [x] The current-latest eval deletion row has P0 native fixture evidence in both Rust and shell artifacts, and cache-store blockers drop to zero.
+- [x] `current-latest-golden-corpus.json` total blocker count drops from 41 to 40 under the tracked-lock phase smoke target, and `perfect_refactor_claim_allowed=false` remains.
 
 ## 7. Phase Risks
 
@@ -45,7 +45,7 @@ Task 33.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：待实施
-- **Phase smoke**：待实施
-- **Artifact evidence**：待实施
-- **保留边界**：待实施
+- **完成日期**：2026-06-02
+- **Phase smoke**：PASS - `s2v_preflight_phase "docs/specs/phases/phase-33-current-latest-eval-deletion-burndown.md"` 通过，随后执行 `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全套通过。
+- **Artifact evidence**：`current-latest-golden-corpus.status=ready-with-blockers`、`blocker_count=40`、`cache-store=0`，总分组为 `config=7, eval-runner=7, prompt-processing=3, provider=16, script-bridge=7`；`current-latest-quality.status=ready-with-blockers`、`local_current_latest_ready=false`、`perfect_refactor_claim_allowed=false`。
+- **保留边界**：本 phase 只移除本地 SQLite eval deletion blocker；不解除 config/provider external authority、eval-runner adaptive/rate-limit、script bridge runtime discovery、JS/Python/executable prompt processor parity、current-target、publication authority 或“无任何潜在 bug”不可证明承诺。
