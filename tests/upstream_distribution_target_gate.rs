@@ -1,5 +1,6 @@
 use std::path::Path;
 use std::process::Command;
+use std::sync::{Mutex, MutexGuard, OnceLock};
 
 use promptfoo_rs::compatibility::inventory::{
     build_upstream_distribution_target, parse_npm_package_observation,
@@ -110,6 +111,7 @@ fn test_21_1_3_non_core_github_release_cannot_allow_current_perfect_claim() {
 #[test]
 fn test_21_1_4_runtime_smoke_wires_distribution_target_artifact() {
     /* TEST-21.1.4 */
+    let _lock = script_artifact_lock();
     let path = std::env::temp_dir().join(format!(
         "promptfoo-rs-upstream-distribution-target-{}.json",
         std::process::id()
@@ -189,6 +191,7 @@ fn test_21_1_4_runtime_smoke_wires_distribution_target_artifact() {
 #[test]
 fn test_23_1_1_script_uses_dynamic_latest_release_metadata() {
     /* TEST-23.1.1 / TEST-23.1.2 / TEST-23.1.3 / TEST-23.1.4 */
+    let _lock = script_artifact_lock();
     let fixture_dir = std::env::temp_dir().join(format!(
         "promptfoo-rs-dynamic-release-fixtures-{}",
         std::process::id()
@@ -308,4 +311,9 @@ fn git_bash() -> &'static str {
     } else {
         "bash"
     }
+}
+
+fn script_artifact_lock() -> MutexGuard<'static, ()> {
+    static LOCK: OnceLock<Mutex<()>> = OnceLock::new();
+    LOCK.get_or_init(|| Mutex::new(())).lock().unwrap()
 }
