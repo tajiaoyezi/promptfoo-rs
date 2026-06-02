@@ -301,6 +301,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Task 31.1 完成后，current-latest 证据记录 cache-store 行为为 6 fixture / 2 snapshot / 1 blocker；tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 `current-latest-golden-corpus.blocker_count=44`，分组为 `cache-store=1, config=7, eval-runner=7, prompt-processing=6, provider=16, script-bridge=7`，且 `perfect_refactor_claim_allowed=false`。§9 runtime-smoke 包含 50 个真实 upstream P0 corpus fixture 并保持 `real-upstream-corpus.summary.status=ready`；剩余 eval deletion、external authority、script bridge、processor、config、publication/current-target blockers 仍需后续 task 或外部决策。
 >
 > Phase 32 是 2026-06-02 Phase 31 后的 current-latest local prompt processor burndown 链路，依据 Phase 31 §9 中仍保留的 6 个 prompt-processing blockers、task 2.2 的 config loader、task 2.3 的 eval prompt rendering、task 9.1 的 script bridge boundary、PRD §Core Capabilities、ADR-009、ADR-011。它只把无需脚本执行权限的 JSON/Markdown/Jinja processor rows 计为 fixture evidence，JS/Python/executable processor rows 继续保持 P0 script-bridge blocker。
+>
+> Task 32.1 完成后，current-latest 证据记录 prompt-processing 行为为 7 fixture / 3 snapshot / 3 blocker；tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 `current-latest-golden-corpus.blocker_count=41`，分组为 `cache-store=1, config=7, eval-runner=7, prompt-processing=3, provider=16, script-bridge=7`，且 `perfect_refactor_claim_allowed=false`。剩余 JS/Python/executable processor rows 仍需 script bridge subprocess fixture 证明，不能由本地 JSON/Markdown/Jinja parser fixture 间接视为 native。
 
 ---
 

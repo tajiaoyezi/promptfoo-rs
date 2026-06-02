@@ -1,6 +1,6 @@
 # Task 32.1: current-latest-local-prompt-processor-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 32 - current-latest-local-prompt-processor-burndown
@@ -77,19 +77,19 @@ Current-latest `category=prompt-processing` rows must classify JSON, Markdown, a
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (task 2.2 / task 2.3 / ADR-009): JSON, Markdown, and Jinja current-latest prompt processor rows have P0 native fixture evidence and do not produce golden release blockers.
-- [ ] **AC2** (task 9.1 / ADR-009): JavaScript, Python, and executable current-latest prompt processor rows remain explicit P0 script-bridge blockers.
-- [ ] **AC3** (ADR-009): Rust extractor and shell extractor emit equivalent local prompt processor classification, evidence kind, evidence reference, and owner values.
-- [ ] **AC4** (ADR-011 / task 24.4): source/matrix/golden/quality artifacts show prompt-processing blockers reduced to 3 and total blockers reduced to 41 under the tracked-lock Phase 31 smoke target, while perfect-refactor completion remains false.
+- [x] **AC1** (task 2.2 / task 2.3 / ADR-009): JSON, Markdown, and Jinja current-latest prompt processor rows have P0 native fixture evidence and do not produce golden release blockers.
+- [x] **AC2** (task 9.1 / ADR-009): JavaScript, Python, and executable current-latest prompt processor rows remain explicit P0 script-bridge blockers.
+- [x] **AC3** (ADR-009): Rust extractor and shell extractor emit equivalent local prompt processor classification, evidence kind, evidence reference, and owner values.
+- [x] **AC4** (ADR-011 / task 24.4): source/matrix/golden/quality artifacts show prompt-processing blockers reduced to 3 and total blockers reduced to 41 under the tracked-lock Phase 31 smoke target, while perfect-refactor completion remains false.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-32.1.1 | TEST-32.1.1 | tests/current_latest_local_prompt_processor_burndown.rs | install, lint, typecheck, unit-test, integration, build | Ready |
-| AC2 | SCEN-32.1.1 | TEST-32.1.2 | tests/current_latest_local_prompt_processor_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Ready |
-| AC3 | SCEN-32.1.1 | TEST-32.1.3 | tests/current_latest_local_prompt_processor_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Ready |
-| AC4 | SCEN-32.1.1 | TEST-32.1.4 | tests/current_latest_local_prompt_processor_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, runtime-smoke, build | Ready |
+| AC1 | SCEN-32.1.1 | TEST-32.1.1 | tests/current_latest_local_prompt_processor_burndown.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-32.1.1 | TEST-32.1.2 | tests/current_latest_local_prompt_processor_burndown.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC3 | SCEN-32.1.1 | TEST-32.1.3 | tests/current_latest_local_prompt_processor_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-32.1.1 | TEST-32.1.4 | tests/current_latest_local_prompt_processor_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -111,9 +111,33 @@ Current-latest `category=prompt-processing` rows must classify JSON, Markdown, a
 
 ## 10. Completion Notes
 
-- **完成日期**：待实施
-- **改动文件**：待实施
-- **commit 列表**：待实施
-- **§9 Verification 结果**：待实施
-- **剩余风险 / 未做项**：待实施
-- **下游 task 影响**：待实施
+- **完成日期**：2026-06-02
+- **改动文件**：
+  - `docs/specs/phases/phase-32-current-latest-local-prompt-processor-burndown.md`
+  - `docs/specs/tasks/task-32.1-current-latest-local-prompt-processor-burndown.md`
+  - `docs/s2v-adapter.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/compatibility/matrix.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_local_prompt_processor_burndown.rs`
+  - `tests/current_latest_prompt_processing_burndown.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+- **commit 列表**：
+  - `c243537` `docs(spec): add phase 32 current latest local prompt processor burndown`
+  - `d4ba3a1` `docs(spec): task-32.1 enters implementation`
+  - `ad58d24` `test(prompt-processing): add current latest local prompt processor RED tests`
+  - `cfc05b9` `feat(prompt-processing): classify current latest local prompt processors`
+  - 本次 docs 回填提交：`docs(spec): complete task 32.1 current latest local prompt processor burndown`
+- **§9 Verification 结果**：
+  - install: PASS - helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS - helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS - helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS - helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-32.1.1 ~ TEST-32.1.4 与累计 TEST-30.1.1 ~ TEST-30.1.5 均通过。
+  - integration: PASS - helper 执行 adapter Integration tests 通过。
+  - e2e: PASS - helper 执行 adapter E2E tests 通过。
+  - coverage: PASS - helper 执行 adapter Coverage，通过覆盖率阈值守卫。
+  - build: PASS - helper 执行 adapter Build 通过。
+  - runtime-smoke: PASS - helper 执行 adapter Runtime smoke 通过；`current-latest-golden-corpus.json` 为 `ready-with-blockers`、`p0_total=92`、`fixture_case_count=92`、`blocker_count=41`、分组 `cache-store=1, config=7, eval-runner=7, prompt-processing=3, provider=16, script-bridge=7`，`perfect_refactor_claim_allowed=false`。
+- **剩余风险 / 未做项**：JS/Python/executable prompt processor rows 仍是 3 个 P0 script-bridge blockers；全局仍保留 cache-store=1、config=7、eval-runner=7、provider external-authority=16、script-bridge=7、current-target drift、external-authority、publication-authority 等 blockers；不承诺“无任何潜在 bug”。
+- **下游 task 影响**：后续 current-latest burndown 可从 41 个总 blockers 继续推进；script-backed processor parity 必须通过 task 9.1 边界下的专用 subprocess/script fixture 证明，不能由本 task 的 local prompt parser fixture 间接视为 native。

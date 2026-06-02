@@ -20,7 +20,7 @@ Phase 31 leaves 44 current-latest P0 golden blockers, including 6 prompt-process
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 32.1 | current-latest-local-prompt-processor-burndown | ../tasks/task-32.1-current-latest-local-prompt-processor-burndown.md | Ready | 将 6 个 prompt-processing blockers 拆为 3 个 local fixture rows 和 3 个保留 script-bridge blockers |
+| 32.1 | current-latest-local-prompt-processor-burndown | ../tasks/task-32.1-current-latest-local-prompt-processor-burndown.md | Done | 将 6 个 prompt-processing blockers 拆为 3 个 local fixture rows 和 3 个保留 script-bridge blockers |
 
 ## 5. Dependencies
 
