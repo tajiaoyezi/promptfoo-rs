@@ -160,7 +160,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 29 | current-latest-eval-runner-burndown | docs/specs/phases/phase-29-current-latest-eval-runner-burndown.md | Done | 1 | N/A (solo) |
 | 30 | current-latest-prompt-processing-burndown | docs/specs/phases/phase-30-current-latest-prompt-processing-burndown.md | Done | 1 | N/A (solo) |
 | 31 | current-latest-cache-store-burndown | docs/specs/phases/phase-31-current-latest-cache-store-burndown.md | Done | 1 | N/A (solo) |
-| 32 | current-latest-local-prompt-processor-burndown | docs/specs/phases/phase-32-current-latest-local-prompt-processor-burndown.md | Ready | 1 | N/A (solo) |
+| 32 | current-latest-local-prompt-processor-burndown | docs/specs/phases/phase-32-current-latest-local-prompt-processor-burndown.md | Done | 1 | N/A (solo) |
 
 ## Task 总索引
 

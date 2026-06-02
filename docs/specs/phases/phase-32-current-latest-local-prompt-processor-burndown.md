@@ -1,6 +1,6 @@
 # Phase 32: current-latest-local-prompt-processor-burndown
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,10 +28,10 @@ Depends on Phase 24 current-latest artifacts, Phase 30 prompt-processing split, 
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] JSON, Markdown, and Jinja current-latest prompt processor rows have P0 native fixture evidence and stop producing prompt-processing golden blockers.
-- [ ] JavaScript, Python, and executable current-latest prompt processor rows remain explicit P0 script-bridge blockers.
-- [ ] Rust and shell current-latest artifact generation emit equivalent prompt processor classification.
-- [ ] `current-latest-golden-corpus.json` prompt-processing blocker count drops from 6 to 3, total blocker count drops from 44 to 41 under the tracked-lock phase smoke target, and `perfect_refactor_claim_allowed=false` remains.
+- [x] JSON, Markdown, and Jinja current-latest prompt processor rows have P0 native fixture evidence and stop producing prompt-processing golden blockers.
+- [x] JavaScript, Python, and executable current-latest prompt processor rows remain explicit P0 script-bridge blockers.
+- [x] Rust and shell current-latest artifact generation emit equivalent prompt processor classification.
+- [x] `current-latest-golden-corpus.json` prompt-processing blocker count drops from 6 to 3, total blocker count drops from 44 to 41 under the tracked-lock phase smoke target, and `perfect_refactor_claim_allowed=false` remains.
 
 ## 7. Phase Risks
 
@@ -45,7 +45,7 @@ Task 32.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：待实施
-- **Phase smoke**：待实施
-- **Artifact evidence**：待实施
-- **保留边界**：待实施
+- **完成日期**：2026-06-02
+- **Phase smoke**：PASS - `s2v_preflight_phase "docs/specs/phases/phase-32-current-latest-local-prompt-processor-burndown.md"` 通过，随后执行 `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全套通过。
+- **Artifact evidence**：`current-latest-golden-corpus.status=ready-with-blockers`、`blocker_count=41`、`prompt-processing=3`，总分组为 `cache-store=1, config=7, eval-runner=7, prompt-processing=3, provider=16, script-bridge=7`；`current-latest-quality.status=ready-with-blockers`、`local_current_latest_ready=false`、`perfect_refactor_claim_allowed=false`。
+- **保留边界**：JS/Python/executable prompt processors 仍是 P0 script-bridge blockers；本 phase 不解除 cache deletion、external provider/config authority、eval-runner adaptive/rate-limit、current-target、publication authority 或“无任何潜在 bug”不可证明承诺。
