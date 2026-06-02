@@ -1,6 +1,6 @@
 # Phase 31: current-latest-cache-store-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,10 +28,10 @@ After Phase 30, phase-smoke artifacts report 52 current-latest P0 golden blocker
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] current-latest cache, database index/tables, and local filesystem storage rows already covered by local deterministic cache/result-store fixtures no longer appear as generic P0 cache-store blockers and carry `fixture:` evidence references.
-- [ ] current-latest database testing and signal helper rows are recorded as P1 snapshot evidence rather than P0 native parity.
-- [ ] current-latest eval deletion remains an explicit P0 cache-store blocker.
-- [ ] `current-latest-golden-corpus.json` cache-store blocker count drops from 9 to 1, total blocker count drops from 52 to 44 under the tracked-lock phase smoke target, and `perfect_refactor_claim_allowed=false` remains.
+- [x] current-latest cache, database index/tables, and local filesystem storage rows already covered by local deterministic cache/result-store fixtures no longer appear as generic P0 cache-store blockers and carry `fixture:` evidence references.
+- [x] current-latest database testing and signal helper rows are recorded as P1 snapshot evidence rather than P0 native parity.
+- [x] current-latest eval deletion remains an explicit P0 cache-store blocker.
+- [x] `current-latest-golden-corpus.json` cache-store blocker count drops from 9 to 1, total blocker count drops from 52 to 44 under the tracked-lock phase smoke target, and `perfect_refactor_claim_allowed=false` remains.
 
 ## 7. Phase Risks
 
@@ -45,7 +45,7 @@ Task 31.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：待实施
-- **Phase smoke**：待实施
-- **Artifact evidence**：待实施
-- **保留边界**：待实施
+- **完成日期**：2026-06-02
+- **Phase smoke**：PASS - `s2v_preflight_phase docs/specs/phases/phase-31-current-latest-cache-store-burndown.md` 通过；`s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全套通过。
+- **Artifact evidence**：最终 phase smoke 使用 tracked current-latest target `1d09dfeb5f0766905409117f923dd5c4b0838d9f`；`current-latest-golden-corpus.json` 为 `ready-with-blockers`、`blocker_count=44`、分组 `cache-store=1, config=7, eval-runner=7, prompt-processing=6, provider=16, script-bridge=7`；`current-latest-matrix.json` 记录 cache-store `6 native fixture / 2 later snapshot / 1 blocked blocker`；`current-latest-quality.json` 为 `ready-with-blockers`、`local_current_latest_ready=false`、`perfect_refactor_claim_allowed=false`；`real-upstream-corpus/summary.json` 为 `ready`、`observed_p0_fixture_count=50`。
+- **保留边界**：Phase 31 只消减 cache-store generic blockers，不处理 eval deletion lifecycle/deletion cascade parity、config external、eval-runner adaptive/rate-limit、prompt processor parity、provider external-authority、script-bridge runtime discovery、current-target drift、publication authority 或“无任何潜在 bug”承诺。
