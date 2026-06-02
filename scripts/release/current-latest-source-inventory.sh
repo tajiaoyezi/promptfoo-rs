@@ -102,6 +102,35 @@ function isCurrentLatestViewerConfig(file) {
   return file.startsWith('src/app/') && /config/i.test(file);
 }
 
+function isCurrentLatestRuntimeConfig(file) {
+  const lower = file.toLowerCase();
+  return lower === 'src/commands/config.ts' || lower === 'src/configtypes.ts' || lower.startsWith('src/util/config/');
+}
+
+function isCurrentLatestRedteamConfig(file) {
+  return file.toLowerCase() === 'src/redteam/plugins/policy/evals/promptfooconfig.yaml';
+}
+
+function isCurrentLatestAuxiliaryConfig(file) {
+  const lower = file.toLowerCase();
+  return lower.startsWith('src/codescan/config/') || lower === 'src/commands/mcp/tools/validatepromptfooconfig.ts';
+}
+
+function currentLatestAuxiliaryConfigOwner(file) {
+  return file.toLowerCase().startsWith('src/codescan/config/') ? 'scan-engine' : 'mcp-runtime';
+}
+
+function isCurrentLatestExternalConfig(file) {
+  const lower = file.toLowerCase();
+  return (
+    lower.startsWith('src/globalconfig/') ||
+    lower.startsWith('src/server/config/') ||
+    lower === 'src/server/routes/configs.ts' ||
+    lower === 'src/tracing/otelconfig.ts' ||
+    lower === 'src/types/api/configs.ts'
+  );
+}
+
 function isViewer(file) {
   return file.startsWith('src/app/') || file.startsWith('src/server/') || file.startsWith('src/openapi/');
 }
@@ -285,6 +314,10 @@ function metadata(category, id, file) {
   if (category === 'assertion') return ['P1', 'later', 'assertion-engine', 'snapshot', `current-latest assertion requires snapshot evidence; item: ${id}`];
   if (category === 'redteam-plugin' || category === 'redteam-strategy') return ['P1', 'later', 'redteam-engine', 'snapshot', `current-latest redteam surface requires snapshot evidence; item: ${id}`];
   if (category === 'output') return ['P1', 'later', 'reporting', 'snapshot', `current-latest output surface requires output contract snapshot; item: ${id}`];
+  if (category === 'config' && isCurrentLatestRuntimeConfig(file)) return ['P0', 'native', 'config-loader', 'fixture', `current-latest runtime promptfooconfig/env/file config surface is covered by existing P0 native config fixtures; item: ${id}`];
+  if (category === 'config' && isCurrentLatestRedteamConfig(file)) return ['P0', 'native', 'redteam-engine', 'fixture', `current-latest redteam promptfooconfig source is covered by redteam YAML fixture evidence; item: ${id}`];
+  if (category === 'config' && isCurrentLatestAuxiliaryConfig(file)) return ['P1', 'later', currentLatestAuxiliaryConfigOwner(file), 'snapshot', `current-latest auxiliary command or scan config source is registered under P1 snapshot evidence; item: ${id}`];
+  if (category === 'config' && isCurrentLatestExternalConfig(file)) return ['P0', 'blocked', 'external-authority', 'blocker', `explicit current-latest external cloud/server/telemetry/global config blocker; not counted as local runtime parity without product authority credentials or service contract evidence; item: ${id}`];
   if (category === 'config') return ['P0', 'blocked', 'config-loader', 'blocker', `current-latest config surface requires fixture evidence; item: ${id}`];
   if (category === 'eval-runner') return ['P0', 'blocked', 'eval-runner', 'blocker', `current-latest eval runtime requires fixture evidence; item: ${id}`];
   if (category === 'cache-store') return ['P0', 'blocked', 'cache-resume-store', 'blocker', `current-latest cache and result store surface requires fixture evidence; item: ${id}`];
@@ -306,7 +339,11 @@ function metadata(category, id, file) {
   return ['P0', 'blocked', 'compatibility', 'blocker', `current-latest source row is unclassified and must be mapped before any perfect-refactor claim; item: ${id}`];
 }
 
-function evidenceReference(category, id) {
+function evidenceReference(category, id, evidenceKind) {
+  if (evidenceKind === 'fixture') return `fixture:${id}`;
+  if (evidenceKind === 'snapshot' || evidenceKind === 'protocol') return `snapshot:${id}`;
+  if (evidenceKind === 'registration') return `registration:${id}`;
+  if (evidenceKind === 'blocker') return `blocker:${id}`;
   if (['provider', 'config', 'eval-runner', 'cache-store', 'prompt-processing', 'script-bridge', 'unclassified'].includes(category)) return `blocker:${id}`;
   if (['example', 'docs', 'integration', 'cloud-share'].includes(category)) return `registration:${id}`;
   return `snapshot:${id}`;
@@ -349,7 +386,7 @@ function addRow(rows, category, file, name, fragment) {
     implementation_status: implementationStatus,
     verification_owner: owner,
     evidence_kind: evidenceKind,
-    evidence_reference: evidenceReference(category, id),
+    evidence_reference: evidenceReference(category, id, evidenceKind),
     blocker_reason: reason,
   });
 }

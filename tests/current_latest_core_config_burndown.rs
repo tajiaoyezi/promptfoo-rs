@@ -244,7 +244,10 @@ fn test_27_1_4_script_artifacts_reduce_config_blockers_to_external_only() {
         );
     }
     assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
-    assert_eq!(quality["perfect_refactor_claim_allowed"], Value::Bool(false));
+    assert_eq!(
+        quality["perfect_refactor_claim_allowed"],
+        Value::Bool(false)
+    );
 
     let _ = std::fs::remove_dir_all(root);
     let _ = std::fs::remove_dir_all(gate_dir);

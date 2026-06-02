@@ -2097,6 +2097,44 @@ fn is_current_latest_viewer_config_file(file: &str) -> bool {
     file.starts_with("src/app/") && file.to_ascii_lowercase().contains("config")
 }
 
+fn is_current_latest_runtime_config_file(file: &str) -> bool {
+    let lower = file.to_ascii_lowercase();
+    matches!(
+        lower.as_str(),
+        "src/commands/config.ts" | "src/configtypes.ts"
+    ) || lower.starts_with("src/util/config/")
+}
+
+fn is_current_latest_redteam_config_file(file: &str) -> bool {
+    file.to_ascii_lowercase() == "src/redteam/plugins/policy/evals/promptfooconfig.yaml"
+}
+
+fn is_current_latest_auxiliary_config_file(file: &str) -> bool {
+    let lower = file.to_ascii_lowercase();
+    lower.starts_with("src/codescan/config/")
+        || lower == "src/commands/mcp/tools/validatepromptfooconfig.ts"
+}
+
+fn current_latest_auxiliary_config_owner(file: &str) -> &'static str {
+    if file
+        .to_ascii_lowercase()
+        .starts_with("src/codescan/config/")
+    {
+        "scan-engine"
+    } else {
+        "mcp-runtime"
+    }
+}
+
+fn is_current_latest_external_config_file(file: &str) -> bool {
+    let lower = file.to_ascii_lowercase();
+    lower.starts_with("src/globalconfig/")
+        || lower.starts_with("src/server/config/")
+        || lower == "src/server/routes/configs.ts"
+        || lower == "src/tracing/otelconfig.ts"
+        || lower == "src/types/api/configs.ts"
+}
+
 fn is_p0_provider_file(file: &str) -> bool {
     [
         "src/providers/openai",
@@ -2568,6 +2606,7 @@ fn insert_current_latest_file_row(
     rows.entry(stable_id.clone()).or_insert_with(|| {
         let (level, implementation_status, verification_owner, evidence_kind, reason) =
             current_latest_default_metadata(category, &stable_id, file);
+        let evidence_reference = default_evidence_reference(category, &stable_id, &evidence_kind);
         CurrentLatestInventoryRow {
             stable_id: stable_id.clone(),
             category: category.to_string(),
@@ -2578,7 +2617,7 @@ fn insert_current_latest_file_row(
             implementation_status,
             verification_owner,
             evidence_kind,
-            evidence_reference: default_evidence_reference(category, &stable_id),
+            evidence_reference,
             blocker_reason: reason,
         }
     });
@@ -2667,6 +2706,38 @@ fn current_latest_default_metadata(
             "snapshot",
             stable_id,
             "current-latest output surface requires output contract snapshot",
+        ),
+        "config" if is_current_latest_runtime_config_file(file) => current_latest_metadata(
+            "P0",
+            "native",
+            "config-loader",
+            "fixture",
+            stable_id,
+            "current-latest runtime promptfooconfig/env/file config surface is covered by existing P0 native config fixtures",
+        ),
+        "config" if is_current_latest_redteam_config_file(file) => current_latest_metadata(
+            "P0",
+            "native",
+            "redteam-engine",
+            "fixture",
+            stable_id,
+            "current-latest redteam promptfooconfig source is covered by redteam YAML fixture evidence",
+        ),
+        "config" if is_current_latest_auxiliary_config_file(file) => current_latest_metadata(
+            "P1",
+            "later",
+            current_latest_auxiliary_config_owner(file),
+            "snapshot",
+            stable_id,
+            "current-latest auxiliary command or scan config source is registered under P1 snapshot evidence",
+        ),
+        "config" if is_current_latest_external_config_file(file) => current_latest_metadata(
+            "P0",
+            "blocked",
+            "external-authority",
+            "blocker",
+            stable_id,
+            "explicit current-latest external cloud/server/telemetry/global config blocker; not counted as local runtime parity without product authority credentials or service contract evidence",
         ),
         "config" => current_latest_metadata(
             "P0",
@@ -2840,14 +2911,20 @@ fn current_latest_metadata(
     )
 }
 
-fn default_evidence_reference(category: &str, stable_id: &str) -> String {
-    match category {
-        "provider" | "config" | "eval-runner" | "cache-store" | "prompt-processing"
-        | "script-bridge" | "unclassified" => format!("blocker:{stable_id}"),
-        "example" | "docs" | "integration" | "cloud-share" => {
-            format!("registration:{stable_id}")
-        }
-        _ => format!("snapshot:{stable_id}"),
+fn default_evidence_reference(category: &str, stable_id: &str, evidence_kind: &str) -> String {
+    match evidence_kind {
+        "fixture" => format!("fixture:{stable_id}"),
+        "snapshot" | "protocol" => format!("snapshot:{stable_id}"),
+        "registration" => format!("registration:{stable_id}"),
+        "blocker" => format!("blocker:{stable_id}"),
+        _ => match category {
+            "provider" | "config" | "eval-runner" | "cache-store" | "prompt-processing"
+            | "script-bridge" | "unclassified" => format!("blocker:{stable_id}"),
+            "example" | "docs" | "integration" | "cloud-share" => {
+                format!("registration:{stable_id}")
+            }
+            _ => format!("snapshot:{stable_id}"),
+        },
     }
 }
 
