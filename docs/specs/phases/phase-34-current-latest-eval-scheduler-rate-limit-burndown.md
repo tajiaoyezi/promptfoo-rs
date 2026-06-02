@@ -20,7 +20,7 @@ Phase 33 leaves 40 current-latest P0 golden blockers, including exactly seven `e
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 34.1 | current-latest-eval-scheduler-rate-limit-burndown | ../tasks/task-34.1-current-latest-eval-scheduler-rate-limit-burndown.md | Ready | 实现 deterministic scheduler rate-limit/adaptive/provider-wrapper 证据并将 7 个 eval-runner blockers 转为 native fixture evidence |
+| 34.1 | current-latest-eval-scheduler-rate-limit-burndown | ../tasks/task-34.1-current-latest-eval-scheduler-rate-limit-burndown.md | Done | 实现 deterministic scheduler rate-limit/adaptive/provider-wrapper 证据并将 7 个 eval-runner blockers 转为 native fixture evidence |
 
 ## 5. Dependencies
 

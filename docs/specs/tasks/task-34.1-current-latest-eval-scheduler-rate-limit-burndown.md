@@ -1,6 +1,6 @@
 # Task 34.1: current-latest-eval-scheduler-rate-limit-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 34 - current-latest-eval-scheduler-rate-limit-burndown
@@ -88,21 +88,21 @@ Provider rate-limit headers must parse common remaining/reset aliases into deter
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Eval runner / task 3.1): provider rate-limit header parsing and rate-limit key derivation are deterministic and fixture-tested.
-- [ ] **AC2** (PRD §Eval runner / task 3.2): provider rate-limit registry records headers and returns deterministic delay decisions without real provider calls.
-- [ ] **AC3** (PRD §Eval runner): adaptive concurrency responds deterministically to success, failure, and rate-limit observations within configured bounds.
-- [ ] **AC4** (PRD §Eval runner / ADR-009): provider call execution context and wrapper expose stable metadata, delay, output/error, and header recording behavior through local fixtures.
-- [ ] **AC5** (ADR-009 / ADR-011): seven current-latest eval-runner scheduler rows have P0 native fixture evidence, Rust and shell extractors emit equivalent classification, total blockers drop to 33, and perfect-refactor completion remains false.
+- [x] **AC1** (PRD §Eval runner / task 3.1): provider rate-limit header parsing and rate-limit key derivation are deterministic and fixture-tested.
+- [x] **AC2** (PRD §Eval runner / task 3.2): provider rate-limit registry records headers and returns deterministic delay decisions without real provider calls.
+- [x] **AC3** (PRD §Eval runner): adaptive concurrency responds deterministically to success, failure, and rate-limit observations within configured bounds.
+- [x] **AC4** (PRD §Eval runner / ADR-009): provider call execution context and wrapper expose stable metadata, delay, output/error, and header recording behavior through local fixtures.
+- [x] **AC5** (ADR-009 / ADR-011): seven current-latest eval-runner scheduler rows have P0 native fixture evidence, Rust and shell extractors emit equivalent classification, total blockers drop to 33, and perfect-refactor completion remains false.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-34.1.1 | TEST-34.1.1 | tests/current_latest_eval_scheduler_rate_limit_burndown.rs | install, lint, typecheck, unit-test, build | Spec Ready |
-| AC2 | SCEN-34.1.1 | TEST-34.1.2 | tests/current_latest_eval_scheduler_rate_limit_burndown.rs | install, typecheck, unit-test, integration, build | Spec Ready |
-| AC3 | SCEN-34.1.1 | TEST-34.1.3 | tests/current_latest_eval_scheduler_rate_limit_burndown.rs | install, typecheck, unit-test, coverage, build | Spec Ready |
-| AC4 | SCEN-34.1.1 | TEST-34.1.4 | tests/current_latest_eval_scheduler_rate_limit_burndown.rs | install, lint, typecheck, unit-test, e2e, build | Spec Ready |
-| AC5 | SCEN-34.1.1 | TEST-34.1.5 | tests/current_latest_eval_scheduler_rate_limit_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, coverage, runtime-smoke, build | Spec Ready |
+| AC1 | SCEN-34.1.1 | TEST-34.1.1 | tests/current_latest_eval_scheduler_rate_limit_burndown.rs | install, lint, typecheck, unit-test, build | Done |
+| AC2 | SCEN-34.1.1 | TEST-34.1.2 | tests/current_latest_eval_scheduler_rate_limit_burndown.rs | install, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-34.1.1 | TEST-34.1.3 | tests/current_latest_eval_scheduler_rate_limit_burndown.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-34.1.1 | TEST-34.1.4 | tests/current_latest_eval_scheduler_rate_limit_burndown.rs | install, lint, typecheck, unit-test, e2e, build | Done |
+| AC5 | SCEN-34.1.1 | TEST-34.1.5 | tests/current_latest_eval_scheduler_rate_limit_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, coverage, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -125,9 +125,36 @@ Provider rate-limit headers must parse common remaining/reset aliases into deter
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-02
+- **改动文件**：
+  - `docs/specs/phases/phase-34-current-latest-eval-scheduler-rate-limit-burndown.md`
+  - `docs/specs/tasks/task-34.1-current-latest-eval-scheduler-rate-limit-burndown.md`
+  - `docs/s2v-adapter.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/compatibility/matrix.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `src/eval/rate_limit.rs`
+  - `src/eval/mod.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+  - `tests/current_latest_eval_scheduler_rate_limit_burndown.rs`
+  - `tests/current_latest_eval_runner_burndown.rs`
+  - `tests/current_latest_source_taxonomy_burndown.rs`
+- **commit 列表**：
+  - `a7ce91a` `docs(spec): add phase 34 current latest eval scheduler rate limit burndown`
+  - `fb775ab` `docs(spec): task-34.1 enters implementation`
+  - `cfa1aee` `test(eval-runner): add current latest scheduler rate limit RED tests`
+  - `7e87452` `feat(eval-runner): implement current latest scheduler rate limit evidence`
+  - 本次 docs 回填提交：`docs(spec): complete task 34.1 current latest eval scheduler rate limit burndown`
+- **§9 Verification 结果**：
+  - install: PASS - helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS - helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS - helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS - helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-34.1.1 ~ TEST-34.1.5、累计 TEST-29.1.1 ~ TEST-29.1.5 和 TEST-25.1.2 更新后均通过。
+  - integration: PASS - helper 执行 adapter Integration tests 通过。
+  - e2e: PASS - helper 执行 adapter E2E tests 通过。
+  - build: PASS - helper 执行 adapter Build 通过。
+  - coverage: PASS - helper 执行 adapter Coverage，通过覆盖率阈值守卫。
+  - runtime-smoke: PASS - helper 执行 adapter Runtime smoke 通过；`current-latest-golden-corpus.json` 为 `ready-with-blockers`、`p0_total=92`、`fixture_case_count=92`、`blocker_count=33`、分组 `config=7, prompt-processing=3, provider=16, script-bridge=7`，`eval-runner=0`，`perfect_refactor_claim_allowed=false`。
+- **剩余风险 / 未做项**：仍保留 config=7、prompt-processing=3、provider external-authority=16、script-bridge=7、current-target drift、external-authority、publication-authority 等 blockers；不承诺“无任何潜在 bug”。本 task 只证明本地 deterministic scheduler rate-limit/adaptive/provider-wrapper contract，不证明真实 provider 服务限流、账号级 quota 或 private SDK 行为。
+- **下游 task 影响**：后续 current-latest burndown 可从 33 个总 blockers 继续推进；script-backed prompt processors 与 Python/Ruby bridge rows 仍需专用 subprocess/runtime discovery fixture，config/provider external authority rows 仍需真实权限或正式 waiver。
