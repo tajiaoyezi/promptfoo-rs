@@ -1,6 +1,6 @@
 # Task 34.1: current-latest-eval-scheduler-rate-limit-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 34 - current-latest-eval-scheduler-rate-limit-burndown
