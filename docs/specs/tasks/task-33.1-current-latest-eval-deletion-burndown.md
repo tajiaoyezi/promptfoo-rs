@@ -1,6 +1,6 @@
 # Task 33.1: current-latest-eval-deletion-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 33 - current-latest-eval-deletion-burndown
@@ -79,19 +79,19 @@ Implement deterministic local SQLite eval deletion semantics and promote only th
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (task 5.1 / ADR-003): `SqliteResultStore::delete_eval` removes all rows for the selected eval id and removes their assertion rows.
-- [ ] **AC2** (task 13.2 / ADR-003): deleting a missing eval id returns zero and preserves unrelated eval output/cache rows.
-- [ ] **AC3** (ADR-009 / ADR-011): current-latest eval deletion row has P0 native fixture evidence and no cache-store blocker remains.
-- [ ] **AC4** (ADR-011 / task 24.4): Rust extractor and shell extractor emit equivalent eval deletion classification, total blockers drop to 40, and perfect-refactor completion remains false.
+- [x] **AC1** (task 5.1 / ADR-003): `SqliteResultStore::delete_eval` removes all rows for the selected eval id and removes their assertion rows.
+- [x] **AC2** (task 13.2 / ADR-003): deleting a missing eval id returns zero and preserves unrelated eval output/cache rows.
+- [x] **AC3** (ADR-009 / ADR-011): current-latest eval deletion row has P0 native fixture evidence and no cache-store blocker remains.
+- [x] **AC4** (ADR-011 / task 24.4): Rust extractor and shell extractor emit equivalent eval deletion classification, total blockers drop to 40, and perfect-refactor completion remains false.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-33.1.1 | TEST-33.1.1 | tests/current_latest_eval_deletion_burndown.rs | install, lint, typecheck, unit-test, integration, build | Ready |
-| AC2 | SCEN-33.1.1 | TEST-33.1.2 | tests/current_latest_eval_deletion_burndown.rs | install, typecheck, unit-test, e2e, build | Ready |
-| AC3 | SCEN-33.1.1 | TEST-33.1.3 | tests/current_latest_eval_deletion_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Ready |
-| AC4 | SCEN-33.1.1 | TEST-33.1.4 | tests/current_latest_eval_deletion_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, runtime-smoke, build | Ready |
+| AC1 | SCEN-33.1.1 | TEST-33.1.1 | tests/current_latest_eval_deletion_burndown.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-33.1.1 | TEST-33.1.2 | tests/current_latest_eval_deletion_burndown.rs | install, typecheck, unit-test, e2e, build | Done |
+| AC3 | SCEN-33.1.1 | TEST-33.1.3 | tests/current_latest_eval_deletion_burndown.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-33.1.1 | TEST-33.1.4 | tests/current_latest_eval_deletion_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -113,9 +113,34 @@ Implement deterministic local SQLite eval deletion semantics and promote only th
 
 ## 10. Completion Notes
 
-- **完成日期**：待实施
-- **改动文件**：待实施
-- **commit 列表**：待实施
-- **§9 Verification 结果**：待实施
-- **剩余风险 / 未做项**：待实施
-- **下游 task 影响**：待实施
+- **完成日期**：2026-06-02
+- **改动文件**：
+  - `docs/specs/phases/phase-33-current-latest-eval-deletion-burndown.md`
+  - `docs/specs/tasks/task-33.1-current-latest-eval-deletion-burndown.md`
+  - `docs/s2v-adapter.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/compatibility/matrix.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_eval_deletion_burndown.rs`
+  - `tests/current_latest_cache_store_burndown.rs`
+  - `src/results/sqlite.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+- **commit 列表**：
+  - `c68e774` `docs(spec): add phase 33 current latest eval deletion burndown`
+  - `d8362e3` `docs(spec): task-33.1 enters implementation`
+  - `7fc656f` `test(cache-store): add current latest eval deletion RED tests`
+  - `c1a0abd` `feat(cache-store): implement current latest eval deletion evidence`
+  - 本次 docs 回填提交：`docs(spec): complete task 33.1 current latest eval deletion burndown`
+- **§9 Verification 结果**：
+  - install: PASS - helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS - helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS - helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS - helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-33.1.1 ~ TEST-33.1.4 与累计 TEST-31.1.1 ~ TEST-31.1.5 均通过。
+  - integration: PASS - helper 执行 adapter Integration tests 通过。
+  - e2e: PASS - helper 执行 adapter E2E tests 通过。
+  - coverage: PASS - helper 执行 adapter Coverage，通过覆盖率阈值守卫。
+  - build: PASS - helper 执行 adapter Build 通过。
+  - runtime-smoke: PASS - helper 执行 adapter Runtime smoke 通过；`current-latest-golden-corpus.json` 为 `ready-with-blockers`、`p0_total=92`、`fixture_case_count=92`、`blocker_count=40`、分组 `config=7, eval-runner=7, prompt-processing=3, provider=16, script-bridge=7`，`cache-store=0`，`perfect_refactor_claim_allowed=false`。
+- **剩余风险 / 未做项**：仍保留 config=7、eval-runner=7、prompt-processing=3、provider external-authority=16、script-bridge=7、current-target drift、external-authority、publication-authority 等 blockers；不承诺“无任何潜在 bug”。
+- **下游 task 影响**：后续 current-latest burndown 可从 40 个总 blockers 继续推进；本 task 只证明本地 SQLite eval deletion lifecycle，不改变 remote/cloud `delete` command unsupported policy，也不证明 provider、script bridge、eval-runner rate-limit 或 publication parity。

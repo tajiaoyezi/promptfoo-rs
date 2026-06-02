@@ -20,7 +20,7 @@ Phase 32 leaves 41 current-latest P0 golden blockers, including exactly one `cac
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 33.1 | current-latest-eval-deletion-burndown | ../tasks/task-33.1-current-latest-eval-deletion-burndown.md | Ready | 实现 SQLite eval 删除语义并将剩余 cache-store blocker 转为 native fixture evidence |
+| 33.1 | current-latest-eval-deletion-burndown | ../tasks/task-33.1-current-latest-eval-deletion-burndown.md | Done | 实现 SQLite eval 删除语义并将剩余 cache-store blocker 转为 native fixture evidence |
 
 ## 5. Dependencies
 

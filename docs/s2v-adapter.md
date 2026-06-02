@@ -234,7 +234,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 30.1 | prompt-processing | docs/specs/tasks/task-30.1-current-latest-prompt-processing-burndown.md | Done | Phase 30 order 1 | N/A (solo) |
 | 31.1 | cache-resume-store | docs/specs/tasks/task-31.1-current-latest-cache-store-burndown.md | Done | Phase 31 order 1 | N/A (solo) |
 | 32.1 | prompt-processing | docs/specs/tasks/task-32.1-current-latest-local-prompt-processor-burndown.md | Done | Phase 32 order 1 | N/A (solo) |
-| 33.1 | cache-resume-store | docs/specs/tasks/task-33.1-current-latest-eval-deletion-burndown.md | Ready | Phase 33 order 1 | N/A (solo) |
+| 33.1 | cache-resume-store | docs/specs/tasks/task-33.1-current-latest-eval-deletion-burndown.md | Done | Phase 33 order 1 | N/A (solo) |
 
 ## ADR 索引
 
