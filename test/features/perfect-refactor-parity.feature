@@ -283,3 +283,13 @@ Feature: perfect refactor parity
     And TEST-29.1.3 proves adaptive rate-limit and provider-wrapper rows remain P0 blockers
     And TEST-29.1.4 proves Rust and shell extractors emit equivalent eval-runner evidence
     And TEST-29.1.5 proves eval-runner golden blockers drop to remaining blocker rows while perfect-refactor completion remains false
+
+  # Maps to: docs/specs/tasks/task-30.1-current-latest-prompt-processing-burndown.md
+  Scenario: SCEN-30.1.1 - current latest prompt processing blockers split fixtures snapshots and real blockers
+    Given Phase 29 current-latest artifacts have 13 prompt-processing blockers
+    When the current-latest prompt-processing burndown runs
+    Then TEST-30.1.1 proves fixture-covered prompt-processing rows have P0 native fixture evidence
+    And TEST-30.1.2 proves constants grading and Ragas prompt rows are P1 snapshot evidence
+    And TEST-30.1.3 proves JSON Markdown Jinja JavaScript Python and executable processor rows remain P0 blockers
+    And TEST-30.1.4 proves Rust and shell extractors emit equivalent prompt-processing evidence
+    And TEST-30.1.5 proves prompt-processing golden blockers drop to remaining blocker rows while perfect-refactor completion remains false

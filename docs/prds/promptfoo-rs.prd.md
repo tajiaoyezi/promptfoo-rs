@@ -288,6 +288,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 28 是 2026-06-02 Phase 27 后的 current-latest provider fixture burndown 链路，依据 Phase 27 §10 中剩余 38 个 provider blockers、task 19.3 的 provider request/response fixture precedent、task 19.4 的 external authority gate、PRD §Provider P0、ADR-009、ADR-011。它只把已有 mock/recorded fixture 可证明的 provider rows 计为 fixture evidence，Codex/Agents/Assistant/Billing/ChatKit/Realtime/Claude Code auth 等仍保持 external-authority blocker。
 >
 > Phase 29 是 2026-06-02 Phase 28 后的 current-latest eval-runner burndown 链路，依据 Phase 28 §10 中剩余 18 个 eval-runner blockers、task 3.1 的 scheduler fixture、task 3.2 的 retry/backoff precedent、task 13.2 的 eval/output/cache parity、PRD §Eval runner、ADR-009、ADR-011。它只把已有 deterministic fixture 可证明的 eval/scheduler rows 计为 fixture evidence，optimizer/events/test synthesis 降为 P1 snapshot，adaptive/rate-limit/provider-wrapper rows 继续保持 P0 blocker。
+>
+> Phase 30 是 2026-06-02 Phase 29 后的 current-latest prompt-processing burndown 链路，依据 Phase 29 §10 中仍保留的 13 个 prompt-processing blockers、task 2.2 的 config/file prompt fixture、task 2.3 的 eval prompt rendering fixture、task 4.2 的 model-graded prompt evidence、task 9.1 的 script bridge boundary、PRD §Core Capabilities、ADR-009、ADR-011。它只把已有 deterministic fixture 可证明的 prompt index/string/text/utils rows 计为 fixture evidence，constants/grading/Ragas helper 降为 P1 snapshot，JSON/Markdown/Jinja/JS/Python/executable processors 继续保持 P0 blocker。
 
 ---
 
