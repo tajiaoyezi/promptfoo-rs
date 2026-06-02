@@ -1,6 +1,6 @@
 # Phase 30: current-latest-prompt-processing-burndown
 
-**Status**: Ready
+**Status**: In Progress
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ After Phase 29, phase-smoke artifacts report 60 current-latest P0 golden blocker
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 30.1 | current-latest-prompt-processing-burndown | ../tasks/task-30.1-current-latest-prompt-processing-burndown.md | Ready | 将 current-latest 13 个 prompt-processing blockers 拆为 4 个 fixture-covered rows、3 个 P1 snapshot rows 和 6 个保留 P0 blockers |
+| 30.1 | current-latest-prompt-processing-burndown | ../tasks/task-30.1-current-latest-prompt-processing-burndown.md | In Progress | 将 current-latest 13 个 prompt-processing blockers 拆为 4 个 fixture-covered rows、3 个 P1 snapshot rows 和 6 个保留 P0 blockers |
 
 ## 5. Dependencies
 

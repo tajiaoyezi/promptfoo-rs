@@ -158,7 +158,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 27 | current-latest-core-config-burndown | docs/specs/phases/phase-27-current-latest-core-config-burndown.md | Done | 1 | N/A (solo) |
 | 28 | current-latest-provider-fixture-burndown | docs/specs/phases/phase-28-current-latest-provider-fixture-burndown.md | Done | 1 | N/A (solo) |
 | 29 | current-latest-eval-runner-burndown | docs/specs/phases/phase-29-current-latest-eval-runner-burndown.md | Done | 1 | N/A (solo) |
-| 30 | current-latest-prompt-processing-burndown | docs/specs/phases/phase-30-current-latest-prompt-processing-burndown.md | Ready | 1 | N/A (solo) |
+| 30 | current-latest-prompt-processing-burndown | docs/specs/phases/phase-30-current-latest-prompt-processing-burndown.md | In Progress | 1 | N/A (solo) |
 
 ## Task 总索引
 
@@ -228,7 +228,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 27.1 | compatibility-inventory | docs/specs/tasks/task-27.1-current-latest-core-config-burndown.md | Done | Phase 27 order 1 | N/A (solo) |
 | 28.1 | providers | docs/specs/tasks/task-28.1-current-latest-provider-fixture-burndown.md | Done | Phase 28 order 1 | N/A (solo) |
 | 29.1 | eval-runner | docs/specs/tasks/task-29.1-current-latest-eval-runner-burndown.md | Done | Phase 29 order 1 | N/A (solo) |
-| 30.1 | prompt-processing | docs/specs/tasks/task-30.1-current-latest-prompt-processing-burndown.md | Ready | Phase 30 order 1 | N/A (solo) |
+| 30.1 | prompt-processing | docs/specs/tasks/task-30.1-current-latest-prompt-processing-burndown.md | In Progress | Phase 30 order 1 | N/A (solo) |
 
 ## ADR 索引
 
