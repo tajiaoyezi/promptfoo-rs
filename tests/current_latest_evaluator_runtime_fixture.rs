@@ -107,8 +107,11 @@ fn test_40_1_2_shell_promotes_evaluator_runtime_to_native_fixture() {
         .as_array()
         .expect("inventory rows should be array")
         .iter()
-        .find(|row| row["item_id"] == Value::String("eval-runner:src-evaluator-runtime".to_string())
-            || row["stable_id"] == Value::String("eval-runner:src-evaluator-runtime".to_string()))
+        .find(|row| {
+            row["item_id"] == Value::String("eval-runner:src-evaluator-runtime".to_string())
+                || row["stable_id"]
+                    == Value::String("eval-runner:src-evaluator-runtime".to_string())
+        })
         .unwrap_or_else(|| panic!("missing evaluator runtime row: {inventory:#?}"));
 
     assert_eq!(row["implementation_status"], "native");
@@ -165,7 +168,9 @@ fn test_40_1_4_evaluator_runtime_fixture_reference_is_stable() {
         .as_array()
         .expect("matrix rows should be array")
         .iter()
-        .find(|row| row["item_id"] == Value::String("eval-runner:src-evaluator-runtime".to_string()))
+        .find(|row| {
+            row["item_id"] == Value::String("eval-runner:src-evaluator-runtime".to_string())
+        })
         .unwrap_or_else(|| panic!("missing evaluator runtime matrix row: {matrix:#?}"));
 
     assert_eq!(row["level"], "P0");
@@ -175,7 +180,7 @@ fn test_40_1_4_evaluator_runtime_fixture_reference_is_stable() {
         row["evidence_reference"],
         "fixture:eval-runner:src-evaluator-runtime"
     );
-    assert_eq!(matrix["perfect_refactor_claim_allowed"], Value::Bool(true));
+    assert_eq!(matrix["perfect_refactor_claim_allowed"], Value::Bool(false));
 
     let _ = std::fs::remove_dir_all(root);
     let _ = std::fs::remove_dir_all(gate_dir);

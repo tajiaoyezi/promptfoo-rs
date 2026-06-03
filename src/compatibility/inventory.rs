@@ -2236,7 +2236,9 @@ fn current_latest_eval_runner_fixture_ids(stable_id: &str) -> &'static [&'static
     match stable_id {
         "eval-runner:src-evaluate"
         | "eval-runner:src-evaluator"
+        | "eval-runner:src-evaluator-runtime"
         | "eval-runner:src-evaluatorhelpers" => &[
+            "p0-eval-runtime-execution",
             "p0-eval-basic",
             "p0-eval-output-json",
             "p0-eval-retry-timeout",
@@ -2265,6 +2267,14 @@ fn current_latest_eval_runner_fixture_ids(stable_id: &str) -> &'static [&'static
 
 fn is_current_latest_eval_runner_fixture(stable_id: &str, file: &str) -> bool {
     is_eval_runtime_file(file) && !current_latest_eval_runner_fixture_ids(stable_id).is_empty()
+}
+
+fn current_latest_eval_runner_fixture_reason(stable_id: &str, _file: &str) -> &'static str {
+    if stable_id.contains("evaluator-runtime") {
+        "current-latest evaluator runtime source is covered by deterministic evaluator runtime fixture evidence"
+    } else {
+        "current-latest eval/evaluator/scheduler source is covered by existing deterministic eval runner fixture evidence"
+    }
 }
 
 fn is_current_latest_eval_runner_snapshot(file: &str) -> bool {
@@ -3114,7 +3124,7 @@ fn current_latest_default_metadata(
                 "eval-runner",
                 "fixture",
                 stable_id,
-                "current-latest eval/evaluator/scheduler source is covered by existing deterministic eval runner fixture evidence",
+                current_latest_eval_runner_fixture_reason(stable_id, file),
             )
         }
         "eval-runner" if is_current_latest_eval_runner_snapshot(file) => current_latest_metadata(

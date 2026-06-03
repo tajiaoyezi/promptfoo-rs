@@ -251,6 +251,7 @@ function currentLatestEvalRunnerFixtureIds(id) {
   const mapping = {
     'eval-runner:src-evaluate': ['p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
     'eval-runner:src-evaluator': ['p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
+    'eval-runner:src-evaluator-runtime': ['p0-eval-runtime-execution', 'p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
     'eval-runner:src-evaluatorhelpers': ['p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
     'eval-runner:src-scheduler-index': [
       'p0-eval-concurrency-limit',
@@ -286,6 +287,13 @@ function currentLatestEvalRunnerFixtureIds(id) {
 
 function isCurrentLatestEvalRunnerFixture(id, file) {
   return isEvalRuntime(file) && currentLatestEvalRunnerFixtureIds(id).length > 0;
+}
+
+function currentLatestEvalRunnerFixtureReason(id, file) {
+  if (id.toLowerCase().includes('evaluator-runtime')) {
+    return 'current-latest evaluator runtime source is covered by deterministic evaluator runtime fixture evidence';
+  }
+  return 'current-latest eval/evaluator/scheduler source is covered by existing deterministic eval runner fixture evidence';
 }
 
 function isCurrentLatestEvalRunnerSnapshot(file) {
@@ -656,7 +664,7 @@ function metadata(category, id, file) {
   if (category === 'config' && isCurrentLatestAuxiliaryConfig(file)) return ['P1', 'later', currentLatestAuxiliaryConfigOwner(file), 'snapshot', `current-latest auxiliary command or scan config source is registered under P1 snapshot evidence; item: ${id}`];
   if (category === 'config' && isCurrentLatestExternalConfig(file)) return ['P0', 'blocked', 'external-authority', 'blocker', `explicit current-latest external cloud/server/telemetry/global config blocker; not counted as local runtime parity without product authority credentials or service contract evidence; item: ${id}`];
   if (category === 'config') return ['P0', 'blocked', 'config-loader', 'blocker', `current-latest config surface requires fixture evidence; item: ${id}`];
-  if (category === 'eval-runner' && isCurrentLatestEvalRunnerFixture(id, file)) return ['P0', 'native', 'eval-runner', 'fixture', `current-latest eval/evaluator/scheduler source is covered by existing deterministic eval runner fixture evidence; item: ${id}`];
+  if (category === 'eval-runner' && isCurrentLatestEvalRunnerFixture(id, file)) return ['P0', 'native', 'eval-runner', 'fixture', `${currentLatestEvalRunnerFixtureReason(id, file)}; item: ${id}`];
   if (category === 'eval-runner' && isCurrentLatestEvalRunnerSnapshot(file)) return ['P1', 'later', 'eval-runner', 'snapshot', `current-latest optimizer/event/synthesis eval-runner source is registered under P1 snapshot evidence until dedicated parity work proves native behavior; item: ${id}`];
   if (category === 'eval-runner') return ['P0', 'blocked', 'eval-runner', 'blocker', `${currentLatestEvalRunnerBlockerReason(id, file)}; item: ${id}`];
   if (category === 'cache-store' && isCurrentLatestCacheStoreFixture(id, file)) return ['P0', 'native', 'cache-resume-store', 'fixture', `current-latest cache key, database schema, eval deletion lifecycle, and local filesystem storage source is covered by deterministic cache/resume/result-store fixtures; item: ${id}`];

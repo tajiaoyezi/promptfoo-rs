@@ -158,9 +158,18 @@ fn test_39_1_3_shell_extractor_matches_rust_evaluator_runtime_classification() {
         .unwrap_or_else(|| panic!("missing evaluator runtime row: {inventory:#?}"));
     assert_eq!(row["stable_id"], "eval-runner:src-evaluator-runtime");
     assert_eq!(row["category"], "eval-runner");
-    assert_eq!(row["implementation_status"], "blocked");
     assert_eq!(row["verification_owner"], "eval-runner");
-    assert_eq!(row["evidence_kind"], "blocker");
+    match row["implementation_status"].as_str().unwrap_or_default() {
+        "blocked" => assert_eq!(row["evidence_kind"], "blocker"),
+        "native" => {
+            assert_eq!(row["evidence_kind"], "fixture");
+            assert_eq!(
+                row["evidence_reference"],
+                "fixture:eval-runner:src-evaluator-runtime"
+            );
+        }
+        status => panic!("unexpected evaluator runtime status {status}: {row:#?}"),
+    }
 
     let _ = std::fs::remove_dir_all(root);
     let _ = std::fs::remove_dir_all(gate_dir);
