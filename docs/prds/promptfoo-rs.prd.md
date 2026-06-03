@@ -267,6 +267,7 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 34 | current-latest-eval-scheduler-rate-limit-burndown | 实现 deterministic scheduler rate-limit/adaptive/provider-wrapper evidence，将剩余 eval-runner scheduler blockers 转为 native fixture evidence | `src/eval/rate_limit.rs` + `src/compatibility/inventory.rs` + `scripts/release/current-latest-source-inventory.sh` + `target/release-gates/` + `tests/current_latest_eval_scheduler_rate_limit_burndown.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 33 | 否 |
 | 35 | current-latest-script-prompt-python-bridge-burndown | 实现 JS/Python/executable prompt processor 与 Python bridge deterministic subprocess evidence，将本地可证明 script blockers 转为 native fixture evidence 并保留 Ruby blockers | `src/script_bridge/` + `src/compatibility/inventory.rs` + `scripts/release/current-latest-source-inventory.sh` + `target/release-gates/` + `tests/current_latest_script_prompt_python_bridge_burndown.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 34 | 否 |
 | 36 | current-latest-ruby-bridge-burndown | 实现 Ruby bridge deterministic subprocess evidence，将最后 2 个本地 script-bridge blockers 转为 native fixture evidence | `src/script_bridge/` + `src/compatibility/inventory.rs` + `scripts/release/current-latest-source-inventory.sh` + `target/release-gates/` + `tests/current_latest_ruby_bridge_burndown.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 35 | 否 |
+| 37 | current-latest-unblock-packet-refresh | 刷新 perfect-refactor unblock packet，使其以 Phase 36 后 current-latest 23 个剩余 blockers 为权威决策源，而不是旧 frozen/source-accounting 口径 | `scripts/release/perfect-refactor-unblock-packet.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `tests/current_latest_unblock_packet.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 36 | 否 |
 
 > Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
 >
@@ -323,6 +324,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 36 是 2026-06-03 Phase 35 后的 current-latest Ruby bridge burndown 链路，依据 Phase 35 §9 中仍保留的 2 个 Ruby script-bridge blockers、task 9.1 的 explicit authorization sandbox、PRD §Core Capabilities、ADR-005、ADR-009、ADR-011。它只实现本地 deterministic Ruby subprocess contract，不解除 config/provider external authority、publication、current-target 或“无任何潜在 bug”不可证明承诺。
 >
 > Task 36.1 完成后，current-latest 证据记录 script-bridge 行为为 7 fixture / 0 blocker；tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 `current-latest-golden-corpus.blocker_count=23`，分组为 `config=7, provider=16`，且 `perfect_refactor_claim_allowed=false`。剩余 blockers 均为外部权限/服务/发布/当前目标/不可证明质量声明边界，不能由本地 Ruby subprocess fixture 间接解除。
+>
+> Phase 37 是 2026-06-03 Phase 36 后的 current-latest unblock packet refresh 链路，依据 Phase 36 §9 中剩余的 23 个 current-latest golden blockers、task 22.1 的 unblock packet gate、task 24.4 的 current-latest quality gate、PRD §Success Metrics、ADR-008、ADR-009、ADR-011。它只刷新用户/维护者决策包，不解除外部权限、发布、current-target 或“无任何潜在 bug”不可证明边界。
 
 ---
 

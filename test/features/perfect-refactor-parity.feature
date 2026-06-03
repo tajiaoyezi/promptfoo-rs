@@ -49,6 +49,7 @@
 #   - docs/specs/tasks/task-34.1-current-latest-eval-scheduler-rate-limit-burndown.md
 #   - docs/specs/tasks/task-35.1-current-latest-script-prompt-python-bridge-burndown.md
 #   - docs/specs/tasks/task-36.1-current-latest-ruby-bridge-burndown.md
+#   - docs/specs/tasks/task-37.1-current-latest-unblock-packet-refresh.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -358,3 +359,13 @@ Feature: perfect refactor parity
     And TEST-36.1.3 proves Ruby bridge rows have P0 native fixture evidence
     And TEST-36.1.4 proves script-bridge blockers drop to zero and total blockers drop to 23
     And TEST-36.1.5 proves perfect-refactor completion remains false while config and provider external-authority blockers remain
+
+  # Maps to: docs/specs/tasks/task-37.1-current-latest-unblock-packet-refresh.md
+  Scenario: SCEN-37.1.1 - current latest unblock packet mirrors remaining blockers
+    Given Phase 36 current-latest artifacts have 23 remaining config and provider blockers
+    When the perfect-refactor unblock packet gate runs
+    Then TEST-37.1.1 proves the packet declares current-latest scope and current-latest blocker counts
+    And TEST-37.1.2 proves every current-latest golden blocker has one non-auto-resolvable decision item
+    And TEST-37.1.3 proves current-target and publication decisions still require real external evidence
+    And TEST-37.1.4 proves perfect-refactor completion remains false and blocked
+    And TEST-37.1.5 proves packet counts reconcile with Phase 36 evidence without script-bridge blockers
