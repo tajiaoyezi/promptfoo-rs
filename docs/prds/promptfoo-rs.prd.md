@@ -270,6 +270,7 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 37 | current-latest-unblock-packet-refresh | 刷新 perfect-refactor unblock packet，使其以 Phase 36 后 current-latest 23 个剩余 blockers 为权威决策源，而不是旧 frozen/source-accounting 口径 | `scripts/release/perfect-refactor-unblock-packet.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `tests/current_latest_unblock_packet.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 36 | 否 |
 | 38 | current-latest-0.121.14-target-refresh | 刷新 current-latest target lock 到 2026-06-03 观测到的 promptfoo 0.121.14，并修复 npm tag 与 GitHub latest release 同 ref 时的解析 | `scripts/release/current-latest-target-lock.sh` + `src/compatibility/inventory.rs` + `compatibility/inventory/current-latest-target.json` + `docs/compatibility/current-latest.lock.md` + `tests/current_latest_target_drift_refresh.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 37 | 否 |
 | 39 | current-latest-evaluator-runtime-classification | 将 promptfoo 0.121.14 新增的 `src/evaluator/runtime.ts` 从 unclassified 转为明确 eval-runner P0 blocker，消除 source/matrix unknown taxonomy blocker 且不伪造 native parity | `src/compatibility/inventory.rs` + `scripts/release/current-latest-source-inventory.sh` + `tests/current_latest_evaluator_runtime_classification.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 38 | 否 |
+| 40 | current-latest-evaluator-runtime-fixture-burndown | 将 `eval-runner:src-evaluator-runtime` 从 P0 blocker 推进为 native fixture evidence，减少一个本地 current-latest golden blocker | `src/compatibility/inventory.rs` + `scripts/release/current-latest-source-inventory.sh` + `tests/current_latest_evaluator_runtime_fixture.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 39 | 否 |
 
 > Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
 >
@@ -338,6 +339,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 39 针对 Phase 38 runtime-smoke 暴露的一个本地 taxonomy regression：`src/evaluator/runtime.ts` 在 `0.121.14` target 下变为 `unclassified:src-evaluator-runtime`。依据 Phase 25 / Phase 29，agent 可保守地将其归入 eval-runner P0 blocker，但必须保留 dedicated fixture 要求，不能把 unknown cleanup 等同于 eval runtime native parity。
 >
 > Task 39.1 完成后，current-latest source inventory 与 matrix 在 `0.121.14` target 下均为 `status=ready` 且 `unclassified_rows=[]`。`src/evaluator/runtime.ts` 被记录为 `eval-runner:src-evaluator-runtime`、P0 blocked、`evidence_kind=blocker`；quality gate 因此从 6 个 blockers 降到 4 个 blockers，但 `perfect_refactor_claim_allowed=false` 仍正确。
+>
+> Phase 40 继续消化唯一剩余的本地 current-latest golden blocker：`eval-runner:src-evaluator-runtime`。该 phase 只能把该单行推进为 native fixture evidence；config/provider external authority、current-target、publication authority、以及“无任何潜在 bug”的不可证明边界仍不在本地实现范围内。
 
 ---
 

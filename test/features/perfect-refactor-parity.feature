@@ -52,6 +52,7 @@
 #   - docs/specs/tasks/task-37.1-current-latest-unblock-packet-refresh.md
 #   - docs/specs/tasks/task-38.1-current-latest-0.121.14-target-refresh.md
 #   - docs/specs/tasks/task-39.1-current-latest-evaluator-runtime-classification.md
+#   - docs/specs/tasks/task-40.1-current-latest-evaluator-runtime-fixture-burndown.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -391,3 +392,12 @@ Feature: perfect refactor parity
     And TEST-39.1.2 proves it remains a P0 blocked eval-runner row until dedicated runtime fixtures exist
     And TEST-39.1.3 proves shell and Rust extraction agree
     And TEST-39.1.4 proves runtime smoke removes the source/matrix unknown blocker without allowing perfect-refactor completion
+
+  # Maps to: docs/specs/tasks/task-40.1-current-latest-evaluator-runtime-fixture-burndown.md
+  Scenario: SCEN-40.1.1 - current latest evaluator runtime has native fixture evidence
+    Given current-latest source inventory already classifies src/evaluator/runtime.ts as eval-runner
+    When evaluator runtime fixture evidence is added
+    Then TEST-40.1.1 proves Rust extraction emits native fixture evidence
+    And TEST-40.1.2 proves shell extraction emits the same native fixture evidence
+    And TEST-40.1.3 proves the isolated current-latest golden corpus has no evaluator runtime blocker
+    And TEST-40.1.4 proves runtime smoke removes that local blocker while perfect-refactor completion remains blocked
