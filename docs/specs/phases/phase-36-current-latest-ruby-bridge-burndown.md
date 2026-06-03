@@ -1,6 +1,6 @@
 # Phase 36: current-latest-ruby-bridge-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ Phase 35 leaves 25 current-latest P0 golden blockers: config=7, provider=16, scr
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 36.1 | current-latest-ruby-bridge-burndown | ../tasks/task-36.1-current-latest-ruby-bridge-burndown.md | In Progress | 实现 Ruby bridge deterministic subprocess evidence 并将 2 个 Ruby script-bridge blockers 转为 native fixture evidence |
+| 36.1 | current-latest-ruby-bridge-burndown | ../tasks/task-36.1-current-latest-ruby-bridge-burndown.md | Done | 实现 Ruby bridge deterministic subprocess evidence 并将 2 个 Ruby script-bridge blockers 转为 native fixture evidence |
 
 ## 5. Dependencies
 
@@ -28,11 +28,11 @@ Depends on Phase 24 current-latest artifacts, Phase 35 script prompt/Python brid
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] Ruby bridge wrapper executes only with explicit authorization, exchanges deterministic JSON stdin/stdout payloads, captures stderr, enforces timeout/stdin/env boundaries through ScriptBridge, and rejects unauthorized execution.
-- [ ] Ruby worker-pool behavior executes authorized Ruby subprocess calls with deterministic result ordering and propagates timeout/I/O/invalid-JSON errors.
-- [ ] Current-latest `src/ruby/rubyUtils.ts` and `src/ruby/wrapper.ts` rows have P0 native fixture evidence in both Rust and shell artifacts.
-- [ ] Current-latest script-bridge blockers drop to zero, total current-latest blockers drop from 25 to 23, and only config/provider external-authority blockers remain.
-- [ ] `perfect_refactor_claim_allowed=false` remains because config/provider external authority, publication, current-target, and impossible zero-bug claim blockers still exist.
+- [x] Ruby bridge wrapper executes only with explicit authorization, exchanges deterministic JSON stdin/stdout payloads, captures stderr, enforces timeout/stdin/env boundaries through ScriptBridge, and rejects unauthorized execution.
+- [x] Ruby worker-pool behavior executes authorized Ruby subprocess calls with deterministic result ordering and propagates timeout/I/O/invalid-JSON errors.
+- [x] Current-latest `src/ruby/rubyUtils.ts` and `src/ruby/wrapper.ts` rows have P0 native fixture evidence in both Rust and shell artifacts.
+- [x] Current-latest script-bridge blockers drop to zero, total current-latest blockers drop from 25 to 23, and only config/provider external-authority blockers remain.
+- [x] `perfect_refactor_claim_allowed=false` remains because config/provider external authority, publication, current-target, and impossible zero-bug claim blockers still exist.
 
 ## 7. Phase Risks
 
@@ -46,7 +46,7 @@ Task 36.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **保留边界**：<TBD-after-impl>
+- **完成日期**：2026-06-03
+- **Phase smoke**：PASS - `s2v_preflight_phase "docs/specs/phases/phase-36-current-latest-ruby-bridge-burndown.md"` 通过，task §9 已执行 `s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 全套通过。
+- **Artifact evidence**：`current-latest-golden-corpus.status=ready-with-blockers`、`blocker_count=23`、分组为 `config=7, provider=16`；`script-bridge=0`；`current-latest-matrix` 记录 `script-bridge native fixture=7 / blocked blocker=0`；`current-latest-quality.status=ready-with-blockers`、`local_current_latest_ready=false`、`perfect_refactor_claim_allowed=false`。
+- **保留边界**：本 phase 只移除本地 deterministic Ruby bridge blockers；不解除 config/provider external authority、publication authority、current-target blocker 或“无任何潜在 bug”不可证明承诺。
