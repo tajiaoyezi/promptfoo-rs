@@ -1,6 +1,6 @@
 # Task 37.1: current-latest-unblock-packet-refresh
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 37 - current-latest-unblock-packet-refresh

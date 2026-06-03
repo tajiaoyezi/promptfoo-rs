@@ -1,6 +1,6 @@
 # Phase 37: current-latest-unblock-packet-refresh
 
-**Status**: Ready
+**Status**: In Progress
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ After Phase 36, local script-bridge blockers are gone and `current-latest-golden
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 37.1 | current-latest-unblock-packet-refresh | ../tasks/task-37.1-current-latest-unblock-packet-refresh.md | Ready | 让 perfect-refactor unblock packet 以 current-latest blockers 为权威决策源 |
+| 37.1 | current-latest-unblock-packet-refresh | ../tasks/task-37.1-current-latest-unblock-packet-refresh.md | In Progress | 让 perfect-refactor unblock packet 以 current-latest blockers 为权威决策源 |
 
 ## 5. Dependencies
 
