@@ -53,6 +53,7 @@
 #   - docs/specs/tasks/task-38.1-current-latest-0.121.14-target-refresh.md
 #   - docs/specs/tasks/task-39.1-current-latest-evaluator-runtime-classification.md
 #   - docs/specs/tasks/task-40.1-current-latest-evaluator-runtime-fixture-burndown.md
+#   - docs/specs/tasks/task-41.1-current-latest-github-head-drift-refresh.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -401,3 +402,13 @@ Feature: perfect refactor parity
     And TEST-40.1.2 proves shell extraction emits the same native fixture evidence
     And TEST-40.1.3 proves the isolated current-latest golden corpus has no evaluator runtime blocker
     And TEST-40.1.4 proves runtime smoke removes that local blocker while perfect-refactor completion remains blocked
+
+  # Maps to: docs/specs/tasks/task-41.1-current-latest-github-head-drift-refresh.md
+  Scenario: SCEN-41.1.1 - current latest repository HEAD drift refresh keeps gates fail-closed
+    Given npm latest and GitHub latest release remain promptfoo 0.121.14
+    And GitHub default branch HEAD moves to 9d7d810c2118c63cb537bf05ea2d34c12bd22066
+    When the current-latest target lock is refreshed
+    Then TEST-41.1.1 proves Rust target-lock parsing records the refreshed HEAD
+    And TEST-41.1.2 proves tracked lock artifacts record the refreshed HEAD
+    And TEST-41.1.3 proves runtime smoke regenerates downstream artifacts and keeps perfect-refactor completion blocked
+    And TEST-41.1.4 proves evaluator runtime native fixture evidence survives re-extraction or any new local blocker is explicit
