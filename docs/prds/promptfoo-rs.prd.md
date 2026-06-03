@@ -326,6 +326,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Task 36.1 完成后，current-latest 证据记录 script-bridge 行为为 7 fixture / 0 blocker；tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 `current-latest-golden-corpus.blocker_count=23`，分组为 `config=7, provider=16`，且 `perfect_refactor_claim_allowed=false`。剩余 blockers 均为外部权限/服务/发布/当前目标/不可证明质量声明边界，不能由本地 Ruby subprocess fixture 间接解除。
 >
 > Phase 37 是 2026-06-03 Phase 36 后的 current-latest unblock packet refresh 链路，依据 Phase 36 §9 中剩余的 23 个 current-latest golden blockers、task 22.1 的 unblock packet gate、task 24.4 的 current-latest quality gate、PRD §Success Metrics、ADR-008、ADR-009、ADR-011。它只刷新用户/维护者决策包，不解除外部权限、发布、current-target 或“无任何潜在 bug”不可证明边界。
+>
+> Task 37.1 完成后，`perfect-refactor-unblock-packet.json` 使用 current-latest artifacts 作为权威来源，记录 `target_scope=current-latest`、23 个 current-latest golden blockers、30 个 required decision items，并保持 `perfect_refactor_claim_allowed=false` / `status=blocked`。剩余工作仍是 config/provider external authority、current-target、publication 和质量声明边界，需要真实外部证据或正式 waiver。
 
 ---
 

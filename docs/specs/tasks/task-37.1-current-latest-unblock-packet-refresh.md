@@ -1,6 +1,6 @@
 # Task 37.1: current-latest-unblock-packet-refresh
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 37 - current-latest-unblock-packet-refresh
@@ -69,21 +69,21 @@ When current-latest artifacts exist, `perfect-refactor-unblock-packet.sh` must t
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-011 / task 24.4): packet records `target_scope=current-latest`, `current_latest_golden_blocker_count`, and `current_latest_required_decision_count` derived from current-latest artifacts.
-- [ ] **AC2** (ADR-009): every current-latest golden blocker is represented as exactly one non-auto-resolvable decision item, with current-latest source artifact/reference evidence.
-- [ ] **AC3** (ADR-008 / task 22.1): current-target and publication authority decisions remain explicit and require real evidence; dry-run or local fixture evidence cannot mark them ready.
-- [ ] **AC4** (PRD §Success Metrics): `perfect_refactor_claim_allowed=false` and `status=blocked` remain while current-latest/config/provider/publication/current-target evidence is absent.
-- [ ] **AC5** (task 36.1): packet counts reconcile with Phase 36 current-latest evidence: tracked smoke has 23 golden blockers and no script-bridge decisions.
+- [x] **AC1** (ADR-011 / task 24.4): packet records `target_scope=current-latest`, `current_latest_golden_blocker_count`, and `current_latest_required_decision_count` derived from current-latest artifacts.
+- [x] **AC2** (ADR-009): every current-latest golden blocker is represented as exactly one non-auto-resolvable decision item, with current-latest source artifact/reference evidence.
+- [x] **AC3** (ADR-008 / task 22.1): current-target and publication authority decisions remain explicit and require real evidence; dry-run or local fixture evidence cannot mark them ready.
+- [x] **AC4** (PRD §Success Metrics): `perfect_refactor_claim_allowed=false` and `status=blocked` remain while current-latest/config/provider/publication/current-target evidence is absent.
+- [x] **AC5** (task 36.1): packet counts reconcile with Phase 36 current-latest evidence: tracked smoke has 23 golden blockers and no script-bridge decisions.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-37.1.1 | TEST-37.1.1 | tests/current_latest_unblock_packet.rs | install, typecheck, unit-test, build | Spec Ready |
-| AC2 | SCEN-37.1.1 | TEST-37.1.2 | tests/current_latest_unblock_packet.rs | install, lint, typecheck, unit-test, integration, build | Spec Ready |
-| AC3 | SCEN-37.1.1 | TEST-37.1.3 | tests/current_latest_unblock_packet.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Spec Ready |
-| AC4 | SCEN-37.1.1 | TEST-37.1.4 | tests/current_latest_unblock_packet.rs | install, lint, typecheck, unit-test, coverage, build | Spec Ready |
-| AC5 | SCEN-37.1.1 | TEST-37.1.5 | tests/current_latest_unblock_packet.rs | install, lint, typecheck, unit-test, integration, e2e, coverage, runtime-smoke, build | Spec Ready |
+| AC1 | SCEN-37.1.1 | TEST-37.1.1 | tests/current_latest_unblock_packet.rs | install, typecheck, unit-test, build | Done |
+| AC2 | SCEN-37.1.1 | TEST-37.1.2 | tests/current_latest_unblock_packet.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-37.1.1 | TEST-37.1.3 | tests/current_latest_unblock_packet.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-37.1.1 | TEST-37.1.4 | tests/current_latest_unblock_packet.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC5 | SCEN-37.1.1 | TEST-37.1.5 | tests/current_latest_unblock_packet.rs | install, lint, typecheck, unit-test, integration, e2e, coverage, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -105,9 +105,30 @@ When current-latest artifacts exist, `perfect-refactor-unblock-packet.sh` must t
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-03
+- **改动文件**：
+  - `docs/s2v-adapter.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/compatibility/matrix.md`
+  - `docs/specs/phases/phase-37-current-latest-unblock-packet-refresh.md`
+  - `docs/specs/tasks/task-37.1-current-latest-unblock-packet-refresh.md`
+  - `scripts/release/perfect-refactor-unblock-packet.sh`
+  - `tests/current_latest_unblock_packet.rs`
+- **commit 列表**：
+  - `ce088cd` `docs(spec): task-37.1 enters implementation`
+  - `03fc272` `test(release): add current latest unblock packet RED tests`
+  - `19602d2` `feat(release): refresh unblock packet from current latest blockers`
+  - `9ac65f9` `refactor(release): format current latest unblock packet tests`
+  - 本次 docs 回填提交：`docs(spec): complete task 37.1 current latest unblock packet refresh`
+- **§9 Verification 结果**：
+  - install: PASS - helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS - helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS - helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS - helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-37.1.1 ~ TEST-37.1.5 通过。
+  - integration: PASS - helper 执行 adapter Integration tests 通过。
+  - e2e: PASS - helper 执行 adapter E2E tests 通过。
+  - coverage: PASS - helper 执行 adapter Coverage 通过，并通过 `s2v_coverage_threshold_guard`。
+  - build: PASS - helper 执行 adapter Build 通过。
+  - runtime-smoke: PASS - helper 执行 adapter Runtime smoke 通过；`perfect-refactor-unblock-packet.target_scope=current-latest`，`status=blocked`，`current_latest_golden_blocker_count=23`，`current_latest_external_authority_blocker_count=23`，`current_latest_required_decision_count=30`，分组为 `config=7, provider=16, current-latest target=1, publication=6`。
+- **剩余风险 / 未做项**：本 task 只刷新 current-latest blocker handoff artifact，不提供真实 provider credentials、账号/私有服务权限、法律/品牌确认、公开发布 URL/digest 或正式 waiver；`perfect_refactor_claim_allowed=false` 与 `status=blocked` 仍为正确状态。
+- **下游 task 影响**：Phase 37 可以进入 phase smoke 收尾。后续若要继续推进“完美重构”完成声明，只能消费 `perfect-refactor-unblock-packet.json` 中 30 个非自动解除决策项，或由用户提供真实外部证据/正式 waiver。

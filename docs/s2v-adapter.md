@@ -242,7 +242,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 34.1 | eval-runner | docs/specs/tasks/task-34.1-current-latest-eval-scheduler-rate-limit-burndown.md | Done | Phase 34 order 1 | N/A (solo) |
 | 35.1 | script-bridge | docs/specs/tasks/task-35.1-current-latest-script-prompt-python-bridge-burndown.md | Done | Phase 35 order 1 | N/A (solo) |
 | 36.1 | script-bridge | docs/specs/tasks/task-36.1-current-latest-ruby-bridge-burndown.md | Done | Phase 36 order 1 | N/A (solo) |
-| 37.1 | release-quality | docs/specs/tasks/task-37.1-current-latest-unblock-packet-refresh.md | In Progress | Phase 37 order 1 | N/A (solo) |
+| 37.1 | release-quality | docs/specs/tasks/task-37.1-current-latest-unblock-packet-refresh.md | Done | Phase 37 order 1 | N/A (solo) |
 
 ## ADR 索引
 
