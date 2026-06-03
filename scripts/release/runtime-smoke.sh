@@ -7,9 +7,9 @@ tmpdir="$(mktemp -d)"
 trap 'rm -rf "$tmpdir"' EXIT
 
 prepare_distribution_fixture_env() {
-  local lock_file="$GATE_DIR/current-latest-target.json"
+  local lock_file="compatibility/inventory/current-latest-target.json"
   if [ ! -f "$lock_file" ]; then
-    lock_file="compatibility/inventory/current-latest-target.json"
+    lock_file="$GATE_DIR/current-latest-target.json"
   fi
   if [ ! -f "$lock_file" ]; then
     return
