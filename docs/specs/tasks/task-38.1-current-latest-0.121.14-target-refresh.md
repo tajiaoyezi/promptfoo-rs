@@ -77,6 +77,7 @@ Refresh the current-latest target lock to the observed `promptfoo@0.121.14` pack
 - [ ] **AC3** (ADR-007 / ADR-009): runtime smoke and downstream release-gate artifacts remain fail-closed with `current_latest_claim_allowed=false` and `perfect_refactor_claim_allowed=false` after target refresh.
 - [ ] **AC4** (task 37.1): perfect-refactor unblock packet continues to expose current-target, external-authority, and publication decisions instead of using stale `0.121.13` target evidence as the current-latest authority.
 - [ ] **AC5** (PRD §Current Latest Rebaseline Addendum): runtime smoke prefers the tracked current-latest lock over a stale ignored `target/release-gates/current-latest-target.json` copy when preparing deterministic distribution fixtures.
+- [ ] **AC6** (ADR-007): runtime smoke distribution fixtures include the frozen baseline `refs/tags/0.121.13` ref even when current-latest npm/release refs have moved to `0.121.14`.
 
 ## 7. SDD / BDD / TDD Traceability
 
@@ -87,6 +88,7 @@ Refresh the current-latest target lock to the observed `promptfoo@0.121.14` pack
 | AC3 | SCEN-38.1.1 | TEST-38.1.3 | tests/current_latest_target_drift_refresh.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Spec Ready |
 | AC4 | SCEN-38.1.1 | TEST-38.1.4 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, coverage, runtime-smoke, build | Spec Ready |
 | AC5 | SCEN-38.1.1 | TEST-38.1.5 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Spec Ready |
+| AC6 | SCEN-38.1.1 | TEST-38.1.6 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Spec Ready |
 
 ## 8. Risks
 

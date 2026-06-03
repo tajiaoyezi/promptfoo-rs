@@ -380,3 +380,4 @@ Feature: perfect refactor parity
     And TEST-38.1.3 proves runtime smoke remains fail-closed for perfect-refactor completion
     And TEST-38.1.4 proves the unblock packet keeps external-authority current-target and publication decisions visible
     And TEST-38.1.5 proves runtime smoke uses the tracked lock before any stale generated gate copy
+    And TEST-38.1.6 proves runtime smoke distribution fixtures still include the frozen 0.121.13 baseline ref

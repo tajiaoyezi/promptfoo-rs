@@ -186,6 +186,21 @@ fn test_38_1_5_runtime_smoke_prefers_tracked_lock_over_stale_gate_copy() {
     );
 }
 
+#[test]
+fn test_38_1_6_runtime_smoke_fixture_keeps_frozen_baseline_ref() {
+    /* TEST-38.1.6 */
+    let script = std::fs::read_to_string("scripts/release/runtime-smoke.sh")
+        .expect("runtime smoke script should be readable");
+    assert!(
+        script.contains("4860e990c7e9a2f8f677173fb92cf9867b34d03f"),
+        "runtime smoke fixture must include frozen baseline commit for upstream-distribution-target.sh:\n{script}"
+    );
+    assert!(
+        script.contains("refs/tags/0.121.13"),
+        "runtime smoke fixture must include frozen baseline tag for upstream-distribution-target.sh:\n{script}"
+    );
+}
+
 fn tracked_lock() -> Value {
     serde_json::from_str(
         &std::fs::read_to_string("compatibility/inventory/current-latest-target.json")
