@@ -530,6 +530,18 @@ function isCurrentLatestPythonScriptBridgeFixture(id, file) {
   return file.startsWith('src/python/') && currentLatestPythonScriptBridgeFixtureIds(id).length > 0;
 }
 
+function currentLatestRubyScriptBridgeFixtureIds(id) {
+  const mapping = {
+    'script-bridge:src-ruby-rubyutils': ['p0-ruby-bridge-runtime-utils'],
+    'script-bridge:src-ruby-wrapper': ['p0-ruby-bridge-wrapper'],
+  };
+  return mapping[id] || [];
+}
+
+function isCurrentLatestRubyScriptBridgeFixture(id, file) {
+  return file.startsWith('src/ruby/') && currentLatestRubyScriptBridgeFixtureIds(id).length > 0;
+}
+
 function currentLatestScriptBridgeBlockerReason(id, file) {
   if (file.startsWith('src/ruby/')) {
     return `current-latest Ruby script bridge surface requires dedicated Ruby runtime fixture evidence before this row can be claimed native: ${id}; source: ${file}`;
@@ -652,6 +664,7 @@ function metadata(category, id, file) {
   if (category === 'prompt-processing' && isCurrentLatestPromptProcessingSnapshot(file)) return ['P1', 'later', 'config-loader', 'snapshot', `current-latest static/external prompt helper source is registered under P1 snapshot evidence until dedicated parity work proves native behavior; item: ${id}`];
   if (category === 'prompt-processing') return ['P0', 'blocked', currentLatestPromptProcessingBlockerOwner(id, file), 'blocker', `${currentLatestPromptProcessingBlockerReason(id, file)}; item: ${id}`];
   if (category === 'script-bridge' && isCurrentLatestPythonScriptBridgeFixture(id, file)) return ['P0', 'native', 'script-bridge', 'fixture', `current-latest Python script bridge source is covered by deterministic authorized Python subprocess fixtures; item: ${id}`];
+  if (category === 'script-bridge' && isCurrentLatestRubyScriptBridgeFixture(id, file)) return ['P0', 'native', 'script-bridge', 'fixture', `current-latest Ruby script bridge source is covered by deterministic authorized Ruby subprocess fixtures; item: ${id}`];
   if (category === 'script-bridge') return ['P0', 'blocked', 'script-bridge', 'blocker', `${currentLatestScriptBridgeBlockerReason(id, file)}; item: ${id}`];
   if (category === 'viewer') return ['P1', 'later', 'web-viewer', 'snapshot', `current-latest viewer surface requires data-contract or browser snapshot; item: ${id}`];
   if (category === 'assertion-support') return ['P1', 'later', 'assertion-engine', 'snapshot', `current-latest assertion support surface requires matcher or grading snapshot evidence; item: ${id}`];

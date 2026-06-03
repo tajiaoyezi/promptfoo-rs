@@ -2508,6 +2508,19 @@ fn is_current_latest_python_script_bridge_fixture(stable_id: &str, file: &str) -
         && !current_latest_python_script_bridge_fixture_ids(stable_id).is_empty()
 }
 
+fn current_latest_ruby_script_bridge_fixture_ids(stable_id: &str) -> &'static [&'static str] {
+    match stable_id {
+        "script-bridge:src-ruby-rubyutils" => &["p0-ruby-bridge-runtime-utils"],
+        "script-bridge:src-ruby-wrapper" => &["p0-ruby-bridge-wrapper"],
+        _ => &[],
+    }
+}
+
+fn is_current_latest_ruby_script_bridge_fixture(stable_id: &str, file: &str) -> bool {
+    file.starts_with("src/ruby/")
+        && !current_latest_ruby_script_bridge_fixture_ids(stable_id).is_empty()
+}
+
 fn current_latest_script_bridge_blocker_reason(stable_id: &str, file: &str) -> String {
     if file.starts_with("src/ruby/") {
         format!(
@@ -3175,6 +3188,16 @@ fn current_latest_default_metadata(
                 "fixture",
                 stable_id,
                 "current-latest Python script bridge source is covered by deterministic authorized Python subprocess fixtures",
+            )
+        }
+        "script-bridge" if is_current_latest_ruby_script_bridge_fixture(stable_id, file) => {
+            current_latest_metadata(
+                "P0",
+                "native",
+                "script-bridge",
+                "fixture",
+                stable_id,
+                "current-latest Ruby script bridge source is covered by deterministic authorized Ruby subprocess fixtures",
             )
         }
         "script-bridge" => current_latest_metadata(

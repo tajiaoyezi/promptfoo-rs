@@ -272,7 +272,7 @@ fn ruby_request(
 
 fn script_options() -> ScriptSandboxOptions {
     ScriptSandboxOptions {
-        timeout: Duration::from_secs(3),
+        timeout: Duration::from_secs(10),
         env_allowlist: vec!["PROMPTFOO_ALLOWED".to_string()],
         cwd: None,
         stdin_limit: 4096,

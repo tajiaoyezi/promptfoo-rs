@@ -1,6 +1,7 @@
 pub mod prompt_processor;
 pub mod python;
 pub mod redaction;
+pub mod ruby;
 pub mod sandbox;
 
 use std::fmt;
@@ -13,6 +14,7 @@ pub use prompt_processor::{
 };
 pub use python::{PythonBridge, PythonBridgeRequest, PythonBridgeResponse, PythonWorkerPool};
 pub use redaction::{redact_secrets, RedactionPolicy};
+pub use ruby::{RubyBridge, RubyBridgeRequest, RubyBridgeResponse, RubyWorkerPool};
 pub use sandbox::{ScriptBridge, ScriptRequest, ScriptResponse, ScriptSandboxOptions};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

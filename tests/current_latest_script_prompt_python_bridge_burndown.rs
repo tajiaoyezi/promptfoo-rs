@@ -220,7 +220,7 @@ fn test_35_1_3_script_prompt_processor_rows_have_native_fixture_evidence() {
 }
 
 #[test]
-fn test_35_1_4_python_bridge_rows_are_native_and_ruby_rows_remain_blockers() {
+fn test_35_1_4_python_and_ruby_bridge_rows_are_native() {
     /* TEST-35.1.4 */
     let root = fixture_dir("python-ruby-inventory");
     write_current_latest_script_sources(&root);
@@ -242,14 +242,11 @@ fn test_35_1_4_python_bridge_rows_are_native_and_ruby_rows_remain_blockers() {
     for source in ruby_bridge_sources() {
         let row = row_for_source(&inventory.rows, source, "script-bridge");
         assert_eq!(row.level, "P0", "{row:#?}");
-        assert_eq!(row.implementation_status, "blocked", "{row:#?}");
+        assert_eq!(row.implementation_status, "native", "{row:#?}");
         assert_eq!(row.verification_owner, "script-bridge", "{row:#?}");
-        assert_eq!(row.evidence_kind, "blocker", "{row:#?}");
+        assert_eq!(row.evidence_kind, "fixture", "{row:#?}");
         assert!(
-            row.blocker_reason
-                .as_deref()
-                .unwrap_or_default()
-                .contains("Ruby"),
+            row.evidence_reference.starts_with("fixture:script-bridge:"),
             "{row:#?}"
         );
     }
@@ -258,7 +255,7 @@ fn test_35_1_4_python_bridge_rows_are_native_and_ruby_rows_remain_blockers() {
 }
 
 #[test]
-fn test_35_1_5_golden_keeps_only_ruby_script_blockers_visible() {
+fn test_35_1_5_golden_has_no_script_bridge_blockers_after_ruby_burndown() {
     /* TEST-35.1.5 */
     let root = fixture_dir("script-golden-source");
     write_current_latest_script_sources(&root);
@@ -275,11 +272,11 @@ fn test_35_1_5_golden_keeps_only_ruby_script_blockers_visible() {
     );
     assert_eq!(
         rows_with_json(script_rows, "script-bridge", "P0", "native", "fixture").len(),
-        5
+        7
     );
     assert_eq!(
         rows_with_json(script_rows, "script-bridge", "P0", "blocked", "blocker").len(),
-        2
+        0
     );
 
     run_current_latest_script(&gate_dir, "scripts/release/current-latest-golden-corpus.sh");
@@ -294,15 +291,9 @@ fn test_35_1_5_golden_keeps_only_ruby_script_blockers_visible() {
         .map(|blocker| blocker["capability"].as_str().unwrap_or_default())
         .collect::<Vec<_>>();
 
-    assert_eq!(golden["blocker_count"], Value::from(2));
-    assert_eq!(
-        capabilities,
-        vec![
-            "script-bridge:src-ruby-rubyutils",
-            "script-bridge:src-ruby-wrapper",
-        ]
-    );
-    assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
+    assert_eq!(golden["blocker_count"], Value::from(0));
+    assert!(capabilities.is_empty(), "{capabilities:#?}");
+    assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(true));
     assert_eq!(
         quality["perfect_refactor_claim_allowed"],
         Value::Bool(false)

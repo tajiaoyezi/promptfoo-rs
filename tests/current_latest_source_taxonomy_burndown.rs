@@ -252,6 +252,11 @@ fn test_25_1_4_golden_corpus_keeps_real_blockers_without_taxonomy_unclassified()
     /* TEST-25.1.4 */
     let root = fixture_dir("golden-source");
     write_taxonomy_source(&root);
+    write_file(
+        &root,
+        "src/providers/openai/billing.ts",
+        "export const billingAuthority = true;",
+    );
     let gate_dir = fixture_dir("golden-gate");
     let inventory = extract_current_latest_inventory(&current_latest_lock(), &root)
         .expect("current latest inventory should extract");
