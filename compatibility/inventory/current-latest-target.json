@@ -3,26 +3,26 @@
   "status": "locked-with-drift",
   "npm_latest": {
     "package_name": "promptfoo",
-    "package_version": "0.121.13",
-    "git_head": "4860e990c7e9a2f8f677173fb92cf9867b34d03f",
-    "tarball": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.13.tgz",
-    "integrity": "sha512-DBPSixUophzcD7S7lML6SqVwnVtrhK5A3HsZ03IG9Xrw0t24r5imG7nLj+YMb0vlAjbdFtE7yFG+rsqDpfYp6g==",
-    "modified": "2026-05-28T23:59:40.582Z",
+    "package_version": "0.121.14",
+    "git_head": "7a48c5fce614bee617efbb3b7fc93d404c75b628",
+    "tarball": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.14.tgz",
+    "integrity": "sha512-YUeBMqwfv3xZC7HJ3ohwk2e0i3DdCitOrvWZPijCOMywp/S+CZEjyqVh1pUzR1PgDo9eBBn9WXyw2wbDBihcpA==",
+    "modified": "2026-06-02T13:59:19.451Z",
     "source": "npm view promptfoo version gitHead dist.tarball dist.integrity time.modified --json"
   },
   "github": {
-    "default_branch_head": "1d09dfeb5f0766905409117f923dd5c4b0838d9f",
-    "npm_tag_ref": "refs/tags/0.121.13",
-    "npm_tag_commit": "4860e990c7e9a2f8f677173fb92cf9867b34d03f",
-    "latest_release_ref": "refs/tags/code-scan-action-0.1.7",
-    "latest_release_commit": "1c743afe0e4807882e858c4f322fc064fa5f0770",
-    "latest_release_name": "code-scan-action: 0.1.7",
-    "latest_release_url": "https://github.com/promptfoo/promptfoo/releases/tag/code-scan-action-0.1.7",
-    "latest_release_published_at": "2026-05-29T03:02:57Z",
-    "latest_release_channel": "github-action",
-    "latest_release_is_core_package": false,
+    "default_branch_head": "4d22e57f5f9b4c7cdde494f00558d9afde8b4975",
+    "npm_tag_ref": "refs/tags/0.121.14",
+    "npm_tag_commit": "7a48c5fce614bee617efbb3b7fc93d404c75b628",
+    "latest_release_ref": "refs/tags/0.121.14",
+    "latest_release_commit": "7a48c5fce614bee617efbb3b7fc93d404c75b628",
+    "latest_release_name": "0.121.14",
+    "latest_release_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.121.14",
+    "latest_release_published_at": "2026-06-02T13:49:18Z",
+    "latest_release_channel": "core-package",
+    "latest_release_is_core_package": true,
     "source": "git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/<npm-version> refs/tags/<latest-release>",
-    "observed_at": "2026-06-01T00:00:00+08:00"
+    "observed_at": "unix:1780450563"
   },
   "target_selection_blocker_resolved": true,
   "current_latest_claim_allowed": false,
@@ -34,6 +34,6 @@
     "external_authority_or_waivers",
     "publication_authority_or_waivers"
   ],
-  "reason": "npm latest package 0.121.13 records gitHead 4860e990c7e9a2f8f677173fb92cf9867b34d03f; GitHub default branch HEAD 1d09dfeb5f0766905409117f923dd5c4b0838d9f differs from npm latest gitHead 4860e990c7e9a2f8f677173fb92cf9867b34d03f; GitHub latest release refs/tags/code-scan-action-0.1.7 is classified as github-action, not core package release evidence; downstream source inventory, golden corpus, quality, external authority, and publication evidence are still required",
-  "observed_at": "2026-06-01T00:00:00+08:00"
+  "reason": "npm latest package 0.121.14 records gitHead 7a48c5fce614bee617efbb3b7fc93d404c75b628; GitHub default branch HEAD 4d22e57f5f9b4c7cdde494f00558d9afde8b4975 differs from npm latest gitHead 7a48c5fce614bee617efbb3b7fc93d404c75b628; downstream source inventory, golden corpus, quality, external authority, and publication evidence are still required",
+  "observed_at": "unix:1780450563"
 }

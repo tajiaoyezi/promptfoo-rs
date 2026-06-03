@@ -534,10 +534,11 @@ impl CurrentLatestTargetLock {
             }
             if reference == "HEAD" {
                 default_branch_head = Some(sha.to_string());
-            } else if reference == npm_tag_ref || reference == format!("{npm_tag_ref}^{{}}") {
+            }
+            if reference == npm_tag_ref || reference == format!("{npm_tag_ref}^{{}}") {
                 npm_tag_commit = Some(sha.to_string());
-            } else if reference == latest_release_ref
-                || reference == format!("{latest_release_ref}^{{}}")
+            }
+            if reference == latest_release_ref || reference == format!("{latest_release_ref}^{{}}")
             {
                 latest_release_commit = Some(sha.to_string());
             }

@@ -176,8 +176,8 @@ for (const line of fs.readFileSync(lsRemotePath, 'utf8').split(/\r?\n/).map((ent
   const [sha, ref] = line.split(/\s+/);
   if (!fullSha(sha)) throw new Error(`ls-remote ref ${ref || '<missing>'} did not contain a full sha`);
   if (ref === 'HEAD') defaultBranchHead = sha;
-  else if (ref === npmTagRef || ref === `${npmTagRef}^{}`) npmTagCommit = sha;
-  else if (ref === release.ref || ref === `${release.ref}^{}`) latestReleaseCommit = sha;
+  if (ref === npmTagRef || ref === `${npmTagRef}^{}`) npmTagCommit = sha;
+  if (ref === release.ref || ref === `${release.ref}^{}`) latestReleaseCommit = sha;
 }
 if (!defaultBranchHead) throw new Error('ls-remote output missing HEAD');
 if (!npmTagCommit) throw new Error(`ls-remote output missing ${npmTagRef}`);

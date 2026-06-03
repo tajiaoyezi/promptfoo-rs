@@ -133,7 +133,10 @@ fn test_38_1_3_shell_lock_script_accepts_same_ref_fixture_and_stays_fail_closed(
     )
     .expect("script gate should be valid JSON");
     assert_eq!(generated["npm_latest"]["package_version"], "0.121.14");
-    assert_eq!(generated["github"]["latest_release_ref"], "refs/tags/0.121.14");
+    assert_eq!(
+        generated["github"]["latest_release_ref"],
+        "refs/tags/0.121.14"
+    );
     assert_eq!(generated["github"]["latest_release_is_core_package"], true);
     assert_eq!(generated["current_latest_claim_allowed"], false);
     assert_eq!(generated["status"], "locked-with-drift");
