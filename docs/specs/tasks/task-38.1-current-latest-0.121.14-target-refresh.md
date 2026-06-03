@@ -1,6 +1,6 @@
 # Task 38.1: current-latest-0.121.14-target-refresh
 
-**Status**: Ready
+**Status**: In Progress
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 38 - current-latest-0.121.14-target-refresh
