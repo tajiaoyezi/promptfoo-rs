@@ -60,11 +60,15 @@ const latestRelease = {
   published_at: github.latest_release_published_at || '',
   html_url: github.latest_release_url || '',
 };
-const lsRemote = [
+const frozenBaselineRef = 'refs/tags/0.121.13';
+const frozenBaselineCommit = '4860e990c7e9a2f8f677173fb92cf9867b34d03f';
+const lsRemoteRows = [
   `${github.default_branch_head}\tHEAD`,
   `${github.npm_tag_commit}\t${github.npm_tag_ref}`,
   `${github.latest_release_commit}\t${github.latest_release_ref}`,
-].join('\n') + '\n';
+  `${frozenBaselineCommit}\t${frozenBaselineRef}`,
+];
+const lsRemote = [...new Set(lsRemoteRows)].join('\n') + '\n';
 fs.writeFileSync(path.join(outDir, 'current-latest-npm-view.json'), `${JSON.stringify(npmView, null, 2)}\n`);
 fs.writeFileSync(path.join(outDir, 'current-latest-github-latest-release.json'), `${JSON.stringify(latestRelease, null, 2)}\n`);
 fs.writeFileSync(path.join(outDir, 'current-latest-ls-remote.txt'), lsRemote);
