@@ -11,7 +11,7 @@
     "source": "npm view promptfoo version gitHead dist.tarball dist.integrity time.modified --json"
   },
   "github": {
-    "default_branch_head": "4d22e57f5f9b4c7cdde494f00558d9afde8b4975",
+    "default_branch_head": "9d7d810c2118c63cb537bf05ea2d34c12bd22066",
     "npm_tag_ref": "refs/tags/0.121.14",
     "npm_tag_commit": "7a48c5fce614bee617efbb3b7fc93d404c75b628",
     "latest_release_ref": "refs/tags/0.121.14",
@@ -22,7 +22,7 @@
     "latest_release_channel": "core-package",
     "latest_release_is_core_package": true,
     "source": "git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/<npm-version> refs/tags/<latest-release>",
-    "observed_at": "unix:1780450563"
+    "observed_at": "unix:1780457762"
   },
   "target_selection_blocker_resolved": true,
   "current_latest_claim_allowed": false,
@@ -34,6 +34,6 @@
     "external_authority_or_waivers",
     "publication_authority_or_waivers"
   ],
-  "reason": "npm latest package 0.121.14 records gitHead 7a48c5fce614bee617efbb3b7fc93d404c75b628; GitHub default branch HEAD 4d22e57f5f9b4c7cdde494f00558d9afde8b4975 differs from npm latest gitHead 7a48c5fce614bee617efbb3b7fc93d404c75b628; downstream source inventory, golden corpus, quality, external authority, and publication evidence are still required",
-  "observed_at": "unix:1780450563"
+  "reason": "npm latest package 0.121.14 records gitHead 7a48c5fce614bee617efbb3b7fc93d404c75b628; GitHub default branch HEAD 9d7d810c2118c63cb537bf05ea2d34c12bd22066 differs from npm latest gitHead 7a48c5fce614bee617efbb3b7fc93d404c75b628; downstream source inventory, golden corpus, quality, external authority, and publication evidence are still required",
+  "observed_at": "unix:1780457762"
 }
