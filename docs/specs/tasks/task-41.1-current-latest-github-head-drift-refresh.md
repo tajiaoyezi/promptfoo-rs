@@ -1,6 +1,6 @@
 # Task 41.1: current-latest-github-head-drift-refresh
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 41 - current-latest-github-head-drift-refresh
@@ -19,6 +19,7 @@ Refresh the current-latest target lock and downstream release-gate evidence to t
 ### In Scope
 
 - `tests/current_latest_github_head_drift_refresh.rs`
+- `tests/current_latest_target_drift_refresh.rs`
 - `compatibility/inventory/current-latest-target.json`
 - `docs/compatibility/current-latest.lock.md`
 - `docs/compatibility/matrix.md`
@@ -71,19 +72,19 @@ The current-latest target lock must record npm latest `0.121.14` / gitHead `7a48
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-011): Rust target-lock parsing records GitHub default branch HEAD `9d7d810c2118c63cb537bf05ea2d34c12bd22066` while npm latest and GitHub latest release remain `0.121.14`.
-- [ ] **AC2** (PRD §Current Latest Rebaseline Addendum): tracked current-latest lock artifacts record the refreshed GitHub HEAD and retain npm tarball, integrity, source commands, and observation timestamp.
-- [ ] **AC3** (ADR-007 / ADR-009): runtime smoke regenerates downstream current-latest artifacts for the refreshed HEAD and leaves `current_latest_claim_allowed=false` / `perfect_refactor_claim_allowed=false`.
-- [ ] **AC4** (task 40.1): evaluator runtime native fixture evidence remains present after the refreshed HEAD re-extraction, or any new local blocker is surfaced explicitly by release-gate artifacts.
+- [x] **AC1** (ADR-011): Rust target-lock parsing records GitHub default branch HEAD `9d7d810c2118c63cb537bf05ea2d34c12bd22066` while npm latest and GitHub latest release remain `0.121.14`.
+- [x] **AC2** (PRD §Current Latest Rebaseline Addendum): tracked current-latest lock artifacts record the refreshed GitHub HEAD and retain npm tarball, integrity, source commands, and observation timestamp.
+- [x] **AC3** (ADR-007 / ADR-009): runtime smoke regenerates downstream current-latest artifacts for the refreshed HEAD and leaves `current_latest_claim_allowed=false` / `perfect_refactor_claim_allowed=false`.
+- [x] **AC4** (task 40.1): evaluator runtime native fixture evidence remains present after the refreshed HEAD re-extraction, or any new local blocker is surfaced explicitly by release-gate artifacts.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-41.1.1 | TEST-41.1.1 | tests/current_latest_github_head_drift_refresh.rs | install, lint, typecheck, unit-test, build | Spec Ready |
-| AC2 | SCEN-41.1.1 | TEST-41.1.2 | tests/current_latest_github_head_drift_refresh.rs | install, lint, typecheck, unit-test, integration, build | Spec Ready |
-| AC3 | SCEN-41.1.1 | TEST-41.1.3 | tests/current_latest_github_head_drift_refresh.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Spec Ready |
-| AC4 | SCEN-41.1.1 | TEST-41.1.4 | tests/current_latest_github_head_drift_refresh.rs | install, lint, typecheck, unit-test, coverage, runtime-smoke, build | Spec Ready |
+| AC1 | SCEN-41.1.1 | TEST-41.1.1 | tests/current_latest_github_head_drift_refresh.rs | install, lint, typecheck, unit-test, build | Done |
+| AC2 | SCEN-41.1.1 | TEST-41.1.2 | tests/current_latest_github_head_drift_refresh.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-41.1.1 | TEST-41.1.3 | tests/current_latest_github_head_drift_refresh.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-41.1.1 | TEST-41.1.4 | tests/current_latest_github_head_drift_refresh.rs | install, lint, typecheck, unit-test, coverage, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -105,9 +106,37 @@ The current-latest target lock must record npm latest `0.121.14` / gitHead `7a48
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-03
+- **改动文件**：
+  - `compatibility/inventory/current-latest-target.json`
+  - `docs/compatibility/current-latest.lock.md`
+  - `docs/compatibility/matrix.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-41-current-latest-github-head-drift-refresh.md`
+  - `docs/specs/tasks/task-41.1-current-latest-github-head-drift-refresh.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_github_head_drift_refresh.rs`
+  - `tests/current_latest_target_drift_refresh.rs`
+- **commit 列表**：
+  - `7a2f032 docs(spec): add github head drift refresh task`
+  - `df79624 test(compatibility): add github head drift refresh RED tests`
+  - `7543f7d feat(compatibility): refresh current latest github head target lock`
+  - `3543a24 refactor(compatibility): decouple prior drift test from moving head`
+  - `<this docs commit> docs(spec): complete task 41.1 github head drift refresh`
+- **§9 Verification 结果**：
+  - install: PASS - adapter §Commands Install passed inside `s2v_verify_full`.
+  - lint: PASS - adapter §Commands Lint passed inside `s2v_verify_full`.
+  - typecheck: PASS - adapter §Commands Typecheck passed inside `s2v_verify_full`.
+  - unit-test: PASS - adapter §Commands Unit Test passed; `TEST-41.1.1` through `TEST-41.1.4` pass in `tests/current_latest_github_head_drift_refresh.rs`, and historical `TEST-38.1.2` now validates the moving tracked GitHub HEAD through the same lock artifact.
+  - integration: PASS - adapter §Commands Integration tests passed inside `s2v_verify_full`.
+  - e2e: PASS - adapter §Commands E2E tests passed inside `s2v_verify_full`.
+  - coverage: PASS - adapter §Commands Coverage passed inside `s2v_verify_full`; `s2v_coverage_threshold_guard` returned PASS.
+  - build: PASS - adapter §Commands Build passed inside `s2v_verify_full`.
+  - runtime-smoke: PASS - adapter §Commands Runtime smoke regenerated release gates with current-latest target `status=locked-with-drift`, `github.default_branch_head=9d7d810c2118c63cb537bf05ea2d34c12bd22066`, source inventory `status=ready`, matrix `status=ready`, both `unclassified_rows=[]`, current-latest golden `blocker_count=24`, current-latest quality `blocker_count=4`, `local_current_latest_ready=false`, release candidate `publication_ready=credential-blocked`, `perfect_refactor_claim_allowed=false`, and unblock packet `required_user_decision_count=31`.
+- **剩余风险 / 未做项**：
+  - GitHub default branch can drift again after this observed lock; future drift must enter a new S2V target-refresh task rather than silently changing this completion proof.
+  - Remaining blockers are external config/provider authority, current-target drift policy, publication authority, and formal zero-bug / bug-free claim boundaries; this task does not and cannot waive them.
+- **下游 task 影响**：
+  - Downstream current-latest gates now consume `git:https://github.com/promptfoo/promptfoo.git#9d7d810c2118c63cb537bf05ea2d34c12bd22066`.
+  - No new local unclassified rows were introduced; evaluator runtime fixture evidence remains native, so future work should focus on external authority/publication decisions or new upstream drift.

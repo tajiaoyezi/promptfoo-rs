@@ -346,6 +346,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Task 40.1 完成后，`eval-runner:src-evaluator-runtime` 已变为 native fixture evidence，current-latest golden blocker count 从 25 降到 24，unblock packet required decisions 从 32 降到 31。剩余 blockers 均属于 external authority、current-target、publication authority 或不可证明质量声明边界，不能由本地代码继续消除。
 >
 > Phase 41 是 2026-06-03 再次 live upstream drift 后的 current-latest target refresh：npm latest 与 GitHub latest release 仍是 `0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`，但 GitHub default branch HEAD 已移动到 `9d7d810c2118c63cb537bf05ea2d34c12bd22066`。该 phase 只刷新 current-latest repository target evidence，不解除外部 authority、publication 或 bug-free claim 边界。
+>
+> Task 41.1 完成后，tracked current-latest target lock 与 runtime-smoke artifacts 均记录 GitHub default branch HEAD `9d7d810c2118c63cb537bf05ea2d34c12bd22066`，npm latest / GitHub latest release 仍保持 `0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`。Runtime-smoke evidence 继续保持 fail-closed：source inventory 与 matrix `status=ready` 且 `unclassified_rows=[]`，current-latest golden `blocker_count=24`，quality `blocker_count=4`，unblock packet `required_user_decision_count=31`，`perfect_refactor_claim_allowed=false`。
 
 ---
 
