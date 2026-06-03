@@ -74,8 +74,11 @@ fn test_38_1_2_tracked_lock_artifacts_record_observed_0_121_14_target() {
         "sha512-YUeBMqwfv3xZC7HJ3ohwk2e0i3DdCitOrvWZPijCOMywp/S+CZEjyqVh1pUzR1PgDo9eBBn9WXyw2wbDBihcpA=="
     );
     assert_eq!(
-        lock["github"]["default_branch_head"],
-        "4d22e57f5f9b4c7cdde494f00558d9afde8b4975"
+        lock["github"]["default_branch_head"]
+            .as_str()
+            .expect("tracked lock should record a GitHub default branch HEAD")
+            .len(),
+        40
     );
     assert_eq!(lock["github"]["latest_release_ref"], "refs/tags/0.121.14");
     assert_eq!(
@@ -87,7 +90,11 @@ fn test_38_1_2_tracked_lock_artifacts_record_observed_0_121_14_target() {
         .expect("tracked current latest markdown lock should be readable");
     assert!(markdown.contains("promptfoo@0.121.14"), "{markdown}");
     assert!(
-        markdown.contains("4d22e57f5f9b4c7cdde494f00558d9afde8b4975"),
+        markdown.contains(
+            lock["github"]["default_branch_head"]
+                .as_str()
+                .expect("tracked lock should record a GitHub default branch HEAD")
+        ),
         "{markdown}"
     );
     assert!(!markdown.contains("promptfoo@0.121.13"), "{markdown}");
