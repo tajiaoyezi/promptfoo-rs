@@ -1,6 +1,6 @@
 # Task 38.1: current-latest-0.121.14-target-refresh
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 38 - current-latest-0.121.14-target-refresh
@@ -72,23 +72,23 @@ Refresh the current-latest target lock to the observed `promptfoo@0.121.14` pack
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-011): Rust target-lock parsing accepts same-ref npm/latest-release evidence and records both `npm_tag_commit` and `latest_release_commit` for `refs/tags/0.121.14`.
-- [ ] **AC2** (PRD §Current Latest Rebaseline Addendum): tracked current-latest lock artifacts record `promptfoo@0.121.14`, npm gitHead `7a48c5fce614bee617efbb3b7fc93d404c75b628`, GitHub HEAD `4d22e57f5f9b4c7cdde494f00558d9afde8b4975`, latest release `refs/tags/0.121.14`, tarball, integrity, source commands, and observation timestamp.
-- [ ] **AC3** (ADR-007 / ADR-009): runtime smoke and downstream release-gate artifacts remain fail-closed with `current_latest_claim_allowed=false` and `perfect_refactor_claim_allowed=false` after target refresh.
-- [ ] **AC4** (task 37.1): perfect-refactor unblock packet continues to expose current-target, external-authority, and publication decisions instead of using stale `0.121.13` target evidence as the current-latest authority.
-- [ ] **AC5** (PRD §Current Latest Rebaseline Addendum): runtime smoke prefers the tracked current-latest lock over a stale ignored `target/release-gates/current-latest-target.json` copy when preparing deterministic distribution fixtures.
-- [ ] **AC6** (ADR-007): runtime smoke distribution fixtures include the frozen baseline `refs/tags/0.121.13` ref even when current-latest npm/release refs have moved to `0.121.14`.
+- [x] **AC1** (ADR-011): Rust target-lock parsing accepts same-ref npm/latest-release evidence and records both `npm_tag_commit` and `latest_release_commit` for `refs/tags/0.121.14`.
+- [x] **AC2** (PRD §Current Latest Rebaseline Addendum): tracked current-latest lock artifacts record `promptfoo@0.121.14`, npm gitHead `7a48c5fce614bee617efbb3b7fc93d404c75b628`, GitHub HEAD `4d22e57f5f9b4c7cdde494f00558d9afde8b4975`, latest release `refs/tags/0.121.14`, tarball, integrity, source commands, and observation timestamp.
+- [x] **AC3** (ADR-007 / ADR-009): runtime smoke and downstream release-gate artifacts remain fail-closed with `current_latest_claim_allowed=false` and `perfect_refactor_claim_allowed=false` after target refresh.
+- [x] **AC4** (task 37.1): perfect-refactor unblock packet continues to expose current-target, external-authority, and publication decisions instead of using stale `0.121.13` target evidence as the current-latest authority.
+- [x] **AC5** (PRD §Current Latest Rebaseline Addendum): runtime smoke prefers the tracked current-latest lock over a stale ignored `target/release-gates/current-latest-target.json` copy when preparing deterministic distribution fixtures.
+- [x] **AC6** (ADR-007): runtime smoke distribution fixtures include the frozen baseline `refs/tags/0.121.13` ref even when current-latest npm/release refs have moved to `0.121.14`.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-38.1.1 | TEST-38.1.1 | tests/current_latest_target_drift_refresh.rs | install, typecheck, unit-test, build | Spec Ready |
-| AC2 | SCEN-38.1.1 | TEST-38.1.2 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, integration, build | Spec Ready |
-| AC3 | SCEN-38.1.1 | TEST-38.1.3 | tests/current_latest_target_drift_refresh.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Spec Ready |
-| AC4 | SCEN-38.1.1 | TEST-38.1.4 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, coverage, runtime-smoke, build | Spec Ready |
-| AC5 | SCEN-38.1.1 | TEST-38.1.5 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Spec Ready |
-| AC6 | SCEN-38.1.1 | TEST-38.1.6 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Spec Ready |
+| AC1 | SCEN-38.1.1 | TEST-38.1.1 | tests/current_latest_target_drift_refresh.rs | install, typecheck, unit-test, build | Done |
+| AC2 | SCEN-38.1.1 | TEST-38.1.2 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-38.1.1 | TEST-38.1.3 | tests/current_latest_target_drift_refresh.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-38.1.1 | TEST-38.1.4 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, coverage, runtime-smoke, build | Done |
+| AC5 | SCEN-38.1.1 | TEST-38.1.5 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
+| AC6 | SCEN-38.1.1 | TEST-38.1.6 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -110,9 +110,45 @@ Refresh the current-latest target lock to the observed `promptfoo@0.121.14` pack
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-03
+- **改动文件**：
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-38-current-latest-0.121.14-target-refresh.md`
+  - `docs/specs/tasks/task-38.1-current-latest-0.121.14-target-refresh.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_target_drift_refresh.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-target-lock.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `compatibility/inventory/current-latest-target.json`
+  - `docs/compatibility/current-latest.lock.md`
+  - `docs/compatibility/matrix.md`
+- **commit 列表**：
+  - `4664f79 docs(spec): add current latest 0.121.14 target refresh task`
+  - `40acab2 docs(spec): task 38.1 enters implementation`
+  - `7a5be83 test(compatibility): add current latest 0.121.14 drift RED tests`
+  - `1e32da4 feat(compatibility): refresh current latest target lock for 0.121.14`
+  - `e8881cb test(compatibility): add current latest runtime smoke stale lock RED test`
+  - `09db4f7 fix(release): prefer tracked current latest lock in runtime smoke`
+  - `6da192b test(release): add frozen baseline ref RED coverage for runtime smoke`
+  - `396864c fix(release): include frozen baseline ref in runtime smoke fixtures`
+  - `<this docs commit> docs(spec): complete task 38.1 current latest target refresh`
+- **§9 Verification 结果**：
+  - install: PASS - adapter §Commands Install passed inside `s2v_verify_full`.
+  - lint: PASS - adapter §Commands Lint passed inside `s2v_verify_full`.
+  - typecheck: PASS - adapter §Commands Typecheck passed inside `s2v_verify_full`.
+  - unit-test: PASS - adapter §Commands Unit Test passed; `TEST-38.1.1` through `TEST-38.1.6` pass in `tests/current_latest_target_drift_refresh.rs`.
+  - integration: PASS - adapter §Commands Integration tests passed inside `s2v_verify_full`.
+  - e2e: PASS - adapter §Commands E2E tests passed inside `s2v_verify_full`.
+  - coverage: PASS - adapter §Commands Coverage passed inside `s2v_verify_full`; `s2v_coverage_threshold_guard` returned PASS.
+  - build: PASS - adapter §Commands Build passed inside `s2v_verify_full`.
+  - runtime-smoke: PASS - adapter §Commands Runtime smoke regenerated release gates with `current-latest-target.status=locked-with-drift`, npm `0.121.14`, npm gitHead `7a48c5fce614bee617efbb3b7fc93d404c75b628`, GitHub HEAD `4d22e57f5f9b4c7cdde494f00558d9afde8b4975`, `current_latest_claim_allowed=false`, current-latest golden `blocker_count=25`, quality `blocker_count=6`, release-candidate `publication_ready=credential-blocked`, and unblock packet `status=blocked`.
+- **剩余风险 / 未做项**：
+  - current-latest target 已刷新到 2026-06-03 观测的 `0.121.14` packet，但 `perfect_refactor_claim_allowed=false` 仍正确：source inventory / matrix 仍有 `unclassified_rows=1`，current-latest golden corpus 仍有 `blocker_count=25`，quality gate 仍有 `blocker_count=6`。
+  - 真实 provider credentials、私有服务账号、法律/品牌授权、发布凭据，以及“无任何潜在 bug / bug-free”一类不可证明声明仍需外部证据或正式 waiver，不能由本地实现消除。
+  - 一次 live GitHub API 调用返回 403；tracked lock 使用已记录的 npm / GitHub release / `git ls-remote` 观测 fixture 写入，runtime smoke 已改为优先使用 tracked lock，避免 stale ignored gate copy。
+- **下游 task 影响**：
+  - 后续 current-latest 证据必须以 `0.121.14` tracked lock 为目标，不得继续把 `0.121.13` 当作当前最新。
+  - runtime smoke fixture 生成现在同时保留 frozen baseline `refs/tags/0.121.13` 与 current-latest `refs/tags/0.121.14`，避免 frozen gate 与 current-latest gate 互相破坏。
+  - 若继续推进，下一步只能针对 current-latest source inventory / matrix unclassified row、golden blockers、quality blockers 或外部 authority/waiver 创建新 task。

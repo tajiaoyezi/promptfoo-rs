@@ -331,6 +331,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Task 37.1 完成后，`perfect-refactor-unblock-packet.json` 使用 current-latest artifacts 作为权威来源，记录 `target_scope=current-latest`、23 个 current-latest golden blockers、30 个 required decision items，并保持 `perfect_refactor_claim_allowed=false` / `status=blocked`。剩余工作仍是 config/provider external authority、current-target、publication 和质量声明边界，需要真实外部证据或正式 waiver。
 >
 > Phase 38 是 2026-06-03 live upstream drift 后的 current-latest target refresh 链路，依据 PRD §Current Latest Rebaseline Addendum、ADR-007、ADR-009、ADR-011、task 24.1 和 task 37.1。实时观测显示 npm latest 已变为 `promptfoo@0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`，GitHub default branch HEAD 为 `4d22e57f5f9b4c7cdde494f00558d9afde8b4975`，GitHub latest release 为 `refs/tags/0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`。该 phase 只刷新 target lock 与同 ref 解析，不解除外部权限、发布或“无任何潜在 bug”不可证明边界。
+>
+> Task 38.1 完成后，tracked current-latest target lock 已刷新为 `promptfoo@0.121.14`，Rust 与 shell target-lock parser 均支持 npm tag 与 GitHub latest release 共享 `refs/tags/0.121.14` 的合法情况。runtime smoke 继续保持 fail-closed：current-latest golden corpus `blocker_count=25`、quality `blocker_count=6`、release candidate `publication_ready=credential-blocked`，因此 `perfect_refactor_claim_allowed=false` 仍是正确状态。
 
 ---
 

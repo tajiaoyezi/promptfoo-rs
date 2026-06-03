@@ -1,6 +1,6 @@
 # Phase 38: current-latest-0.121.14-target-refresh
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ The repository currently has complete S2V task history for the earlier current-l
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 38.1 | current-latest-0.121.14-target-refresh | ../tasks/task-38.1-current-latest-0.121.14-target-refresh.md | Ready | 刷新 current-latest target lock 到 promptfoo 0.121.14 并修复 npm tag 与 latest release 同 ref 的解析 |
+| 38.1 | current-latest-0.121.14-target-refresh | ../tasks/task-38.1-current-latest-0.121.14-target-refresh.md | Done | 刷新 current-latest target lock 到 promptfoo 0.121.14 并修复 npm tag 与 latest release 同 ref 的解析 |
 
 ## 5. Dependencies
 
@@ -28,10 +28,10 @@ Depends on Phase 24 current-latest target lock, Phase 37 unblock packet refresh,
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `current-latest-target.json` and `current-latest.lock.md` record `promptfoo@0.121.14`, npm gitHead `7a48c5fce614bee617efbb3b7fc93d404c75b628`, and GitHub HEAD `4d22e57f5f9b4c7cdde494f00558d9afde8b4975`.
-- [ ] The target-lock parser accepts the valid case where `npm_tag_ref == latest_release_ref == refs/tags/0.121.14` and records both commits instead of failing closed.
-- [ ] Runtime smoke and downstream current-latest artifacts consume the refreshed target without setting `perfect_refactor_claim_allowed=true`.
-- [ ] Remaining blockers stay explicit: config/provider external authority, current-target consistency, publication authority, and unprovable zero-bug claims still require external evidence or formal waiver.
+- [x] `current-latest-target.json` and `current-latest.lock.md` record `promptfoo@0.121.14`, npm gitHead `7a48c5fce614bee617efbb3b7fc93d404c75b628`, and GitHub HEAD `4d22e57f5f9b4c7cdde494f00558d9afde8b4975`.
+- [x] The target-lock parser accepts the valid case where `npm_tag_ref == latest_release_ref == refs/tags/0.121.14` and records both commits instead of failing closed.
+- [x] Runtime smoke and downstream current-latest artifacts consume the refreshed target without setting `perfect_refactor_claim_allowed=true`.
+- [x] Remaining blockers stay explicit: config/provider external authority, current-target consistency, publication authority, and unprovable zero-bug claims still require external evidence or formal waiver.
 
 ## 7. Phase Risks
 
@@ -42,3 +42,10 @@ Depends on Phase 24 current-latest target lock, Phase 37 unblock packet refresh,
 ## 8. Definition of Done
 
 Task 38.1 spec is Done, phase §6 smoke passes with the task §9 verification plan, tracked current-latest lock artifacts point to `0.121.14`, parser and shell tests cover same-ref release accounting, and the repository is clean and pushed.
+
+## 9. Phase Completion Notes
+
+- **完成日期**：2026-06-03
+- **Phase smoke**：PASS - `s2v_preflight_phase "docs/specs/phases/phase-38-current-latest-0.121.14-target-refresh.md"` passed after this completion update; task 38.1 full §9 verification passed with install, lint, typecheck, unit-test, integration, e2e, coverage, build, runtime-smoke, plus `s2v_coverage_threshold_guard`.
+- **Artifact evidence**：runtime smoke regenerated `target/release-gates/current-latest-target.json` with `status=locked-with-drift`, npm `0.121.14`, npm gitHead `7a48c5fce614bee617efbb3b7fc93d404c75b628`, GitHub HEAD `4d22e57f5f9b4c7cdde494f00558d9afde8b4975`, and `current_latest_claim_allowed=false`. `target/release-gates/current-latest-golden-corpus.json` reports `fixture_case_count=94`, `p0_total=94`, `p1_total=2367`, `p2_total=1417`, and `blocker_count=25`. `target/release-gates/current-latest-quality.json` reports `status=ready-with-blockers`, `local_current_latest_ready=false`, and `blocker_count=6`. `target/release-gates/release-candidate.json` keeps `publication_ready=credential-blocked`.
+- **Remaining boundaries**：Phase 38 only resolves target drift and same-ref parsing. It does not supply external provider/account evidence, legal/brand authorization, publication credentials, or a provable zero-bug guarantee.
