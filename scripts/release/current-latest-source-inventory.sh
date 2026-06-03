@@ -240,7 +240,7 @@ function currentLatestProviderExternalReason(id, file) {
 function isEvalRuntime(file) {
   return (
     isTsOrJs(file) &&
-    (['src/evaluate.ts', 'src/evaluator.ts', 'src/evaluatorHelpers.ts', 'src/testCase.ts'].includes(file) ||
+    (['src/evaluate.ts', 'src/evaluator.ts', 'src/evaluator/runtime.ts', 'src/evaluatorHelpers.ts', 'src/testCase.ts'].includes(file) ||
       file.startsWith('src/scheduler/') ||
       file.startsWith('src/testCase/') ||
       file.startsWith('src/optimizer/'))
@@ -301,6 +301,8 @@ function currentLatestEvalRunnerBlockerReason(id, file) {
   let reason;
   if (lower.includes('adaptiveconcurrency')) {
     reason = 'adaptive concurrency requires dedicated current-latest scheduler fixture evidence';
+  } else if (lower.includes('runtime')) {
+    reason = 'evaluator runtime requires dedicated current-latest eval-runner runtime fixture evidence';
   } else if (lower.includes('headerparser')) {
     reason = 'provider rate-limit header parsing requires dedicated current-latest eval-runner evidence';
   } else if (lower.includes('providercallexecutioncontext')) {

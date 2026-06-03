@@ -2222,7 +2222,11 @@ fn is_eval_runtime_file(file: &str) -> bool {
     is_ts_or_js_file(file)
         && (matches!(
             file,
-            "src/evaluate.ts" | "src/evaluator.ts" | "src/evaluatorHelpers.ts" | "src/testCase.ts"
+            "src/evaluate.ts"
+                | "src/evaluator.ts"
+                | "src/evaluator/runtime.ts"
+                | "src/evaluatorHelpers.ts"
+                | "src/testCase.ts"
         ) || file.starts_with("src/scheduler/")
             || file.starts_with("src/testCase/")
             || file.starts_with("src/optimizer/"))
@@ -2276,6 +2280,8 @@ fn current_latest_eval_runner_blocker_reason(stable_id: &str, file: &str) -> Str
     let lower = stable_id.to_ascii_lowercase();
     let reason = if lower.contains("adaptiveconcurrency") {
         "adaptive concurrency requires dedicated current-latest scheduler fixture evidence"
+    } else if lower.contains("runtime") {
+        "evaluator runtime requires dedicated current-latest eval-runner runtime fixture evidence"
     } else if lower.contains("headerparser") {
         "provider rate-limit header parsing requires dedicated current-latest eval-runner evidence"
     } else if lower.contains("providercallexecutioncontext") {
