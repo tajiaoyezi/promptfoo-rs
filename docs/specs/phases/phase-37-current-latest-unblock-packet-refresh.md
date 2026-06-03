@@ -1,6 +1,6 @@
 # Phase 37: current-latest-unblock-packet-refresh
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -28,11 +28,11 @@ Depends on Phase 24 current-latest quality gate, Phase 36 Ruby bridge burndown, 
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `perfect-refactor-unblock-packet.json` declares a current-latest target scope and records `current_latest_golden_blocker_count=23` under the tracked Phase 36 evidence.
-- [ ] Every current-latest golden blocker appears as a non-auto-resolvable decision item sourced from current-latest artifacts, including config and provider external-authority rows.
-- [ ] Current-target and publication authority decisions remain explicit and fail-closed; local dry-run or fixture evidence cannot mark them ready.
-- [ ] Runtime smoke exposes the refreshed packet without changing `perfect_refactor_claim_allowed=false`.
-- [ ] The packet no longer lets older frozen/source-accounting counts obscure the current-latest remaining work.
+- [x] `perfect-refactor-unblock-packet.json` declares a current-latest target scope and records `current_latest_golden_blocker_count=23` under the tracked Phase 36 evidence.
+- [x] Every current-latest golden blocker appears as a non-auto-resolvable decision item sourced from current-latest artifacts, including config and provider external-authority rows.
+- [x] Current-target and publication authority decisions remain explicit and fail-closed; local dry-run or fixture evidence cannot mark them ready.
+- [x] Runtime smoke exposes the refreshed packet without changing `perfect_refactor_claim_allowed=false`.
+- [x] The packet no longer lets older frozen/source-accounting counts obscure the current-latest remaining work.
 
 ## 7. Phase Risks
 
@@ -46,7 +46,7 @@ Task 37.1 spec is Done, phase §6 smoke passes with `s2v_verify_full "install li
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **保留边界**：<TBD-after-impl>
+- **完成日期**：2026-06-03
+- **Phase smoke**：PASS - `s2v_preflight_phase "docs/specs/phases/phase-37-current-latest-unblock-packet-refresh.md"` 通过；`s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"` 完整通过。第一次 phase smoke 在 15 分钟工具超时处留下 `real-upstream-corpus` 子进程；已按 systematic-debugging 查明为 upstream corpus 子进程卡住而非 packet gate 失败，清理本次验证进程树后用更长 timeout 复跑通过。
+- **Artifact evidence**：`perfect-refactor-unblock-packet.target_scope=current-latest`、`status=blocked`、`perfect_refactor_claim_allowed=false`、`current_latest_golden_blocker_count=23`、`current_latest_external_authority_blocker_count=23`、`current_latest_required_decision_count=30`，分组为 `config=7, provider=16, current-latest target=1, publication=6`；`current-latest-quality.status=ready-with-blockers`、`local_current_latest_ready=false`、`perfect_refactor_claim_allowed=false`、quality blockers=4；`release-candidate.perfect_refactor_unblock_packet.required_user_decision_count=30`。
+- **保留边界**：Phase 37 只刷新 current-latest blocker handoff artifact；config/provider external authority、current-target、publication authority、真实凭据/账号/私有服务、法律/品牌确认、公开发布 URL/digest 和不可证明的“无潜在 bug”声明仍保持阻塞。
