@@ -21,8 +21,7 @@ fn test_37_1_1_packet_records_current_latest_scope_and_counts() {
         "{packet:#}"
     );
     assert_eq!(
-        packet["current_latest_required_decision_count"],
-        packet["required_user_decision_count"],
+        packet["current_latest_required_decision_count"], packet["required_user_decision_count"],
         "{packet:#}"
     );
     assert_eq!(
@@ -92,8 +91,14 @@ fn test_37_1_3_current_target_and_publication_decisions_require_external_evidenc
     let decisions = decision_items(&packet);
 
     let current_target = find_decision(decisions, "current-latest:target");
-    assert_eq!(current_target["category"], "current-target", "{current_target:#}");
-    assert_eq!(current_target["auto_resolvable"], false, "{current_target:#}");
+    assert_eq!(
+        current_target["category"], "current-target",
+        "{current_target:#}"
+    );
+    assert_eq!(
+        current_target["auto_resolvable"], false,
+        "{current_target:#}"
+    );
     assert!(
         current_target["source_artifact"]
             .as_str()
@@ -115,14 +120,19 @@ fn test_37_1_3_current_target_and_publication_decisions_require_external_evidenc
             publication["category"], "publication-authority",
             "{publication:#}"
         );
-        let required_evidence = publication["required_evidence"].as_str().unwrap_or_default();
+        let required_evidence = publication["required_evidence"]
+            .as_str()
+            .unwrap_or_default();
         assert!(
             required_evidence.contains("credentials")
                 && required_evidence.contains("legal/brand approval")
                 && required_evidence.contains("external URL/digest"),
             "{publication:#}"
         );
-        assert!(!required_evidence.contains("dry-run is enough"), "{publication:#}");
+        assert!(
+            !required_evidence.contains("dry-run is enough"),
+            "{publication:#}"
+        );
         assert_eq!(publication["auto_resolvable"], false, "{publication:#}");
     }
 
@@ -136,7 +146,10 @@ fn test_37_1_4_packet_remains_blocked_and_not_auto_resolvable() {
     let packet = run_packet(&gate_dir);
 
     assert_eq!(packet["status"], "blocked", "{packet:#}");
-    assert_eq!(packet["perfect_refactor_claim_allowed"], false, "{packet:#}");
+    assert_eq!(
+        packet["perfect_refactor_claim_allowed"], false,
+        "{packet:#}"
+    );
     assert_eq!(packet["auto_resolvable"], false, "{packet:#}");
     assert!(
         decision_items(&packet)
