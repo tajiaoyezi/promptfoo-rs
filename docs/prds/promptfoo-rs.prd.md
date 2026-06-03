@@ -336,6 +336,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Task 38.1 完成后，tracked current-latest target lock 已刷新为 `promptfoo@0.121.14`，Rust 与 shell target-lock parser 均支持 npm tag 与 GitHub latest release 共享 `refs/tags/0.121.14` 的合法情况。runtime smoke 继续保持 fail-closed：current-latest golden corpus `blocker_count=25`、quality `blocker_count=6`、release candidate `publication_ready=credential-blocked`，因此 `perfect_refactor_claim_allowed=false` 仍是正确状态。
 >
 > Phase 39 针对 Phase 38 runtime-smoke 暴露的一个本地 taxonomy regression：`src/evaluator/runtime.ts` 在 `0.121.14` target 下变为 `unclassified:src-evaluator-runtime`。依据 Phase 25 / Phase 29，agent 可保守地将其归入 eval-runner P0 blocker，但必须保留 dedicated fixture 要求，不能把 unknown cleanup 等同于 eval runtime native parity。
+>
+> Task 39.1 完成后，current-latest source inventory 与 matrix 在 `0.121.14` target 下均为 `status=ready` 且 `unclassified_rows=[]`。`src/evaluator/runtime.ts` 被记录为 `eval-runner:src-evaluator-runtime`、P0 blocked、`evidence_kind=blocker`；quality gate 因此从 6 个 blockers 降到 4 个 blockers，但 `perfect_refactor_claim_allowed=false` 仍正确。
 
 ---
 

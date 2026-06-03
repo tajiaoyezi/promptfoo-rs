@@ -1,6 +1,6 @@
 # Task 39.1: current-latest-evaluator-runtime-classification
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 39 - current-latest-evaluator-runtime-classification
@@ -71,19 +71,19 @@ The current-latest source inventory extractor must treat `src/evaluator/runtime.
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (Phase 25 taxonomy): Rust extractor classifies `src/evaluator/runtime.ts` as `category=eval-runner` with stable id `eval-runner:src-evaluator-runtime`, not `unclassified:src-evaluator-runtime`.
-- [ ] **AC2** (ADR-009 / task 29.1): the evaluator runtime row remains P0 blocked eval-runner evidence with owner `eval-runner`, `evidence_kind=blocker`, and a blocker reason requiring dedicated current-latest eval-runner runtime fixture evidence.
-- [ ] **AC3** (ADR-011): shell source-inventory extraction emits the same evaluator runtime classification as Rust and writes source inventory / matrix artifacts with `unclassified_rows=[]` for this fixture.
-- [ ] **AC4** (task 38.1): runtime-smoke artifacts for the Phase 38 target no longer report `unclassified:src-evaluator-runtime` in source inventory or matrix, while `perfect_refactor_claim_allowed=false` remains.
+- [x] **AC1** (Phase 25 taxonomy): Rust extractor classifies `src/evaluator/runtime.ts` as `category=eval-runner` with stable id `eval-runner:src-evaluator-runtime`, not `unclassified:src-evaluator-runtime`.
+- [x] **AC2** (ADR-009 / task 29.1): the evaluator runtime row remains P0 blocked eval-runner evidence with owner `eval-runner`, `evidence_kind=blocker`, and a blocker reason requiring dedicated current-latest eval-runner runtime fixture evidence.
+- [x] **AC3** (ADR-011): shell source-inventory extraction emits the same evaluator runtime classification as Rust and writes source inventory / matrix artifacts with `unclassified_rows=[]` for this fixture.
+- [x] **AC4** (task 38.1): runtime-smoke artifacts for the Phase 38 target no longer report `unclassified:src-evaluator-runtime` in source inventory or matrix, while `perfect_refactor_claim_allowed=false` remains.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-39.1.1 | TEST-39.1.1 | tests/current_latest_evaluator_runtime_classification.rs | install, lint, typecheck, unit-test, build | Spec Ready |
-| AC2 | SCEN-39.1.1 | TEST-39.1.2 | tests/current_latest_evaluator_runtime_classification.rs | install, typecheck, unit-test, coverage, build | Spec Ready |
-| AC3 | SCEN-39.1.1 | TEST-39.1.3 | tests/current_latest_evaluator_runtime_classification.rs | install, lint, typecheck, unit-test, integration, build | Spec Ready |
-| AC4 | SCEN-39.1.1 | TEST-39.1.4 | tests/current_latest_evaluator_runtime_classification.rs | install, lint, typecheck, unit-test, e2e, runtime-smoke, build | Spec Ready |
+| AC1 | SCEN-39.1.1 | TEST-39.1.1 | tests/current_latest_evaluator_runtime_classification.rs | install, lint, typecheck, unit-test, build | Done |
+| AC2 | SCEN-39.1.1 | TEST-39.1.2 | tests/current_latest_evaluator_runtime_classification.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-39.1.1 | TEST-39.1.3 | tests/current_latest_evaluator_runtime_classification.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC4 | SCEN-39.1.1 | TEST-39.1.4 | tests/current_latest_evaluator_runtime_classification.rs | install, lint, typecheck, unit-test, e2e, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -105,9 +105,35 @@ The current-latest source inventory extractor must treat `src/evaluator/runtime.
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-03
+- **改动文件**：
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-39-current-latest-evaluator-runtime-classification.md`
+  - `docs/specs/tasks/task-39.1-current-latest-evaluator-runtime-classification.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_evaluator_runtime_classification.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+  - `docs/compatibility/matrix.md`
+- **commit 列表**：
+  - `c73fc8b docs(spec): add evaluator runtime classification task`
+  - `23698e7 test(eval-runner): add evaluator runtime classification RED tests`
+  - `95fff66 feat(eval-runner): classify current latest evaluator runtime source`
+  - `<this docs commit> docs(spec): complete task 39.1 evaluator runtime classification`
+- **§9 Verification 结果**：
+  - install: PASS - adapter §Commands Install passed inside `s2v_verify_full`.
+  - lint: PASS - adapter §Commands Lint passed inside `s2v_verify_full`.
+  - typecheck: PASS - adapter §Commands Typecheck passed inside `s2v_verify_full`.
+  - unit-test: PASS - adapter §Commands Unit Test passed; `TEST-39.1.1` through `TEST-39.1.4` pass in `tests/current_latest_evaluator_runtime_classification.rs`.
+  - integration: PASS - adapter §Commands Integration tests passed inside `s2v_verify_full`.
+  - e2e: PASS - adapter §Commands E2E tests passed inside `s2v_verify_full`.
+  - coverage: PASS - adapter §Commands Coverage passed inside `s2v_verify_full`; `s2v_coverage_threshold_guard` returned PASS.
+  - build: PASS - adapter §Commands Build passed inside `s2v_verify_full`.
+  - runtime-smoke: PASS - adapter §Commands Runtime smoke regenerated release gates with `current-latest-source-inventory.status=ready`, `inventory_unclassified_count=0`, `current-latest-matrix.status=ready`, `matrix_unclassified_count=0`, evaluator runtime row `eval-runner:src-evaluator-runtime` / `implementation_status=blocked` / `verification_owner=eval-runner` / `evidence_kind=blocker`, current-latest golden `blocker_count=25`, quality `blocker_count=4`, `local_current_latest_ready=false`, release candidate `publication_ready=credential-blocked`, `perfect_refactor_claim_allowed=false`, and unblock packet `required_user_decision_count=32`.
+- **剩余风险 / 未做项**：
+  - `src/evaluator/runtime.ts` 仍是 P0 eval-runner blocker；本 task 只消除了 unknown taxonomy，未提供 dedicated runtime fixture 或 native parity 证明。
+  - current-latest golden corpus 仍有 `blocker_count=25`，quality 仍有 `blocker_count=4`，publication 仍 `credential-blocked`，外部 authority / publication / zero-bug claim 边界仍未解除。
+- **下游 task 影响**：
+  - 后续 task 可直接面向 `eval-runner:src-evaluator-runtime` 设计专用 runtime fixture，或继续处理 current-latest golden blockers / external authority / publication authority。
+  - current-latest source inventory 与 matrix 已不再因 unknown taxonomy 阻塞；后续不能再把 `src/evaluator/runtime.ts` 当作 unclassified cleanup，而应视为明确 P0 eval-runner parity work。

@@ -1,6 +1,6 @@
 # Phase 39: current-latest-evaluator-runtime-classification
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ After the target moved to `promptfoo@0.121.14`, release gates again report sourc
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 39.1 | current-latest-evaluator-runtime-classification | ../tasks/task-39.1-current-latest-evaluator-runtime-classification.md | Ready | 将 `src/evaluator/runtime.ts` 从 unknown taxonomy 转成明确 eval-runner P0 blocker |
+| 39.1 | current-latest-evaluator-runtime-classification | ../tasks/task-39.1-current-latest-evaluator-runtime-classification.md | Done | 将 `src/evaluator/runtime.ts` 从 unknown taxonomy 转成明确 eval-runner P0 blocker |
 
 ## 5. Dependencies
 
@@ -28,10 +28,10 @@ Depends on Phase 25 current-latest source taxonomy, Phase 29 eval-runner evidenc
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `current-latest-source-inventory.json` and `current-latest-matrix.json` no longer contain `unclassified:src-evaluator-runtime`.
-- [ ] `src/evaluator/runtime.ts` is classified as `eval-runner` with stable id `eval-runner:src-evaluator-runtime`.
-- [ ] The evaluator runtime row remains `level=P0`, `implementation_status=blocked`, `evidence_kind=blocker`, and `verification_owner=eval-runner` until dedicated runtime fixture evidence exists.
-- [ ] Runtime smoke and quality gates keep `perfect_refactor_claim_allowed=false`; this phase removes an unknown taxonomy blocker, not an eval-runtime parity gap.
+- [x] `current-latest-source-inventory.json` and `current-latest-matrix.json` no longer contain `unclassified:src-evaluator-runtime`.
+- [x] `src/evaluator/runtime.ts` is classified as `eval-runner` with stable id `eval-runner:src-evaluator-runtime`.
+- [x] The evaluator runtime row remains `level=P0`, `implementation_status=blocked`, `evidence_kind=blocker`, and `verification_owner=eval-runner` until dedicated runtime fixture evidence exists.
+- [x] Runtime smoke and quality gates keep `perfect_refactor_claim_allowed=false`; this phase removes an unknown taxonomy blocker, not an eval-runtime parity gap.
 
 ## 7. Phase Risks
 
@@ -42,3 +42,10 @@ Depends on Phase 25 current-latest source taxonomy, Phase 29 eval-runner evidenc
 ## 8. Definition of Done
 
 Task 39.1 spec is Done, phase §6 smoke passes with the task §9 verification plan, current-latest source inventory and matrix have zero unclassified rows for the Phase 38 target, and the repository is clean and pushed.
+
+## 9. Phase Completion Notes
+
+- **完成日期**：2026-06-03
+- **Phase smoke**：PASS - task 39.1 full §9 verification passed with install, lint, typecheck, unit-test, integration, e2e, coverage, build, runtime-smoke, plus `s2v_coverage_threshold_guard`. `s2v_preflight_phase "docs/specs/phases/phase-39-current-latest-evaluator-runtime-classification.md"` passed after this completion update.
+- **Artifact evidence**：runtime smoke regenerated `target/release-gates/current-latest-source-inventory.json` with `status=ready`, `unclassified_rows=[]`, and evaluator runtime row `eval-runner:src-evaluator-runtime`. `target/release-gates/current-latest-matrix.json` also reports `status=ready` and `unclassified_rows=[]`. `target/release-gates/current-latest-quality.json` reports `blocker_count=4`, `local_current_latest_ready=false`, and `perfect_refactor_claim_allowed=false`. `target/release-gates/release-candidate.json` keeps `publication_ready=credential-blocked`.
+- **Remaining boundaries**：Phase 39 converts an unknown taxonomy row into an explicit P0 eval-runner blocker. Dedicated evaluator runtime fixtures, external authority evidence, publication credentials, and provable zero-bug guarantees remain outside this phase.
