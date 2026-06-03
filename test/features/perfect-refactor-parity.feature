@@ -50,6 +50,7 @@
 #   - docs/specs/tasks/task-35.1-current-latest-script-prompt-python-bridge-burndown.md
 #   - docs/specs/tasks/task-36.1-current-latest-ruby-bridge-burndown.md
 #   - docs/specs/tasks/task-37.1-current-latest-unblock-packet-refresh.md
+#   - docs/specs/tasks/task-38.1-current-latest-0.121.14-target-refresh.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -369,3 +370,12 @@ Feature: perfect refactor parity
     And TEST-37.1.3 proves current-target and publication decisions still require real external evidence
     And TEST-37.1.4 proves perfect-refactor completion remains false and blocked
     And TEST-37.1.5 proves packet counts reconcile with Phase 36 evidence without script-bridge blockers
+
+  # Maps to: docs/specs/tasks/task-38.1-current-latest-0.121.14-target-refresh.md
+  Scenario: SCEN-38.1.1 - current latest target refresh accepts npm and release same ref
+    Given upstream promptfoo current latest is observed as npm package 0.121.14
+    When the current-latest target lock is refreshed
+    Then TEST-38.1.1 proves the same refs/tags/0.121.14 row fills both npm tag and latest release commits
+    And TEST-38.1.2 proves tracked lock artifacts record npm 0.121.14 and GitHub HEAD 4d22e57f5f9b4c7cdde494f00558d9afde8b4975
+    And TEST-38.1.3 proves runtime smoke remains fail-closed for perfect-refactor completion
+    And TEST-38.1.4 proves the unblock packet keeps external-authority current-target and publication decisions visible
