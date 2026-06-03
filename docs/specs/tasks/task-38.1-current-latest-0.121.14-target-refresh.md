@@ -19,6 +19,7 @@ Refresh the current-latest target lock to the observed `promptfoo@0.121.14` pack
 ### In Scope
 
 - `scripts/release/current-latest-target-lock.sh`
+- `scripts/release/runtime-smoke.sh`
 - `src/compatibility/inventory.rs`
 - `compatibility/inventory/current-latest-target.json`
 - `docs/compatibility/current-latest.lock.md`
@@ -75,6 +76,7 @@ Refresh the current-latest target lock to the observed `promptfoo@0.121.14` pack
 - [ ] **AC2** (PRD §Current Latest Rebaseline Addendum): tracked current-latest lock artifacts record `promptfoo@0.121.14`, npm gitHead `7a48c5fce614bee617efbb3b7fc93d404c75b628`, GitHub HEAD `4d22e57f5f9b4c7cdde494f00558d9afde8b4975`, latest release `refs/tags/0.121.14`, tarball, integrity, source commands, and observation timestamp.
 - [ ] **AC3** (ADR-007 / ADR-009): runtime smoke and downstream release-gate artifacts remain fail-closed with `current_latest_claim_allowed=false` and `perfect_refactor_claim_allowed=false` after target refresh.
 - [ ] **AC4** (task 37.1): perfect-refactor unblock packet continues to expose current-target, external-authority, and publication decisions instead of using stale `0.121.13` target evidence as the current-latest authority.
+- [ ] **AC5** (PRD §Current Latest Rebaseline Addendum): runtime smoke prefers the tracked current-latest lock over a stale ignored `target/release-gates/current-latest-target.json` copy when preparing deterministic distribution fixtures.
 
 ## 7. SDD / BDD / TDD Traceability
 
@@ -84,6 +86,7 @@ Refresh the current-latest target lock to the observed `promptfoo@0.121.14` pack
 | AC2 | SCEN-38.1.1 | TEST-38.1.2 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, integration, build | Spec Ready |
 | AC3 | SCEN-38.1.1 | TEST-38.1.3 | tests/current_latest_target_drift_refresh.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Spec Ready |
 | AC4 | SCEN-38.1.1 | TEST-38.1.4 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, coverage, runtime-smoke, build | Spec Ready |
+| AC5 | SCEN-38.1.1 | TEST-38.1.5 | tests/current_latest_target_drift_refresh.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Spec Ready |
 
 ## 8. Risks
 

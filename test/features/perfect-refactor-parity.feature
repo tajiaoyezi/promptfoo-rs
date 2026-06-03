@@ -379,3 +379,4 @@ Feature: perfect refactor parity
     And TEST-38.1.2 proves tracked lock artifacts record npm 0.121.14 and GitHub HEAD 4d22e57f5f9b4c7cdde494f00558d9afde8b4975
     And TEST-38.1.3 proves runtime smoke remains fail-closed for perfect-refactor completion
     And TEST-38.1.4 proves the unblock packet keeps external-authority current-target and publication decisions visible
+    And TEST-38.1.5 proves runtime smoke uses the tracked lock before any stale generated gate copy

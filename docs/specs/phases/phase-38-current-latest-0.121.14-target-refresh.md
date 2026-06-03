@@ -14,7 +14,7 @@ The repository currently has complete S2V task history for the earlier current-l
 
 ## 3. Scope / Modules
 
-`scripts/release/current-latest-target-lock.sh`, `src/compatibility/inventory.rs`, `compatibility/inventory/current-latest-target.json`, `docs/compatibility/current-latest.lock.md`, `tests/current_latest_target_drift_refresh.rs`, `docs/compatibility/matrix.md`, `docs/prds/promptfoo-rs.prd.md`, `docs/s2v-adapter.md`, and `test/features/perfect-refactor-parity.feature`.
+`scripts/release/current-latest-target-lock.sh`, `scripts/release/runtime-smoke.sh`, `src/compatibility/inventory.rs`, `compatibility/inventory/current-latest-target.json`, `docs/compatibility/current-latest.lock.md`, `tests/current_latest_target_drift_refresh.rs`, `docs/compatibility/matrix.md`, `docs/prds/promptfoo-rs.prd.md`, `docs/s2v-adapter.md`, and `test/features/perfect-refactor-parity.feature`.
 
 ## 4. Task List
 

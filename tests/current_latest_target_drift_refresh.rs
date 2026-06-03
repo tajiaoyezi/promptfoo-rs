@@ -169,6 +169,23 @@ fn test_38_1_4_refreshed_target_keeps_perfect_refactor_decisions_blocked() {
     );
 }
 
+#[test]
+fn test_38_1_5_runtime_smoke_prefers_tracked_lock_over_stale_gate_copy() {
+    /* TEST-38.1.5 */
+    let script = std::fs::read_to_string("scripts/release/runtime-smoke.sh")
+        .expect("runtime smoke script should be readable");
+    let tracked_lock = script
+        .find("lock_file=\"compatibility/inventory/current-latest-target.json\"")
+        .expect("runtime smoke should read tracked current-latest lock");
+    let stale_gate_fallback = script
+        .find("lock_file=\"$GATE_DIR/current-latest-target.json\"")
+        .expect("runtime smoke should keep generated gate as a fallback");
+    assert!(
+        tracked_lock < stale_gate_fallback,
+        "runtime smoke must prefer tracked lock over stale generated gate copy:\n{script}"
+    );
+}
+
 fn tracked_lock() -> Value {
     serde_json::from_str(
         &std::fs::read_to_string("compatibility/inventory/current-latest-target.json")
