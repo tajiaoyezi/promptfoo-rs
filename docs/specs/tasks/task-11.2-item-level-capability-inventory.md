@@ -59,9 +59,9 @@
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Compatibility Matrix): inventory 覆盖 upstream commands/flags/providers/assertions/redteam/outputs/config/API/viewer/release surfaces。
-- [ ] **AC2** (PRD §Success Metrics): 每个 item 有 stable id、source reference、category、level hint、status、owner hint。
-- [ ] **AC3** (docs/audits/upstream inventory): extractor 输出 unresolved bucket，且 unresolved item 不允许被 release gate 忽略。
+- [x] **AC1** (PRD §Compatibility Matrix): inventory 覆盖 upstream commands/flags/providers/assertions/redteam/outputs/config/API/viewer/release surfaces。
+- [x] **AC2** (PRD §Success Metrics): 每个 item 有 stable id、source reference、category、level hint、status、owner hint。
+- [x] **AC3** (docs/audits/upstream inventory): extractor 输出 unresolved bucket，且 unresolved item 不允许被 release gate 忽略。
 
 ## 7. SDD / BDD / TDD Traceability
 

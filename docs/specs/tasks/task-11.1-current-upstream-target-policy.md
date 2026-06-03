@@ -60,9 +60,9 @@ Stable release target 必须是 frozen target 或 explicitly rebaselined target�
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Upstream Baseline Freeze Strategy / ADR-007): stable release policy 明确 frozen target 与 moving upstream tracking 的差异。
-- [ ] **AC2** (PRD §Compatibility Matrix): policy validator 拒绝 `latest`、`main`、`HEAD` 或同时存在多个 stable targets 的配置。
-- [ ] **AC3** (docs/audits/final): moving upstream observation 记录 head、package version、采集时间和来源，不修改 frozen baseline。
+- [x] **AC1** (PRD §Upstream Baseline Freeze Strategy / ADR-007): stable release policy 明确 frozen target 与 moving upstream tracking 的差异。
+- [x] **AC2** (PRD §Compatibility Matrix): policy validator 拒绝 `latest`、`main`、`HEAD` 或同时存在多个 stable targets 的配置。
+- [x] **AC3** (docs/audits/final): moving upstream observation 记录 head、package version、采集时间和来源，不修改 frozen baseline。
 
 ## 7. SDD / BDD / TDD Traceability
 

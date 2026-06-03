@@ -63,9 +63,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): cargo workspace 能承载 core/cli 代码并通过 cargo check
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): CLI 暴露 eval/view/cache/redteam/mcp/code-scans/scan-model/import/export skeleton
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 未知命令和无效 flag 按稳定 stderr/exit code 返回
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): cargo workspace 能承载 core/cli 代码并通过 cargo check
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): CLI 暴露 eval/view/cache/redteam/mcp/code-scans/scan-model/import/export skeleton
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 未知命令和无效 flag 按稳定 stderr/exit code 返回
 
 ## 7. SDD / BDD / TDD Traceability
 

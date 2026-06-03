@@ -30,9 +30,9 @@ docs/compatibility/、compatibility/inventory/、src/compatibility/、tests/comp
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] Phase 11 所有 task spec 状态为 Done，adapter Phase/Task 索引与文件一致。
-- [ ] frozen baseline 与 moving upstream 的声明边界写入 compatibility docs，且 stable release 只引用一个明确目标。
-- [ ] item-level inventory 和 expanded matrix 能覆盖 upstream CLI/provider/assertion/redteam/output/config/API/release surface，并能报告遗漏数。
+- [x] Phase 11 所有 task spec 状态为 Done，adapter Phase/Task 索引与文件一致。
+- [x] frozen baseline 与 moving upstream 的声明边界写入 compatibility docs，且 stable release 只引用一个明确目标。
+- [x] item-level inventory 和 expanded matrix 能覆盖 upstream CLI/provider/assertion/redteam/output/config/API/release surface，并能报告遗漏数。
 
 ## 7. Phase Risks
 

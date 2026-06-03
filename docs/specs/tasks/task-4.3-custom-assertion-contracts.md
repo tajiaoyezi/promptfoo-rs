@@ -63,9 +63,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): JS/Python/Shell custom contract 在矩阵中标 P0/P1 与 bridge 状态
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 未启用 allow-scripts 时返回稳定拒绝错误
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): custom assertion 输入输出 schema 有 snapshot
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): JS/Python/Shell custom contract 在矩阵中标 P0/P1 与 bridge 状态
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 未启用 allow-scripts 时返回稳定拒绝错误
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): custom assertion 输入输出 schema 有 snapshot
 
 ## 7. SDD / BDD / TDD Traceability
 

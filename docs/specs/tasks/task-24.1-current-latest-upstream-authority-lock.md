@@ -71,19 +71,19 @@ The new lock command must fetch or read fixture inputs for npm latest metadata, 
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-011): JSON and Markdown lock artifacts record npm latest package, GitHub default branch HEAD, and GitHub latest release channel with full SHAs and acquisition commands.
-- [ ] **AC2** (ADR-007): raw floating refs such as `latest`, `main`, `master`, and `HEAD` are never accepted as proof of current-latest completion without the observed full SHA packet.
-- [ ] **AC3** (ADR-009): non-core GitHub release channel remains classified separately from npm latest stable package and cannot set `perfect_refactor_claim_allowed=true`.
-- [ ] **AC4** (task-22.1): unblock packet decision `current-upstream:rebaseline` is replaced or narrowed to downstream current-latest inventory/golden/publication/external evidence requirements, not left as an ambiguous target-selection blocker.
+- [x] **AC1** (ADR-011): JSON and Markdown lock artifacts record npm latest package, GitHub default branch HEAD, and GitHub latest release channel with full SHAs and acquisition commands.
+- [x] **AC2** (ADR-007): raw floating refs such as `latest`, `main`, `master`, and `HEAD` are never accepted as proof of current-latest completion without the observed full SHA packet.
+- [x] **AC3** (ADR-009): non-core GitHub release channel remains classified separately from npm latest stable package and cannot set `perfect_refactor_claim_allowed=true`.
+- [x] **AC4** (task-22.1): unblock packet decision `current-upstream:rebaseline` is replaced or narrowed to downstream current-latest inventory/golden/publication/external evidence requirements, not left as an ambiguous target-selection blocker.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-24.1.1 | TEST-24.1.1 | tests/current_latest_target_lock.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-24.1.1 | TEST-24.1.2 | tests/current_latest_target_lock.rs | install, lint, typecheck, unit-test, coverage, build | Not Started |
-| AC3 | SCEN-24.1.1 | TEST-24.1.3 | tests/current_latest_target_lock.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Not Started |
-| AC4 | SCEN-24.1.1 | TEST-24.1.4 | tests/current_latest_target_lock.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Not Started |
+| AC1 | SCEN-24.1.1 | TEST-24.1.1 | tests/current_latest_target_lock.rs | install, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-24.1.1 | TEST-24.1.2 | tests/current_latest_target_lock.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC3 | SCEN-24.1.1 | TEST-24.1.3 | tests/current_latest_target_lock.rs | install, typecheck, unit-test, e2e, runtime-smoke, build | Done |
+| AC4 | SCEN-24.1.1 | TEST-24.1.4 | tests/current_latest_target_lock.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 

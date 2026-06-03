@@ -63,9 +63,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): equals/contains/regex/json/schema 等 deterministic assertions 有 golden diff
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): model-graded assertion 比较 prompt construction、threshold、score parsing 和 metadata schema
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): assertion aggregation 输出稳定 pass/fail/error shape
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): equals/contains/regex/json/schema 等 deterministic assertions 有 golden diff
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): model-graded assertion 比较 prompt construction、threshold、score parsing 和 metadata schema
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): assertion aggregation 输出稳定 pass/fail/error shape
 
 ## 7. SDD / BDD / TDD Traceability
 

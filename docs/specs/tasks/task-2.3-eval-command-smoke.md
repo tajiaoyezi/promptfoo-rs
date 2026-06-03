@@ -62,9 +62,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): eval -c promptfooconfig.yaml 能完成空/最小 eval smoke
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): runner 输出结构化 result envelope
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 失败配置返回可定位错误和非零 exit code
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): eval -c promptfooconfig.yaml 能完成空/最小 eval smoke
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): runner 输出结构化 result envelope
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 失败配置返回可定位错误和非零 exit code
 
 ## 7. SDD / BDD / TDD Traceability
 

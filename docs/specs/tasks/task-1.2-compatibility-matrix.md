@@ -64,9 +64,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): 矩阵覆盖 CLI、config、provider、assertion、redteam、MCP、scan、output、Node API、cloud/share 边界
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 每项能力都有 P0/P1/P2、native/bridge/unsupported/later、验证方式和 owner 字段
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): P2 known gap 不允许空 reason
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): 矩阵覆盖 CLI、config、provider、assertion、redteam、MCP、scan、output、Node API、cloud/share 边界
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 每项能力都有 P0/P1/P2、native/bridge/unsupported/later、验证方式和 owner 字段
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): P2 known gap 不允许空 reason
 
 ## 7. SDD / BDD / TDD Traceability
 

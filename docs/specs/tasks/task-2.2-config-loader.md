@@ -62,9 +62,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): 配置 loader 能输出归一化 config model
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 路径、env、vars、prompts、tests 解析有 Windows/Linux fixture
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 解析差异能记录到 compatibility report
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): 配置 loader 能输出归一化 config model
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 路径、env、vars、prompts、tests 解析有 Windows/Linux fixture
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 解析差异能记录到 compatibility report
 
 ## 7. SDD / BDD / TDD Traceability
 

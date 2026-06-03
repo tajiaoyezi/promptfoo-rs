@@ -62,9 +62,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): max-concurrency 能限制并发 provider 调用
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): delay 和 cancellation 有 deterministic tests
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): partial failure 保留已完成结果并继续按配置收敛
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): max-concurrency 能限制并发 provider 调用
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): delay 和 cancellation 有 deterministic tests
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): partial failure 保留已完成结果并继续按配置收敛
 
 ## 7. SDD / BDD / TDD Traceability
 

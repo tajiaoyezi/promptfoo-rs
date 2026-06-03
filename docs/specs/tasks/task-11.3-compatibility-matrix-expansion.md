@@ -58,9 +58,9 @@ matrix completeness validator 必须在 inventory item 无 matrix row、P2 无 r
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Success Metrics): 100% inventory items have matrix rows with level/status/verification/owner.
-- [ ] **AC2** (ADR-009): P0 rows require fixture or blocker reference; P1 rows require snapshot plan; P2 rows require reason and later/unsupported target.
-- [ ] **AC3** (docs/audits/requirements traceability): validator fails when aggregate rows hide item-level omissions.
+- [x] **AC1** (PRD §Success Metrics): 100% inventory items have matrix rows with level/status/verification/owner.
+- [x] **AC2** (ADR-009): P0 rows require fixture or blocker reference; P1 rows require snapshot plan; P2 rows require reason and later/unsupported target.
+- [x] **AC3** (docs/audits/requirements traceability): validator fails when aggregate rows hide item-level omissions.
 
 ## 7. SDD / BDD / TDD Traceability
 

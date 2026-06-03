@@ -63,9 +63,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): cache key fixture 覆盖 provider/config/test case 输入
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): resume 能从 partial JSONL/SQLite 状态继续
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): retry-errors 和 backoff 失败路径有可复现 tests
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): cache key fixture 覆盖 provider/config/test case 输入
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): resume 能从 partial JSONL/SQLite 状态继续
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): retry-errors 和 backoff 失败路径有可复现 tests
 
 ## 7. SDD / BDD / TDD Traceability
 

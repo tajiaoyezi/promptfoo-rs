@@ -64,9 +64,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): baseline lock 记录 promptfoo 0.121.13、commit 4860e99、npm artifact、container artifact 与采集命令
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 缺失任一 artifact 校验时 release gate 标为 blocked
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): baseline 文件禁止引用 latest 或浮动 tag
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): baseline lock 记录 promptfoo 0.121.13、commit 4860e99、npm artifact、container artifact 与采集命令
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): 缺失任一 artifact 校验时 release gate 标为 blocked
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): baseline 文件禁止引用 latest 或浮动 tag
 
 ## 7. SDD / BDD / TDD Traceability
 

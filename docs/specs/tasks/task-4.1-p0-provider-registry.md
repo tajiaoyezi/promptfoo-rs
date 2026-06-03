@@ -63,9 +63,9 @@ PRD 要求 promptfoo-rs 在 promptfoo 0.121.13 baseline 下建立 Rust-native co
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): 四类 P0 provider 均有 request/response snapshot
-- [ ] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): provider-scoped env/header/model/options 被归一化
-- [ ] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 网络调用通过 mock server 验证，不依赖真实模型
+- [x] **AC1** (PRD §Implementation Phases / §Compatibility Matrix): 四类 P0 provider 均有 request/response snapshot
+- [x] **AC2** (PRD §Implementation Phases / §Compatibility Matrix): provider-scoped env/header/model/options 被归一化
+- [x] **AC3** (PRD §Implementation Phases / §Compatibility Matrix): 网络调用通过 mock server 验证，不依赖真实模型
 
 ## 7. SDD / BDD / TDD Traceability
 
