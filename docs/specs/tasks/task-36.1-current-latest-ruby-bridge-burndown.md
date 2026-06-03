@@ -1,6 +1,6 @@
 # Task 36.1: current-latest-ruby-bridge-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 36 - current-latest-ruby-bridge-burndown
@@ -82,21 +82,21 @@ Ruby bridge calls must execute only with `ScriptAuthorization::Allow`, serialize
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-005 / task 9.1): Ruby bridge calls require explicit authorization, exchange JSON stdin/stdout, capture stderr, and enforce env/timeout/stdin boundaries through ScriptBridge.
-- [ ] **AC2** (ADR-005 / task 9.1): Ruby worker-pool behavior executes authorized Ruby subprocess calls with stable JSON parsing, stderr capture, error propagation, and deterministic result ordering.
-- [ ] **AC3** (ADR-009 / ADR-011): two current-latest Ruby bridge rows have P0 native fixture evidence with `script-bridge` owner in both Rust and shell artifacts.
-- [ ] **AC4** (ADR-009 / ADR-011): current-latest script-bridge blockers drop to zero and total current-latest golden blockers drop from 25 to 23.
-- [ ] **AC5** (PRD §Compatibility Matrix): perfect-refactor completion remains false because remaining blockers are config/provider external-authority, publication, current-target, or impossible zero-bug claim boundaries.
+- [x] **AC1** (ADR-005 / task 9.1): Ruby bridge calls require explicit authorization, exchange JSON stdin/stdout, capture stderr, and enforce env/timeout/stdin boundaries through ScriptBridge.
+- [x] **AC2** (ADR-005 / task 9.1): Ruby worker-pool behavior executes authorized Ruby subprocess calls with stable JSON parsing, stderr capture, error propagation, and deterministic result ordering.
+- [x] **AC3** (ADR-009 / ADR-011): two current-latest Ruby bridge rows have P0 native fixture evidence with `script-bridge` owner in both Rust and shell artifacts.
+- [x] **AC4** (ADR-009 / ADR-011): current-latest script-bridge blockers drop to zero and total current-latest golden blockers drop from 25 to 23.
+- [x] **AC5** (PRD §Compatibility Matrix): perfect-refactor completion remains false because remaining blockers are config/provider external-authority, publication, current-target, or impossible zero-bug claim boundaries.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-36.1.1 | TEST-36.1.1 | tests/current_latest_ruby_bridge_burndown.rs | install, lint, typecheck, unit-test, build | Spec Ready |
-| AC2 | SCEN-36.1.1 | TEST-36.1.2 | tests/current_latest_ruby_bridge_burndown.rs | install, typecheck, unit-test, integration, build | Spec Ready |
-| AC3 | SCEN-36.1.1 | TEST-36.1.3 | tests/current_latest_ruby_bridge_burndown.rs | install, lint, typecheck, unit-test, e2e, build | Spec Ready |
-| AC4 | SCEN-36.1.1 | TEST-36.1.4 | tests/current_latest_ruby_bridge_burndown.rs | install, lint, typecheck, unit-test, coverage, runtime-smoke, build | Spec Ready |
-| AC5 | SCEN-36.1.1 | TEST-36.1.5 | tests/current_latest_ruby_bridge_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, coverage, runtime-smoke, build | Spec Ready |
+| AC1 | SCEN-36.1.1 | TEST-36.1.1 | tests/current_latest_ruby_bridge_burndown.rs | install, lint, typecheck, unit-test, build | Done |
+| AC2 | SCEN-36.1.1 | TEST-36.1.2 | tests/current_latest_ruby_bridge_burndown.rs | install, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-36.1.1 | TEST-36.1.3 | tests/current_latest_ruby_bridge_burndown.rs | install, lint, typecheck, unit-test, e2e, build | Done |
+| AC4 | SCEN-36.1.1 | TEST-36.1.4 | tests/current_latest_ruby_bridge_burndown.rs | install, lint, typecheck, unit-test, coverage, runtime-smoke, build | Done |
+| AC5 | SCEN-36.1.1 | TEST-36.1.5 | tests/current_latest_ruby_bridge_burndown.rs | install, lint, typecheck, unit-test, integration, e2e, coverage, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -118,9 +118,36 @@ Ruby bridge calls must execute only with `ScriptAuthorization::Allow`, serialize
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-03
+- **改动文件**：
+  - `docs/specs/phases/phase-36-current-latest-ruby-bridge-burndown.md`
+  - `docs/specs/tasks/task-36.1-current-latest-ruby-bridge-burndown.md`
+  - `docs/s2v-adapter.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/compatibility/matrix.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `src/script_bridge/mod.rs`
+  - `src/script_bridge/ruby.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+  - `tests/current_latest_ruby_bridge_burndown.rs`
+  - `tests/current_latest_script_prompt_python_bridge_burndown.rs`
+  - `tests/current_latest_source_taxonomy_burndown.rs`
+- **commit 列表**：
+  - `8cbd370` `docs(spec): add phase 36 current latest ruby bridge burndown`
+  - `df262b9` `docs(spec): task-36.1 enters implementation`
+  - `c81c1e3` `test(script-bridge): add current latest Ruby bridge RED tests`
+  - `c93c5e3` `feat(script-bridge): implement current latest Ruby bridge evidence`
+  - 本次 docs 回填提交：`docs(spec): complete task 36.1 current latest ruby bridge burndown`
+- **§9 Verification 结果**：
+  - install: PASS - helper 执行 adapter Install，`cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过。
+  - lint: PASS - helper 执行 `bash scripts/release/lint.sh` 通过。
+  - typecheck: PASS - helper 执行 `cargo check --workspace`、viewer/npm `pnpm typecheck` 通过。
+  - unit-test: PASS - helper 执行 `cargo test --workspace`、viewer/npm `pnpm test` 通过；新增 TEST-36.1.1 ~ TEST-36.1.5 与相关 current-latest 回归均通过。
+  - integration: PASS - helper 执行 adapter Integration tests 通过。
+  - e2e: PASS - helper 执行 adapter E2E tests 通过。
+  - build: PASS - helper 执行 adapter Build 通过。
+  - coverage: PASS - helper 执行 adapter Coverage，并通过 `s2v_coverage_threshold_guard`。
+  - runtime-smoke: PASS - helper 执行 adapter Runtime smoke 通过；`current-latest-golden-corpus.status=ready-with-blockers`、`blocker_count=23`、分组 `config=7, provider=16`、`script-bridge=0`，`perfect_refactor_claim_allowed=false`。
+- **剩余风险 / 未做项**：仍保留 config=7、provider external-authority=16、current-target、publication-authority 和“无任何潜在 bug”不可证明承诺边界。本 task 只证明本地 deterministic Ruby subprocess contract，不证明真实 provider 服务、账号级权限、private SDK、外部云配置或公开发布行为。
+- **下游 task 影响**：current-latest 本地可证明的 script-bridge blockers 已清零；后续只能继续处理 config/provider external authority（需要真实权限、产品/服务合同证据或正式 waiver）以及 publication/current-target/claim wording gates。

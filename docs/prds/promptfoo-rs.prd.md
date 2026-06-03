@@ -321,6 +321,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Task 35.1 完成后，current-latest 证据记录 prompt-processing 行为为 10 fixture / 3 snapshot / 0 blocker，script-bridge 行为为 5 fixture / 2 blocker；tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 `current-latest-golden-corpus.blocker_count=25`，分组为 `config=7, provider=16, script-bridge=2`，且 `perfect_refactor_claim_allowed=false`。剩余 script-bridge blockers 仅为 Ruby runtime rows；config/provider external-authority、publication、current-target 和“无任何潜在 bug”承诺仍需外部证据或正式 waiver。
 >
 > Phase 36 是 2026-06-03 Phase 35 后的 current-latest Ruby bridge burndown 链路，依据 Phase 35 §9 中仍保留的 2 个 Ruby script-bridge blockers、task 9.1 的 explicit authorization sandbox、PRD §Core Capabilities、ADR-005、ADR-009、ADR-011。它只实现本地 deterministic Ruby subprocess contract，不解除 config/provider external authority、publication、current-target 或“无任何潜在 bug”不可证明承诺。
+>
+> Task 36.1 完成后，current-latest 证据记录 script-bridge 行为为 7 fixture / 0 blocker；tracked target `1d09dfeb5f0766905409117f923dd5c4b0838d9f` 的 `current-latest-golden-corpus.blocker_count=23`，分组为 `config=7, provider=16`，且 `perfect_refactor_claim_allowed=false`。剩余 blockers 均为外部权限/服务/发布/当前目标/不可证明质量声明边界，不能由本地 Ruby subprocess fixture 间接解除。
 
 ---
 

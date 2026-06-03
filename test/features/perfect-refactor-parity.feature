@@ -346,8 +346,8 @@ Feature: perfect refactor parity
     Then TEST-35.1.1 proves JavaScript Python and executable prompt processors require authorization and exchange JSON through ScriptBridge
     And TEST-35.1.2 proves Python bridge wrapper and worker-pool behavior preserve JSON stderr errors and deterministic ordering
     And TEST-35.1.3 proves script-backed prompt processor rows have P0 native fixture evidence
-    And TEST-35.1.4 proves Python bridge rows have P0 native fixture evidence while Ruby rows remain blockers
-    And TEST-35.1.5 proves Rust and shell extractors emit equivalent script evidence and total blockers drop to 25 while perfect-refactor completion remains false
+    And TEST-35.1.4 proves Python bridge rows have P0 native fixture evidence and keeps Ruby promotion delegated to SCEN-36.1.1
+    And TEST-35.1.5 proves Rust and shell extractors emit equivalent script evidence while perfect-refactor completion remains false
 
   # Maps to: docs/specs/tasks/task-36.1-current-latest-ruby-bridge-burndown.md
   Scenario: SCEN-36.1.1 - current latest Ruby bridge rows have local subprocess evidence
