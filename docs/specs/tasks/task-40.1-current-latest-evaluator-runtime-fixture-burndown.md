@@ -1,6 +1,6 @@
 # Task 40.1: current-latest-evaluator-runtime-fixture-burndown
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 40 - current-latest-evaluator-runtime-fixture-burndown
@@ -70,19 +70,19 @@ Promote `eval-runner:src-evaluator-runtime` to native fixture evidence in Rust a
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (task 29.1 / ADR-009): Rust extractor emits `eval-runner:src-evaluator-runtime` as P0 native fixture evidence.
-- [ ] **AC2** (task 39.1): shell extractor emits the same evaluator runtime native fixture evidence and no blocker evidence for this row.
-- [ ] **AC3** (ADR-011): current-latest golden corpus has no release blocker for `eval-runner:src-evaluator-runtime` in an isolated evaluator runtime fixture.
-- [ ] **AC4** (task 38.1 / task 39.1): runtime smoke for the Phase 38 target reduces current-latest golden blocker count by one for this local row while keeping `perfect_refactor_claim_allowed=false`.
+- [x] **AC1** (task 29.1 / ADR-009): Rust extractor emits `eval-runner:src-evaluator-runtime` as P0 native fixture evidence.
+- [x] **AC2** (task 39.1): shell extractor emits the same evaluator runtime native fixture evidence and no blocker evidence for this row.
+- [x] **AC3** (ADR-011): current-latest golden corpus has no release blocker for `eval-runner:src-evaluator-runtime` in an isolated evaluator runtime fixture.
+- [x] **AC4** (task 38.1 / task 39.1): runtime smoke for the Phase 38 target reduces current-latest golden blocker count by one for this local row while keeping `perfect_refactor_claim_allowed=false`.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-40.1.1 | TEST-40.1.1 | tests/current_latest_evaluator_runtime_fixture.rs | install, lint, typecheck, unit-test, build | Spec Ready |
-| AC2 | SCEN-40.1.1 | TEST-40.1.2 | tests/current_latest_evaluator_runtime_fixture.rs | install, lint, typecheck, unit-test, integration, build | Spec Ready |
-| AC3 | SCEN-40.1.1 | TEST-40.1.3 | tests/current_latest_evaluator_runtime_fixture.rs | install, typecheck, unit-test, coverage, build | Spec Ready |
-| AC4 | SCEN-40.1.1 | TEST-40.1.4 | tests/current_latest_evaluator_runtime_fixture.rs | install, lint, typecheck, unit-test, e2e, runtime-smoke, build | Spec Ready |
+| AC1 | SCEN-40.1.1 | TEST-40.1.1 | tests/current_latest_evaluator_runtime_fixture.rs | install, lint, typecheck, unit-test, build | Done |
+| AC2 | SCEN-40.1.1 | TEST-40.1.2 | tests/current_latest_evaluator_runtime_fixture.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-40.1.1 | TEST-40.1.3 | tests/current_latest_evaluator_runtime_fixture.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-40.1.1 | TEST-40.1.4 | tests/current_latest_evaluator_runtime_fixture.rs | install, lint, typecheck, unit-test, e2e, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -104,9 +104,36 @@ Promote `eval-runner:src-evaluator-runtime` to native fixture evidence in Rust a
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
-- **§9 Verification 结果**：<TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+- **完成日期**：2026-06-03
+- **改动文件**：
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `docs/specs/phases/phase-40-current-latest-evaluator-runtime-fixture-burndown.md`
+  - `docs/specs/tasks/task-40.1-current-latest-evaluator-runtime-fixture-burndown.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `tests/current_latest_evaluator_runtime_fixture.rs`
+  - `tests/current_latest_evaluator_runtime_classification.rs`
+  - `src/compatibility/inventory.rs`
+  - `scripts/release/current-latest-source-inventory.sh`
+  - `docs/compatibility/matrix.md`
+- **commit 列表**：
+  - `556cae6 docs(spec): add evaluator runtime fixture burndown task`
+  - `ce2a453 test(eval-runner): add evaluator runtime fixture RED tests`
+  - `06a6ce2 feat(eval-runner): add evaluator runtime fixture evidence`
+  - `<this docs commit> docs(spec): complete task 40.1 evaluator runtime fixture burndown`
+- **§9 Verification 结果**：
+  - install: PASS - adapter §Commands Install passed inside `s2v_verify_full`.
+  - lint: PASS - adapter §Commands Lint passed inside `s2v_verify_full`.
+  - typecheck: PASS - adapter §Commands Typecheck passed inside `s2v_verify_full`.
+  - unit-test: PASS - adapter §Commands Unit Test passed; `TEST-40.1.1` through `TEST-40.1.4` pass in `tests/current_latest_evaluator_runtime_fixture.rs`, and evolved `TEST-39.1.*` remains green.
+  - integration: PASS - adapter §Commands Integration tests passed inside `s2v_verify_full`.
+  - e2e: PASS - adapter §Commands E2E tests passed inside `s2v_verify_full`.
+  - coverage: PASS - adapter §Commands Coverage passed inside `s2v_verify_full`; `s2v_coverage_threshold_guard` returned PASS.
+  - build: PASS - adapter §Commands Build passed inside `s2v_verify_full`.
+  - runtime-smoke: PASS - adapter §Commands Runtime smoke regenerated release gates with source inventory `status=ready`, matrix `status=ready`, evaluator runtime row `implementation_status=native`, `evidence_kind=fixture`, `evidence_reference=fixture:eval-runner:src-evaluator-runtime`, evaluator runtime `release_blocker_count=0`, current-latest golden `blocker_count=24`, current-latest quality `blocker_count=4`, `local_current_latest_ready=false`, release candidate `publication_ready=credential-blocked`, `perfect_refactor_claim_allowed=false`, and unblock packet `required_user_decision_count=31`.
+- **剩余风险 / 未做项**：
+  - 本地 `eval-runner:src-evaluator-runtime` blocker 已消除；剩余 24 个 current-latest golden blockers 是 config/provider 外部 authority 类 item。
+  - current-target drift、publication credentials / legal-brand approval、真实 provider/account/private service authority，以及 zero-bug / bug-free 类不可证明声明仍未解除。
+- **下游 task 影响**：
+  - 后续本地代码层面已没有明显未分类或 eval-runner current-latest blocker；剩余推进需要外部 authority/waiver、publication evidence，或新的 upstream drift task。
+  - Task 39 的测试已演进为允许“blocked until fixture exists”后的 native fixture 状态，避免新 evidence 反向破坏旧 taxonomy proof。

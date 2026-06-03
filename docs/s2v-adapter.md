@@ -168,7 +168,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 37 | current-latest-unblock-packet-refresh | docs/specs/phases/phase-37-current-latest-unblock-packet-refresh.md | Done | 1 | N/A (solo) |
 | 38 | current-latest-0.121.14-target-refresh | docs/specs/phases/phase-38-current-latest-0.121.14-target-refresh.md | Done | 1 | N/A (solo) |
 | 39 | current-latest-evaluator-runtime-classification | docs/specs/phases/phase-39-current-latest-evaluator-runtime-classification.md | Done | 1 | N/A (solo) |
-| 40 | current-latest-evaluator-runtime-fixture-burndown | docs/specs/phases/phase-40-current-latest-evaluator-runtime-fixture-burndown.md | Ready | 1 | N/A (solo) |
+| 40 | current-latest-evaluator-runtime-fixture-burndown | docs/specs/phases/phase-40-current-latest-evaluator-runtime-fixture-burndown.md | Done | 1 | N/A (solo) |
 
 ## Task 总索引
 
@@ -248,7 +248,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 37.1 | release-quality | docs/specs/tasks/task-37.1-current-latest-unblock-packet-refresh.md | Done | Phase 37 order 1 | N/A (solo) |
 | 38.1 | compatibility | docs/specs/tasks/task-38.1-current-latest-0.121.14-target-refresh.md | Done | Phase 38 order 1 | N/A (solo) |
 | 39.1 | eval-runner | docs/specs/tasks/task-39.1-current-latest-evaluator-runtime-classification.md | Done | Phase 39 order 1 | N/A (solo) |
-| 40.1 | eval-runner | docs/specs/tasks/task-40.1-current-latest-evaluator-runtime-fixture-burndown.md | Ready | Phase 40 order 1 | N/A (solo) |
+| 40.1 | eval-runner | docs/specs/tasks/task-40.1-current-latest-evaluator-runtime-fixture-burndown.md | Done | Phase 40 order 1 | N/A (solo) |
 
 ## ADR 索引
 

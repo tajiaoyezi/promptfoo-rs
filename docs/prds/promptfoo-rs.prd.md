@@ -341,6 +341,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Task 39.1 完成后，current-latest source inventory 与 matrix 在 `0.121.14` target 下均为 `status=ready` 且 `unclassified_rows=[]`。`src/evaluator/runtime.ts` 被记录为 `eval-runner:src-evaluator-runtime`、P0 blocked、`evidence_kind=blocker`；quality gate 因此从 6 个 blockers 降到 4 个 blockers，但 `perfect_refactor_claim_allowed=false` 仍正确。
 >
 > Phase 40 继续消化唯一剩余的本地 current-latest golden blocker：`eval-runner:src-evaluator-runtime`。该 phase 只能把该单行推进为 native fixture evidence；config/provider external authority、current-target、publication authority、以及“无任何潜在 bug”的不可证明边界仍不在本地实现范围内。
+>
+> Task 40.1 完成后，`eval-runner:src-evaluator-runtime` 已变为 native fixture evidence，current-latest golden blocker count 从 25 降到 24，unblock packet required decisions 从 32 降到 31。剩余 blockers 均属于 external authority、current-target、publication authority 或不可证明质量声明边界，不能由本地代码继续消除。
 
 ---
 
