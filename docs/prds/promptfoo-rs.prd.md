@@ -269,6 +269,7 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 | 36 | current-latest-ruby-bridge-burndown | 实现 Ruby bridge deterministic subprocess evidence，将最后 2 个本地 script-bridge blockers 转为 native fixture evidence | `src/script_bridge/` + `src/compatibility/inventory.rs` + `scripts/release/current-latest-source-inventory.sh` + `target/release-gates/` + `tests/current_latest_ruby_bridge_burndown.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 35 | 否 |
 | 37 | current-latest-unblock-packet-refresh | 刷新 perfect-refactor unblock packet，使其以 Phase 36 后 current-latest 23 个剩余 blockers 为权威决策源，而不是旧 frozen/source-accounting 口径 | `scripts/release/perfect-refactor-unblock-packet.sh` + `scripts/release/runtime-smoke.sh` + `target/release-gates/` + `tests/current_latest_unblock_packet.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 36 | 否 |
 | 38 | current-latest-0.121.14-target-refresh | 刷新 current-latest target lock 到 2026-06-03 观测到的 promptfoo 0.121.14，并修复 npm tag 与 GitHub latest release 同 ref 时的解析 | `scripts/release/current-latest-target-lock.sh` + `src/compatibility/inventory.rs` + `compatibility/inventory/current-latest-target.json` + `docs/compatibility/current-latest.lock.md` + `tests/current_latest_target_drift_refresh.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 37 | 否 |
+| 39 | current-latest-evaluator-runtime-classification | 将 promptfoo 0.121.14 新增的 `src/evaluator/runtime.ts` 从 unclassified 转为明确 eval-runner P0 blocker，消除 source/matrix unknown taxonomy blocker 且不伪造 native parity | `src/compatibility/inventory.rs` + `scripts/release/current-latest-source-inventory.sh` + `tests/current_latest_evaluator_runtime_classification.rs` + `docs/compatibility/matrix.md` + `test/features/perfect-refactor-parity.feature` | 38 | 否 |
 
 > Phase 11-15 是 2026-05-30 审计后的补强链路，依据 `docs/audits/promptfoo-final-audit-index-2026-05-30.md`、PRD §Compatibility Matrix、ADR-007、ADR-008、ADR-009、ADR-010。它们不替换 Phase 1-10 的已完成履迹，而是把“promptfoo 完整重构”从初版可运行实现推进到 item-level parity、可执行 release gate 和可发布证据。
 >
@@ -333,6 +334,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 38 是 2026-06-03 live upstream drift 后的 current-latest target refresh 链路，依据 PRD §Current Latest Rebaseline Addendum、ADR-007、ADR-009、ADR-011、task 24.1 和 task 37.1。实时观测显示 npm latest 已变为 `promptfoo@0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`，GitHub default branch HEAD 为 `4d22e57f5f9b4c7cdde494f00558d9afde8b4975`，GitHub latest release 为 `refs/tags/0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`。该 phase 只刷新 target lock 与同 ref 解析，不解除外部权限、发布或“无任何潜在 bug”不可证明边界。
 >
 > Task 38.1 完成后，tracked current-latest target lock 已刷新为 `promptfoo@0.121.14`，Rust 与 shell target-lock parser 均支持 npm tag 与 GitHub latest release 共享 `refs/tags/0.121.14` 的合法情况。runtime smoke 继续保持 fail-closed：current-latest golden corpus `blocker_count=25`、quality `blocker_count=6`、release candidate `publication_ready=credential-blocked`，因此 `perfect_refactor_claim_allowed=false` 仍是正确状态。
+>
+> Phase 39 针对 Phase 38 runtime-smoke 暴露的一个本地 taxonomy regression：`src/evaluator/runtime.ts` 在 `0.121.14` target 下变为 `unclassified:src-evaluator-runtime`。依据 Phase 25 / Phase 29，agent 可保守地将其归入 eval-runner P0 blocker，但必须保留 dedicated fixture 要求，不能把 unknown cleanup 等同于 eval runtime native parity。
 
 ---
 

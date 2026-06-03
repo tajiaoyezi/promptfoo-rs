@@ -51,6 +51,7 @@
 #   - docs/specs/tasks/task-36.1-current-latest-ruby-bridge-burndown.md
 #   - docs/specs/tasks/task-37.1-current-latest-unblock-packet-refresh.md
 #   - docs/specs/tasks/task-38.1-current-latest-0.121.14-target-refresh.md
+#   - docs/specs/tasks/task-39.1-current-latest-evaluator-runtime-classification.md
 
 Feature: perfect refactor parity
   In order to make promptfoo-rs a complete audited refactor of promptfoo
@@ -381,3 +382,12 @@ Feature: perfect refactor parity
     And TEST-38.1.4 proves the unblock packet keeps external-authority current-target and publication decisions visible
     And TEST-38.1.5 proves runtime smoke uses the tracked lock before any stale generated gate copy
     And TEST-38.1.6 proves runtime smoke distribution fixtures still include the frozen 0.121.13 baseline ref
+
+  # Maps to: docs/specs/tasks/task-39.1-current-latest-evaluator-runtime-classification.md
+  Scenario: SCEN-39.1.1 - current latest evaluator runtime source is classified but still blocked
+    Given upstream promptfoo current latest contains src/evaluator/runtime.ts
+    When current-latest source inventory is extracted
+    Then TEST-39.1.1 proves the row is eval-runner rather than unclassified
+    And TEST-39.1.2 proves it remains a P0 blocked eval-runner row until dedicated runtime fixtures exist
+    And TEST-39.1.3 proves shell and Rust extraction agree
+    And TEST-39.1.4 proves runtime smoke removes the source/matrix unknown blocker without allowing perfect-refactor completion
