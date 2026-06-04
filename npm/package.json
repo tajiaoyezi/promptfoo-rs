@@ -5,6 +5,11 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "promptfoo": "./bin/promptfoo.mjs",
+    "promptfoo-rs": "./bin/promptfoo-rs.mjs",
+    "pf": "./bin/pf.mjs"
+  },
   "packageManager": "pnpm@10.33.0",
   "exports": {
     ".": {
@@ -19,6 +24,7 @@
     "smoke:node": "node scripts/node-smoke.mjs"
   },
   "files": [
+    "bin",
     "dist",
     "src"
   ]
