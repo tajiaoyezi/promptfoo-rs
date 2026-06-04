@@ -356,6 +356,18 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 >
 > Task 41.1 完成后，tracked current-latest target lock 与 runtime-smoke artifacts 均记录 GitHub default branch HEAD `9d7d810c2118c63cb537bf05ea2d34c12bd22066`，npm latest / GitHub latest release 仍保持 `0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`。Runtime-smoke evidence 继续保持 fail-closed：source inventory 与 matrix `status=ready` 且 `unclassified_rows=[]`，current-latest golden `blocker_count=24`，quality `blocker_count=4`，unblock packet `required_user_decision_count=31`，`perfect_refactor_claim_allowed=false`。
 
+## 2026-06-04 CLI Drop-in Entry Point Addendum
+
+Upstream promptfoo README Quick Start instructs users to install `promptfoo` and run `promptfoo init`, `promptfoo eval`, and `promptfoo view`; the npm package metadata exposes `promptfoo` and `pf` bin entries. The current Rust implementation only exposes `promptfoo-rs`, which is functional but not drop-in compatible for command spelling.
+
+Phase 45 (`promptfoo-drop-in-cli-entrypoints`) adds a local command-name compatibility layer:
+
+- Rust release builds must produce both `promptfoo` and `promptfoo-rs` entrypoints over the same CLI dispatcher.
+- The npm wrapper must expose local `promptfoo`, `promptfoo-rs`, and `pf` bin shims without claiming public npm package ownership or publishing authority.
+- README / Quickstart / release docs must prefer tested `promptfoo` usage while preserving independent-reimplementation, publication, and perfect-refactor claim boundaries.
+
+This addendum is grounded in PRD §Compatibility Matrix / §Release constraints, ADR-004, ADR-008, ADR-011, task 2.1, task 2.3, task 9.2, and task 10.2. It does not resolve cloud/share authority, public registry publication, or current-latest external authority blockers.
+
 ---
 
 ## Decisions Log｜决策日志

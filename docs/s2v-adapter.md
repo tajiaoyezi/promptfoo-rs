@@ -173,6 +173,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 42 | current-latest-2ca16c-head-refresh | docs/specs/phases/phase-42-current-latest-2ca16c-head-refresh.md | Ready | 1 | N/A (solo) |
 | 43 | authority-evidence-intake-gates | docs/specs/phases/phase-43-authority-evidence-intake-gates.md | Ready | 2 | N/A (solo) |
 | 44 | public-stable-release-authority-closure | docs/specs/phases/phase-44-public-stable-release-authority-closure.md | Draft | 2 | N/A (solo) |
+| 45 | promptfoo-drop-in-cli-entrypoints | docs/specs/phases/phase-45-promptfoo-drop-in-cli-entrypoints.md | Ready | 3 | N/A (solo) |
 
 ## Task 总索引
 
@@ -259,6 +260,9 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 43.2 | release | docs/specs/tasks/task-43.2-publication-evidence-manifest-gate.md | Ready | Phase 43 order 2 | N/A (solo) |
 | 44.1 | compatibility-authority | docs/specs/tasks/task-44.1-external-authority-evidence-application.md | Draft | Phase 44 order 1 | N/A (solo) |
 | 44.2 | release | docs/specs/tasks/task-44.2-public-publication-evidence-application.md | Draft | Phase 44 order 2 | N/A (solo) |
+| 45.1 | cli | docs/specs/tasks/task-45.1-rust-promptfoo-binary-alias.md | Ready | Phase 45 order 1 | N/A (solo) |
+| 45.2 | npm-wrapper | docs/specs/tasks/task-45.2-npm-promptfoo-bin-shims.md | Ready | Phase 45 order 2 | N/A (solo) |
+| 45.3 | docs | docs/specs/tasks/task-45.3-readme-drop-in-cli-usage.md | Ready | Phase 45 order 3 | N/A (solo) |
 
 ## ADR 索引
 
@@ -282,7 +286,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 |---|---|
 | 4.2, 4.3 | test/features/assertion-engine.feature |
 | 3.2 | test/features/cache-resume-store.feature |
-| 2.1 | test/features/cli.feature |
+| 2.1, 45.1, 45.2, 45.3 | test/features/cli.feature |
 | 1.1, 1.2, 6.1, 6.2 | test/features/compatibility.feature |
 | 2.2 | test/features/config-loader.feature |
 | 2.3, 3.1 | test/features/eval-runner.feature |
