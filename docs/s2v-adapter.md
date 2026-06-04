@@ -173,7 +173,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 42 | current-latest-2ca16c-head-refresh | docs/specs/phases/phase-42-current-latest-2ca16c-head-refresh.md | Ready | 1 | N/A (solo) |
 | 43 | authority-evidence-intake-gates | docs/specs/phases/phase-43-authority-evidence-intake-gates.md | Ready | 2 | N/A (solo) |
 | 44 | public-stable-release-authority-closure | docs/specs/phases/phase-44-public-stable-release-authority-closure.md | Draft | 2 | N/A (solo) |
-| 45 | promptfoo-drop-in-cli-entrypoints | docs/specs/phases/phase-45-promptfoo-drop-in-cli-entrypoints.md | Ready | 3 | N/A (solo) |
+| 45 | promptfoo-drop-in-cli-entrypoints | docs/specs/phases/phase-45-promptfoo-drop-in-cli-entrypoints.md | Done | 3 | N/A (solo) |
 
 ## Task 总索引
 

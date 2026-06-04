@@ -1,6 +1,6 @@
 # Phase 45: promptfoo-drop-in-cli-entrypoints
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -30,10 +30,10 @@ Depends on task 2.1 CLI skeleton, task 2.3 eval smoke, task 9.2 Node API wrapper
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `cargo build --workspace --release` produces a runnable `promptfoo` binary in addition to `promptfoo-rs`, and both execute the same CLI command surface.
-- [ ] Running `promptfoo --help`, `promptfoo eval -c promptfooconfig.yaml`, and `promptfoo view <dir>` is covered by RED/GREEN tests and produces command-name-appropriate UX.
-- [ ] The npm wrapper declares and tests local bin shims for `promptfoo`, `promptfoo-rs`, and `pf` without publishing to npm or shadowing upstream ownership claims.
-- [ ] README, Quickstart, release docs, and compatibility docs explain `promptfoo` as the drop-in local command and keep publication/perfect-refactor claims fail-closed.
+- [x] `cargo build --workspace --release` produces a runnable `promptfoo` binary in addition to `promptfoo-rs`, and both execute the same CLI command surface.
+- [x] Running `promptfoo --help`, `promptfoo eval -c promptfooconfig.yaml`, and `promptfoo view <dir>` is covered by RED/GREEN tests and produces command-name-appropriate UX.
+- [x] The npm wrapper declares and tests local bin shims for `promptfoo`, `promptfoo-rs`, and `pf` without publishing to npm or shadowing upstream ownership claims.
+- [x] README, Quickstart, release docs, and compatibility docs explain `promptfoo` as the drop-in local command and keep publication/perfect-refactor claims fail-closed.
 
 ## 7. Phase Risks
 
@@ -48,7 +48,7 @@ Tasks 45.1, 45.2, and 45.3 are Done; phase §6 smoke passes through task §9 ver
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
+- **完成日期**：2026-06-04
+- **Phase smoke**：通过。执行 `cargo build --workspace --release`，随后运行 `.\target\release\promptfoo.exe --help`、`.\target\release\promptfoo.exe eval -c <phase-smoke>\promptfooconfig.yaml --output <phase-smoke>\results.jsonl`、`.\target\release\promptfoo.exe view <phase-smoke>`；`view` 输出 `schema_version=promptfoo-rs.viewer.cli.v1` 且 `record_count >= 1`。继续执行 `pnpm -C npm test`、`pnpm -C npm build`、`cargo test --test promptfoo_cli_alias --test drop_in_cli_docs`，全部通过。
+- **Artifact evidence**：release binaries `target/release/promptfoo.exe` and `target/release/promptfoo-rs.exe`; smoke workspace `C:\Users\15783\AppData\Local\Temp\promptfoo-rs-phase45-1780583416380`; RED/GREEN tests `tests/promptfoo_cli_alias.rs`, `tests/drop_in_cli_docs.rs`, npm wrapper smoke `npm/scripts/node-smoke.mjs`.
 - **Remaining boundaries**：Public npm package ownership, actual npm publish authority, Homebrew formula publication, legal/brand approval, and perfect-refactor claim gates remain outside this phase.
