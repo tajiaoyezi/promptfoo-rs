@@ -80,6 +80,10 @@ target/release/promptfoo-rs eval -c promptfooconfig.yaml --output results.json
 
 See [docs/QUICKSTART.en.md](docs/QUICKSTART.en.md) for more examples.
 
+### Release and install channel status
+
+The release surface covers GitHub Releases, `cargo install`, Docker, the npm wrapper, and GitHub Action examples. This repository currently claims only the local build, documentation, and gate shape for those channels; real public publication still requires credentials, legal/brand confirmation, and external artifact URL/digest evidence. See [docs/release.md](docs/release.md).
+
 ## CLI surface
 
 The CLI currently exposes:

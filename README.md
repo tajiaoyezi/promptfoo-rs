@@ -82,6 +82,10 @@ target/release/promptfoo-rs eval -c promptfooconfig.yaml --output results.json
 
 更多示例见 [docs/QUICKSTART.md](docs/QUICKSTART.md)。
 
+### 发布与安装渠道状态
+
+项目 release surface 覆盖 GitHub Releases、`cargo install`、Docker、npm wrapper 和 GitHub Action 示例。当前仓库只声明这些渠道的本地构建、文档和 gate 形态；真实公开发布仍需要凭据、法律/品牌确认和外部 artifact URL/digest 证据，详见 [docs/release.md](docs/release.md)。
+
 ## CLI 能力
 
 当前 CLI 暴露以下命令族：
