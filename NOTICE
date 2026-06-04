@@ -1,0 +1,11 @@
+promptfoo-rs
+
+promptfoo-rs is an independent Rust reimplementation that targets selected
+promptfoo-compatible local workflows and configuration formats. It is not
+affiliated with, endorsed by, or sponsored by the upstream promptfoo project.
+
+The name "promptfoo" is used in this repository to describe compatibility
+targets, command surfaces, configuration files, fixtures, and release-gate
+evidence.
+
+Unless otherwise stated, this repository is licensed under the MIT License.
