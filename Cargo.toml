@@ -8,6 +8,14 @@ license = "MIT"
 name = "promptfoo_rs"
 path = "src/lib.rs"
 
+[[bin]]
+name = "promptfoo-rs"
+path = "src/main.rs"
+
+[[bin]]
+name = "promptfoo"
+path = "src/bin/promptfoo.rs"
+
 [dependencies]
 clap = { version = "4.5.53", features = ["derive"] }
 csv = "1"

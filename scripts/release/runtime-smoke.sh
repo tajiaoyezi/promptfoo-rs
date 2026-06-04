@@ -94,11 +94,17 @@ NODE
   fi
 }
 
-cargo build --quiet --release --bin promptfoo-rs
+cargo build --quiet --release --bin promptfoo-rs --bin promptfoo
 BIN="target/release/promptfoo-rs"
 if [ -f "${BIN}.exe" ]; then
   BIN="${BIN}.exe"
 fi
+PROMPTFOO_BIN="target/release/promptfoo"
+if [ -f "${PROMPTFOO_BIN}.exe" ]; then
+  PROMPTFOO_BIN="${PROMPTFOO_BIN}.exe"
+fi
+"$PROMPTFOO_BIN" --help > "$GATE_DIR/cli-help-promptfoo.txt"
+grep -Eq "Usage: promptfoo(\\.exe)? \\[COMMAND\\]" "$GATE_DIR/cli-help-promptfoo.txt"
 
 cargo test \
   --test eval_command_smoke \

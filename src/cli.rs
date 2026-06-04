@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
+use clap::{ArgAction, Args, CommandFactory, FromArgMatches, Parser, Subcommand, ValueEnum};
 
 use crate::cache::resume::ResumeStore;
 use crate::compatibility::matrix::CapabilityMatrix;
@@ -245,6 +245,13 @@ pub enum ScanFormatArg {
 }
 
 pub fn run_cli(cli: Cli) -> Result<ExitCode, CliError> {
+    run_cli_with_command_name(cli, "promptfoo-rs")
+}
+
+pub fn run_cli_with_command_name(
+    cli: Cli,
+    command_name: &'static str,
+) -> Result<ExitCode, CliError> {
     match cli.command {
         Some(Command::Eval(args)) => handle_eval_command(args),
         Some(Command::Redteam(args)) => handle_redteam_command(args),
@@ -341,8 +348,8 @@ pub fn run_cli(cli: Cli) -> Result<ExitCode, CliError> {
             "show is registered as a compatibility gap until source-backed behavior is implemented",
         )),
         None => Err(unsupported_command_error(
-            "promptfoo-rs",
-            "command is required; run promptfoo-rs --help",
+            command_name,
+            &format!("command is required; run {command_name} --help"),
         )),
     }
 }
@@ -982,7 +989,13 @@ fn handle_redteam_plugins_command() -> Result<ExitCode, CliError> {
 }
 
 pub fn main() -> ExitCode {
-    match run_cli(Cli::parse()) {
+    main_with_command_name("promptfoo-rs")
+}
+
+pub fn main_with_command_name(command_name: &'static str) -> ExitCode {
+    let matches = Cli::command().name(command_name).get_matches();
+    let cli = Cli::from_arg_matches(&matches).unwrap_or_else(|error| error.exit());
+    match run_cli_with_command_name(cli, command_name) {
         Ok(code) => code,
         Err(err) => {
             eprintln!("{err}");

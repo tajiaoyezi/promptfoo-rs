@@ -138,8 +138,9 @@ fn assert_json_eq(left: &[u8], right: &[u8]) {
 
 fn normalized_command_name(bytes: &[u8]) -> String {
     String::from_utf8_lossy(bytes)
-        .replace("promptfoo-rs", "<promptfoo-bin>")
-        .replace("promptfoo", "<promptfoo-bin>")
+        .replace("promptfoo-rs", "__PROMPTFOO_BIN__")
+        .replace("promptfoo", "__PROMPTFOO_BIN__")
+        .replace("__PROMPTFOO_BIN__", "<promptfoo-bin>")
 }
 
 struct FixtureDir {
