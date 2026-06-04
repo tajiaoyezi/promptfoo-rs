@@ -412,3 +412,49 @@ Feature: perfect refactor parity
     And TEST-41.1.2 proves tracked lock artifacts record the refreshed HEAD
     And TEST-41.1.3 proves runtime smoke regenerates downstream artifacts and keeps perfect-refactor completion blocked
     And TEST-41.1.4 proves evaluator runtime native fixture evidence survives re-extraction or any new local blocker is explicit
+
+  # Maps to: docs/specs/tasks/task-42.1-current-latest-2ca16c-head-refresh.md
+  Scenario: SCEN-42.1.1 - current latest repository HEAD drift refresh to 2ca16c keeps gates fail-closed
+    Given npm latest and GitHub latest release remain promptfoo 0.121.14
+    And GitHub default branch HEAD moves to 2ca16c59b64e0afca10533de0f817c0d24eba20a
+    When the current-latest target lock is refreshed
+    Then TEST-42.1.1 proves Rust target-lock parsing records the refreshed HEAD
+    And TEST-42.1.2 proves tracked lock artifacts record the refreshed HEAD
+    And TEST-42.1.3 proves runtime smoke regenerates downstream artifacts and keeps perfect-refactor completion blocked unless every gate agrees
+    And TEST-42.1.4 proves prior local current-latest fixture evidence survives re-extraction or any new local blocker is explicit
+
+  # Maps to: docs/specs/tasks/task-43.1-authority-decision-manifest-gate.md
+  Scenario: SCEN-43.1.1 - authority decision manifest keeps unresolved external blockers visible
+    Given the current-latest unblock packet contains non-auto-resolvable decision items
+    When the authority decision manifest gate runs
+    Then TEST-43.1.1 proves every decision item has exactly one manifest row
+    And TEST-43.1.2 proves unresolved or mock-only evidence rows keep perfect-refactor completion false
+    And TEST-43.1.3 proves waiver rows require owner date scope expiration rationale and release impact
+    And TEST-43.1.4 proves the manifest stores no real secrets
+
+  # Maps to: docs/specs/tasks/task-43.2-publication-evidence-manifest-gate.md
+  Scenario: SCEN-43.2.1 - publication evidence manifest distinguishes dry-run installability from public release
+    Given publication authority is credential-blocked and legal-brand-blocked
+    When the publication evidence manifest gate runs
+    Then TEST-43.2.1 proves every release channel has one evidence manifest row
+    And TEST-43.2.2 proves dry-run installability alone never sets published true
+    And TEST-43.2.3 proves ready publication rows require URL digest release notes credential authority legal approval and timestamp
+    And TEST-43.2.4 proves the manifest stores no publish tokens or private credentials
+
+  # Maps to: docs/specs/tasks/task-44.1-external-authority-evidence-application.md
+  Scenario: SCEN-44.1.1 - external authority evidence application only resolves validated decisions
+    Given authority decisions require real product account credential private-service or current-target evidence
+    When external authority evidence is applied
+    Then TEST-44.1.1 proves every resolved item has validated evidence or formal waiver metadata
+    And TEST-44.1.2 proves no committed artifact contains provider secrets API keys account tokens or private credentials
+    And TEST-44.1.3 proves unresolved or invalid evidence keeps the item release-blocking
+    And TEST-44.1.4 proves perfect-refactor completion remains false unless all current-latest gates agree
+
+  # Maps to: docs/specs/tasks/task-44.2-public-publication-evidence-application.md
+  Scenario: SCEN-44.2.1 - public publication evidence application requires real external artifacts
+    Given publication evidence requires external URLs digests credentials and legal-brand approval
+    When public publication evidence is applied
+    Then TEST-44.2.1 proves every published channel has external URL digest release notes credential authority legal approval and timestamp
+    And TEST-44.2.2 proves channels without complete evidence remain blocked
+    And TEST-44.2.3 proves release candidate evidence distinguishes local installability from public availability
+    And TEST-44.2.4 proves public release notes use only allowed claim wording

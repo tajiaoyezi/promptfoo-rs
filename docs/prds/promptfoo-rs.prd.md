@@ -163,6 +163,13 @@ AI eval、LLM regression testing、redteam、MCP、Agent 安全测试正在变�
 
 依据：用户 2026-06-01 澄清、ADR-007、ADR-009、ADR-011。
 
+**2026-06-04 后续 S2V 规划**：
+- Phase 42 继续处理 live GitHub default branch drift：当前观察显示 npm latest / GitHub latest release 仍为 `0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`，但 GitHub default branch HEAD 已移动到 `2ca16c59b64e0afca10533de0f817c0d24eba20a`；该 phase 只刷新 immutable target packet 与 downstream gates，不解除 external authority 或 publication blockers。
+- Phase 43 建立 authority/publication evidence intake gates：把 31 个 non-auto-resolvable decisions 转为可校验 manifest，要求 unresolved / evidence-provided / waived-with-boundary 三态并禁止提交 secrets。该 phase 只提供本地校验框架，不代表真实授权已获得。
+- Phase 44 保留 public stable release authority closure：只有在用户或 maintainer 提供真实凭据、账号/私有服务权限、法律/品牌批准、发布授权、外部 URL/digest 证据或正式 waiver 后，才能从 Draft 推进到 Ready。
+
+依据：docs/audits/promptfoo-current-stage-full-verification-audit-2026-06-03.md、task 37.1、task 41.1、ADR-008、ADR-011。
+
 ---
 
 ## Compatibility Matrix｜兼容矩阵
