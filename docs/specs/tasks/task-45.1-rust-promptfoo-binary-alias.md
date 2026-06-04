@@ -1,6 +1,6 @@
 # Task 45.1: rust-promptfoo-binary-alias
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 45 - promptfoo-drop-in-cli-entrypoints
@@ -67,19 +67,19 @@ Add a Rust binary target named `promptfoo` that routes to the same CLI implement
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (upstream README): release build emits a `promptfoo` binary that runs `--help` successfully and presents the `promptfoo` command spelling.
-- [ ] **AC2** (task 2.3): `promptfoo eval -c promptfooconfig.yaml` passes the same minimal eval smoke as `promptfoo-rs eval -c promptfooconfig.yaml`.
-- [ ] **AC3** (ADR-004): `promptfoo` and `promptfoo-rs` preserve equivalent stdout/stderr/exit-code behavior for valid eval, invalid config, and unknown command cases.
-- [ ] **AC4** (task 2.1): existing `promptfoo-rs` binary remains built, tested, and documented as a non-conflicting explicit alias.
+- [x] **AC1** (upstream README): release build emits a `promptfoo` binary that runs `--help` successfully and presents the `promptfoo` command spelling.
+- [x] **AC2** (task 2.3): `promptfoo eval -c promptfooconfig.yaml` passes the same minimal eval smoke as `promptfoo-rs eval -c promptfooconfig.yaml`.
+- [x] **AC3** (ADR-004): `promptfoo` and `promptfoo-rs` preserve equivalent stdout/stderr/exit-code behavior for valid eval, invalid config, and unknown command cases.
+- [x] **AC4** (task 2.1): existing `promptfoo-rs` binary remains built, tested, and documented as a non-conflicting explicit alias.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-45.1.1 | TEST-45.1.1 | tests/promptfoo_cli_alias.rs | install, lint, typecheck, unit-test, build | Not Started |
-| AC2 | SCEN-45.1.1 | TEST-45.1.2 | tests/promptfoo_cli_alias.rs | install, typecheck, unit-test, integration, build | Not Started |
-| AC3 | SCEN-45.1.1 | TEST-45.1.3 | tests/promptfoo_cli_alias.rs | install, lint, typecheck, unit-test, e2e, build | Not Started |
-| AC4 | SCEN-45.1.1 | TEST-45.1.4 | tests/promptfoo_cli_alias.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Not Started |
+| AC1 | SCEN-45.1.1 | TEST-45.1.1 | tests/promptfoo_cli_alias.rs | install, lint, typecheck, unit-test, build | Done |
+| AC2 | SCEN-45.1.1 | TEST-45.1.2 | tests/promptfoo_cli_alias.rs | install, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-45.1.1 | TEST-45.1.3 | tests/promptfoo_cli_alias.rs | install, lint, typecheck, unit-test, e2e, build | Done |
+| AC4 | SCEN-45.1.1 | TEST-45.1.4 | tests/promptfoo_cli_alias.rs | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -101,18 +101,31 @@ Add a Rust binary target named `promptfoo` that routes to the same CLI implement
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
+- **完成日期**：2026-06-04
+- **改动文件**：
+  - Cargo.toml
+  - src/main.rs
+  - src/bin/promptfoo.rs
+  - src/cli.rs
+  - tests/promptfoo_cli_alias.rs
+  - scripts/release/runtime-smoke.sh
+  - docs/specs/tasks/task-45.1-rust-promptfoo-binary-alias.md
+  - docs/s2v-adapter.md
+  - docs/specs/phases/phase-45-promptfoo-drop-in-cli-entrypoints.md
+- **commit 列表**：
+  - 85ac294 test(cli): add task-45.1 promptfoo alias RED tests
+  - e8b8c89 feat(cli): add promptfoo Rust binary alias
+  - 5e31e50 refactor(cli): tighten promptfoo alias test helper
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-45.1 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - lint: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - integration: <TBD-after-impl>
-  - e2e: <TBD-after-impl>
-  - coverage: <TBD-after-impl>
-  - build: <TBD-after-impl>
-  - runtime-smoke: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: 通过；`s2v_verify_full` 执行 adapter Install，cargo fetch、viewer pnpm install、npm pnpm install 均成功。
+  - lint: 通过；`bash scripts/release/lint.sh` 成功。
+  - typecheck: 通过；`cargo check --workspace`、viewer typecheck、npm typecheck 均成功。
+  - unit-test: 通过；`cargo test --workspace`、viewer test、npm test 均成功，包含 TEST-45.1.1 ~ TEST-45.1.4。
+  - integration: 通过；`bash scripts/release/integration.sh` 成功。
+  - e2e: 通过；`bash scripts/release/e2e.sh` 成功。
+  - coverage: 通过；`bash scripts/release/coverage.sh` 成功。
+  - build: 通过；adapter Build 成功。
+  - runtime-smoke: 通过；`bash scripts/release/runtime-smoke.sh` 成功，release build 产出并检查 `promptfoo` 与 `promptfoo-rs`。
+- **剩余风险 / 未做项**：未发布名为 `promptfoo` 的 npm 包；真实 npm/Homebrew/GitHub Releases 发布授权仍在 Phase 43/44 authority gate 范围内。Windows help 会显示 `.exe` 后缀，TEST-45.1.1 / TEST-45.1.4 已按平台等价行为覆盖。
+- **下游 task 影响**：task 45.2 可复用 Rust `promptfoo` release binary 作为 npm bin shim 后端；task 45.3 可把 README / Quickstart 主命令切换为已测试的 `promptfoo` spelling。
