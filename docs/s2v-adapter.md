@@ -261,7 +261,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 44.1 | compatibility-authority | docs/specs/tasks/task-44.1-external-authority-evidence-application.md | Draft | Phase 44 order 1 | N/A (solo) |
 | 44.2 | release | docs/specs/tasks/task-44.2-public-publication-evidence-application.md | Draft | Phase 44 order 2 | N/A (solo) |
 | 45.1 | cli | docs/specs/tasks/task-45.1-rust-promptfoo-binary-alias.md | Done | Phase 45 order 1 | N/A (solo) |
-| 45.2 | npm-wrapper | docs/specs/tasks/task-45.2-npm-promptfoo-bin-shims.md | Ready | Phase 45 order 2 | N/A (solo) |
+| 45.2 | npm-wrapper | docs/specs/tasks/task-45.2-npm-promptfoo-bin-shims.md | Done | Phase 45 order 2 | N/A (solo) |
 | 45.3 | docs | docs/specs/tasks/task-45.3-readme-drop-in-cli-usage.md | Ready | Phase 45 order 3 | N/A (solo) |
 
 ## ADR 索引

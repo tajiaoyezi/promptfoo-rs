@@ -1,6 +1,6 @@
 # Task 45.2: npm-promptfoo-bin-shims
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 45 - promptfoo-drop-in-cli-entrypoints
@@ -67,19 +67,19 @@ The npm wrapper must declare local bin shims named `promptfoo`, `promptfoo-rs`, 
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (`npm view promptfoo bin`): `npm/package.json` declares `promptfoo` and `pf` bin entries, and also exposes `promptfoo-rs` for explicit reimplementation usage.
-- [ ] **AC2** (ADR-008): npm bin shims delegate to the Rust CLI boundary and do not reimplement eval/provider/assertion business logic.
-- [ ] **AC3** (task 17.5 / task 18.4): npm pack/build smoke proves bin installability locally while keeping `published=false` and publication authority blocked without real credentials.
-- [ ] **AC4** (PRD §Security): bin shims do not store tokens, upload results, or execute unapproved scripts by default.
+- [x] **AC1** (`npm view promptfoo bin`): `npm/package.json` declares `promptfoo` and `pf` bin entries, and also exposes `promptfoo-rs` for explicit reimplementation usage.
+- [x] **AC2** (ADR-008): npm bin shims delegate to the Rust CLI boundary and do not reimplement eval/provider/assertion business logic.
+- [x] **AC3** (task 17.5 / task 18.4): npm pack/build smoke proves bin installability locally while keeping `published=false` and publication authority blocked without real credentials.
+- [x] **AC4** (PRD §Security): bin shims do not store tokens, upload results, or execute unapproved scripts by default.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-45.2.1 | TEST-45.2.1 | tests/npm_promptfoo_bin_shims.rs or npm scripts/test.mjs | install, lint, typecheck, unit-test, build | Not Started |
-| AC2 | SCEN-45.2.1 | TEST-45.2.2 | tests/npm_promptfoo_bin_shims.rs or npm scripts/test.mjs | install, typecheck, unit-test, integration, build | Not Started |
-| AC3 | SCEN-45.2.1 | TEST-45.2.3 | npm scripts/node-smoke.mjs / installability gate | install, lint, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC4 | SCEN-45.2.1 | TEST-45.2.4 | npm scripts/test.mjs | install, lint, typecheck, unit-test, e2e, build | Not Started |
+| AC1 | SCEN-45.2.1 | TEST-45.2.1 | npm/scripts/test.mjs | install, lint, typecheck, unit-test, build | Done |
+| AC2 | SCEN-45.2.1 | TEST-45.2.2 | npm/scripts/test.mjs, npm/scripts/node-smoke.mjs | install, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-45.2.1 | TEST-45.2.3 | npm/scripts/node-smoke.mjs / installability gate | install, lint, typecheck, unit-test, runtime-smoke, build | Done |
+| AC4 | SCEN-45.2.1 | TEST-45.2.4 | npm/scripts/test.mjs | install, lint, typecheck, unit-test, e2e, build | Done |
 
 ## 8. Risks
 
@@ -101,18 +101,31 @@ The npm wrapper must declare local bin shims named `promptfoo`, `promptfoo-rs`, 
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
+- **完成日期**：2026-06-04
+- **改动文件**：
+  - npm/package.json
+  - npm/bin/promptfoo.mjs
+  - npm/bin/promptfoo-rs.mjs
+  - npm/bin/pf.mjs
+  - npm/bin/run-promptfoo-bin.mjs
+  - npm/scripts/test.mjs
+  - npm/scripts/node-smoke.mjs
+  - docs/specs/tasks/task-45.2-npm-promptfoo-bin-shims.md
+  - docs/s2v-adapter.md
+  - docs/specs/phases/phase-45-promptfoo-drop-in-cli-entrypoints.md
+- **commit 列表**：
+  - 73afde7 test(npm-wrapper): add task-45.2 bin shim RED tests
+  - 3ab6474 feat(npm-wrapper): add promptfoo bin shims
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-45.2 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - lint: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - integration: <TBD-after-impl>
-  - e2e: <TBD-after-impl>
-  - coverage: <TBD-after-impl>
-  - build: <TBD-after-impl>
-  - runtime-smoke: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: 通过；`s2v_verify_full` 执行 adapter Install，cargo fetch、viewer pnpm install、npm pnpm install 均成功。
+  - lint: 通过；`bash scripts/release/lint.sh` 成功。
+  - typecheck: 通过；`cargo check --workspace`、viewer typecheck、npm typecheck 均成功。
+  - unit-test: 通过；`cargo test --workspace`、viewer test、npm test 均成功；npm test 覆盖 package bin entries、shim 文件存在、无业务逻辑/凭据/发布命令文本。
+  - integration: 通过；`bash scripts/release/integration.sh` 成功。
+  - e2e: 通过；`bash scripts/release/e2e.sh` 成功。
+  - coverage: 通过；`bash scripts/release/coverage.sh` 成功。
+  - build: 通过；adapter Build 成功；`pnpm -C npm build` 通过 node smoke，覆盖 `promptfoo` / `promptfoo-rs` / `pf` 的 `--help`、`eval -c` 与 `pnpm pack --dry-run`。
+  - runtime-smoke: 通过；`bash scripts/release/runtime-smoke.sh` 成功，release candidate 继续保持 publication authority fail-closed。
+- **剩余风险 / 未做项**：npm wrapper 仍为 `private: true`，未执行 `npm publish`，也不声明拥有 upstream `promptfoo` npm package；真实 public publication、registry token、法律/品牌授权仍由 Phase 43/44 authority gates 管理。
+- **下游 task 影响**：task 45.3 可把 npm install / npx 风格文档写成本地 wrapper bin surface，并必须保留 private/no-publish 边界。
