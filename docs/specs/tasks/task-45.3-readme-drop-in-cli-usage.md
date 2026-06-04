@@ -1,6 +1,6 @@
 # Task 45.3: readme-drop-in-cli-usage
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P1
 **Owner**: leafiellune
 **Related Phase**: Phase 45 - promptfoo-drop-in-cli-entrypoints
@@ -73,19 +73,19 @@ Docs must prefer `promptfoo` for installed/local drop-in command examples once t
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (upstream README): README and Quickstart show `promptfoo eval`, `promptfoo view`, and `promptfoo --help` as the preferred local command after build/install.
-- [ ] **AC2** (task 45.1 / 45.2): docs mention `promptfoo-rs` and `pf` only where supported by tested Rust/npm aliases.
-- [ ] **AC3** (ADR-008 / docs/release.md): install/publish sections distinguish local build/package smoke from real public registry publication.
-- [ ] **AC4** (ADR-011): docs contain no forbidden perfect-refactor, public stable, upstream endorsement, or bug-free claims.
+- [x] **AC1** (upstream README): README and Quickstart show `promptfoo eval`, `promptfoo view`, and `promptfoo --help` as the preferred local command after build/install.
+- [x] **AC2** (task 45.1 / 45.2): docs mention `promptfoo-rs` and `pf` only where supported by tested Rust/npm aliases.
+- [x] **AC3** (ADR-008 / docs/release.md): install/publish sections distinguish local build/package smoke from real public registry publication.
+- [x] **AC4** (ADR-011): docs contain no forbidden perfect-refactor, public stable, upstream endorsement, or bug-free claims.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-45.3.1 | TEST-45.3.1 | docs link/claim checker or release docs test | install, lint, typecheck, unit-test, build | Not Started |
-| AC2 | SCEN-45.3.1 | TEST-45.3.2 | docs link/claim checker or release docs test | install, lint, typecheck, unit-test, build | Not Started |
-| AC3 | SCEN-45.3.1 | TEST-45.3.3 | docs link/claim checker or release docs test | install, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC4 | SCEN-45.3.1 | TEST-45.3.4 | docs link/claim checker or current_latest_quality_gate docs assertions | install, lint, typecheck, unit-test, coverage, build | Not Started |
+| AC1 | SCEN-45.3.1 | TEST-45.3.1 | `tests/drop_in_cli_docs.rs` docs command checker | install, lint, typecheck, unit-test, build | Done |
+| AC2 | SCEN-45.3.1 | TEST-45.3.2 | `tests/drop_in_cli_docs.rs` alias checker | install, lint, typecheck, unit-test, build | Done |
+| AC3 | SCEN-45.3.1 | TEST-45.3.3 | `tests/drop_in_cli_docs.rs` publication-boundary checker | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC4 | SCEN-45.3.1 | TEST-45.3.4 | `tests/drop_in_cli_docs.rs` forbidden-claim checker + current-latest quality wording policy | install, lint, typecheck, unit-test, coverage, build | Done |
 
 ## 8. Risks
 
@@ -107,18 +107,31 @@ Docs must prefer `promptfoo` for installed/local drop-in command examples once t
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
+- **完成日期**：2026-06-04
+- **改动文件**：
+  - README.md
+  - README.en.md
+  - docs/QUICKSTART.md
+  - docs/QUICKSTART.en.md
+  - docs/PROJECT-OVERVIEW.md
+  - docs/release.md
+  - tests/drop_in_cli_docs.rs
+  - docs/specs/tasks/task-45.3-readme-drop-in-cli-usage.md
+  - docs/s2v-adapter.md
+  - docs/specs/phases/phase-45-promptfoo-drop-in-cli-entrypoints.md
+- **commit 列表**：
+  - 318a0c0 test(docs): add task-45.3 drop-in CLI docs RED tests
+  - 6a64389 docs(readme): document promptfoo drop-in CLI usage
+  - 本 docs(spec) 回填提交见 git log：docs(spec): 回填 task-45.3 §10 Completion Notes + Status → Done
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - lint: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - integration: <TBD-after-impl>
-  - e2e: <TBD-after-impl>
-  - coverage: <TBD-after-impl>
-  - build: <TBD-after-impl>
-  - runtime-smoke: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: 通过；`s2v_verify_full` 执行 adapter Install，cargo fetch、viewer pnpm install、npm pnpm install 均成功。
+  - lint: 通过；`bash scripts/release/lint.sh` 成功。
+  - typecheck: 通过；`cargo check --workspace`、viewer typecheck、npm typecheck 均成功。
+  - unit-test: 通过；`cargo test --workspace`、viewer test、npm test 均成功，包含 TEST-45.3.1 ~ TEST-45.3.4。
+  - integration: 通过；`bash scripts/release/integration.sh` 成功。
+  - e2e: 通过；`bash scripts/release/e2e.sh` 成功。
+  - coverage: 通过；`bash scripts/release/coverage.sh` 成功，`s2v_coverage_threshold_guard` 通过。
+  - build: 通过；adapter Build 成功，Rust release 与 viewer/npm build 继续通过。
+  - runtime-smoke: 通过；`bash scripts/release/runtime-smoke.sh` 成功。
+- **剩余风险 / 未做项**：真实 npm/GitHub Releases/Homebrew/Docker public publication 仍未执行；文档仅声明已测试的本地 `promptfoo` / `promptfoo-rs` / `pf` 入口和 `local build/package smoke`，不声明 public registry publication 或 perfect-refactor completion。
+- **下游 task 影响**：Phase 45 可进入 phase smoke 收尾；Phase 43/44 的真实凭据、法律/品牌、外部 URL/digest 权限任务仍保持独立阻塞边界。

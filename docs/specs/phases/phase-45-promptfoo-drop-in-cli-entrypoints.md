@@ -22,7 +22,7 @@ Existing promptfoo users copy commands from upstream docs and expect `promptfoo 
 |---|---|---|---|---|
 | 45.1 | rust-promptfoo-binary-alias | ../tasks/task-45.1-rust-promptfoo-binary-alias.md | Done | 让 Cargo release 同时生成 `promptfoo` 和 `promptfoo-rs` 两个等价 Rust CLI 入口 |
 | 45.2 | npm-promptfoo-bin-shims | ../tasks/task-45.2-npm-promptfoo-bin-shims.md | Done | 让 npm wrapper 暴露 `promptfoo`、`promptfoo-rs`、`pf` bin shim 并保持本地 smoke 可验证 |
-| 45.3 | readme-drop-in-cli-usage | ../tasks/task-45.3-readme-drop-in-cli-usage.md | Ready | 把 README/Quickstart/release docs 从 `promptfoo-rs` only 更新为 drop-in CLI 用法，并保留品牌/发布边界 |
+| 45.3 | readme-drop-in-cli-usage | ../tasks/task-45.3-readme-drop-in-cli-usage.md | Done | 把 README/Quickstart/release docs 从 `promptfoo-rs` only 更新为 drop-in CLI 用法，并保留品牌/发布边界 |
 
 ## 5. Dependencies
 
