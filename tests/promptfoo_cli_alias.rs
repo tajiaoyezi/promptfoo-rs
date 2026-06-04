@@ -5,8 +5,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 fn promptfoo_bin(name: &str) -> Command {
     let path = match name {
-        "promptfoo" => option_env!("CARGO_BIN_EXE_promptfoo")
-            .expect("TEST-45.1 promptfoo bin target should be built by Cargo"),
+        "promptfoo" => env!("CARGO_BIN_EXE_promptfoo"),
         "promptfoo-rs" => env!("CARGO_BIN_EXE_promptfoo-rs"),
         other => panic!("unknown test binary {other}"),
     };
@@ -91,7 +90,10 @@ fn test_45_1_3_promptfoo_alias_preserves_error_behavior() {
         .output()
         .expect("promptfoo-rs unknown command should execute");
 
-    assert_eq!(unknown_promptfoo.status.code(), unknown_promptfoo_rs.status.code());
+    assert_eq!(
+        unknown_promptfoo.status.code(),
+        unknown_promptfoo_rs.status.code()
+    );
     assert_eq!(
         normalized_command_name(&unknown_promptfoo.stderr),
         normalized_command_name(&unknown_promptfoo_rs.stderr)
