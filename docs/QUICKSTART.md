@@ -1,6 +1,6 @@
 # Quickstart
 
-本指南用于把 `promptfoo-rs` 从源码构建起来，并运行一个最小本地 eval。
+本指南用于把 `promptfoo-rs` 从源码构建起来，并通过本地 `promptfoo` 命令运行一个最小 eval。
 
 ## 1. 准备环境
 
@@ -26,7 +26,7 @@ corepack --version
 git clone https://github.com/tajiaoyezi/promptfoo-rs.git
 cd promptfoo-rs
 cargo build --workspace --release
-target/release/promptfoo-rs --help
+target/release/promptfoo --help
 ```
 
 Windows PowerShell:
@@ -35,8 +35,10 @@ Windows PowerShell:
 git clone https://github.com/tajiaoyezi/promptfoo-rs.git
 cd promptfoo-rs
 cargo build --workspace --release
-.\target\release\promptfoo-rs.exe --help
+.\target\release\promptfoo.exe --help
 ```
+
+首选本地入口是 `promptfoo --help`。Rust release 同时保留 `promptfoo-rs`；npm wrapper 的本地 bin shim 还支持 `pf`。
 
 ## 3. 运行最小 eval
 
@@ -58,13 +60,13 @@ tests:
 运行：
 
 ```bash
-target/release/promptfoo-rs eval -c promptfooconfig.yaml
+target/release/promptfoo eval -c promptfooconfig.yaml
 ```
 
 Windows PowerShell:
 
 ```powershell
-.\target\release\promptfoo-rs.exe eval -c promptfooconfig.yaml
+.\target\release\promptfoo.exe eval -c promptfooconfig.yaml
 ```
 
 默认输出为 JSON envelope。成功时应看到 `status: "ok"` 和 `summary.total_cases: 1`。
@@ -72,7 +74,8 @@ Windows PowerShell:
 ## 4. 写入输出文件
 
 ```bash
-target/release/promptfoo-rs eval -c promptfooconfig.yaml --output results.json
+target/release/promptfoo eval -c promptfooconfig.yaml --output results.json
+target/release/promptfoo view .
 ```
 
 可用于 CI 的输出契约包括 JSON、JSONL、JUnit、SARIF、CSV 和 HTML；具体支持由 `src/output/` 和 release gate 测试覆盖。
@@ -106,7 +109,7 @@ tests:
 运行：
 
 ```bash
-target/release/promptfoo-rs eval -c promptfooconfig.yaml --env-file .env
+target/release/promptfoo eval -c promptfooconfig.yaml --env-file .env
 ```
 
 ## 6. 常用开发验证
@@ -145,5 +148,5 @@ Windows PowerShell：
 
 - `share`、`auth`、`delete` 等 cloud/SaaS 命令默认 fail-closed，不上传、不改远端。
 - 脚本 bridge 默认关闭；需要显式授权和 sandbox/redaction 约束。
-- 本地 gate 通过不等于已经公开发布，也不等于完整替代 promptfoo 当前 GitHub HEAD。
+- `local build/package smoke` 通过不等于已经完成 `public registry publication`，也不等于完整替代 promptfoo 当前 GitHub HEAD。
 - 当前兼容边界以 [docs/compatibility/matrix.md](compatibility/matrix.md) 和 [docs/release.md](release.md) 为准。

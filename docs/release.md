@@ -42,7 +42,7 @@ Build from `Dockerfile` and publish an immutable image digest. The container is 
 
 ### npm Wrapper
 
-The npm wrapper is a compatibility distribution channel over the Rust core boundary. The tracked `npm/package.json` supports local typecheck, test, build, smoke, and `pnpm pack` dry-run evidence. Real `npm publish` requires explicit credentials and must remain blocked in release evidence until those credentials and publication authority are provided.
+The npm wrapper is a compatibility distribution channel over the Rust core boundary. The tracked `npm/package.json` exposes local bin shims for `promptfoo`, `promptfoo-rs`, and `pf`, and supports local typecheck, test, build, smoke, and `pnpm pack` dry-run evidence. This is `local build/package smoke`; real `public registry publication` through `npm publish` requires explicit credentials and must remain blocked in release evidence until those credentials and publication authority are provided.
 
 ### GitHub Action
 

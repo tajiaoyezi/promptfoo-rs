@@ -1,6 +1,6 @@
 # Quickstart
 
-This guide builds `promptfoo-rs` from source and runs a minimal local eval.
+This guide builds `promptfoo-rs` from source and runs a minimal local eval through the local `promptfoo` command.
 
 ## 1. Prerequisites
 
@@ -26,7 +26,7 @@ corepack --version
 git clone https://github.com/tajiaoyezi/promptfoo-rs.git
 cd promptfoo-rs
 cargo build --workspace --release
-target/release/promptfoo-rs --help
+target/release/promptfoo --help
 ```
 
 Windows PowerShell:
@@ -35,8 +35,10 @@ Windows PowerShell:
 git clone https://github.com/tajiaoyezi/promptfoo-rs.git
 cd promptfoo-rs
 cargo build --workspace --release
-.\target\release\promptfoo-rs.exe --help
+.\target\release\promptfoo.exe --help
 ```
+
+The preferred local entrypoint is `promptfoo --help`. The Rust release also keeps `promptfoo-rs`, and the npm wrapper's local bin shim supports `pf`.
 
 ## 3. Run a minimal eval
 
@@ -58,13 +60,13 @@ tests:
 Run:
 
 ```bash
-target/release/promptfoo-rs eval -c promptfooconfig.yaml
+target/release/promptfoo eval -c promptfooconfig.yaml
 ```
 
 Windows PowerShell:
 
 ```powershell
-.\target\release\promptfoo-rs.exe eval -c promptfooconfig.yaml
+.\target\release\promptfoo.exe eval -c promptfooconfig.yaml
 ```
 
 The default output is a JSON envelope. A successful run should contain `status: "ok"` and `summary.total_cases: 1`.
@@ -72,7 +74,8 @@ The default output is a JSON envelope. A successful run should contain `status: 
 ## 4. Write output files
 
 ```bash
-target/release/promptfoo-rs eval -c promptfooconfig.yaml --output results.json
+target/release/promptfoo eval -c promptfooconfig.yaml --output results.json
+target/release/promptfoo view .
 ```
 
 CI-facing output contracts include JSON, JSONL, JUnit, SARIF, CSV, and HTML; support is covered by `src/output/` and release-gate tests.
@@ -106,7 +109,7 @@ tests:
 Run:
 
 ```bash
-target/release/promptfoo-rs eval -c promptfooconfig.yaml --env-file .env
+target/release/promptfoo eval -c promptfooconfig.yaml --env-file .env
 ```
 
 ## 6. Common development checks
@@ -145,5 +148,5 @@ Windows PowerShell:
 
 - `share`, `auth`, `delete`, and related cloud/SaaS commands fail closed by default and do not upload or mutate remote state.
 - Script bridges are disabled by default; they require explicit authorization and sandbox/redaction constraints.
-- Passing local gates does not mean the project is publicly published or a complete replacement for the latest promptfoo GitHub HEAD.
+- Passing `local build/package smoke` does not mean `public registry publication` is complete or that the project is a complete replacement for the latest promptfoo GitHub HEAD.
 - The compatibility boundary is defined by [docs/compatibility/matrix.md](compatibility/matrix.md) and [docs/release.md](release.md).

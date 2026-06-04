@@ -16,7 +16,7 @@
 
 promptfoo-rs 关注这些场景：
 
-- 在 CI 或本地运行 `promptfoo-rs eval -c promptfooconfig.yaml`，输出稳定 JSON/JSONL/JUnit/SARIF/CSV/HTML 结果。
+- 在 CI 或本地运行 `promptfoo eval -c promptfooconfig.yaml`，输出稳定 JSON/JSONL/JUnit/SARIF/CSV/HTML 结果。
 - 用 Rust 实现 eval runner、调度、缓存、结果存储、断点恢复、provider/assertion 契约和安全默认值。
 - 用 compatibility matrix、golden corpus、real upstream corpus 和 S2V gate 记录与 upstream promptfoo 的兼容边界。
 - 默认不上传、不执行未授权脚本、不写远程云端状态；需要脚本 bridge 时必须显式授权。
@@ -31,7 +31,7 @@ promptfoo-rs 关注这些场景：
 | 本地构建和测试 | 可用。`install`、`lint`、`typecheck`、`unit-test`、`integration`、`e2e`、`coverage`、`build`、`runtime-smoke` 已通过。 |
 | 已声明范围内的正常使用 | 可用。CLI、核心 eval、输出、viewer 数据契约、Node wrapper smoke 和 compatibility gates 均有测试覆盖。 |
 | promptfoo 当前最新版完整替代 | 尚未声明。current-latest gate 仍保留 blocker，`perfect_refactor_claim_allowed=false`。 |
-| 公开稳定发布 | 尚未完成。发布渠道仍需要真实凭据、法律/品牌确认、外部 URL/digest 证据。 |
+| 公开稳定发布 | 尚未完成。`local build/package smoke` 可验证；`public registry publication` 仍需要真实凭据、法律/品牌确认、外部 URL/digest 证据。 |
 
 允许的质量表述是：在已声明 gate 下，没有已知 release-blocking defect。项目不会承诺“无任何潜在 bug”或“完整 live-provider parity”，除非对应 gate 和外部证据闭合。
 
@@ -47,15 +47,17 @@ promptfoo-rs 关注这些场景：
 
 ```bash
 cargo build --workspace --release
-target/release/promptfoo-rs --help
+target/release/promptfoo --help
 ```
 
 Windows PowerShell:
 
 ```powershell
 cargo build --workspace --release
-.\target\release\promptfoo-rs.exe --help
+.\target\release\promptfoo.exe --help
 ```
+
+构建后首选本地命令是 `promptfoo --help`。`promptfoo-rs` 仍作为显式 Rust 别名保留；npm wrapper 的本地 bin shim 还支持 `pf`。
 
 ### 运行一个最小 eval
 
@@ -77,19 +79,27 @@ tests:
 运行：
 
 ```bash
-target/release/promptfoo-rs eval -c promptfooconfig.yaml --output results.json
+target/release/promptfoo eval -c promptfooconfig.yaml --output results.json
+```
+
+如果需要打开本地结果目录：
+
+```bash
+target/release/promptfoo view .
 ```
 
 更多示例见 [docs/QUICKSTART.md](docs/QUICKSTART.md)。
 
 ### 发布与安装渠道状态
 
-项目 release surface 覆盖 GitHub Releases、`cargo install`、Docker、npm wrapper 和 GitHub Action 示例。当前仓库只声明这些渠道的本地构建、文档和 gate 形态；真实公开发布仍需要凭据、法律/品牌确认和外部 artifact URL/digest 证据，详见 [docs/release.md](docs/release.md)。
+项目 release surface 覆盖 GitHub Releases、`cargo install`、Docker、npm wrapper 和 GitHub Action 示例。当前仓库只声明这些渠道的 `local build/package smoke`、文档和 gate 形态；真实 `public registry publication` 仍需要凭据、法律/品牌确认和外部 artifact URL/digest 证据，详见 [docs/release.md](docs/release.md)。
 
 ## CLI 能力
 
 当前 CLI 暴露以下命令族：
 
+- 首选本地入口：`promptfoo --help`、`promptfoo eval -c promptfooconfig.yaml`、`promptfoo view .`。
+- 兼容别名：Rust release 同时生成 `promptfoo-rs`；npm wrapper 本地 bin shim 暴露 `promptfoo`、`promptfoo-rs` 和 `pf`。
 - `eval`：从 promptfoo config 运行本地 eval。
 - `view`：读取本地结果目录，输出 viewer 数据契约。
 - `cache`：管理本地 eval cache。

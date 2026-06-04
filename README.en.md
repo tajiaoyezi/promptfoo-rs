@@ -16,7 +16,7 @@ Current status: local S2V verification passes, and the implemented scope builds,
 
 promptfoo-rs is designed for:
 
-- Running `promptfoo-rs eval -c promptfooconfig.yaml` locally or in CI with stable JSON/JSONL/JUnit/SARIF/CSV/HTML output.
+- Running `promptfoo eval -c promptfooconfig.yaml` locally or in CI with stable JSON/JSONL/JUnit/SARIF/CSV/HTML output.
 - Implementing the eval runner, scheduler, cache, result store, retry behavior, provider/assertion contracts, and security defaults in Rust.
 - Recording promptfoo compatibility through a compatibility matrix, golden corpus, real upstream corpus, and S2V release gates.
 - Staying local-first by default: no upload, no unapproved script execution, and no remote cloud mutation.
@@ -29,7 +29,7 @@ promptfoo-rs is designed for:
 | Local build and tests | Ready. `install`, `lint`, `typecheck`, `unit-test`, `integration`, `e2e`, `coverage`, `build`, and `runtime-smoke` pass. |
 | Normal use within implemented scope | Ready. CLI, core eval, output formats, viewer data contracts, Node wrapper smoke, and compatibility gates are covered. |
 | Full replacement for current latest promptfoo | Not claimed. Current-latest gates still keep blockers and `perfect_refactor_claim_allowed=false`. |
-| Public stable publication | Not complete. Real credentials, legal/brand approval, external URLs, and digests are still required. |
+| Public stable publication | Not complete. `local build/package smoke` is verified; `public registry publication` still requires real credentials, legal/brand approval, external URLs, and digests. |
 
 The strongest supported wording is: no known release-blocking defects under the declared gates. The project does not claim bug-free behavior or complete live-provider parity without matching gate evidence.
 
@@ -45,15 +45,17 @@ The strongest supported wording is: no known release-blocking defects under the 
 
 ```bash
 cargo build --workspace --release
-target/release/promptfoo-rs --help
+target/release/promptfoo --help
 ```
 
 Windows PowerShell:
 
 ```powershell
 cargo build --workspace --release
-.\target\release\promptfoo-rs.exe --help
+.\target\release\promptfoo.exe --help
 ```
+
+After building, the preferred local command is `promptfoo --help`. `promptfoo-rs` remains available as the explicit Rust alias, and the npm wrapper's local bin shims also support `pf`.
 
 ### Run a minimal eval
 
@@ -75,19 +77,27 @@ tests:
 Run:
 
 ```bash
-target/release/promptfoo-rs eval -c promptfooconfig.yaml --output results.json
+target/release/promptfoo eval -c promptfooconfig.yaml --output results.json
+```
+
+To open a local result directory:
+
+```bash
+target/release/promptfoo view .
 ```
 
 See [docs/QUICKSTART.en.md](docs/QUICKSTART.en.md) for more examples.
 
 ### Release and install channel status
 
-The release surface covers GitHub Releases, `cargo install`, Docker, the npm wrapper, and GitHub Action examples. This repository currently claims only the local build, documentation, and gate shape for those channels; real public publication still requires credentials, legal/brand confirmation, and external artifact URL/digest evidence. See [docs/release.md](docs/release.md).
+The release surface covers GitHub Releases, `cargo install`, Docker, the npm wrapper, and GitHub Action examples. This repository currently claims only the `local build/package smoke`, documentation, and gate shape for those channels; real `public registry publication` still requires credentials, legal/brand confirmation, and external artifact URL/digest evidence. See [docs/release.md](docs/release.md).
 
 ## CLI surface
 
 The CLI currently exposes:
 
+- Preferred local entrypoints: `promptfoo --help`, `promptfoo eval -c promptfooconfig.yaml`, and `promptfoo view .`.
+- Supported aliases: the Rust release also builds `promptfoo-rs`; the npm wrapper local bin shims expose `promptfoo`, `promptfoo-rs`, and `pf`.
 - `eval`: run a local eval from a promptfoo config.
 - `view`: read local result artifacts and emit the viewer data contract.
 - `cache`: manage local eval cache state.

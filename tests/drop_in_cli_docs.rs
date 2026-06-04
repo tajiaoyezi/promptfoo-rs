@@ -30,6 +30,20 @@ fn assert_contains(path: &str, contents: &str, needle: &str) {
     );
 }
 
+fn is_allowed_negative_claim_context(line: &str) -> bool {
+    [
+        "does not claim",
+        "must not claim",
+        "rejects phrases",
+        "gate rejects",
+        "不会承诺",
+        "不得声明",
+        "禁止声明",
+    ]
+    .iter()
+    .any(|marker| line.contains(marker))
+}
+
 #[test]
 fn test_45_3_1_docs_prefer_promptfoo_command_examples() {
     // TEST-45.3.1
@@ -82,10 +96,12 @@ fn test_45_3_4_docs_do_not_make_forbidden_release_or_parity_claims() {
     for path in CLAIM_DOCS {
         let normalized = read_doc(path).to_ascii_lowercase();
         for claim in forbidden_claims {
-            assert!(
-                !normalized.contains(claim),
-                "{path} should not contain forbidden claim `{claim}`"
-            );
+            for (line_number, line) in normalized.lines().enumerate() {
+                assert!(
+                    !line.contains(claim) || is_allowed_negative_claim_context(line),
+                    "{path}:{line_number} should not contain forbidden claim `{claim}`"
+                );
+            }
         }
     }
 }

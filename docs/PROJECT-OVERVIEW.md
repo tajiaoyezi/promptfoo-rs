@@ -18,14 +18,16 @@
 
 ## Runtime architecture
 
-The default path is a single Rust binary:
+The default path is a Rust CLI core exposed through tested local entrypoints:
 
-1. CLI parses promptfoo-compatible commands and flags.
-2. Config loader normalizes `promptfooconfig.yaml`, env files, prompt files, providers, tests, and assertions.
-3. Eval runtime schedules cases, applies cache/resume/retry behavior, executes providers, runs assertions, and emits result records.
-4. Output layer writes CI-facing formats such as JSON, JSONL, JUnit, SARIF, CSV, and HTML.
-5. Viewer and npm wrapper consume stable data contracts instead of owning the core eval path.
-6. Compatibility and release gates read artifacts and decide whether stable, current-latest, or perfect-refactor claims are allowed.
+1. The release build produces `promptfoo` as the drop-in local command and `promptfoo-rs` as the explicit Rust alias.
+2. CLI parses promptfoo-compatible commands and flags, including `promptfoo eval -c promptfooconfig.yaml` and `promptfoo view .`.
+3. The npm wrapper exposes local bin shims for `promptfoo`, `promptfoo-rs`, and `pf` over the same Rust core boundary.
+4. Config loader normalizes `promptfooconfig.yaml`, env files, prompt files, providers, tests, and assertions.
+5. Eval runtime schedules cases, applies cache/resume/retry behavior, executes providers, runs assertions, and emits result records.
+6. Output layer writes CI-facing formats such as JSON, JSONL, JUnit, SARIF, CSV, and HTML.
+7. Viewer and npm wrapper consume stable data contracts instead of owning the core eval path.
+8. Compatibility and release gates read artifacts and decide whether stable, current-latest, or perfect-refactor claims are allowed.
 
 ## Compatibility model
 
