@@ -1,6 +1,6 @@
 # Phase 42: current-latest-2ca16c-head-refresh
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ The tracked current-latest lock still records GitHub HEAD `9d7d810c2118c63cb537b
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 42.1 | current-latest-2ca16c-head-refresh | ../tasks/task-42.1-current-latest-2ca16c-head-refresh.md | Ready | 刷新 current-latest target lock 的 GitHub default branch HEAD 到 `2ca16c...` 并重跑 downstream gates |
+| 42.1 | current-latest-2ca16c-head-refresh | ../tasks/task-42.1-current-latest-2ca16c-head-refresh.md | Done | 刷新 current-latest target lock 的 GitHub default branch HEAD 到 `2ca16c...` 并重跑 downstream gates |
 
 ## 5. Dependencies
 
@@ -28,10 +28,10 @@ Depends on Phase 41 target refresh, ADR-007, ADR-009, ADR-011, and live upstream
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `current-latest-target.json` and `current-latest.lock.md` record npm latest `0.121.14`, npm gitHead `7a48c5fce614bee617efbb3b7fc93d404c75b628`, GitHub latest release `refs/tags/0.121.14`, and GitHub default branch HEAD `2ca16c59b64e0afca10533de0f817c0d24eba20a`.
-- [ ] Runtime smoke consumes the refreshed default branch target and regenerates current-latest source inventory, matrix, golden corpus, quality, release-candidate, and unblock packet artifacts.
-- [ ] Downstream gates remain fail-closed with `current_latest_claim_allowed=false` and `perfect_refactor_claim_allowed=false` unless all refreshed evidence and external authority gates are ready.
-- [ ] Any new source/matrix/golden blocker introduced by the refreshed HEAD is surfaced explicitly and not removed from compatibility evidence.
+- [x] `current-latest-target.json` and `current-latest.lock.md` record npm latest `0.121.14`, npm gitHead `7a48c5fce614bee617efbb3b7fc93d404c75b628`, GitHub latest release `refs/tags/0.121.14`, and GitHub default branch HEAD `2ca16c59b64e0afca10533de0f817c0d24eba20a`.
+- [x] Runtime smoke consumes the refreshed default branch target and regenerates current-latest source inventory, matrix, golden corpus, quality, release-candidate, and unblock packet artifacts.
+- [x] Downstream gates remain fail-closed with `current_latest_claim_allowed=false` and `perfect_refactor_claim_allowed=false` unless all refreshed evidence and external authority gates are ready.
+- [x] Any new source/matrix/golden blocker introduced by the refreshed HEAD is surfaced explicitly and not removed from compatibility evidence.
 
 ## 7. Phase Risks
 
@@ -45,7 +45,7 @@ Task 42.1 spec is Done, phase §6 smoke passes with task §9 verification, track
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
+- **完成日期**：2026-06-06
+- **Phase smoke**：task 42.1 §9 verification 全套通过；`bash scripts/release/runtime-smoke.sh` 成功。
+- **Artifact evidence**：runtime smoke regenerated `target/release-gates/current-latest-target.json` with `status=locked-with-drift`, `github.default_branch_head=2ca16c59b64e0afca10533de0f817c0d24eba20a`, and `current_latest_claim_allowed=false`. Current-latest source inventory and matrix report `status=ready-with-blockers` with `unclassified_rows=[unclassified:src-evaluator-inmemorystore]`; evaluator runtime remains native fixture evidence; current-latest golden reports `blocker_count=25`; quality reports `blocker_count=6`; release candidate keeps `publication_ready=credential-blocked`; unblock packet reports `required_user_decision_count=32`.
 - **Remaining boundaries**：External provider/config authority, current-target policy, publication credentials/approval, and bug-free/perfect-refactor claim boundaries remain unresolved without external decisions or formal waivers.

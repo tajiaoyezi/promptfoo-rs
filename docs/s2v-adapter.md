@@ -170,7 +170,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 39 | current-latest-evaluator-runtime-classification | docs/specs/phases/phase-39-current-latest-evaluator-runtime-classification.md | Done | 1 | N/A (solo) |
 | 40 | current-latest-evaluator-runtime-fixture-burndown | docs/specs/phases/phase-40-current-latest-evaluator-runtime-fixture-burndown.md | Done | 1 | N/A (solo) |
 | 41 | current-latest-github-head-drift-refresh | docs/specs/phases/phase-41-current-latest-github-head-drift-refresh.md | Done | 1 | N/A (solo) |
-| 42 | current-latest-2ca16c-head-refresh | docs/specs/phases/phase-42-current-latest-2ca16c-head-refresh.md | Ready | 1 | N/A (solo) |
+| 42 | current-latest-2ca16c-head-refresh | docs/specs/phases/phase-42-current-latest-2ca16c-head-refresh.md | Done | 1 | N/A (solo) |
 | 43 | authority-evidence-intake-gates | docs/specs/phases/phase-43-authority-evidence-intake-gates.md | Ready | 2 | N/A (solo) |
 | 44 | public-stable-release-authority-closure | docs/specs/phases/phase-44-public-stable-release-authority-closure.md | Draft | 2 | N/A (solo) |
 | 45 | promptfoo-drop-in-cli-entrypoints | docs/specs/phases/phase-45-promptfoo-drop-in-cli-entrypoints.md | Done | 3 | N/A (solo) |
@@ -255,7 +255,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 39.1 | eval-runner | docs/specs/tasks/task-39.1-current-latest-evaluator-runtime-classification.md | Done | Phase 39 order 1 | N/A (solo) |
 | 40.1 | eval-runner | docs/specs/tasks/task-40.1-current-latest-evaluator-runtime-fixture-burndown.md | Done | Phase 40 order 1 | N/A (solo) |
 | 41.1 | compatibility | docs/specs/tasks/task-41.1-current-latest-github-head-drift-refresh.md | Done | Phase 41 order 1 | N/A (solo) |
-| 42.1 | compatibility | docs/specs/tasks/task-42.1-current-latest-2ca16c-head-refresh.md | Ready | Phase 42 order 1 | N/A (solo) |
+| 42.1 | compatibility | docs/specs/tasks/task-42.1-current-latest-2ca16c-head-refresh.md | Done | Phase 42 order 1 | N/A (solo) |
 | 43.1 | compatibility-authority | docs/specs/tasks/task-43.1-authority-decision-manifest-gate.md | Ready | Phase 43 order 1 | N/A (solo) |
 | 43.2 | release | docs/specs/tasks/task-43.2-publication-evidence-manifest-gate.md | Ready | Phase 43 order 2 | N/A (solo) |
 | 44.1 | compatibility-authority | docs/specs/tasks/task-44.1-external-authority-evidence-application.md | Draft | Phase 44 order 1 | N/A (solo) |
