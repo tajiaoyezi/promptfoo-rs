@@ -165,4 +165,10 @@ fn preserve_platform_process_env(command: &mut Command) {
 }
 
 #[cfg(not(windows))]
-fn preserve_platform_process_env(_command: &mut Command) {}
+fn preserve_platform_process_env(command: &mut Command) {
+    for key in ["PATH", "HOME", "TMPDIR", "LANG"] {
+        if let Some(value) = std::env::var_os(key) {
+            command.env(key, value);
+        }
+    }
+}
