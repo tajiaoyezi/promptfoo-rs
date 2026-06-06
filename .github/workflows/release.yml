@@ -89,7 +89,6 @@ jobs:
           path: |
             target/github-release-dist/*.tar.gz
             target/github-release-dist/*.zip
-            target/github-release-dist/SHA256SUMS
 
   publish:
     needs: [verify, build]
@@ -105,6 +104,17 @@ jobs:
           pattern: github-release-*
           merge-multiple: true
           path: dist
+      - name: Write combined SHA256SUMS
+        run: |
+          cd dist
+          shopt -s nullglob
+          archives=( *.tar.gz *.zip )
+          if [ "${#archives[@]}" -eq 0 ]; then
+            echo "no release archives found in dist/" >&2
+            exit 1
+          fi
+          sha256sum "${archives[@]}" > SHA256SUMS
+          cat SHA256SUMS
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
