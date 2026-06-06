@@ -62,3 +62,58 @@ jobs:
         run: |
           echo "Stable publishing requires the compatibility release gate to be Ready."
           echo "Blocked gates may only publish prerelease or nightly artifacts."
+
+  build:
+    needs: verify
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Package GitHub Release archive
+        shell: bash
+        env:
+          TARGET: ${{ matrix.target }}
+        run: bash scripts/release/package-github-release.sh
+      - name: Upload release archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-release-${{ matrix.target }}
+          path: |
+            target/github-release-dist/*.tar.gz
+            target/github-release-dist/*.zip
+            target/github-release-dist/SHA256SUMS
+
+  publish:
+    needs: [verify, build]
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download release archives
+        uses: actions/download-artifact@v4
+        with:
+          pattern: github-release-*
+          merge-multiple: true
+          path: dist
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          body_path: docs/release-notes/${{ github.ref_name }}.md
+          generate_release_notes: false
+          fail_on_unmatched_files: true
+      - name: Publication evidence backfill reminder
+        run: |
+          echo "After release upload completes, run:"
+          echo "  node scripts/release/backfill-github-release-evidence.mjs --artifact-url <release-asset-url> --digest sha256:<hash> --timestamp <iso8601>"
+          echo "Then commit docs/compatibility/publication-evidence.json and open a PR."

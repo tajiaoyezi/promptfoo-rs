@@ -62,6 +62,22 @@ Maintainer policy: `docs/compatibility/v1-release-authority-policy.md`
 
 Current publication evidence (`docs/compatibility/publication-evidence.json`) keeps every channel `published=false` until a real tagged GitHub Release records an external artifact URL and checksum. Deferred channels document v1 waiver notes instead of claiming public availability.
 
+## v0.1.0 GitHub Release Procedure
+
+1. Merge release workflow changes to `master`.
+2. Push an annotated tag: `git tag v0.1.0 && git push origin v0.1.0`.
+3. `.github/workflows/release.yml` runs S2V verification, packages linux/windows archives, and uploads assets to the GitHub Release using `docs/release-notes/v0.1.0.md`.
+4. Backfill publication evidence for the published asset:
+
+```bash
+node scripts/release/backfill-github-release-evidence.mjs \
+  --artifact-url https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.0/<archive-name> \
+  --digest sha256:<checksum-from-SHA256SUMS> \
+  --timestamp 2026-06-06T00:00:00Z
+```
+
+5. Run `bash scripts/release/publication-evidence.sh` and commit the updated manifest. Aggregate `publication_ready` may remain `false` while v1-deferred channels stay blocked; that is expected.
+
 `target/release-gates/release-candidate.json.publication_authority` remains `credential-blocked` while any channel is unpublished. Dry-run archives, `cargo package`, `pnpm pack`, Dockerfile checks, and Homebrew documentation checks are not public release evidence.
 
 ## External Authority Gate
