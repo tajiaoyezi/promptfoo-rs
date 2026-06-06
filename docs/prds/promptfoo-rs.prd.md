@@ -360,6 +360,10 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 > Phase 42 是 2026-06-04 再次 live upstream drift 后的 current-latest target refresh：npm latest 与 GitHub latest release 仍是 `0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`，但 GitHub default branch HEAD 已移动到 `2ca16c59b64e0afca10533de0f817c0d24eba20a`。该 phase 只刷新 current-latest repository target evidence，不解除外部 authority、publication 或 bug-free claim 边界。
 >
 > Task 42.1 完成后，tracked current-latest target lock 与 runtime-smoke artifacts 均记录 GitHub default branch HEAD `2ca16c59b64e0afca10533de0f817c0d24eba20a`，npm latest / GitHub latest release 仍保持 `0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`。Runtime-smoke evidence 继续保持 fail-closed：source inventory 与 matrix `status=ready-with-blockers` 且 `unclassified_rows=[unclassified:src-evaluator-inmemorystore]`，evaluator runtime fixture evidence 仍为 native，current-latest golden `blocker_count=25`，quality `blocker_count=6`，unblock packet `required_user_decision_count=32`，`perfect_refactor_claim_allowed=false`。刷新后新增的 `src/evaluator/inMemoryStore` 行被显式登记为 unclassified blocker，而不是被静默忽略。
+>
+> Phase 46 针对 Phase 42 runtime-smoke 暴露的本地 taxonomy regression：`src/evaluator/inMemoryStore.ts` 在 `2ca16c59` HEAD target 下为 `unclassified:src-evaluator-inmemorystore`。依据 Phase 25 / Phase 29 / Phase 39，agent 可保守地将其归入 eval-runner P0 blocker，但必须保留 dedicated fixture 要求，不能把 unknown cleanup 等同于 in-memory store native parity。
+>
+> Task 46.1 完成后，current-latest source inventory 与 matrix 在 `2ca16c59` HEAD target 下均为 `status=ready` 且 `unclassified_rows=[]`。`src/evaluator/inMemoryStore.ts` 被记录为 `eval-runner:src-evaluator-inmemorystore`、P0 blocked、`evidence_kind=blocker`；quality gate 因此从 6 个 blockers 降到 4 个 blockers，但 `perfect_refactor_claim_allowed=false` 仍正确。
 
 ## 2026-06-04 CLI Drop-in Entry Point Addendum
 

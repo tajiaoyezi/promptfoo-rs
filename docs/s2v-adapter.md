@@ -176,9 +176,10 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 40 | current-latest-evaluator-runtime-fixture-burndown | docs/specs/phases/phase-40-current-latest-evaluator-runtime-fixture-burndown.md | Done | 1 | N/A (solo) |
 | 41 | current-latest-github-head-drift-refresh | docs/specs/phases/phase-41-current-latest-github-head-drift-refresh.md | Done | 1 | N/A (solo) |
 | 42 | current-latest-2ca16c-head-refresh | docs/specs/phases/phase-42-current-latest-2ca16c-head-refresh.md | Done | 1 | N/A (solo) |
-| 43 | authority-evidence-intake-gates | docs/specs/phases/phase-43-authority-evidence-intake-gates.md | Ready | 2 | N/A (solo) |
+| 43 | authority-evidence-intake-gates | docs/specs/phases/phase-43-authority-evidence-intake-gates.md | Done | 2 | N/A (solo) |
 | 44 | public-stable-release-authority-closure | docs/specs/phases/phase-44-public-stable-release-authority-closure.md | Draft | 2 | N/A (solo) |
 | 45 | promptfoo-drop-in-cli-entrypoints | docs/specs/phases/phase-45-promptfoo-drop-in-cli-entrypoints.md | Done | 3 | N/A (solo) |
+| 46 | current-latest-evaluator-inmemorystore-classification | docs/specs/phases/phase-46-current-latest-evaluator-inmemorystore-classification.md | Done | 1 | N/A (solo) |
 
 ## Task 总索引
 
@@ -261,13 +262,14 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 40.1 | eval-runner | docs/specs/tasks/task-40.1-current-latest-evaluator-runtime-fixture-burndown.md | Done | Phase 40 order 1 | N/A (solo) |
 | 41.1 | compatibility | docs/specs/tasks/task-41.1-current-latest-github-head-drift-refresh.md | Done | Phase 41 order 1 | N/A (solo) |
 | 42.1 | compatibility | docs/specs/tasks/task-42.1-current-latest-2ca16c-head-refresh.md | Done | Phase 42 order 1 | N/A (solo) |
-| 43.1 | compatibility-authority | docs/specs/tasks/task-43.1-authority-decision-manifest-gate.md | Ready | Phase 43 order 1 | N/A (solo) |
-| 43.2 | release | docs/specs/tasks/task-43.2-publication-evidence-manifest-gate.md | Ready | Phase 43 order 2 | N/A (solo) |
+| 43.1 | compatibility-authority | docs/specs/tasks/task-43.1-authority-decision-manifest-gate.md | Done | Phase 43 order 1 | N/A (solo) |
+| 43.2 | release | docs/specs/tasks/task-43.2-publication-evidence-manifest-gate.md | Done | Phase 43 order 2 | N/A (solo) |
 | 44.1 | compatibility-authority | docs/specs/tasks/task-44.1-external-authority-evidence-application.md | Draft | Phase 44 order 1 | N/A (solo) |
 | 44.2 | release | docs/specs/tasks/task-44.2-public-publication-evidence-application.md | Draft | Phase 44 order 2 | N/A (solo) |
 | 45.1 | cli | docs/specs/tasks/task-45.1-rust-promptfoo-binary-alias.md | Done | Phase 45 order 1 | N/A (solo) |
 | 45.2 | npm-wrapper | docs/specs/tasks/task-45.2-npm-promptfoo-bin-shims.md | Done | Phase 45 order 2 | N/A (solo) |
 | 45.3 | docs | docs/specs/tasks/task-45.3-readme-drop-in-cli-usage.md | Done | Phase 45 order 3 | N/A (solo) |
+| 46.1 | eval-runner | docs/specs/tasks/task-46.1-current-latest-evaluator-inmemorystore-classification.md | Done | Phase 46 order 1 | N/A (solo) |
 
 ## ADR 索引
 
@@ -304,4 +306,4 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 8.2 | test/features/scan-engine.feature |
 | 9.1 | test/features/script-bridge.feature |
 | 10.1 | test/features/web-viewer.feature |
-| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5, 18.1, 18.2, 18.3, 18.4, 19.1, 19.2, 19.3, 19.4, 20.1, 20.2, 21.1, 22.1, 23.1, 24.1, 24.2, 24.3, 24.4, 25.1, 26.1, 27.1, 28.1, 29.1, 30.1, 31.1, 32.1, 33.1, 34.1, 35.1, 36.1, 37.1, 38.1, 39.1, 40.1, 41.1, 42.1, 43.1, 43.2, 44.1, 44.2 | test/features/perfect-refactor-parity.feature |
+| 11.1, 11.2, 11.3, 12.1, 12.2, 12.3, 13.1, 13.2, 14.1, 14.2, 15.1, 15.2, 16.1, 16.2, 16.3, 17.1, 17.2, 17.3, 17.4, 17.5, 18.1, 18.2, 18.3, 18.4, 19.1, 19.2, 19.3, 19.4, 20.1, 20.2, 21.1, 22.1, 23.1, 24.1, 24.2, 24.3, 24.4, 25.1, 26.1, 27.1, 28.1, 29.1, 30.1, 31.1, 32.1, 33.1, 34.1, 35.1, 36.1, 37.1, 38.1, 39.1, 40.1, 41.1, 42.1, 43.1, 43.2, 44.1, 44.2, 46.1 | test/features/perfect-refactor-parity.feature |
