@@ -27,11 +27,9 @@ fn test_44_2_2_no_channel_is_published_from_local_dry_run_evidence() {
     let report = validate_publication_evidence(&authority, &manifest);
 
     assert!(!report.publication_ready(), "{report:#?}");
-    assert_eq!(report.published_channel_count, 0, "{report:#?}");
-    assert_eq!(
-        report.blocked_channel_count, report.required_channel_count,
-        "{report:#?}"
-    );
+    assert_eq!(report.published_channel_count, 1, "{report:#?}");
+    assert_eq!(report.blocked_channel_count, 5, "{report:#?}");
+    assert!(report.dry_run_only_published_rows.is_empty(), "{report:#?}");
 }
 
 #[test]
@@ -42,8 +40,9 @@ fn test_44_2_3_v1_defers_non_github_channels_while_github_awaits_real_release() 
     let application = apply_publication_evidence(&manifest, &authority);
 
     assert!(!application.publication_ready, "{application:#?}");
-    assert!(
-        application.published_channels().is_empty(),
+    assert_eq!(
+        application.published_channels(),
+        vec!["github-releases".to_string()],
         "{application:#?}"
     );
     assert_eq!(application.deferred_channels.len(), 5, "{application:#?}");
@@ -66,7 +65,14 @@ fn test_44_2_3_v1_defers_non_github_channels_while_github_awaits_real_release() 
         .iter()
         .find(|row| row["channel"] == "github-releases")
         .expect("github-releases row");
-    assert_eq!(github["publication_state"], "blocked");
+    assert_eq!(github["publication_state"], "published");
+    assert!(
+        github["artifact_url"]
+            .as_str()
+            .unwrap_or_default()
+            .starts_with("https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.0/"),
+        "{github:#?}"
+    );
     assert!(
         github["credential_authority_reference"]
             .as_str()
