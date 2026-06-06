@@ -14,7 +14,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
+      - name: Prepare pnpm
+        run: corepack enable && corepack prepare pnpm@10.33.0 --activate
       - name: S2V verification
         run: |
           source docs/s2v/scripts/lib/preflight.sh
@@ -23,7 +25,6 @@ jobs:
           s2v_verify_full "install lint typecheck runtime-smoke unit-test integration e2e coverage build"
       - name: Viewer package smoke
         run: |
-          corepack enable
           cd viewer
           pnpm install --frozen-lockfile
           pnpm typecheck
@@ -31,7 +32,6 @@ jobs:
           pnpm build
       - name: npm wrapper package smoke
         run: |
-          corepack enable
           cd npm
           pnpm install --frozen-lockfile
           pnpm typecheck
