@@ -219,4 +219,3 @@ fn load_tracked_manifest() -> Value {
     load_authority_decision_manifest(Path::new("docs/compatibility/authority-decisions.json"))
         .expect("tracked authority decision manifest should load")
 }
-
