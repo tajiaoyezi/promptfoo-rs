@@ -1,6 +1,6 @@
 # Phase 47: current-latest-evaluator-inmemorystore-fixture-burndown
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ Phase 46 removed the unknown taxonomy blocker but intentionally left evaluator i
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 47.1 | current-latest-evaluator-inmemorystore-fixture-burndown | ../tasks/task-47.1-current-latest-evaluator-inmemorystore-fixture-burndown.md | Ready | 将 `eval-runner:src-evaluator-inmemorystore` 从 P0 blocker 提升为 native fixture evidence |
+| 47.1 | current-latest-evaluator-inmemorystore-fixture-burndown | ../tasks/task-47.1-current-latest-evaluator-inmemorystore-fixture-burndown.md | Done | 将 `eval-runner:src-evaluator-inmemorystore` 从 P0 blocker 提升为 native fixture evidence |
 
 ## 5. Dependencies
 
@@ -28,10 +28,10 @@ Depends on task 46.1 evaluator in-memory store classification, task 40.1 evaluat
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `eval-runner:src-evaluator-inmemorystore` carries `level=P0`, `implementation_status=native`, `evidence_kind=fixture`, and `verification_owner=eval-runner`.
-- [ ] Rust and shell extractors emit equivalent evaluator in-memory store fixture evidence.
-- [ ] Current-latest golden corpus no longer includes `eval-runner:src-evaluator-inmemorystore` in release blockers.
-- [ ] Runtime smoke keeps `perfect_refactor_claim_allowed=false`; this phase only reduces one local eval-runner blocker.
+- [x] `eval-runner:src-evaluator-inmemorystore` carries `level=P0`, `implementation_status=native`, `evidence_kind=fixture`, and `verification_owner=eval-runner`.
+- [x] Rust and shell extractors emit equivalent evaluator in-memory store fixture evidence.
+- [x] Current-latest golden corpus no longer includes `eval-runner:src-evaluator-inmemorystore` in release blockers.
+- [x] Runtime smoke keeps `perfect_refactor_claim_allowed=false`; this phase only reduces one local eval-runner blocker.
 
 ## 7. Phase Risks
 
@@ -43,9 +43,9 @@ Depends on task 46.1 evaluator in-memory store classification, task 40.1 evaluat
 
 Task 47.1 spec is Done, phase §6 smoke passes with task §9 verification, current-latest golden blockers no longer include `eval-runner:src-evaluator-inmemorystore`, and the repository is clean and pushed via PR.
 
-## 9. Phase Smoke
+## 9. Phase Completion Notes
 
-```bash
-cargo test --test current_latest_evaluator_inmemorystore_fixture --test current_latest_evaluator_inmemorystore_classification
-bash scripts/release/runtime-smoke.sh
-```
+- **完成日期**：2026-06-06
+- **Phase smoke**：PASS — task 47.1 full §9 verification；`eval-runner:src-evaluator-inmemorystore` 为 `native`/`fixture`；golden `blocker_count=24`；`perfect_refactor_claim_allowed=false`
+- **Artifact evidence**：runtime smoke regenerated local gates with in-memory store row `evidence_reference=fixture:eval-runner:src-evaluator-inmemorystore` and empty diff findings for that row.
+- **Remaining boundaries**：config/provider external authority、publication 聚合 ready、current-target claim 与 perfect-refactor 完成声明仍未解除。

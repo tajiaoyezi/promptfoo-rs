@@ -1,6 +1,6 @@
 # Task 47.1: current-latest-evaluator-inmemorystore-fixture-burndown
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 47 - current-latest-evaluator-inmemorystore-fixture-burndown
@@ -74,19 +74,19 @@ Promote `eval-runner:src-evaluator-inmemorystore` to native fixture evidence in 
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (task 46.1 / ADR-009): Rust extractor emits `eval-runner:src-evaluator-inmemorystore` as P0 native fixture evidence.
-- [ ] **AC2** (task 46.1): shell extractor emits the same evaluator in-memory store native fixture evidence and no blocker evidence for this row.
-- [ ] **AC3** (ADR-011): current-latest golden corpus has no release blocker for `eval-runner:src-evaluator-inmemorystore` in an isolated evaluator in-memory store fixture.
-- [ ] **AC4** (task 42.1 / task 46.1): runtime smoke for the Phase 42 target reduces current-latest golden blocker count by one for this local row while keeping `perfect_refactor_claim_allowed=false`.
+- [x] **AC1** (task 46.1 / ADR-009): Rust extractor emits `eval-runner:src-evaluator-inmemorystore` as P0 native fixture evidence.
+- [x] **AC2** (task 46.1): shell extractor emits the same evaluator in-memory store native fixture evidence and no blocker evidence for this row.
+- [x] **AC3** (ADR-011): current-latest golden corpus has no release blocker for `eval-runner:src-evaluator-inmemorystore` in an isolated evaluator in-memory store fixture.
+- [x] **AC4** (task 42.1 / task 46.1): runtime smoke for the Phase 42 target reduces current-latest golden blocker count by one for this local row while keeping `perfect_refactor_claim_allowed=false`.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-47.1.1 | TEST-47.1.1 | tests/current_latest_evaluator_inmemorystore_fixture.rs | install, lint, typecheck, unit-test, build | Not Started |
-| AC2 | SCEN-47.1.1 | TEST-47.1.2 | tests/current_latest_evaluator_inmemorystore_fixture.rs | install, lint, typecheck, unit-test, integration, build | Not Started |
-| AC3 | SCEN-47.1.1 | TEST-47.1.3 | tests/current_latest_evaluator_inmemorystore_fixture.rs | install, typecheck, unit-test, coverage, build | Not Started |
-| AC4 | SCEN-47.1.1 | TEST-47.1.4 | tests/current_latest_evaluator_inmemorystore_fixture.rs | install, lint, typecheck, unit-test, e2e, runtime-smoke, build | Not Started |
+| AC1 | SCEN-47.1.1 | TEST-47.1.1 | tests/current_latest_evaluator_inmemorystore_fixture.rs | install, lint, typecheck, unit-test, build | Done |
+| AC2 | SCEN-47.1.1 | TEST-47.1.2 | tests/current_latest_evaluator_inmemorystore_fixture.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-47.1.1 | TEST-47.1.3 | tests/current_latest_evaluator_inmemorystore_fixture.rs | install, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-47.1.1 | TEST-47.1.4 | tests/current_latest_evaluator_inmemorystore_fixture.rs | install, lint, typecheck, unit-test, e2e, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -108,20 +108,36 @@ Promote `eval-runner:src-evaluator-inmemorystore` to native fixture evidence in 
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
+- **完成日期**：2026-06-06
 - **改动文件**：
-  - <source-file-1>
+  - `src/compatibility/inventory.rs`（新增 inmemorystore fixture mapping）
+  - `scripts/release/current-latest-source-inventory.sh`
+  - `scripts/release/generate-v1-authority-manifest.mjs`
+  - `tests/current_latest_evaluator_inmemorystore_fixture.rs`（新增）
+  - `tests/current_latest_evaluator_inmemorystore_classification.rs`
+  - `docs/compatibility/authority-decisions.json`（移除非 unblock-packet 的 inmemorystore 行）
+  - `docs/compatibility/matrix.md`
+  - `docs/compatibility/v1-release-authority-policy.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+  - `docs/s2v-adapter.md`
+  - `test/features/perfect-refactor-parity.feature`
+  - `docs/specs/phases/phase-47-current-latest-evaluator-inmemorystore-fixture-burndown.md`
+  - `docs/specs/tasks/task-47.1-current-latest-evaluator-inmemorystore-fixture-burndown.md`
 - **commit 列表**：
-  - <hash1> <message>
+  - `507730b` docs(spec): add phase 47 evaluator in-memory store fixture burndown task
+  - `e62ff15` test(eval-runner): add inmemorystore fixture burndown tests
+  - `a3bf3d5` feat(eval-runner): promote inmemorystore to native fixture evidence
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - lint: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - integration: <TBD-after-impl>
-  - e2e: <TBD-after-impl>
-  - coverage: <TBD-after-impl>
-  - build: <TBD-after-impl>
-  - runtime-smoke: <TBD-after-impl>
-- **剩余风险 / 未做项**：<RISK_OR_NONE>
-- **下游 task 影响**：<DOWNSTREAM_OR_NONE>
+  - install: ✅
+  - lint: ✅
+  - typecheck: ✅
+  - unit-test: ✅（TEST-47.1.1–47.1.4 全绿；authority manifest gate 恢复 31 行对齐）
+  - integration: ✅
+  - e2e: ✅
+  - coverage: ✅
+  - build: ✅
+  - runtime-smoke: ✅ — `eval-runner:src-evaluator-inmemorystore` 为 `native`/`fixture`；golden `blocker_count=24`（较 task 46.1 的 25 减 1）；quality `blocker_count=4`；`perfect_refactor_claim_allowed=false`
+- **剩余风险 / 未做项**：
+  - 剩余 24 个 current-latest golden blockers 仍为 config/provider 外部 authority 类 item；`publication_ready` 聚合仍为 false。
+- **下游 task 影响**：
+  - 无新增下游 task；upstream HEAD drift 仍须独立 S2V task 处理。

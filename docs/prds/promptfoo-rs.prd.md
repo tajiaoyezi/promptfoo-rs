@@ -365,6 +365,8 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 >
 > Task 46.1 完成后，current-latest source inventory 与 matrix 在 `2ca16c59` HEAD target 下均为 `status=ready` 且 `unclassified_rows=[]`。`src/evaluator/inMemoryStore.ts` 被记录为 `eval-runner:src-evaluator-inmemorystore`、P0 blocked、`evidence_kind=blocker`；quality gate 因此从 6 个 blockers 降到 4 个 blockers，但 `perfect_refactor_claim_allowed=false` 仍正确。
 >
+> Task 47.1 完成后，`eval-runner:src-evaluator-inmemorystore` 提升为 P0 native fixture evidence（`evidence_reference=fixture:eval-runner:src-evaluator-inmemorystore`），current-latest golden `blocker_count` 对该本地行减少 1；`local_current_latest_ready=false` 与 `perfect_refactor_claim_allowed=false` 仍正确。
+>
 > Phase 44 应用 maintainer v1 策略（`docs/compatibility/v1-release-authority-policy.md`）：`authority-decisions.json` 32 条 decision 全部以 evidence 或 formal waiver 结案（`perfect_refactor_decision_ready=true`）；`publication-evidence.json` 六渠道仍 `published=false`（五渠道 v1 豁免，GitHub Releases 已授权但等待首个 tag 的 URL/checksum）。`perfect_refactor_claim_allowed=false` 与 `publication_ready=false` 保持不变。
 
 ## 2026-06-04 CLI Drop-in Entry Point Addendum

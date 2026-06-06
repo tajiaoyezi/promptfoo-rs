@@ -39,4 +39,4 @@ v1 waives live parity claims for Assistants, Agents, Realtime, Claude Code auth,
 
 ## Evaluator in-memory store
 
-v1 waives native in-memory store implementation parity until a dedicated eval-runner fixture lands (planned follow-up). The row stays visible as a golden blocker.
+Phase 47 adds dedicated eval-runner fixture evidence for `eval-runner:src-evaluator-inmemorystore`. This is a local eval-runner golden burndown item, not an external authority decision row in `authority-decisions.json`. `perfect_refactor_claim_allowed` still remains false while other golden blockers exist.
