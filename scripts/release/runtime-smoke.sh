@@ -453,6 +453,10 @@ bash scripts/release/authority-decisions.sh
 authority_decisions_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/authority-decisions-gate.json', 'utf8')); console.log(r.status)")"
 authority_decisions_unresolved_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/authority-decisions-gate.json', 'utf8')); console.log(r.unresolved_count)")"
 authority_decisions_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/authority-decisions-gate.json', 'utf8')); console.log(r.perfect_refactor_decision_ready ? 'true' : 'false')")"
+bash scripts/release/publication-evidence.sh
+publication_evidence_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-evidence-gate.json', 'utf8')); console.log(r.status)")"
+publication_evidence_blocked_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-evidence-gate.json', 'utf8')); console.log(r.blocked_channel_count)")"
+publication_evidence_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-evidence-gate.json', 'utf8')); console.log(r.publication_ready ? 'true' : 'false')")"
 CURRENT_LATEST_ADAPTER_STATUS="$adapter_status" \
 CURRENT_LATEST_SOURCE_INVENTORY_STATUS="$current_latest_source_inventory_status" \
 CURRENT_LATEST_SOURCE_INVENTORY_UNCLASSIFIED_COUNT="$current_latest_source_inventory_unclassified_count" \
@@ -560,6 +564,13 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "manifest_artifact": "docs/compatibility/authority-decisions.json",
     "gate_artifact": "target/release-gates/authority-decisions-gate.json"
   },
+  "publication_evidence": {
+    "status": "$publication_evidence_status",
+    "blocked_channel_count": $publication_evidence_blocked_count,
+    "publication_ready": $publication_evidence_ready,
+    "manifest_artifact": "docs/compatibility/publication-evidence.json",
+    "gate_artifact": "target/release-gates/publication-evidence-gate.json"
+  },
   "current_latest_quality": {
     "status": "$current_latest_quality_status",
     "local_current_latest_ready": $current_latest_quality_local_ready,
@@ -579,6 +590,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "longtail_classification": "$longtail_classification_status",
     "external_authority": "$external_authority_status",
     "authority_decisions": "$authority_decisions_status",
+    "publication_evidence": "$publication_evidence_status",
     "current_upstream_policy": "$current_upstream_policy_status",
     "current_latest_target": "$current_latest_target_status",
     "current_latest_source_inventory": "$current_latest_source_inventory_status",
@@ -658,6 +670,8 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/perfect-refactor-unblock-packet.json",
     "target/release-gates/authority-decisions-gate.json",
     "docs/compatibility/authority-decisions.json",
+    "target/release-gates/publication-evidence-gate.json",
+    "docs/compatibility/publication-evidence.json",
     "target/release-gates/current-upstream-policy.json",
     "target/release-gates/current-latest-target.json",
     "target/release-gates/current-latest-source-inventory.json",
@@ -687,6 +701,7 @@ validate_report_json "$GATE_DIR/external-authority-blockers.json"
 validate_report_json "$GATE_DIR/perfect-refactor-claim.json"
 validate_report_json "$GATE_DIR/perfect-refactor-unblock-packet.json"
 validate_report_json "$GATE_DIR/authority-decisions-gate.json"
+validate_report_json "$GATE_DIR/publication-evidence-gate.json"
 validate_report_json "$GATE_DIR/current-latest-target.json"
 validate_report_json "$GATE_DIR/current-latest-source-inventory.json"
 validate_report_json "$GATE_DIR/current-latest-matrix.json"
