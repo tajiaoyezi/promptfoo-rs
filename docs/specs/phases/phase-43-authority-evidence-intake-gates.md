@@ -1,6 +1,6 @@
 # Phase 43: authority-evidence-intake-gates
 
-**Status**: Ready
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,8 +20,8 @@ The project cannot reach public stable / perfect-refactor status while real prov
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 43.1 | authority-decision-manifest-gate | ../tasks/task-43.1-authority-decision-manifest-gate.md | Ready | 建立 current-latest authority decision manifest schema 和校验 gate |
-| 43.2 | publication-evidence-manifest-gate | ../tasks/task-43.2-publication-evidence-manifest-gate.md | Ready | 建立 publication URL/digest/credential/legal evidence manifest schema 和校验 gate |
+| 43.1 | authority-decision-manifest-gate | ../tasks/task-43.1-authority-decision-manifest-gate.md | Done | 建立 current-latest authority decision manifest schema 和校验 gate |
+| 43.2 | publication-evidence-manifest-gate | ../tasks/task-43.2-publication-evidence-manifest-gate.md | Done | 建立 publication URL/digest/credential/legal evidence manifest schema 和校验 gate |
 
 ## 5. Dependencies
 
@@ -29,10 +29,10 @@ Depends on task 37.1 current-latest unblock packet, task 18.4 publication author
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] A current-latest authority decision manifest schema exists and every unblock-packet decision item is either unresolved, backed by real evidence, or explicitly waived with owner/date/scope/risk.
-- [ ] Publication evidence intake requires channel, credential authority, legal/brand approval, artifact URL, digest, and no-upload provenance before any channel can become `published=true`.
-- [ ] Missing, partial, expired, or mock-only evidence keeps `perfect_refactor_claim_allowed=false`, `publication_ready=credential-blocked`, or equivalent blocked status.
-- [ ] Runtime smoke or coverage gate consumes the new manifests without requiring real secrets in the repository.
+- [x] A current-latest authority decision manifest schema exists and every unblock-packet decision item is either unresolved, backed by real evidence, or explicitly waived with owner/date/scope/risk.
+- [x] Publication evidence intake requires channel, credential authority, legal/brand approval, artifact URL, digest, and no-upload provenance before any channel can become `published=true`.
+- [x] Missing, partial, expired, or mock-only evidence keeps `perfect_refactor_claim_allowed=false`, `publication_ready=credential-blocked`, or equivalent blocked status.
+- [x] Runtime smoke or coverage gate consumes the new manifests without requiring real secrets in the repository.
 
 ## 7. Phase Risks
 
@@ -46,7 +46,11 @@ Tasks 43.1 and 43.2 are Done, phase §6 smoke passes with task §9 verification,
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
+- **完成日期**：2026-06-06
+- **Phase smoke**：PASS — `cargo test --test authority_decision_manifest_gate --test publication_evidence_manifest_gate`；`bash scripts/release/authority-decisions.sh` + `bash scripts/release/publication-evidence.sh`；`bash scripts/release/runtime-smoke.sh` 确认 `authority_decisions.status=blocked`、`publication_evidence.publication_ready=false`、`perfect_refactor_claim.perfect_refactor_claim_allowed=false`
+- **Artifact evidence**：
+  - `docs/compatibility/authority-decisions.json`（32 unresolved rows）
+  - `docs/compatibility/publication-evidence.json`（6 blocked channels）
+  - `target/release-gates/authority-decisions-gate.json`
+  - `target/release-gates/publication-evidence-gate.json`
 - **Remaining boundaries**：Real external authority, publication credentials, legal/brand approval, and public artifact evidence still require user or maintainer action before Phase 44 can be completed.

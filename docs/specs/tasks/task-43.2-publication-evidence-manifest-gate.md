@@ -1,6 +1,6 @@
 # Task 43.2: publication-evidence-manifest-gate
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 43 - authority-evidence-intake-gates
@@ -65,19 +65,19 @@ Each publication channel must remain blocked unless its manifest row includes ch
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-008): every release channel in `publication-authority.json.channels[]` has one publication evidence manifest row.
-- [ ] **AC2** (task 18.4): dry-run installability evidence alone never sets channel `published=true`.
-- [ ] **AC3** (PRD §Release constraints): a ready publication row requires artifact URL, digest/checksum, release notes reference, credential authority reference, legal/brand approval reference, and publication timestamp.
-- [ ] **AC4** (PRD §Security): the manifest stores no publish tokens, API keys, or private credentials.
+- [x] **AC1** (ADR-008): every release channel in `publication-authority.json.channels[]` has one publication evidence manifest row.
+- [x] **AC2** (task 18.4): dry-run installability evidence alone never sets channel `published=true`.
+- [x] **AC3** (PRD §Release constraints): a ready publication row requires artifact URL, digest/checksum, release notes reference, credential authority reference, legal/brand approval reference, and publication timestamp.
+- [x] **AC4** (PRD §Security): the manifest stores no publish tokens, API keys, or private credentials.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-43.2.1 | TEST-43.2.1 | tests/publication_evidence_manifest_gate.rs | install, lint, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-43.2.1 | TEST-43.2.2 | tests/publication_evidence_manifest_gate.rs | install, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC3 | SCEN-43.2.1 | TEST-43.2.3 | tests/publication_evidence_manifest_gate.rs | install, lint, typecheck, unit-test, coverage, build | Not Started |
-| AC4 | SCEN-43.2.1 | TEST-43.2.4 | tests/publication_evidence_manifest_gate.rs | install, lint, typecheck, unit-test, integration, e2e, build | Not Started |
+| AC1 | SCEN-43.2.1 | TEST-43.2.1 | tests/publication_evidence_manifest_gate.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-43.2.1 | TEST-43.2.2 | tests/publication_evidence_manifest_gate.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC3 | SCEN-43.2.1 | TEST-43.2.3 | tests/publication_evidence_manifest_gate.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-43.2.1 | TEST-43.2.4 | tests/publication_evidence_manifest_gate.rs | install, lint, typecheck, unit-test, integration, e2e, build | Done |
 
 ## 8. Risks
 
@@ -99,18 +99,29 @@ Each publication channel must remain blocked unless its manifest row includes ch
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
+- **完成日期**：2026-06-06
+- **改动文件**：
+  - `tests/publication_evidence_manifest_gate.rs`
+  - `tests/publication_authority_release_gate.rs`
+  - `src/release.rs`
+  - `docs/compatibility/publication-evidence.json`
+  - `scripts/release/publication-evidence.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `scripts/release/integration.sh`
+  - `docs/specs/tasks/task-43.2-publication-evidence-manifest-gate.md`
+- **commit 列表**：
+  - `87dcaf6` `test(release): add SCEN-43.2.1 publication evidence manifest gate tests`
+  - `989695c` `feat(release): wire publication evidence gate into runtime smoke`
+  - `docs commit` `docs(spec): 回填 task-43.2 §10 Completion Notes + Status → Done`
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - lint: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - integration: <TBD-after-impl>
-  - e2e: <TBD-after-impl>
-  - coverage: <TBD-after-impl>
-  - build: <TBD-after-impl>
-  - runtime-smoke: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: PASS — `cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过
+  - lint: PASS — `bash scripts/release/lint.sh` 通过
+  - typecheck: PASS — `cargo check --workspace`、viewer/npm typecheck 通过
+  - unit-test: PASS — `cargo test --workspace`、viewer/npm test 通过；TEST-43.2.1 ~ TEST-43.2.4 通过
+  - integration: PASS — `bash scripts/release/integration.sh` 含 `publication_evidence_manifest_gate` 通过
+  - e2e: PASS — `bash scripts/release/e2e.sh` 通过
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过
+  - build: PASS — `cargo build --release` 通过
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 生成 `publication-evidence-gate.json` 且 `publication_ready=false`
+- **剩余风险 / 未做项**：6 个 publication channel 仍为 `blocked`；真实 credentials、legal/brand approval、external URL/digest 需 maintainer 在 Phase 44 前手动填入 manifest。
+- **下游 task 影响**：task 44.2 依赖本 manifest schema 应用真实 publication evidence；typed gate helper 已重命名为 `validate_publication_authority_gate` 以避免与 manifest `validate_publication_evidence` 冲突。
