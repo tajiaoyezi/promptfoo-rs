@@ -103,7 +103,7 @@ PROMPTFOO_BIN="target/release/promptfoo"
 if [ -f "${PROMPTFOO_BIN}.exe" ]; then
   PROMPTFOO_BIN="${PROMPTFOO_BIN}.exe"
 fi
-"$PROMPTFOO_BIN" --help > "$GATE_DIR/cli-help-promptfoo.txt"
+NO_COLOR=1 "$PROMPTFOO_BIN" --help > "$GATE_DIR/cli-help-promptfoo.txt"
 grep -Eq "Usage: promptfoo(\\.exe)? \\[COMMAND\\]" "$GATE_DIR/cli-help-promptfoo.txt"
 
 cargo test \
