@@ -133,20 +133,19 @@ const rows = [
       'v1 authorized public publication channel; publish credentials remain outside the repository.',
   },
   ...publicationDeferred.map(publicationDeferredWaiver),
-  {
-    item_id: 'eval-runner:src-evaluator-inmemorystore',
-    decision_state: 'waived-with-boundary',
-    waiver: {
-      owner: 'leafiellune',
-      approval_date: '2026-06-06',
-      scope: 'v1 defers evaluator in-memory store native fixture parity',
-      expiration_or_review_date: '2026-12-31',
-      rationale:
-        'src/evaluator/inMemoryStore.ts remains a P0 eval-runner blocker until a dedicated fixture exists; v1 does not claim native in-memory store implementation parity.',
-      release_impact:
-        'Golden corpus may keep eval-runner:src-evaluator-inmemorystore blocked; perfect-refactor claim remains false.',
-    },
-    notes: 'Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md',
+
+      {
+        kind: 'policy-doc',
+        reference: 'docs/compatibility/v1-release-authority-policy.md#evaluator-in-memory-store',
+      },
+      {
+        kind: 'task-spec',
+        reference:
+          'docs/specs/tasks/task-47.1-current-latest-evaluator-inmemorystore-fixture-burndown.md',
+      },
+    ],
+    notes:
+      'Phase 47 dedicated eval-runner in-memory store fixture evidence; perfect-refactor claim remains false while other blockers remain.',
   },
 ];
 

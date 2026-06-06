@@ -2244,6 +2244,11 @@ fn current_latest_eval_runner_fixture_ids(stable_id: &str) -> &'static [&'static
             "p0-eval-output-json",
             "p0-eval-retry-timeout",
         ],
+        "eval-runner:src-evaluator-inmemorystore" => &[
+            "p0-eval-inmemory-store",
+            "p0-eval-basic",
+            "p0-eval-output-json",
+        ],
         "eval-runner:src-scheduler-index"
         | "eval-runner:src-scheduler-providercallqueue"
         | "eval-runner:src-scheduler-slotqueue"
@@ -2271,7 +2276,9 @@ fn is_current_latest_eval_runner_fixture(stable_id: &str, file: &str) -> bool {
 }
 
 fn current_latest_eval_runner_fixture_reason(stable_id: &str, _file: &str) -> &'static str {
-    if stable_id.contains("evaluator-runtime") {
+    if stable_id.contains("inmemorystore") {
+        "current-latest evaluator in-memory store source is covered by deterministic evaluator in-memory store fixture evidence"
+    } else if stable_id.contains("evaluator-runtime") {
         "current-latest evaluator runtime source is covered by deterministic evaluator runtime fixture evidence"
     } else {
         "current-latest eval/evaluator/scheduler source is covered by existing deterministic eval runner fixture evidence"

@@ -432,6 +432,15 @@ Feature: perfect refactor parity
     And TEST-46.1.3 proves shell and Rust extraction agree
     And TEST-46.1.4 proves runtime smoke removes the source/matrix unknown blocker without allowing perfect-refactor completion
 
+  # Maps to: docs/specs/tasks/task-47.1-current-latest-evaluator-inmemorystore-fixture-burndown.md
+  Scenario: SCEN-47.1.1 - current latest evaluator in-memory store fixture evidence burndown
+    Given upstream promptfoo current latest contains src/evaluator/inMemoryStore.ts
+    When evaluator in-memory store fixture evidence is added
+    Then TEST-47.1.1 proves Rust extraction emits native fixture evidence
+    And TEST-47.1.2 proves shell extraction emits the same native fixture evidence
+    And TEST-47.1.3 proves the isolated current-latest golden corpus has no evaluator in-memory store blocker
+    And TEST-47.1.4 proves runtime smoke removes that local blocker while perfect-refactor completion remains blocked
+
   # Maps to: docs/specs/tasks/task-43.1-authority-decision-manifest-gate.md
   Scenario: SCEN-43.1.1 - authority decision manifest keeps unresolved external blockers visible
     Given the current-latest unblock packet contains non-auto-resolvable decision items

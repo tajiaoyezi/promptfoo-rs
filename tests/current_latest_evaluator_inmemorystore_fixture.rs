@@ -1,7 +1,6 @@
 use std::path::Path;
 use std::process::Command;
 
-use promptfoo_rs::compatibility::diff::DiffClass;
 use promptfoo_rs::compatibility::harness::{
     build_current_latest_golden_corpus, evaluate_current_latest_release_blockers,
 };
@@ -42,7 +41,7 @@ fn current_latest_lock() -> CurrentLatestTargetLock {
 
 fn fixture_dir(name: &str) -> std::path::PathBuf {
     let dir = std::env::temp_dir().join(format!(
-        "promptfoo-rs-current-latest-evaluator-inmemorystore-{name}-{}",
+        "promptfoo-rs-current-latest-evaluator-inmemorystore-fixture-{name}-{}",
         std::process::id()
     ));
     let _ = std::fs::remove_dir_all(&dir);
@@ -67,119 +66,71 @@ fn write_evaluator_inmemorystore_source(root: &Path) {
 }
 
 #[test]
-fn test_46_1_1_rust_classifies_evaluator_inmemorystore_as_eval_runner() {
-    /* TEST-46.1.1 */
-    let root = fixture_dir("rust-category");
+fn test_47_1_1_rust_promotes_evaluator_inmemorystore_to_native_fixture() {
+    /* TEST-47.1.1 */
+    let root = fixture_dir("rust-native");
     write_evaluator_inmemorystore_source(&root);
 
     let inventory = extract_current_latest_inventory(&current_latest_lock(), &root)
         .expect("current latest inventory should extract");
-    let row = inventory
-        .rows
-        .iter()
-        .find(|row| row.source_file == "src/evaluator/inMemoryStore.ts")
-        .unwrap_or_else(|| panic!("missing evaluator in-memory store row: {inventory:#?}"));
+    let row = evaluator_inmemorystore_row(&inventory.rows);
 
-    assert_eq!(row.stable_id, "eval-runner:src-evaluator-inmemorystore");
-    assert_eq!(row.category, "eval-runner");
+    assert_eq!(row.level, "P0", "{row:#?}");
+    assert_eq!(row.implementation_status, "native", "{row:#?}");
+    assert_eq!(row.verification_owner, "eval-runner", "{row:#?}");
+    assert_eq!(row.evidence_kind, "fixture", "{row:#?}");
+    assert_eq!(
+        row.evidence_reference,
+        "fixture:eval-runner:src-evaluator-inmemorystore"
+    );
     assert!(
-        !inventory
-            .unclassified_rows
-            .iter()
-            .any(|id| id == "unclassified:src-evaluator-inmemorystore"),
-        "{inventory:#?}"
+        row.blocker_reason
+            .as_deref()
+            .unwrap_or_default()
+            .contains("deterministic evaluator in-memory store fixture evidence"),
+        "{row:#?}"
     );
 
     let _ = std::fs::remove_dir_all(root);
 }
 
 #[test]
-fn test_46_1_2_evaluator_inmemorystore_remains_p0_eval_runner_until_fixture_exists() {
-    /* TEST-46.1.2 */
-    let root = fixture_dir("rust-metadata");
-    write_evaluator_inmemorystore_source(&root);
-
-    let inventory = extract_current_latest_inventory(&current_latest_lock(), &root)
-        .expect("current latest inventory should extract");
-    let row = inventory
-        .rows
-        .iter()
-        .find(|row| row.source_file == "src/evaluator/inMemoryStore.ts")
-        .unwrap_or_else(|| panic!("missing evaluator in-memory store row: {inventory:#?}"));
-
-    assert_eq!(row.level, "P0", "{row:#?}");
-    assert_eq!(row.verification_owner, "eval-runner", "{row:#?}");
-    match row.implementation_status.as_str() {
-        "blocked" => {
-            assert_eq!(row.evidence_kind, "blocker", "{row:#?}");
-            assert_eq!(
-                row.evidence_reference,
-                "blocker:eval-runner:src-evaluator-inmemorystore"
-            );
-            assert!(
-                row.blocker_reason.as_deref().unwrap_or_default().contains(
-                    "dedicated current-latest eval-runner in-memory store fixture evidence"
-                ),
-                "{row:#?}"
-            );
-        }
-        "native" => {
-            assert_eq!(row.evidence_kind, "fixture", "{row:#?}");
-            assert_eq!(
-                row.evidence_reference,
-                "fixture:eval-runner:src-evaluator-inmemorystore"
-            );
-        }
-        status => panic!("unexpected evaluator in-memory store status {status}: {row:#?}"),
-    }
-
-    let _ = std::fs::remove_dir_all(root);
-}
-
-#[test]
-fn test_46_1_3_shell_extractor_matches_rust_evaluator_inmemorystore_classification() {
-    /* TEST-46.1.3 */
-    let root = fixture_dir("script-source");
+fn test_47_1_2_shell_promotes_evaluator_inmemorystore_to_native_fixture() {
+    /* TEST-47.1.2 */
+    let root = fixture_dir("script-native");
     write_evaluator_inmemorystore_source(&root);
     let gate_dir = fixture_dir("script-gate");
     run_current_latest_source_inventory_script(&root, &gate_dir);
 
     let inventory = read_json(&gate_dir.join("current-latest-source-inventory.json"));
-    let matrix = read_json(&gate_dir.join("current-latest-matrix.json"));
-    assert_eq!(inventory["unclassified_rows"], Value::Array(vec![]));
-    assert_eq!(matrix["unclassified_rows"], Value::Array(vec![]));
-
     let row = inventory["rows"]
         .as_array()
         .expect("inventory rows should be array")
         .iter()
         .find(|row| {
-            row["source_file"] == Value::String("src/evaluator/inMemoryStore.ts".to_string())
+            row["item_id"] == Value::String("eval-runner:src-evaluator-inmemorystore".to_string())
+                || row["stable_id"]
+                    == Value::String("eval-runner:src-evaluator-inmemorystore".to_string())
         })
         .unwrap_or_else(|| panic!("missing evaluator in-memory store row: {inventory:#?}"));
-    assert_eq!(row["stable_id"], "eval-runner:src-evaluator-inmemorystore");
-    assert_eq!(row["category"], "eval-runner");
+
+    assert_eq!(row["implementation_status"], "native");
     assert_eq!(row["verification_owner"], "eval-runner");
-    match row["implementation_status"].as_str().unwrap_or_default() {
-        "blocked" => assert_eq!(row["evidence_kind"], "blocker"),
-        "native" => {
-            assert_eq!(row["evidence_kind"], "fixture");
-            assert_eq!(
-                row["evidence_reference"],
-                "fixture:eval-runner:src-evaluator-inmemorystore"
-            );
-        }
-        status => panic!("unexpected evaluator in-memory store status {status}: {row:#?}"),
-    }
+    assert_eq!(row["evidence_kind"], "fixture");
+    assert_eq!(
+        row["evidence_reference"],
+        "fixture:eval-runner:src-evaluator-inmemorystore"
+    );
+    assert_eq!(inventory["unclassified_rows"], Value::Array(vec![]));
 
     let _ = std::fs::remove_dir_all(root);
     let _ = std::fs::remove_dir_all(gate_dir);
 }
 
 #[test]
-fn test_46_1_4_golden_keeps_evaluator_inmemorystore_classified_without_unclassified_diff() {
-    /* TEST-46.1.4 */
-    let root = fixture_dir("golden-source");
+fn test_47_1_3_golden_has_no_evaluator_inmemorystore_release_blocker() {
+    /* TEST-47.1.3 */
+    let root = fixture_dir("golden-native");
     write_evaluator_inmemorystore_source(&root);
     let gate_dir = fixture_dir("golden-gate");
     run_current_latest_source_inventory_script(&root, &gate_dir);
@@ -195,21 +146,52 @@ fn test_46_1_4_golden_keeps_evaluator_inmemorystore_classified_without_unclassif
     assert!(
         blockers
             .iter()
-            .all(|finding| finding.class != DiffClass::Unclassified),
-        "taxonomy cleanup should remove unknown blocker class: {blockers:#?}"
+            .all(|finding| finding.capability != "eval-runner:src-evaluator-inmemorystore"),
+        "evaluator in-memory store should not remain a release blocker: {blockers:#?}"
     );
-    if !blockers.is_empty() {
-        assert!(
-            blockers
-                .iter()
-                .any(|finding| finding.class == DiffClass::Bug),
-            "pre-fixture in-memory store gap should stay an explicit Bug blocker: {blockers:#?}"
-        );
-        assert!(!report.perfect_refactor_claim_allowed, "{report:#?}");
-    }
+    assert_eq!(report.blocker_count, 0, "{report:#?}");
 
     let _ = std::fs::remove_dir_all(root);
     let _ = std::fs::remove_dir_all(gate_dir);
+}
+
+#[test]
+fn test_47_1_4_evaluator_inmemorystore_fixture_reference_is_stable() {
+    /* TEST-47.1.4 */
+    let root = fixture_dir("matrix-native");
+    write_evaluator_inmemorystore_source(&root);
+    let gate_dir = fixture_dir("matrix-gate");
+    run_current_latest_source_inventory_script(&root, &gate_dir);
+
+    let matrix = read_json(&gate_dir.join("current-latest-matrix.json"));
+    let row = matrix["rows"]
+        .as_array()
+        .expect("matrix rows should be array")
+        .iter()
+        .find(|row| {
+            row["item_id"] == Value::String("eval-runner:src-evaluator-inmemorystore".to_string())
+        })
+        .unwrap_or_else(|| panic!("missing evaluator in-memory store matrix row: {matrix:#?}"));
+
+    assert_eq!(row["level"], "P0");
+    assert_eq!(row["implementation_status"], "native");
+    assert_eq!(row["evidence_kind"], "fixture");
+    assert_eq!(
+        row["evidence_reference"],
+        "fixture:eval-runner:src-evaluator-inmemorystore"
+    );
+    assert_eq!(matrix["perfect_refactor_claim_allowed"], Value::Bool(false));
+
+    let _ = std::fs::remove_dir_all(root);
+    let _ = std::fs::remove_dir_all(gate_dir);
+}
+
+fn evaluator_inmemorystore_row(
+    rows: &[promptfoo_rs::compatibility::inventory::CurrentLatestInventoryRow],
+) -> &promptfoo_rs::compatibility::inventory::CurrentLatestInventoryRow {
+    rows.iter()
+        .find(|row| row.stable_id == "eval-runner:src-evaluator-inmemorystore")
+        .unwrap_or_else(|| panic!("missing evaluator in-memory store row: {rows:#?}"))
 }
 
 fn run_current_latest_source_inventory_script(root: &Path, gate_dir: &Path) {
