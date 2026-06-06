@@ -112,7 +112,7 @@ Each publication channel must remain blocked unless its manifest row includes ch
 - **commit 列表**：
   - `87dcaf6` `test(release): add SCEN-43.2.1 publication evidence manifest gate tests`
   - `989695c` `feat(release): wire publication evidence gate into runtime smoke`
-  - `docs commit` `docs(spec): 回填 task-43.2 §10 Completion Notes + Status → Done`
+  - `5bfdd3c` `docs(spec): complete Phase 43 authority-evidence-intake-gates`
 - **§9 Verification 结果**：
   - install: PASS — `cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过
   - lint: PASS — `bash scripts/release/lint.sh` 通过
