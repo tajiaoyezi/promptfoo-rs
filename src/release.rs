@@ -1606,6 +1606,59 @@ impl AuthorityDecisionReport {
     }
 }
 
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AuthorityApplicationReport {
+    pub schema: String,
+    pub authority_decision_ready: bool,
+    pub perfect_refactor_claim_allowed: bool,
+    pub authority_report: AuthorityDecisionReport,
+    pub remaining_gate_blockers: Vec<String>,
+}
+
+impl AuthorityApplicationReport {
+    pub fn remaining_blockers(&self) -> Vec<String> {
+        let mut blockers = self.authority_report.blockers.clone();
+        blockers.extend(self.remaining_gate_blockers.clone());
+        blockers
+    }
+}
+
+pub fn apply_authority_decisions(
+    manifest: &Value,
+    release_gates: &Value,
+) -> AuthorityApplicationReport {
+    let unblock_packet = release_gates
+        .get("perfect_refactor_unblock_packet")
+        .cloned()
+        .unwrap_or_else(|| release_gates.clone());
+    let claim_allowed = release_gates
+        .get("perfect_refactor_claim")
+        .and_then(|claim| claim["perfect_refactor_claim_allowed"].as_bool())
+        .unwrap_or(false);
+    let authority_report = validate_authority_decisions(&unblock_packet, manifest);
+    let mut remaining_gate_blockers = Vec::new();
+    if let Some(claim) = release_gates.get("perfect_refactor_claim") {
+        for blocker in claim["blockers"].as_array().cloned().unwrap_or_default() {
+            if let Some(reason) = blocker["reason"].as_str() {
+                remaining_gate_blockers.push(reason.to_string());
+            } else if let Some(item_id) = blocker["item_id"].as_str() {
+                remaining_gate_blockers.push(item_id.to_string());
+            }
+        }
+    }
+    let perfect_refactor_claim_allowed = claim_allowed
+        && authority_report.perfect_refactor_decision_ready
+        && remaining_gate_blockers.is_empty();
+
+    AuthorityApplicationReport {
+        schema: "promptfoo-rs.authority-application.v1".to_string(),
+        authority_decision_ready: authority_report.perfect_refactor_decision_ready,
+        perfect_refactor_claim_allowed,
+        authority_report,
+        remaining_gate_blockers,
+    }
+}
+
 pub fn load_authority_decision_manifest(path: &Path) -> Result<Value, ReleaseError> {
     let json = fs::read_to_string(path).map_err(|error| ReleaseError::Io {
         path: path.to_path_buf(),
@@ -1920,6 +1973,52 @@ pub struct PublicationEvidenceReport {
 impl PublicationEvidenceReport {
     pub fn publication_ready(&self) -> bool {
         self.publication_ready
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PublicationApplicationReport {
+    pub schema: String,
+    pub publication_ready: bool,
+    pub published_channels: Vec<String>,
+    pub deferred_channels: Vec<String>,
+    pub evidence_report: PublicationEvidenceReport,
+}
+
+impl PublicationApplicationReport {
+    pub fn published_channels(&self) -> Vec<String> {
+        self.published_channels.clone()
+    }
+}
+
+pub fn apply_publication_evidence(
+    manifest: &Value,
+    publication_authority: &Value,
+) -> PublicationApplicationReport {
+    let evidence_report = validate_publication_evidence(publication_authority, manifest);
+    let mut published_channels = Vec::new();
+    let mut deferred_channels = Vec::new();
+    for row in manifest["rows"].as_array().cloned().unwrap_or_default() {
+        let Some(channel) = row["channel"].as_str().map(str::to_string) else {
+            continue;
+        };
+        match row["publication_state"].as_str().unwrap_or_default() {
+            "published" => published_channels.push(channel),
+            "blocked" if row["v1_deferred"].as_bool() == Some(true) => {
+                deferred_channels.push(channel)
+            }
+            _ => {}
+        }
+    }
+    published_channels.sort();
+    deferred_channels.sort();
+
+    PublicationApplicationReport {
+        schema: "promptfoo-rs.publication-application.v1".to_string(),
+        publication_ready: evidence_report.publication_ready,
+        published_channels,
+        deferred_channels,
+        evidence_report,
     }
 }
 

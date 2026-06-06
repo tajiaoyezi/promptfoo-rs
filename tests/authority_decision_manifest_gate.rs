@@ -49,8 +49,15 @@ fn test_43_1_1_every_decision_item_has_exactly_one_manifest_row() {
 fn test_43_1_2_unresolved_and_mock_evidence_keep_perfect_refactor_blocked() {
     /* TEST-43.1.2 */
     let packet = load_unblock_packet();
-    let manifest = load_tracked_manifest();
-    let report = validate_authority_decisions(&packet, &manifest);
+    let mut unresolved_manifest = load_tracked_manifest();
+    for row in unresolved_manifest["rows"].as_array_mut().expect("rows") {
+        row["decision_state"] = Value::String("unresolved".to_string());
+        if let Some(obj) = row.as_object_mut() {
+            obj.remove("waiver");
+            obj.remove("evidence_references");
+        }
+    }
+    let report = validate_authority_decisions(&packet, &unresolved_manifest);
 
     assert!(!report.perfect_refactor_decision_ready(), "{report:#?}");
     assert_eq!(
@@ -65,6 +72,8 @@ fn test_43_1_2_unresolved_and_mock_evidence_keep_perfect_refactor_blocked() {
             .any(|blocker| blocker.contains("unresolved")),
         "{report:#?}"
     );
+
+    let manifest = load_tracked_manifest();
 
     let mut mock_manifest = manifest.clone();
     let mock_item_id = mock_manifest["rows"][0]["item_id"]
@@ -125,9 +134,19 @@ fn test_43_1_3_waiver_rows_require_owner_date_scope_expiration_rationale_and_rel
         "{incomplete_report:#?}"
     );
 
-    let mut complete_one = load_tracked_manifest();
-    let rows = complete_one["rows"].as_array_mut().expect("rows");
-    rows[0] = json!({
+    let mut partial_manifest = load_tracked_manifest();
+    for row in partial_manifest["rows"].as_array_mut().expect("rows") {
+        row["decision_state"] = Value::String("unresolved".to_string());
+        if let Some(obj) = row.as_object_mut() {
+            obj.remove("waiver");
+            obj.remove("evidence_references");
+        }
+    }
+    let rows = partial_manifest["rows"].as_array_mut().expect("rows");
+    *rows
+        .iter_mut()
+        .find(|row| row["item_id"] == item_id)
+        .expect("item row") = json!({
         "item_id": item_id,
         "decision_state": "waived-with-boundary",
         "waiver": {
@@ -139,7 +158,7 @@ fn test_43_1_3_waiver_rows_require_owner_date_scope_expiration_rationale_and_rel
             "release_impact": "Blocks perfect-refactor claim for this item until review date"
         }
     });
-    let partial_report = validate_authority_decisions(&packet, &complete_one);
+    let partial_report = validate_authority_decisions(&packet, &partial_manifest);
     assert!(
         partial_report.invalid_waiver_rows.is_empty()
             || !partial_report.invalid_waiver_rows.contains(&item_id),
@@ -203,8 +222,8 @@ fn test_43_1_4_manifest_stores_no_real_secrets() {
     )
     .expect("gate report should be valid json");
     let _ = std::fs::remove_file(&output);
-    assert_eq!(gate_json["status"], "blocked");
-    assert_eq!(gate_json["perfect_refactor_decision_ready"], false);
+    assert_eq!(gate_json["status"], "ready");
+    assert_eq!(gate_json["perfect_refactor_decision_ready"], true);
 }
 
 fn load_unblock_packet() -> Value {

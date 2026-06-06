@@ -1,172 +1,441 @@
 {
   "schema": "promptfoo-rs.authority-decisions.v1",
-  "status": "blocked",
-  "perfect_refactor_decision_ready": false,
-  "unresolved_count": 32,
+  "status": "ready",
+  "perfect_refactor_decision_ready": true,
+  "unresolved_count": 0,
   "rows": [
     {
       "item_id": "config:src-globalconfig-accounts",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 local-first CLI; cloud/account/server config modules out of scope",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "promptfoo-rs v1 targets local eval workflows; upstream cloud sync, hosted server, and account-linked config parity are not implemented or claimed in v1.",
+        "release_impact": "Users must not expect cloud share, remote server config, or account-linked settings parity for config:src-globalconfig-accounts in v1 stable."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
     },
     {
       "item_id": "config:src-globalconfig-cloud",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 local-first CLI; cloud/account/server config modules out of scope",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "promptfoo-rs v1 targets local eval workflows; upstream cloud sync, hosted server, and account-linked config parity are not implemented or claimed in v1.",
+        "release_impact": "Users must not expect cloud share, remote server config, or account-linked settings parity for config:src-globalconfig-cloud in v1 stable."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
     },
     {
       "item_id": "config:src-globalconfig-globalconfig",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 local-first CLI; cloud/account/server config modules out of scope",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "promptfoo-rs v1 targets local eval workflows; upstream cloud sync, hosted server, and account-linked config parity are not implemented or claimed in v1.",
+        "release_impact": "Users must not expect cloud share, remote server config, or account-linked settings parity for config:src-globalconfig-globalconfig in v1 stable."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
     },
     {
       "item_id": "config:src-server-config-serverconfig",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 local-first CLI; cloud/account/server config modules out of scope",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "promptfoo-rs v1 targets local eval workflows; upstream cloud sync, hosted server, and account-linked config parity are not implemented or claimed in v1.",
+        "release_impact": "Users must not expect cloud share, remote server config, or account-linked settings parity for config:src-server-config-serverconfig in v1 stable."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
     },
     {
       "item_id": "config:src-server-routes-configs",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 local-first CLI; cloud/account/server config modules out of scope",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "promptfoo-rs v1 targets local eval workflows; upstream cloud sync, hosted server, and account-linked config parity are not implemented or claimed in v1.",
+        "release_impact": "Users must not expect cloud share, remote server config, or account-linked settings parity for config:src-server-routes-configs in v1 stable."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
     },
     {
       "item_id": "config:src-tracing-otelconfig",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 local-first CLI; cloud/account/server config modules out of scope",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "promptfoo-rs v1 targets local eval workflows; upstream cloud sync, hosted server, and account-linked config parity are not implemented or claimed in v1.",
+        "release_impact": "Users must not expect cloud share, remote server config, or account-linked settings parity for config:src-tracing-otelconfig in v1 stable."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
     },
     {
       "item_id": "config:src-types-api-configs",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 local-first CLI; cloud/account/server config modules out of scope",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "promptfoo-rs v1 targets local eval workflows; upstream cloud sync, hosted server, and account-linked config parity are not implemented or claimed in v1.",
+        "release_impact": "Users must not expect cloud share, remote server config, or account-linked settings parity for config:src-types-api-configs in v1 stable."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
     },
     {
       "item_id": "current-latest:target",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-anthropic-claudecodeauth",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-agents",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-agents-loader",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-agents-model-settings",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-agents-tracing",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-agents-types",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-assistant",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-billing",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-chatkit",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-chatkit-pool",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-chatkit-types",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-codex-app-server",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-codex-sdk",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-codexapikeygating",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-codexdefaults",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-codexskillmetadata",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "provider:src-providers-openai-realtime",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "publication:cargo",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "publication:docker",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "publication:github-action",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "publication:github-releases",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "publication:homebrew",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
-    },
-    {
-      "item_id": "publication:npm-wrapper",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+      "decision_state": "evidence-provided",
+      "evidence_references": [
+        {
+          "kind": "artifact-path",
+          "reference": "target/release-gates/current-latest-target.json"
+        },
+        {
+          "kind": "policy-doc",
+          "reference": "docs/compatibility/v1-release-authority-policy.md#current-latest-target"
+        },
+        {
+          "kind": "approval-id",
+          "reference": "approval:v1-current-latest-target-2026-06-06"
+        }
+      ],
+      "notes": "Maintainer-approved current-latest target lock for promptfoo@0.121.14 with GitHub HEAD tracked in release gates."
     },
     {
       "item_id": "eval-runner:src-evaluator-inmemorystore",
-      "decision_state": "unresolved",
-      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers evaluator in-memory store native fixture parity",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "src/evaluator/inMemoryStore.ts remains a P0 eval-runner blocker until a dedicated fixture exists; v1 does not claim native in-memory store implementation parity.",
+        "release_impact": "Golden corpus may keep eval-runner:src-evaluator-inmemorystore blocked; perfect-refactor claim remains false."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-anthropic-claudecodeauth",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-anthropic-claudecodeauth in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-agents",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-agents in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-agents-loader",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-agents-loader in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-agents-model-settings",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-agents-model-settings in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-agents-tracing",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-agents-tracing in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-agents-types",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-agents-types in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-assistant",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-assistant in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-billing",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-billing in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-chatkit",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-chatkit in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-chatkit-pool",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-chatkit-pool in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-chatkit-types",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-chatkit-types in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-codex-app-server",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-codex-app-server in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-codex-sdk",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-codex-sdk in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-codexapikeygating",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-codexapikeygating in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-codexdefaults",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-codexdefaults in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-codexskillmetadata",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-codexskillmetadata in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "provider:src-providers-openai-realtime",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 defers longtail live provider parity claims",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "Longtail live provider modules require dedicated fixtures and external product authority; v1 documents these as external-authority blockers. Users supply their own API keys at their own risk.",
+        "release_impact": "No live parity claim for provider:src-providers-openai-realtime in v1; see docs/compatibility/matrix.md."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "publication:cargo",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 publication excludes cargo channel",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "v1 release strategy authorizes GitHub Releases only; cargo is deferred to avoid brand confusion, credential scope creep, and unfinished packaging maintenance.",
+        "release_impact": "cargo remains unpublished in v1; users install via GitHub Releases binaries."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "publication:docker",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 publication excludes docker channel",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "v1 release strategy authorizes GitHub Releases only; docker is deferred to avoid brand confusion, credential scope creep, and unfinished packaging maintenance.",
+        "release_impact": "docker remains unpublished in v1; users install via GitHub Releases binaries."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "publication:github-action",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 publication excludes github-action channel",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "v1 release strategy authorizes GitHub Releases only; github-action is deferred to avoid brand confusion, credential scope creep, and unfinished packaging maintenance.",
+        "release_impact": "github-action remains unpublished in v1; users install via GitHub Releases binaries."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "publication:github-releases",
+      "decision_state": "evidence-provided",
+      "evidence_references": [
+        {
+          "kind": "policy-doc",
+          "reference": "docs/compatibility/v1-release-authority-policy.md#v1-publication-channels"
+        },
+        {
+          "kind": "approval-id",
+          "reference": "approval:v1-github-releases-only-2026-06-06"
+        },
+        {
+          "kind": "approval-id",
+          "reference": "approval:legal-brand-independent-reimplementation-2026-06-06"
+        }
+      ],
+      "notes": "v1 authorized public publication channel; publish credentials remain outside the repository."
+    },
+    {
+      "item_id": "publication:homebrew",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 publication excludes homebrew channel",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "v1 release strategy authorizes GitHub Releases only; homebrew is deferred to avoid brand confusion, credential scope creep, and unfinished packaging maintenance.",
+        "release_impact": "homebrew remains unpublished in v1; users install via GitHub Releases binaries."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
+    },
+    {
+      "item_id": "publication:npm-wrapper",
+      "decision_state": "waived-with-boundary",
+      "waiver": {
+        "owner": "leafiellune",
+        "approval_date": "2026-06-06",
+        "scope": "v1 publication excludes npm-wrapper channel",
+        "expiration_or_review_date": "2026-12-31",
+        "rationale": "v1 release strategy authorizes GitHub Releases only; npm-wrapper is deferred to avoid brand confusion, credential scope creep, and unfinished packaging maintenance.",
+        "release_impact": "npm-wrapper remains unpublished in v1; users install via GitHub Releases binaries."
+      },
+      "notes": "Formal v1 waiver per docs/compatibility/v1-release-authority-policy.md"
     }
   ],
   "source_artifacts": [
     "target/release-gates/perfect-refactor-unblock-packet.json",
-    "docs/compatibility/authority-decisions.json"
+    "docs/compatibility/authority-decisions.json",
+    "docs/compatibility/v1-release-authority-policy.md"
   ]
 }
