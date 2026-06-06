@@ -180,6 +180,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 44 | public-stable-release-authority-closure | docs/specs/phases/phase-44-public-stable-release-authority-closure.md | Done | 2 | N/A (solo) |
 | 45 | promptfoo-drop-in-cli-entrypoints | docs/specs/phases/phase-45-promptfoo-drop-in-cli-entrypoints.md | Done | 3 | N/A (solo) |
 | 46 | current-latest-evaluator-inmemorystore-classification | docs/specs/phases/phase-46-current-latest-evaluator-inmemorystore-classification.md | Done | 1 | N/A (solo) |
+| 47 | current-latest-evaluator-inmemorystore-fixture-burndown | docs/specs/phases/phase-47-current-latest-evaluator-inmemorystore-fixture-burndown.md | Ready | 1 | N/A (solo) |
 
 ## Task 总索引
 
@@ -270,6 +271,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 45.2 | npm-wrapper | docs/specs/tasks/task-45.2-npm-promptfoo-bin-shims.md | Done | Phase 45 order 2 | N/A (solo) |
 | 45.3 | docs | docs/specs/tasks/task-45.3-readme-drop-in-cli-usage.md | Done | Phase 45 order 3 | N/A (solo) |
 | 46.1 | eval-runner | docs/specs/tasks/task-46.1-current-latest-evaluator-inmemorystore-classification.md | Done | Phase 46 order 1 | N/A (solo) |
+| 47.1 | eval-runner | docs/specs/tasks/task-47.1-current-latest-evaluator-inmemorystore-fixture-burndown.md | Ready | Phase 47 order 1 | N/A (solo) |
 
 ## ADR 索引
 
