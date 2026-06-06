@@ -119,7 +119,7 @@ The current-latest target lock must record npm latest `0.121.14` / gitHead `7a48
   - `7da0cdc test(compatibility): add 2ca16c head drift refresh RED tests`
   - `7b8108f feat(compatibility): refresh current latest target lock to 2ca16c head`
   - `089d98c refactor(cli): disable ANSI colors in promptfoo alias tests`
-  - `<this docs commit> docs(spec): complete task 42.1 2ca16c head refresh`
+  - `da4ea67 docs(spec): complete task 42.1 2ca16c head refresh + phase 42 Done`
 - **§9 Verification 结果**：
   - install: PASS - adapter §Commands Install passed inside `s2v_verify_full`.
   - lint: PASS - adapter §Commands Lint passed inside `s2v_verify_full`.
