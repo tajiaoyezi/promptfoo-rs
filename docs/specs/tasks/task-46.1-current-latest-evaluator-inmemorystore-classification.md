@@ -118,8 +118,8 @@ The current-latest source inventory extractor must treat `src/evaluator/inMemory
   - `docs/specs/phases/phase-46-current-latest-evaluator-inmemorystore-classification.md`
   - `docs/specs/tasks/task-46.1-current-latest-evaluator-inmemorystore-classification.md`
 - **commit 列表**：
-  - TBD-after-merge feat(inventory): classify evaluator inMemoryStore as eval-runner
-  - TBD-after-merge docs(spec): complete task-46.1 and Phase 46
+  - `fd11019` feat(inventory): classify evaluator inMemoryStore as eval-runner P0 blocker
+  - `9028f51` docs(spec): complete task-46.1 and Phase 46
 - **§9 Verification 结果**：
   - install: ✅
   - lint: ✅
