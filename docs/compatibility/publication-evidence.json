@@ -2,15 +2,20 @@
   "schema": "promptfoo-rs.publication-evidence.v1",
   "status": "credential-blocked",
   "publication_ready": false,
-  "blocked_channel_count": 6,
+  "blocked_channel_count": 5,
   "rows": [
     {
       "channel": "github-releases",
-      "publication_state": "blocked",
+      "publication_state": "published",
       "authority_owner": "leafiellune",
       "credential_authority_reference": "approval:v1-github-releases-only-2026-06-06",
       "legal_brand_approval_reference": "approval:legal-brand-independent-reimplementation-2026-06-06",
-      "notes": "v1 authorized channel per docs/compatibility/v1-release-authority-policy.md; published=true awaits first tagged GitHub Release with external artifact URL and checksum."
+      "artifact_url": "https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.0/promptfoo-rs-0.1.0-x86_64-unknown-linux-gnu.tar.gz",
+      "digest": "sha256:f3b5e26f067e7abb86373cbe2b77324025ca7e1d2adff65cbc5f7922570f7c0a",
+      "release_notes_reference": "docs/release-notes/v0.1.0.md",
+      "publication_timestamp": "2026-06-06T14:02:57Z",
+      "no_upload_provenance": "gh release create with verified external artifact URL and checksum",
+      "notes": "v1 GitHub Releases channel published; other channels remain v1_deferred per docs/compatibility/v1-release-authority-policy.md"
     },
     {
       "channel": "cargo",
@@ -47,5 +52,6 @@
     "target/release-gates/publication-authority.json",
     "docs/compatibility/publication-evidence.json",
     "docs/compatibility/v1-release-authority-policy.md"
-  ]
+  ],
+  "notes": "github-releases published; aggregate publication_ready stays false until deferred channels are waived or published per gate policy"
 }

@@ -50,11 +50,9 @@ fn test_43_2_2_dry_run_installability_never_sets_published_true() {
     let report = validate_publication_evidence(&authority, &manifest);
 
     assert!(!report.publication_ready(), "{report:#?}");
-    assert_eq!(
-        report.blocked_channel_count, report.required_channel_count,
-        "{report:#?}"
-    );
-    assert_eq!(report.published_channel_count, 0, "{report:#?}");
+    assert_eq!(report.published_channel_count, 1, "{report:#?}");
+    assert_eq!(report.blocked_channel_count, 5, "{report:#?}");
+    assert!(report.dry_run_only_published_rows.is_empty(), "{report:#?}");
 
     let mut dry_run_manifest = manifest.clone();
     let channel_name = dry_run_manifest["rows"][0]["channel"]
