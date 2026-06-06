@@ -1,6 +1,6 @@
 # Task 43.1: authority-decision-manifest-gate
 
-**Status**: Ready
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 43 - authority-evidence-intake-gates
@@ -64,19 +64,19 @@ The manifest must enumerate each non-auto-resolvable decision item from `perfect
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (task 37.1): every `decision_items[]` row in `perfect-refactor-unblock-packet.json` has exactly one corresponding authority decision manifest row.
-- [ ] **AC2** (ADR-011): unresolved or mock-only evidence rows remain release-blocking and keep `perfect_refactor_claim_allowed=false`.
-- [ ] **AC3** (ADR-009): waiver rows require owner, approval date, scope, expiration/review date, rationale, and release impact before they can be counted.
-- [ ] **AC4** (PRD §Security): the manifest stores no real secrets and only records redacted references, approval IDs, URLs, digests, or evidence artifact paths.
+- [x] **AC1** (task 37.1): every `decision_items[]` row in `perfect-refactor-unblock-packet.json` has exactly one corresponding authority decision manifest row.
+- [x] **AC2** (ADR-011): unresolved or mock-only evidence rows remain release-blocking and keep `perfect_refactor_claim_allowed=false`.
+- [x] **AC3** (ADR-009): waiver rows require owner, approval date, scope, expiration/review date, rationale, and release impact before they can be counted.
+- [x] **AC4** (PRD §Security): the manifest stores no real secrets and only records redacted references, approval IDs, URLs, digests, or evidence artifact paths.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-43.1.1 | TEST-43.1.1 | tests/authority_decision_manifest_gate.rs | install, lint, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-43.1.1 | TEST-43.1.2 | tests/authority_decision_manifest_gate.rs | install, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC3 | SCEN-43.1.1 | TEST-43.1.3 | tests/authority_decision_manifest_gate.rs | install, lint, typecheck, unit-test, coverage, build | Not Started |
-| AC4 | SCEN-43.1.1 | TEST-43.1.4 | tests/authority_decision_manifest_gate.rs | install, lint, typecheck, unit-test, integration, e2e, build | Not Started |
+| AC1 | SCEN-43.1.1 | TEST-43.1.1 | tests/authority_decision_manifest_gate.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-43.1.1 | TEST-43.1.2 | tests/authority_decision_manifest_gate.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC3 | SCEN-43.1.1 | TEST-43.1.3 | tests/authority_decision_manifest_gate.rs | install, lint, typecheck, unit-test, coverage, build | Done |
+| AC4 | SCEN-43.1.1 | TEST-43.1.4 | tests/authority_decision_manifest_gate.rs | install, lint, typecheck, unit-test, integration, e2e, build | Done |
 
 ## 8. Risks
 
@@ -98,18 +98,30 @@ The manifest must enumerate each non-auto-resolvable decision item from `perfect
 
 ## 10. Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **改动文件**：<TBD-after-impl>
-- **commit 列表**：<TBD-after-impl>
+- **完成日期**：2026-06-06
+- **改动文件**：
+  - `tests/authority_decision_manifest_gate.rs`
+  - `src/release.rs`
+  - `docs/compatibility/authority-decisions.json`
+  - `scripts/release/authority-decisions.sh`
+  - `scripts/release/runtime-smoke.sh`
+  - `scripts/release/integration.sh`
+  - `docs/specs/tasks/task-43.1-authority-decision-manifest-gate.md`
+- **commit 列表**：
+  - `07bfbe4` `test(authority): add SCEN-43.1.1 authority decision manifest gate tests`
+  - `acd632e` `feat(authority): wire authority decisions gate into runtime smoke`
+  - `81e8acc` `refactor(authority): format authority decision gate sources`
+  - `5908d0d` `refactor(authority): fix clippy collapsible_match in secret scan`
+  - `docs commit` `docs(spec): 回填 task-43.1 §10 Completion Notes + Status → Done`
 - **§9 Verification 结果**：
-  - install: <TBD-after-impl>
-  - lint: <TBD-after-impl>
-  - typecheck: <TBD-after-impl>
-  - unit-test: <TBD-after-impl>
-  - integration: <TBD-after-impl>
-  - e2e: <TBD-after-impl>
-  - coverage: <TBD-after-impl>
-  - build: <TBD-after-impl>
-  - runtime-smoke: <TBD-after-impl>
-- **剩余风险 / 未做项**：<TBD-after-impl>
-- **下游 task 影响**：<TBD-after-impl>
+  - install: PASS — `cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过
+  - lint: PASS — `bash scripts/release/lint.sh`（含 clippy）通过
+  - typecheck: PASS — `cargo check --workspace`、viewer/npm typecheck 通过
+  - unit-test: PASS — `cargo test --workspace`、viewer/npm test 通过；TEST-43.1.1 ~ TEST-43.1.4 通过
+  - integration: PASS — `bash scripts/release/integration.sh` 含 `authority_decision_manifest_gate` 通过
+  - e2e: PASS — `bash scripts/release/e2e.sh` 通过
+  - coverage: PASS — `bash scripts/release/coverage.sh` 通过
+  - build: PASS — `cargo build --release` 通过
+  - runtime-smoke: PASS — `bash scripts/release/runtime-smoke.sh` 生成 `authority-decisions-gate.json` 且 `perfect_refactor_decision_ready=false`
+- **剩余风险 / 未做项**：32 条 authority decision 仍为 `unresolved`；真实外部授权证据或正式 waiver 需 maintainer 在 Phase 44 前手动填入 manifest。`unclassified:src-evaluator-inmemorystore` 仍在 unblock packet 中等待分类。
+- **下游 task 影响**：task 43.2 可复用同一 intake/fail-closed 模式处理 publication evidence；task 44.1 依赖本 manifest schema 应用真实 evidence 或 waiver。
