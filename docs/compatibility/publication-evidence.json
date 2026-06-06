@@ -7,36 +7,45 @@
     {
       "channel": "github-releases",
       "publication_state": "blocked",
-      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+      "authority_owner": "leafiellune",
+      "credential_authority_reference": "approval:v1-github-releases-only-2026-06-06",
+      "legal_brand_approval_reference": "approval:legal-brand-independent-reimplementation-2026-06-06",
+      "notes": "v1 authorized channel per docs/compatibility/v1-release-authority-policy.md; published=true awaits first tagged GitHub Release with external artifact URL and checksum."
     },
     {
       "channel": "cargo",
       "publication_state": "blocked",
-      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+      "v1_deferred": true,
+      "notes": "v1 waiver: crates.io publication deferred to v1.1+; install via GitHub Releases binaries."
     },
     {
       "channel": "npm-wrapper",
       "publication_state": "blocked",
-      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+      "v1_deferred": true,
+      "notes": "v1 waiver: npm publish deferred to avoid upstream promptfoo npm brand confusion; local wrapper shims remain for development only."
     },
     {
       "channel": "docker",
       "publication_state": "blocked",
-      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+      "v1_deferred": true,
+      "notes": "v1 waiver: container registry publication deferred; Docker packaging maintenance out of v1 scope."
     },
     {
       "channel": "homebrew",
       "publication_state": "blocked",
-      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+      "v1_deferred": true,
+      "notes": "v1 waiver: Homebrew formula publication deferred; users install via GitHub Releases binaries."
     },
     {
       "channel": "github-action",
       "publication_state": "blocked",
-      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+      "v1_deferred": true,
+      "notes": "v1 waiver: marketplace GitHub Action publication deferred until release cadence stabilizes."
     }
   ],
   "source_artifacts": [
     "target/release-gates/publication-authority.json",
-    "docs/compatibility/publication-evidence.json"
+    "docs/compatibility/publication-evidence.json",
+    "docs/compatibility/v1-release-authority-policy.md"
   ]
 }

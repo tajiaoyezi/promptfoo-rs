@@ -14,7 +14,9 @@ cargo test \
   --test provider_request_response_fixture_burndown \
   --test external_authority_blocker_waiver_gate \
   --test authority_decision_manifest_gate \
+  --test external_authority_evidence_application \
   --test publication_evidence_manifest_gate \
+  --test public_publication_evidence_application \
   --test real_p0_golden_corpus_runner \
   --test current_latest_golden_corpus \
   --test current_latest_quality_gate \
