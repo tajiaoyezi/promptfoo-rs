@@ -1891,9 +1891,243 @@ fn authority_manifest_contains_secret_like_value(text: &str) -> bool {
         "token-123",
         "private_key",
         "-----begin ",
+        "publish token",
+        "crates.io publish token",
+        "npm publish token",
     ]
     .iter()
     .any(|needle| lower.contains(needle))
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PublicationEvidenceReport {
+    pub schema: String,
+    pub status: String,
+    pub publication_ready: bool,
+    pub required_channel_count: usize,
+    pub manifest_row_count: usize,
+    pub blocked_channel_count: usize,
+    pub published_channel_count: usize,
+    pub missing_manifest_rows: Vec<String>,
+    pub extra_manifest_rows: Vec<String>,
+    pub duplicate_manifest_rows: Vec<String>,
+    pub incomplete_published_rows: Vec<String>,
+    pub dry_run_only_published_rows: Vec<String>,
+    pub secret_bearing_rows: Vec<String>,
+    pub blockers: Vec<String>,
+}
+
+impl PublicationEvidenceReport {
+    pub fn publication_ready(&self) -> bool {
+        self.publication_ready
+    }
+}
+
+pub fn load_publication_evidence_manifest(path: &Path) -> Result<Value, ReleaseError> {
+    let json = fs::read_to_string(path).map_err(|error| ReleaseError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })?;
+    serde_json::from_str(&json).map_err(|error| ReleaseError::Serialize(error.to_string()))
+}
+
+pub fn validate_publication_evidence(
+    publication_authority: &Value,
+    manifest: &Value,
+) -> PublicationEvidenceReport {
+    let channels = publication_authority["channels"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
+    let manifest_rows = manifest["rows"].as_array().cloned().unwrap_or_default();
+
+    let required_channels = channels
+        .iter()
+        .filter_map(|channel| channel["channel"].as_str().map(str::to_string))
+        .collect::<Vec<_>>();
+    let mut manifest_channels = Vec::<String>::new();
+    let mut duplicate_manifest_rows = Vec::<String>::new();
+    for row in &manifest_rows {
+        let Some(channel) = row["channel"].as_str() else {
+            continue;
+        };
+        if manifest_channels.iter().any(|existing| existing == channel) {
+            duplicate_manifest_rows.push(channel.to_string());
+        }
+        manifest_channels.push(channel.to_string());
+    }
+
+    let required_set = required_channels.iter().cloned().collect::<BTreeSet<_>>();
+    let manifest_set = manifest_channels.iter().cloned().collect::<BTreeSet<_>>();
+    let missing_manifest_rows = required_channels
+        .iter()
+        .filter(|channel| !manifest_set.contains(*channel))
+        .cloned()
+        .collect::<Vec<_>>();
+    let extra_manifest_rows = manifest_channels
+        .iter()
+        .filter(|channel| !required_set.contains(*channel))
+        .cloned()
+        .collect::<Vec<_>>();
+
+    let mut blocked_channel_count = 0usize;
+    let mut published_channel_count = 0usize;
+    let mut incomplete_published_rows = Vec::<String>::new();
+    let mut dry_run_only_published_rows = Vec::<String>::new();
+    let mut secret_bearing_rows = Vec::<String>::new();
+    let mut blockers = Vec::<String>::new();
+
+    if !missing_manifest_rows.is_empty() {
+        blockers.push(format!(
+            "{} publication channels are missing manifest rows",
+            missing_manifest_rows.len()
+        ));
+    }
+    if !extra_manifest_rows.is_empty() {
+        blockers.push(format!(
+            "{} manifest rows do not map to publication-authority channels",
+            extra_manifest_rows.len()
+        ));
+    }
+    if !duplicate_manifest_rows.is_empty() {
+        blockers.push(format!(
+            "{} manifest rows duplicate channel values",
+            duplicate_manifest_rows.len()
+        ));
+    }
+
+    for row in manifest_rows {
+        let Some(channel) = row["channel"].as_str().map(str::to_string) else {
+            blockers.push("manifest row missing channel".to_string());
+            continue;
+        };
+        if !secret_values_in_value(&row).is_empty() {
+            secret_bearing_rows.push(channel.clone());
+            blockers.push(format!(
+                "{channel}: manifest row contains secret-like values"
+            ));
+        }
+
+        let publication_state = row["publication_state"].as_str().unwrap_or_default();
+        match publication_state {
+            "blocked" => {
+                blocked_channel_count += 1;
+                blockers.push(format!("{channel}: publication evidence remains blocked"));
+            }
+            "published" => {
+                let missing = publication_published_required_fields(&row);
+                if !missing.is_empty() {
+                    incomplete_published_rows.push(channel.clone());
+                    blockers.push(format!(
+                        "{channel}: published row missing required fields: {}",
+                        missing.join(", ")
+                    ));
+                    continue;
+                }
+                if publication_row_is_dry_run_only(&row) {
+                    dry_run_only_published_rows.push(channel.clone());
+                    blockers.push(format!(
+                        "{channel}: dry-run installability evidence cannot set published=true"
+                    ));
+                    continue;
+                }
+                published_channel_count += 1;
+            }
+            other => blockers.push(format!("{channel}: invalid publication_state '{other}'")),
+        }
+    }
+
+    let structural_ready = missing_manifest_rows.is_empty()
+        && extra_manifest_rows.is_empty()
+        && duplicate_manifest_rows.is_empty()
+        && incomplete_published_rows.is_empty()
+        && dry_run_only_published_rows.is_empty()
+        && secret_bearing_rows.is_empty();
+    let publication_ready = structural_ready
+        && !required_channels.is_empty()
+        && published_channel_count == required_channels.len()
+        && blocked_channel_count == 0;
+    let status = if publication_ready {
+        "ready"
+    } else {
+        "credential-blocked"
+    };
+
+    PublicationEvidenceReport {
+        schema: "promptfoo-rs.publication-evidence-gate.v1".to_string(),
+        status: status.to_string(),
+        publication_ready,
+        required_channel_count: required_channels.len(),
+        manifest_row_count: manifest_channels.len(),
+        blocked_channel_count,
+        published_channel_count,
+        missing_manifest_rows,
+        extra_manifest_rows,
+        duplicate_manifest_rows,
+        incomplete_published_rows,
+        dry_run_only_published_rows,
+        secret_bearing_rows,
+        blockers,
+    }
+}
+
+pub fn write_publication_evidence_gate_report(
+    report: &PublicationEvidenceReport,
+    path: &Path,
+) -> Result<(), ReleaseError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|error| ReleaseError::Io {
+            path: parent.to_path_buf(),
+            message: error.to_string(),
+        })?;
+    }
+    let json = serde_json::to_string_pretty(report)
+        .map_err(|error| ReleaseError::Serialize(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(|error| ReleaseError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })
+}
+
+fn publication_published_required_fields(row: &Value) -> Vec<&'static str> {
+    [
+        ("authority_owner", "authority_owner"),
+        (
+            "credential_authority_reference",
+            "credential_authority_reference",
+        ),
+        (
+            "legal_brand_approval_reference",
+            "legal_brand_approval_reference",
+        ),
+        ("artifact_url", "artifact_url"),
+        ("digest", "digest"),
+        ("release_notes_reference", "release_notes_reference"),
+        ("publication_timestamp", "publication_timestamp"),
+        ("no_upload_provenance", "no_upload_provenance"),
+    ]
+    .into_iter()
+    .filter_map(|(field, label)| {
+        row[field]
+            .as_str()
+            .filter(|value| !value.trim().is_empty())
+            .is_none()
+            .then_some(label)
+    })
+    .collect()
+}
+
+fn publication_row_is_dry_run_only(row: &Value) -> bool {
+    let artifact_url = row["artifact_url"].as_str().unwrap_or_default();
+    let digest = row["digest"].as_str().unwrap_or_default();
+    let provenance = row["no_upload_provenance"].as_str().unwrap_or_default();
+    authority_evidence_is_mock_only(artifact_url)
+        || authority_evidence_is_mock_only(digest)
+        || authority_evidence_is_mock_only(provenance)
+        || artifact_url.contains("release-installability")
+        || artifact_url.contains("dry-run")
+        || provenance.to_ascii_lowercase().contains("dry-run")
+        || !artifact_url.starts_with("https://")
 }
 
 fn claim_source_artifact(source_artifacts: &[String], needle: &str) -> String {
@@ -1944,14 +2178,14 @@ pub fn collect_publication_authority(channels: &[ReleaseChannel]) -> Publication
             "local dry-run only; no upload, publish, push, or external release command executed"
                 .to_string(),
     };
-    let decision = validate_publication_evidence(&report);
+    let decision = validate_publication_authority_gate(&report);
     report.publication_ready = decision.publication_ready;
     report.credential_blocked = decision.credential_blocked;
     report.blockers = decision.blockers;
     report
 }
 
-pub fn validate_publication_evidence(
+pub fn validate_publication_authority_gate(
     report: &PublicationAuthorityReport,
 ) -> PublicationGateDecision {
     let invalid_published_evidence = report

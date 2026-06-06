@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use promptfoo_rs::release::{
-    collect_publication_authority, validate_publication_evidence,
+    collect_publication_authority, validate_publication_authority_gate,
     write_publication_authority_report, ChannelEvidenceStatus, CredentialProbeStatus,
     PublicationAuthorityStatus, PublicationReadiness, PublishedEvidence, ReleaseChannel,
 };
@@ -66,7 +66,7 @@ fn test_18_4_2_published_true_requires_external_evidence_not_dry_run() {
     report.channels[0].published = true;
     report.channels[0].published_evidence = None;
 
-    let decision = validate_publication_evidence(&report);
+    let decision = validate_publication_authority_gate(&report);
     assert_eq!(decision.publication_ready, PublicationReadiness::Blocked);
     assert_eq!(
         decision.invalid_published_evidence,
@@ -86,7 +86,7 @@ fn test_18_4_2_published_true_requires_external_evidence_not_dry_run() {
         digest: "sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
             .to_string(),
     });
-    let decision = validate_publication_evidence(&report);
+    let decision = validate_publication_authority_gate(&report);
     assert!(
         decision.invalid_published_evidence.is_empty(),
         "{decision:#?}"
@@ -110,7 +110,7 @@ fn test_18_4_3_missing_credentials_and_homebrew_tooling_block_publication_candid
     assert!(json.contains("legal_brand_requirement"), "{json}");
     assert!(json.contains("publication-authority"), "{json}");
 
-    let decision = validate_publication_evidence(&report);
+    let decision = validate_publication_authority_gate(&report);
     assert!(decision.credential_blocked, "{decision:#?}");
     assert!(
         decision

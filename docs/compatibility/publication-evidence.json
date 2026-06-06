@@ -1,0 +1,42 @@
+{
+  "schema": "promptfoo-rs.publication-evidence.v1",
+  "status": "credential-blocked",
+  "publication_ready": false,
+  "blocked_channel_count": 6,
+  "rows": [
+    {
+      "channel": "github-releases",
+      "publication_state": "blocked",
+      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+    },
+    {
+      "channel": "cargo",
+      "publication_state": "blocked",
+      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+    },
+    {
+      "channel": "npm-wrapper",
+      "publication_state": "blocked",
+      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+    },
+    {
+      "channel": "docker",
+      "publication_state": "blocked",
+      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+    },
+    {
+      "channel": "homebrew",
+      "publication_state": "blocked",
+      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+    },
+    {
+      "channel": "github-action",
+      "publication_state": "blocked",
+      "notes": "Awaiting authorized credentials, legal/brand approval, external artifact URL/digest, and release notes reference before published=true."
+    }
+  ],
+  "source_artifacts": [
+    "target/release-gates/publication-authority.json",
+    "docs/compatibility/publication-evidence.json"
+  ]
+}
