@@ -9,7 +9,7 @@ use promptfoo_rs::compatibility::inventory::{
 };
 use serde_json::Value;
 
-const EXPECTED_GITHUB_HEAD: &str = "9d7d810c2118c63cb537bf05ea2d34c12bd22066";
+const EXPECTED_GITHUB_HEAD: &str = "2ca16c59b64e0afca10533de0f817c0d24eba20a";
 const NPM_GIT_HEAD: &str = "7a48c5fce614bee617efbb3b7fc93d404c75b628";
 
 const NPM_VIEW_012114: &str = r#"{
@@ -33,14 +33,14 @@ const GITHUB_LATEST_RELEASE_012114: &str = r#"{
 }"#;
 
 const LS_REMOTE_HEAD_DRIFT: &str = "\
-9d7d810c2118c63cb537bf05ea2d34c12bd22066\tHEAD
+2ca16c59b64e0afca10533de0f817c0d24eba20a\tHEAD
 7a48c5fce614bee617efbb3b7fc93d404c75b628\trefs/tags/0.121.14
 4860e990c7e9a2f8f677173fb92cf9867b34d03f\trefs/tags/0.121.13
 ";
 
 #[test]
-fn test_41_1_1_parser_records_refreshed_github_head_without_moving_npm_latest() {
-    /* TEST-41.1.1 */
+fn test_42_1_1_parser_records_refreshed_github_head_without_moving_npm_latest() {
+    /* TEST-42.1.1 */
     let lock = current_latest_lock();
 
     assert_eq!(lock.npm_latest.package_version, "0.121.14");
@@ -58,8 +58,8 @@ fn test_41_1_1_parser_records_refreshed_github_head_without_moving_npm_latest() 
 }
 
 #[test]
-fn test_41_1_2_tracked_lock_artifacts_record_refreshed_github_head() {
-    /* TEST-41.1.2 */
+fn test_42_1_2_tracked_lock_artifacts_record_refreshed_github_head() {
+    /* TEST-42.1.2 */
     let lock = read_json(Path::new(
         "compatibility/inventory/current-latest-target.json",
     ));
@@ -90,8 +90,8 @@ fn test_41_1_2_tracked_lock_artifacts_record_refreshed_github_head() {
 }
 
 #[test]
-fn test_41_1_3_shell_lock_script_accepts_refreshed_github_head_fixture() {
-    /* TEST-41.1.3 */
+fn test_42_1_3_shell_lock_script_accepts_refreshed_github_head_fixture() {
+    /* TEST-42.1.3 */
     let fixture_dir = fixture_dir("target-lock-script");
     let npm_path = fixture_dir.join("npm-view.json");
     let release_path = fixture_dir.join("github-latest-release.json");
@@ -127,8 +127,8 @@ fn test_41_1_3_shell_lock_script_accepts_refreshed_github_head_fixture() {
 }
 
 #[test]
-fn test_41_1_4_evaluator_runtime_fixture_survives_refreshed_head_inventory() {
-    /* TEST-41.1.4 */
+fn test_42_1_4_evaluator_runtime_fixture_survives_refreshed_head_inventory() {
+    /* TEST-42.1.4 */
     let root = fixture_dir("evaluator-runtime-source");
     write_file(
         &root,
