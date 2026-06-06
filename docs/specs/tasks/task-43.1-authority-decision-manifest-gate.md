@@ -112,7 +112,7 @@ The manifest must enumerate each non-auto-resolvable decision item from `perfect
   - `acd632e` `feat(authority): wire authority decisions gate into runtime smoke`
   - `81e8acc` `refactor(authority): format authority decision gate sources`
   - `5908d0d` `refactor(authority): fix clippy collapsible_match in secret scan`
-  - `docs commit` `docs(spec): 回填 task-43.1 §10 Completion Notes + Status → Done`
+  - `606ca9b` `docs(spec): 回填 task-43.1 §10 Completion Notes + Status → Done`
 - **§9 Verification 结果**：
   - install: PASS — `cargo fetch`、viewer/npm `pnpm install --frozen-lockfile` 通过
   - lint: PASS — `bash scripts/release/lint.sh`（含 clippy）通过
