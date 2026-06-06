@@ -423,6 +423,15 @@ Feature: perfect refactor parity
     And TEST-42.1.3 proves runtime smoke regenerates downstream artifacts and keeps perfect-refactor completion blocked unless every gate agrees
     And TEST-42.1.4 proves prior local current-latest fixture evidence survives re-extraction or any new local blocker is explicit
 
+  # Maps to: docs/specs/tasks/task-46.1-current-latest-evaluator-inmemorystore-classification.md
+  Scenario: SCEN-46.1.1 - current latest evaluator in-memory store source is classified but still blocked
+    Given upstream promptfoo current latest contains src/evaluator/inMemoryStore.ts
+    When current-latest source inventory is extracted
+    Then TEST-46.1.1 proves the row is eval-runner rather than unclassified
+    And TEST-46.1.2 proves it remains a P0 blocked eval-runner row until dedicated in-memory store fixtures exist
+    And TEST-46.1.3 proves shell and Rust extraction agree
+    And TEST-46.1.4 proves runtime smoke removes the source/matrix unknown blocker without allowing perfect-refactor completion
+
   # Maps to: docs/specs/tasks/task-43.1-authority-decision-manifest-gate.md
   Scenario: SCEN-43.1.1 - authority decision manifest keeps unresolved external blockers visible
     Given the current-latest unblock packet contains non-auto-resolvable decision items

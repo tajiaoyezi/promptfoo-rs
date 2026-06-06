@@ -160,7 +160,7 @@
       "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
     },
     {
-      "item_id": "unclassified:src-evaluator-inmemorystore",
+      "item_id": "eval-runner:src-evaluator-inmemorystore",
       "decision_state": "unresolved",
       "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
     }

@@ -2224,6 +2224,7 @@ fn is_eval_runtime_file(file: &str) -> bool {
             file,
             "src/evaluate.ts"
                 | "src/evaluator.ts"
+                | "src/evaluator/inMemoryStore.ts"
                 | "src/evaluator/runtime.ts"
                 | "src/evaluatorHelpers.ts"
                 | "src/testCase.ts"
@@ -2290,6 +2291,8 @@ fn current_latest_eval_runner_blocker_reason(stable_id: &str, file: &str) -> Str
     let lower = stable_id.to_ascii_lowercase();
     let reason = if lower.contains("adaptiveconcurrency") {
         "adaptive concurrency requires dedicated current-latest scheduler fixture evidence"
+    } else if lower.contains("inmemorystore") {
+        "evaluator in-memory store requires dedicated current-latest eval-runner in-memory store fixture evidence"
     } else if lower.contains("runtime") {
         "evaluator runtime requires dedicated current-latest eval-runner runtime fixture evidence"
     } else if lower.contains("headerparser") {
