@@ -30,3 +30,6 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+
+# S2V team collaboration temp file
+STATUS-MAIN.md
