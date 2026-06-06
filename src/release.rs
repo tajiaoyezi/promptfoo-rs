@@ -1,7 +1,8 @@
 use crate::compatibility::release_gate::{ReleaseGateStatus, ReleaseGateSummary};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use sha2::{Digest, Sha256};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -1579,6 +1580,322 @@ pub fn write_perfect_refactor_unblock_packet(
         path: path.to_path_buf(),
         message: error.to_string(),
     })
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AuthorityDecisionReport {
+    pub schema: String,
+    pub status: String,
+    pub perfect_refactor_decision_ready: bool,
+    pub required_decision_count: usize,
+    pub manifest_row_count: usize,
+    pub unresolved_count: usize,
+    pub ready_row_count: usize,
+    pub missing_manifest_rows: Vec<String>,
+    pub extra_manifest_rows: Vec<String>,
+    pub duplicate_manifest_rows: Vec<String>,
+    pub invalid_waiver_rows: Vec<String>,
+    pub mock_only_evidence_rows: Vec<String>,
+    pub secret_bearing_rows: Vec<String>,
+    pub blockers: Vec<String>,
+}
+
+impl AuthorityDecisionReport {
+    pub fn perfect_refactor_decision_ready(&self) -> bool {
+        self.perfect_refactor_decision_ready
+    }
+}
+
+pub fn load_authority_decision_manifest(path: &Path) -> Result<Value, ReleaseError> {
+    let json = fs::read_to_string(path).map_err(|error| ReleaseError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })?;
+    serde_json::from_str(&json).map_err(|error| ReleaseError::Serialize(error.to_string()))
+}
+
+pub fn validate_authority_decisions(
+    unblock_packet: &Value,
+    manifest: &Value,
+) -> AuthorityDecisionReport {
+    let decision_items = unblock_packet["decision_items"]
+        .as_array()
+        .cloned()
+        .unwrap_or_default();
+    let manifest_rows = manifest["rows"].as_array().cloned().unwrap_or_default();
+
+    let required_ids = decision_items
+        .iter()
+        .filter_map(|item| item["item_id"].as_str().map(str::to_string))
+        .collect::<Vec<_>>();
+    let mut manifest_ids = Vec::<String>::new();
+    let mut duplicate_manifest_rows = Vec::<String>::new();
+    for row in &manifest_rows {
+        let Some(item_id) = row["item_id"].as_str() else {
+            continue;
+        };
+        if manifest_ids.iter().any(|existing| existing == item_id) {
+            duplicate_manifest_rows.push(item_id.to_string());
+        }
+        manifest_ids.push(item_id.to_string());
+    }
+
+    let required_set = required_ids.iter().cloned().collect::<BTreeSet<_>>();
+    let manifest_set = manifest_ids.iter().cloned().collect::<BTreeSet<_>>();
+    let missing_manifest_rows = required_ids
+        .iter()
+        .filter(|item_id| !manifest_set.contains(*item_id))
+        .cloned()
+        .collect::<Vec<_>>();
+    let extra_manifest_rows = manifest_ids
+        .iter()
+        .filter(|item_id| !required_set.contains(*item_id))
+        .cloned()
+        .collect::<Vec<_>>();
+
+    let mut unresolved_count = 0usize;
+    let mut ready_row_count = 0usize;
+    let mut invalid_waiver_rows = Vec::<String>::new();
+    let mut mock_only_evidence_rows = Vec::<String>::new();
+    let mut secret_bearing_rows = Vec::<String>::new();
+    let mut blockers = Vec::<String>::new();
+
+    if !missing_manifest_rows.is_empty() {
+        blockers.push(format!(
+            "{} unblock-packet decision items are missing manifest rows",
+            missing_manifest_rows.len()
+        ));
+    }
+    if !extra_manifest_rows.is_empty() {
+        blockers.push(format!(
+            "{} manifest rows do not map to unblock-packet decision items",
+            extra_manifest_rows.len()
+        ));
+    }
+    if !duplicate_manifest_rows.is_empty() {
+        blockers.push(format!(
+            "{} manifest rows duplicate item_id values",
+            duplicate_manifest_rows.len()
+        ));
+    }
+
+    for row in manifest_rows {
+        let Some(item_id) = row["item_id"].as_str().map(str::to_string) else {
+            blockers.push("manifest row missing item_id".to_string());
+            continue;
+        };
+        if secret_values_in_value(&row)
+            .into_iter()
+            .any(|secret| !secret.trim().is_empty())
+        {
+            secret_bearing_rows.push(item_id.clone());
+            blockers.push(format!(
+                "{item_id}: manifest row contains secret-like values"
+            ));
+        }
+
+        let decision_state = row["decision_state"].as_str().unwrap_or_default();
+        match decision_state {
+            "unresolved" => {
+                unresolved_count += 1;
+                blockers.push(format!("{item_id}: authority decision remains unresolved"));
+            }
+            "evidence-provided" => {
+                let references = row["evidence_references"]
+                    .as_array()
+                    .cloned()
+                    .unwrap_or_default();
+                if references.is_empty() {
+                    blockers.push(format!(
+                        "{item_id}: evidence-provided requires non-empty evidence_references"
+                    ));
+                    continue;
+                }
+                if references.iter().any(|reference| {
+                    reference["reference"]
+                        .as_str()
+                        .map(authority_evidence_is_mock_only)
+                        .unwrap_or(true)
+                        || reference["kind"]
+                            .as_str()
+                            .map(str::to_ascii_lowercase)
+                            .is_some_and(|kind| kind.contains("mock"))
+                }) {
+                    mock_only_evidence_rows.push(item_id.clone());
+                    blockers.push(format!(
+                        "{item_id}: evidence-provided references are mock-only or dry-run"
+                    ));
+                    continue;
+                }
+                ready_row_count += 1;
+            }
+            "waived-with-boundary" => {
+                let waiver = row.get("waiver");
+                let missing = waiver_required_fields(waiver);
+                if !missing.is_empty() {
+                    invalid_waiver_rows.push(item_id.clone());
+                    blockers.push(format!(
+                        "{item_id}: waiver missing required fields: {}",
+                        missing.join(", ")
+                    ));
+                    continue;
+                }
+                ready_row_count += 1;
+            }
+            other => blockers.push(format!("{item_id}: invalid decision_state '{other}'")),
+        }
+    }
+
+    let structural_ready = missing_manifest_rows.is_empty()
+        && extra_manifest_rows.is_empty()
+        && duplicate_manifest_rows.is_empty()
+        && invalid_waiver_rows.is_empty()
+        && mock_only_evidence_rows.is_empty()
+        && secret_bearing_rows.is_empty();
+    let perfect_refactor_decision_ready = structural_ready
+        && !required_ids.is_empty()
+        && ready_row_count == required_ids.len()
+        && unresolved_count == 0;
+    let status = if perfect_refactor_decision_ready {
+        "ready"
+    } else {
+        "blocked"
+    };
+
+    AuthorityDecisionReport {
+        schema: "promptfoo-rs.authority-decisions-gate.v1".to_string(),
+        status: status.to_string(),
+        perfect_refactor_decision_ready,
+        required_decision_count: required_ids.len(),
+        manifest_row_count: manifest_ids.len(),
+        unresolved_count,
+        ready_row_count,
+        missing_manifest_rows,
+        extra_manifest_rows,
+        duplicate_manifest_rows,
+        invalid_waiver_rows,
+        mock_only_evidence_rows,
+        secret_bearing_rows,
+        blockers,
+    }
+}
+
+pub fn write_authority_decision_gate_report(
+    report: &AuthorityDecisionReport,
+    path: &Path,
+) -> Result<(), ReleaseError> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).map_err(|error| ReleaseError::Io {
+            path: parent.to_path_buf(),
+            message: error.to_string(),
+        })?;
+    }
+    let json = serde_json::to_string_pretty(report)
+        .map_err(|error| ReleaseError::Serialize(error.to_string()))?;
+    fs::write(path, format!("{json}\n")).map_err(|error| ReleaseError::Io {
+        path: path.to_path_buf(),
+        message: error.to_string(),
+    })
+}
+
+fn waiver_required_fields(waiver: Option<&Value>) -> Vec<&'static str> {
+    let Some(waiver) = waiver else {
+        return vec![
+            "owner",
+            "approval_date",
+            "scope",
+            "expiration_or_review_date",
+            "rationale",
+            "release_impact",
+        ];
+    };
+    [
+        ("owner", "owner"),
+        ("approval_date", "approval_date"),
+        ("scope", "scope"),
+        ("expiration_or_review_date", "expiration_or_review_date"),
+        ("rationale", "rationale"),
+        ("release_impact", "release_impact"),
+    ]
+    .into_iter()
+    .filter_map(|(field, label)| {
+        waiver[field]
+            .as_str()
+            .filter(|value| !value.trim().is_empty())
+            .is_none()
+            .then_some(label)
+    })
+    .collect()
+}
+
+fn authority_evidence_is_mock_only(reference: &str) -> bool {
+    let lower = reference.to_ascii_lowercase();
+    [
+        "mock",
+        "dry-run",
+        "dry_run",
+        "local-only",
+        "local only",
+        "fixture-only",
+        "fixture only",
+        "echo",
+        "placeholder",
+        "sample-only",
+    ]
+    .iter()
+    .any(|needle| lower.contains(needle))
+}
+
+fn secret_values_in_value(value: &Value) -> Vec<String> {
+    let mut secrets = Vec::new();
+    collect_secret_like_strings(value, &mut secrets);
+    secrets
+}
+
+fn collect_secret_like_strings(value: &Value, secrets: &mut Vec<String>) {
+    match value {
+        Value::String(text) => {
+            if authority_manifest_contains_secret_like_value(text) {
+                secrets.push(text.clone());
+            }
+        }
+        Value::Array(items) => {
+            for item in items {
+                collect_secret_like_strings(item, secrets);
+            }
+        }
+        Value::Object(map) => {
+            for nested in map.values() {
+                collect_secret_like_strings(nested, secrets);
+            }
+        }
+        _ => {}
+    }
+}
+
+fn authority_manifest_contains_secret_like_value(text: &str) -> bool {
+    let trimmed = text.trim();
+    if trimmed.is_empty() {
+        return false;
+    }
+    let lower = trimmed.to_ascii_lowercase();
+    if lower.starts_with("sk-") || lower.contains("sk-live-") {
+        return true;
+    }
+    if lower.contains("bearer ") && !lower.contains("bearer <redacted>") {
+        return true;
+    }
+    [
+        "api_key=",
+        "apikey=",
+        "password=",
+        "secret=",
+        "token-123",
+        "private_key",
+        "-----begin ",
+    ]
+    .iter()
+    .any(|needle| lower.contains(needle))
 }
 
 fn claim_source_artifact(source_artifacts: &[String], needle: &str) -> String {

@@ -1,0 +1,172 @@
+{
+  "schema": "promptfoo-rs.authority-decisions.v1",
+  "status": "blocked",
+  "perfect_refactor_decision_ready": false,
+  "unresolved_count": 32,
+  "rows": [
+    {
+      "item_id": "config:src-globalconfig-accounts",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "config:src-globalconfig-cloud",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "config:src-globalconfig-globalconfig",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "config:src-server-config-serverconfig",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "config:src-server-routes-configs",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "config:src-tracing-otelconfig",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "config:src-types-api-configs",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "current-latest:target",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-anthropic-claudecodeauth",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-agents",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-agents-loader",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-agents-model-settings",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-agents-tracing",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-agents-types",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-assistant",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-billing",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-chatkit",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-chatkit-pool",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-chatkit-types",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-codex-app-server",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-codex-sdk",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-codexapikeygating",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-codexdefaults",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-codexskillmetadata",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "provider:src-providers-openai-realtime",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "publication:cargo",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "publication:docker",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "publication:github-action",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "publication:github-releases",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "publication:homebrew",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "publication:npm-wrapper",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    },
+    {
+      "item_id": "unclassified:src-evaluator-inmemorystore",
+      "decision_state": "unresolved",
+      "notes": "Awaiting real external authority evidence or formal waiver; unresolved entries remain release-blocking."
+    }
+  ],
+  "source_artifacts": [
+    "target/release-gates/perfect-refactor-unblock-packet.json",
+    "docs/compatibility/authority-decisions.json"
+  ]
+}
