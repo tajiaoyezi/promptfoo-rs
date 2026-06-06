@@ -449,6 +449,10 @@ bash scripts/release/perfect-refactor-unblock-packet.sh
 perfect_refactor_unblock_packet_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-unblock-packet.json', 'utf8')); console.log(r.status)")"
 perfect_refactor_unblock_packet_decision_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-unblock-packet.json', 'utf8')); console.log(r.required_user_decision_count)")"
 perfect_refactor_unblock_packet_auto_resolvable="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/perfect-refactor-unblock-packet.json', 'utf8')); console.log(r.auto_resolvable ? 'true' : 'false')")"
+bash scripts/release/authority-decisions.sh
+authority_decisions_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/authority-decisions-gate.json', 'utf8')); console.log(r.status)")"
+authority_decisions_unresolved_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/authority-decisions-gate.json', 'utf8')); console.log(r.unresolved_count)")"
+authority_decisions_ready="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/authority-decisions-gate.json', 'utf8')); console.log(r.perfect_refactor_decision_ready ? 'true' : 'false')")"
 CURRENT_LATEST_ADAPTER_STATUS="$adapter_status" \
 CURRENT_LATEST_SOURCE_INVENTORY_STATUS="$current_latest_source_inventory_status" \
 CURRENT_LATEST_SOURCE_INVENTORY_UNCLASSIFIED_COUNT="$current_latest_source_inventory_unclassified_count" \
@@ -549,6 +553,13 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "auto_resolvable": $perfect_refactor_unblock_packet_auto_resolvable,
     "packet_artifact": "target/release-gates/perfect-refactor-unblock-packet.json"
   },
+  "authority_decisions": {
+    "status": "$authority_decisions_status",
+    "unresolved_count": $authority_decisions_unresolved_count,
+    "perfect_refactor_decision_ready": $authority_decisions_ready,
+    "manifest_artifact": "docs/compatibility/authority-decisions.json",
+    "gate_artifact": "target/release-gates/authority-decisions-gate.json"
+  },
   "current_latest_quality": {
     "status": "$current_latest_quality_status",
     "local_current_latest_ready": $current_latest_quality_local_ready,
@@ -567,6 +578,7 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "source_inventory": "$source_inventory_status",
     "longtail_classification": "$longtail_classification_status",
     "external_authority": "$external_authority_status",
+    "authority_decisions": "$authority_decisions_status",
     "current_upstream_policy": "$current_upstream_policy_status",
     "current_latest_target": "$current_latest_target_status",
     "current_latest_source_inventory": "$current_latest_source_inventory_status",
@@ -644,6 +656,8 @@ cat > "$GATE_DIR/release-candidate.json" <<JSON
     "target/release-gates/external-authority-blockers.json",
     "target/release-gates/perfect-refactor-claim.json",
     "target/release-gates/perfect-refactor-unblock-packet.json",
+    "target/release-gates/authority-decisions-gate.json",
+    "docs/compatibility/authority-decisions.json",
     "target/release-gates/current-upstream-policy.json",
     "target/release-gates/current-latest-target.json",
     "target/release-gates/current-latest-source-inventory.json",
@@ -672,6 +686,7 @@ validate_report_json "$GATE_DIR/source-inventory-ledger.json"
 validate_report_json "$GATE_DIR/external-authority-blockers.json"
 validate_report_json "$GATE_DIR/perfect-refactor-claim.json"
 validate_report_json "$GATE_DIR/perfect-refactor-unblock-packet.json"
+validate_report_json "$GATE_DIR/authority-decisions-gate.json"
 validate_report_json "$GATE_DIR/current-latest-target.json"
 validate_report_json "$GATE_DIR/current-latest-source-inventory.json"
 validate_report_json "$GATE_DIR/current-latest-matrix.json"
