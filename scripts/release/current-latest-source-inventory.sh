@@ -252,6 +252,7 @@ function currentLatestEvalRunnerFixtureIds(id) {
     'eval-runner:src-evaluate': ['p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
     'eval-runner:src-evaluator': ['p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
     'eval-runner:src-evaluator-runtime': ['p0-eval-runtime-execution', 'p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
+    'eval-runner:src-evaluator-inmemorystore': ['p0-eval-inmemory-store', 'p0-eval-basic', 'p0-eval-output-json'],
     'eval-runner:src-evaluatorhelpers': ['p0-eval-basic', 'p0-eval-output-json', 'p0-eval-retry-timeout'],
     'eval-runner:src-scheduler-index': [
       'p0-eval-concurrency-limit',
@@ -290,6 +291,9 @@ function isCurrentLatestEvalRunnerFixture(id, file) {
 }
 
 function currentLatestEvalRunnerFixtureReason(id, file) {
+  if (id.toLowerCase().includes('inmemorystore')) {
+    return 'current-latest evaluator in-memory store source is covered by deterministic evaluator in-memory store fixture evidence';
+  }
   if (id.toLowerCase().includes('evaluator-runtime')) {
     return 'current-latest evaluator runtime source is covered by deterministic evaluator runtime fixture evidence';
   }
