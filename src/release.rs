@@ -1854,10 +1854,8 @@ fn secret_values_in_value(value: &Value) -> Vec<String> {
 
 fn collect_secret_like_strings(value: &Value, secrets: &mut Vec<String>) {
     match value {
-        Value::String(text) => {
-            if authority_manifest_contains_secret_like_value(text) {
-                secrets.push(text.clone());
-            }
+        Value::String(text) if authority_manifest_contains_secret_like_value(text) => {
+            secrets.push(text.clone());
         }
         Value::Array(items) => {
             for item in items {
