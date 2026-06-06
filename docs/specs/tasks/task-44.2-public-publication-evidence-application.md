@@ -106,7 +106,9 @@ No publication channel can become `published=true` unless Phase 43's publication
   - `scripts/release/integration.sh`
   - `docs/release.md`
   - `docs/compatibility/matrix.md`
-- **commit 列表**：TBD-after-merge
+- **commit 列表**：
+  - f110ca0 test(release): add Phase 44 authority and publication evidence tests
+  - 465ef9c docs(spec): complete Phase 44 authority and publication closure
 - **§9 Verification 结果**：
   - install: ✅
   - lint: ✅
