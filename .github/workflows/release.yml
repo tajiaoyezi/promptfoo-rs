@@ -19,7 +19,8 @@ jobs:
         run: |
           source docs/s2v/scripts/lib/preflight.sh
           source docs/s2v/scripts/lib/verify.sh
-          s2v_verify_full "install lint typecheck unit-test integration e2e coverage build runtime-smoke"
+          # runtime-smoke before unit-test: cold CI needs target/release-gates artifacts first
+          s2v_verify_full "install lint typecheck runtime-smoke unit-test integration e2e coverage build"
       - name: Viewer package smoke
         run: |
           corepack enable
