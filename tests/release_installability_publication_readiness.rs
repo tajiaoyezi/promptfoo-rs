@@ -94,7 +94,7 @@ fn test_17_5_3_release_workflow_requires_full_gate_before_stable_artifacts() {
         .expect("installability script should exist");
 
     let gate_index = workflow
-        .find("s2v_verify_full \"install lint typecheck unit-test integration e2e coverage build runtime-smoke\"")
+        .find("s2v_verify_full \"install lint typecheck runtime-smoke unit-test integration e2e coverage build\"")
         .expect("workflow must run full S2V phase gate");
     let corpus_index = workflow
         .find("real-upstream-corpus")
