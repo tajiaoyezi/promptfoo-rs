@@ -118,10 +118,15 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 
 ## Workflow
 
-- **Collaboration Tier**: solo
+- **Collaboration Tier**: `team`
   Overrides:
-    - git-flow: direct trunk commits; no worktree; no PR required
+    - PR-only: true
+    - default-branch: master
     - task-mode: AUTO generated Draft specs
+
+### Tier Change History
+
+- 2026-06-06: solo → team（`master` 启用 branch protection；后续任务一律 PR 合入）
 
 ---
 
