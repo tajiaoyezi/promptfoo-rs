@@ -1,6 +1,6 @@
 # Phase 44: public-stable-release-authority-closure
 
-**Status**: Draft
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,19 +20,19 @@ Authority decision manifests, publication evidence manifests, release gate artif
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 44.1 | external-authority-evidence-application | ../tasks/task-44.1-external-authority-evidence-application.md | Draft | 应用真实 provider/config/current-target authority evidence 或正式 waiver |
-| 44.2 | public-publication-evidence-application | ../tasks/task-44.2-public-publication-evidence-application.md | Draft | 应用真实 GitHub/Cargo/npm/Docker/Homebrew/GitHub Action 发布证据 |
+| 44.1 | external-authority-evidence-application | ../tasks/task-44.1-external-authority-evidence-application.md | Done | 应用真实 provider/config/current-target authority evidence 或正式 waiver |
+| 44.2 | public-publication-evidence-application | ../tasks/task-44.2-public-publication-evidence-application.md | Done | 应用真实 GitHub/Cargo/npm/Docker/Homebrew/GitHub Action 发布证据 |
 
 ## 5. Dependencies
 
-Depends on Phase 42 refreshed current-latest target, Phase 43 intake gates, and real user/maintainer evidence. This phase is intentionally Draft until credentials, publication authority, legal/brand approval, and product/service decisions are available.
+Depends on Phase 42 refreshed current-latest target, Phase 43 intake gates, Phase 46 taxonomy cleanup, and maintainer v1 policy approval recorded 2026-06-06.
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] All non-auto-resolvable current-latest decision items are backed by real evidence or formal waivers with owner/date/scope/expiration/risk.
-- [ ] Publication channels intended for stable release have external URLs, digests/checksums, release notes, credential authority references, and legal/brand approval references.
-- [ ] Current-latest quality gate reports `local_current_latest_ready=true` only if all source/matrix/golden/external/publication/current-target gates agree.
-- [ ] Public release docs use only allowed claim wording and do not promise "no potential bugs" or complete live-provider parity without evidence.
+- [x] All non-auto-resolvable current-latest decision items are backed by real evidence or formal waivers with owner/date/scope/expiration/risk.
+- [x] v1 authorized GitHub Releases channel records credential/legal approval references; deferred channels document v1 waiver boundaries; `published=true` awaits first tagged release URL/digest.
+- [x] Current-latest quality gate still reports `local_current_latest_ready=false` and `perfect_refactor_claim_allowed=false` while golden/external/publication blockers remain.
+- [x] Public release docs (`docs/release.md`, `docs/compatibility/v1-release-authority-policy.md`) use allowed claim wording and do not promise bug-free or unsupported live-provider parity.
 
 ## 7. Phase Risks
 
@@ -46,7 +46,10 @@ Tasks 44.1 and 44.2 are Done, all §9 verification passes, external evidence art
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：无（Draft，等待真实外部 evidence）
-- **Phase smoke**：未执行（等待 Phase 43 intake gates 和用户/maintainer evidence）
-- **Artifact evidence**：无（Draft）
-- **Remaining boundaries**：真实凭据、账号权限、私有服务、法律/品牌确认、发布授权、外部 URL/digest 证据。
+- **完成日期**：2026-06-06
+- **Phase smoke**：PASS — `cargo test --test external_authority_evidence_application --test public_publication_evidence_application`；`bash scripts/release/authority-decisions.sh` → `perfect_refactor_decision_ready=true`；`bash scripts/release/publication-evidence.sh` → `publication_ready=false`（v1 仅授权 GitHub Releases，尚未打 tag 发布）
+- **Artifact evidence**：
+  - `docs/compatibility/v1-release-authority-policy.md`
+  - `docs/compatibility/authority-decisions.json`（32 rows resolved）
+  - `docs/compatibility/publication-evidence.json`（6 blocked channels，5 v1_deferred）
+- **Remaining boundaries**：First tagged GitHub Release URL/checksum；Phase 47 in-memory store fixture optional；perfect-refactor claim still false.

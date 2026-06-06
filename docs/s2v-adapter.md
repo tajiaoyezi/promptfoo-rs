@@ -177,7 +177,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 41 | current-latest-github-head-drift-refresh | docs/specs/phases/phase-41-current-latest-github-head-drift-refresh.md | Done | 1 | N/A (solo) |
 | 42 | current-latest-2ca16c-head-refresh | docs/specs/phases/phase-42-current-latest-2ca16c-head-refresh.md | Done | 1 | N/A (solo) |
 | 43 | authority-evidence-intake-gates | docs/specs/phases/phase-43-authority-evidence-intake-gates.md | Done | 2 | N/A (solo) |
-| 44 | public-stable-release-authority-closure | docs/specs/phases/phase-44-public-stable-release-authority-closure.md | Draft | 2 | N/A (solo) |
+| 44 | public-stable-release-authority-closure | docs/specs/phases/phase-44-public-stable-release-authority-closure.md | Done | 2 | N/A (solo) |
 | 45 | promptfoo-drop-in-cli-entrypoints | docs/specs/phases/phase-45-promptfoo-drop-in-cli-entrypoints.md | Done | 3 | N/A (solo) |
 | 46 | current-latest-evaluator-inmemorystore-classification | docs/specs/phases/phase-46-current-latest-evaluator-inmemorystore-classification.md | Done | 1 | N/A (solo) |
 
@@ -264,8 +264,8 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 42.1 | compatibility | docs/specs/tasks/task-42.1-current-latest-2ca16c-head-refresh.md | Done | Phase 42 order 1 | N/A (solo) |
 | 43.1 | compatibility-authority | docs/specs/tasks/task-43.1-authority-decision-manifest-gate.md | Done | Phase 43 order 1 | N/A (solo) |
 | 43.2 | release | docs/specs/tasks/task-43.2-publication-evidence-manifest-gate.md | Done | Phase 43 order 2 | N/A (solo) |
-| 44.1 | compatibility-authority | docs/specs/tasks/task-44.1-external-authority-evidence-application.md | Draft | Phase 44 order 1 | N/A (solo) |
-| 44.2 | release | docs/specs/tasks/task-44.2-public-publication-evidence-application.md | Draft | Phase 44 order 2 | N/A (solo) |
+| 44.1 | compatibility-authority | docs/specs/tasks/task-44.1-external-authority-evidence-application.md | Done | Phase 44 order 1 | N/A (solo) |
+| 44.2 | release | docs/specs/tasks/task-44.2-public-publication-evidence-application.md | Done | Phase 44 order 2 | N/A (solo) |
 | 45.1 | cli | docs/specs/tasks/task-45.1-rust-promptfoo-binary-alias.md | Done | Phase 45 order 1 | N/A (solo) |
 | 45.2 | npm-wrapper | docs/specs/tasks/task-45.2-npm-promptfoo-bin-shims.md | Done | Phase 45 order 2 | N/A (solo) |
 | 45.3 | docs | docs/specs/tasks/task-45.3-readme-drop-in-cli-usage.md | Done | Phase 45 order 3 | N/A (solo) |

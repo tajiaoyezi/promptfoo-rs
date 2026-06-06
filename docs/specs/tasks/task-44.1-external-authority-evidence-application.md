@@ -1,6 +1,6 @@
 # Task 44.1: external-authority-evidence-application
 
-**Status**: Draft
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 44 - public-stable-release-authority-closure
@@ -62,19 +62,19 @@ Each authority row can move from unresolved only when Phase 43's manifest valida
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-011): every product/account/private-service/credential/current-target item has validated evidence or formal waiver metadata.
-- [ ] **AC2** (PRD §Security): no committed artifact contains provider secrets, API keys, account tokens, or private credentials.
-- [ ] **AC3** (ADR-009): unresolved or invalid evidence keeps its item release-blocking.
-- [ ] **AC4** (PRD §Current Latest Rebaseline Addendum): perfect-refactor claim remains false unless all current-latest gates agree on the same target packet and authority status.
+- [x] **AC1** (ADR-011): every product/account/private-service/credential/current-target item has validated evidence or formal waiver metadata.
+- [x] **AC2** (PRD §Security): no committed artifact contains provider secrets, API keys, account tokens, or private credentials.
+- [x] **AC3** (ADR-009): unresolved or invalid evidence keeps its item release-blocking.
+- [x] **AC4** (PRD §Current Latest Rebaseline Addendum): perfect-refactor claim remains false unless all current-latest gates agree on the same target packet and authority status.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-44.1.1 | TEST-44.1.1 | tests/external_authority_evidence_application.rs | install, lint, typecheck, unit-test, integration, build | Not Started |
-| AC2 | SCEN-44.1.1 | TEST-44.1.2 | tests/external_authority_evidence_application.rs | install, lint, typecheck, unit-test, e2e, build | Not Started |
-| AC3 | SCEN-44.1.1 | TEST-44.1.3 | tests/external_authority_evidence_application.rs | install, typecheck, unit-test, runtime-smoke, build | Not Started |
-| AC4 | SCEN-44.1.1 | TEST-44.1.4 | tests/external_authority_evidence_application.rs | install, lint, typecheck, unit-test, coverage, runtime-smoke, build | Not Started |
+| AC1 | SCEN-44.1.1 | TEST-44.1.1 | tests/external_authority_evidence_application.rs | install, lint, typecheck, unit-test, integration, build | Done |
+| AC2 | SCEN-44.1.1 | TEST-44.1.2 | tests/external_authority_evidence_application.rs | install, lint, typecheck, unit-test, e2e, build | Done |
+| AC3 | SCEN-44.1.1 | TEST-44.1.3 | tests/external_authority_evidence_application.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC4 | SCEN-44.1.1 | TEST-44.1.4 | tests/external_authority_evidence_application.rs | install, lint, typecheck, unit-test, coverage, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -96,18 +96,28 @@ Each authority row can move from unresolved only when Phase 43's manifest valida
 
 ## 10. Completion Notes
 
-- **完成日期**：无（Draft，等待真实外部 evidence）
-- **改动文件**：无（未实施）
-- **commit 列表**：无（未实施）
+- **完成日期**：2026-06-06
+- **改动文件**：
+  - `docs/compatibility/v1-release-authority-policy.md`
+  - `docs/compatibility/authority-decisions.json`
+  - `scripts/release/generate-v1-authority-manifest.mjs`
+  - `src/release.rs`
+  - `tests/external_authority_evidence_application.rs`
+  - `tests/authority_decision_manifest_gate.rs`
+  - `scripts/release/integration.sh`
+  - `docs/release.md`
+  - `docs/compatibility/matrix.md`
+  - `docs/prds/promptfoo-rs.prd.md`
+- **commit 列表**：TBD-after-merge
 - **§9 Verification 结果**：
-  - install: 未执行（Draft）
-  - lint: 未执行（Draft）
-  - typecheck: 未执行（Draft）
-  - unit-test: 未执行（Draft）
-  - integration: 未执行（Draft）
-  - e2e: 未执行（Draft）
-  - coverage: 未执行（Draft）
-  - build: 未执行（Draft）
-  - runtime-smoke: 未执行（Draft）
-- **剩余风险 / 未做项**：需要真实产品/账号/凭据/私有服务/current-target policy evidence 或正式 waiver。
-- **下游 task 影响**：Task 44.2 和最终 public stable release claim 仍等待本 task 的 evidence。
+  - install: ✅
+  - lint: ✅
+  - typecheck: ✅
+  - unit-test: all passed / 0 failed
+  - integration: ✅
+  - e2e: ✅
+  - coverage: ✅
+  - build: ✅
+  - runtime-smoke: PASS — `authority-decisions-gate.json` `status=ready` `perfect_refactor_decision_ready=true`; `perfect_refactor_claim_allowed=false`
+- **剩余风险 / 未做项**：Waived longtail provider/cloud rows reduce v1 scope; perfect-refactor claim still blocked by golden corpus and publication gates.
+- **下游 task 影响**：Task 44.2 applied v1 publication deferrals; first GitHub Release tag still required for `published=true`.
