@@ -9,7 +9,9 @@ fn promptfoo_bin(name: &str) -> Command {
         "promptfoo-rs" => env!("CARGO_BIN_EXE_promptfoo-rs"),
         other => panic!("unknown test binary {other}"),
     };
-    Command::new(path)
+    let mut command = Command::new(path);
+    command.env("NO_COLOR", "1");
+    command
 }
 
 #[test]

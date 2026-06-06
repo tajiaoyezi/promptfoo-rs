@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+export NO_COLOR=1
+export FORCE_COLOR=0
+
 GATE_DIR="target/release-gates"
 mkdir -p "$GATE_DIR"
 tmpdir="$(mktemp -d)"
