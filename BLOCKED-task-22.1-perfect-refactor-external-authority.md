@@ -1,6 +1,17 @@
 # BLOCKED — task-22.1 / perfect-refactor external authority
 
-## 卡住的 AC
+## Phase 49 结案（2026-06-07）— Option B + C，非 perfect-refactor 完成
+
+Maintainer 决策（ADR-012 + v1 policy）：
+
+- **Option B**：项目目标收窄为 **冻结产品基线**（`promptfoo@0.121.15`）上的 `local_stable_allowed=true`，**不**追求 `perfect_refactor_claim_allowed=true` 或 live upstream HEAD 对齐。
+- **Option C**：Phase 44 已在 `authority-decisions.json` / `publication-evidence.json` 登记正式 waiver；Phase 49 让 runtime gate **消费**这些 manifest（`active_blocker_count=0`、`v1_scope_ready=true`、`required_user_decision_count=0`），并设置 `current_upstream_rebaseline_required=false`。
+
+**仍保持 fail-closed**：`perfect_refactor_claim_allowed=false`（golden fixture burndown 仍在 `current-latest-golden-corpus.json`）。本文件保留为历史审计；新工作走 Phase 49 gate alignment，不再规划 upstream rebaseline backlog。
+
+---
+
+## 卡住的 AC（历史记录）
 
 - Goal-level AC: `perfect_refactor_claim_allowed=true` for a complete promptfoo perfect-refactor claim.
 - This is not a failure of task 22.1 AC1-AC5. Task 22.1 completed its blocker handoff artifact. The remaining failure is the higher-level project goal: the generated claim contract still correctly reports `perfect_refactor_claim_allowed=false`.

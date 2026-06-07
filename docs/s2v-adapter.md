@@ -183,6 +183,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 46 | current-latest-evaluator-inmemorystore-classification | docs/specs/phases/phase-46-current-latest-evaluator-inmemorystore-classification.md | Done | 1 | N/A (solo) |
 | 47 | current-latest-evaluator-inmemorystore-fixture-burndown | docs/specs/phases/phase-47-current-latest-evaluator-inmemorystore-fixture-burndown.md | Done | 1 | N/A (solo) |
 | 48 | current-latest-0.121.15-target-refresh | docs/specs/phases/phase-48-current-latest-0.121.15-target-refresh.md | Done | 1 | N/A (solo) |
+| 49 | product-baseline-v1-gate-alignment | docs/specs/phases/phase-49-product-baseline-v1-gate-alignment.md | In Progress | 2 | N/A (solo) |
 
 ### 产品战略（ADR-012，2026-06-07）
 
@@ -190,7 +191,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 |---|---|
 | 兼容基线 | `promptfoo@0.121.15`（Phase 48 观测包 = 最终冻结）|
 | 独立产品 | 不持续对齐 promptfoo 发布节奏或 GitHub HEAD |
-| Drift refresh | Phase 49+ **不在默认 backlog**；upstream 再漂移不自动开 task |
+| Drift refresh | upstream 再漂移不自动开 task；Phase 49 为 gate/waiver 对齐（非 drift refresh）|
 | 后续方向 | 冻结基线 burndown、发布渠道、promptfoo-rs 自有 roadmap |
 
 ## Task 总索引
@@ -284,6 +285,8 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 46.1 | eval-runner | docs/specs/tasks/task-46.1-current-latest-evaluator-inmemorystore-classification.md | Done | Phase 46 order 1 | N/A (solo) |
 | 47.1 | eval-runner | docs/specs/tasks/task-47.1-current-latest-evaluator-inmemorystore-fixture-burndown.md | Done | Phase 47 order 1 | N/A (solo) |
 | 48.1 | compatibility | docs/specs/tasks/task-48.1-current-latest-0.121.15-target-refresh.md | Done | Phase 48 order 1 | N/A (solo) |
+| 49.1 | compatibility-gates | docs/specs/tasks/task-49.1-product-baseline-policy-gate-alignment.md | In Progress | Phase 49 order 1 | N/A (solo) |
+| 49.2 | compatibility-gates | docs/specs/tasks/task-49.2-v1-waiver-unblock-packet-alignment.md | In Progress | Phase 49 order 2; depends 49.1 | N/A (solo) |
 
 ## ADR 索引
 

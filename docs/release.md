@@ -61,7 +61,7 @@ Maintainer policy: `docs/compatibility/v1-release-authority-policy.md`
 - **Deferred for v1 (formal waiver)**: Cargo, npm wrapper, Docker, Homebrew, GitHub Action.
 - **Brand/legal**: independent reimplementation wording required (`approval:legal-brand-independent-reimplementation-2026-06-06`).
 
-Current publication evidence (`docs/compatibility/publication-evidence.json`) records **github-releases** as `published` for tag `v0.1.2` (external URL + sha256). The five v1-deferred channels remain `blocked`. Aggregate `publication_ready` stays `false` until policy requires more than the single authorized channel or deferred channels are waived/published.
+Current publication evidence (`docs/compatibility/publication-evidence.json`) records **github-releases** as `published` for tag `v0.1.2` (external URL + sha256). Five channels are **v1-deferred** (formal waiver, not active blockers). Phase 49 gate alignment sets `publication-evidence-gate.json` `v1_scope_ready=true` when the authorized channel is published and deferred channels document waiver boundaries. `perfect_refactor_claim_allowed` remains `false` until golden burndown closes.
 
 ## v0.1.0 GitHub Release (shipped 2026-06-06)
 

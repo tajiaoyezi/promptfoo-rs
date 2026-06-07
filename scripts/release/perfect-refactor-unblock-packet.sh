@@ -6,6 +6,13 @@ mkdir -p "$GATE_DIR"
 
 node <<'NODE'
 const fs = require('fs');
+const {
+  loadAuthorityDecisions,
+  isResolvedAuthorityDecision,
+  loadPublicationEvidence,
+  isV1DeferredPublication,
+  isPublishedChannel,
+} = require('./product-baseline-gate-lib.cjs');
 
 const gateDir = process.env.GATE_DIR || 'target/release-gates';
 const read = (name) => JSON.parse(fs.readFileSync(`${gateDir}/${name}`, 'utf8'));
@@ -18,13 +25,56 @@ const source = read('source-inventory-evidence.json');
 const external = read('external-authority-blockers.json');
 const publication = read('publication-authority.json');
 const distribution = read('upstream-distribution-target.json');
+const upstreamPolicy = readOptional('current-upstream-policy.json');
 const currentLatestGolden = readOptional('current-latest-golden-corpus.json');
 const currentLatestMatrix = readOptional('current-latest-matrix.json');
 const currentLatestQuality = readOptional('current-latest-quality.json');
 const currentLatestTarget = readOptional('current-latest-target.json');
+const { byId: authorityById } = loadAuthorityDecisions();
+const { byChannel: publicationByChannel } = loadPublicationEvidence();
 
 function artifactFor(name) {
   return `target/release-gates/${name}`;
+}
+
+function productBaselineFrozen() {
+  return upstreamPolicy?.product_baseline_frozen === true;
+}
+
+function currentUpstreamRebaselineRequired() {
+  if (productBaselineFrozen()) {
+    return false;
+  }
+  if (upstreamPolicy?.current_upstream_rebaseline_required === false) {
+    return false;
+  }
+  return distribution.current_repository_perfect_claim_allowed !== true;
+}
+
+function shouldIncludeDecision(itemId) {
+  if (isResolvedAuthorityDecision(itemId, authorityById)) {
+    return false;
+  }
+  if (String(itemId).startsWith('publication:')) {
+    const channel = String(itemId).replace(/^publication:/, '');
+    if (isPublishedChannel(channel, publicationByChannel)) {
+      return false;
+    }
+    if (isV1DeferredPublication(channel, publicationByChannel)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function filterDecisions(decisions) {
+  const filtered = new Map();
+  for (const [itemId, item] of decisions) {
+    if (shouldIncludeDecision(itemId)) {
+      filtered.set(itemId, item);
+    }
+  }
+  return filtered;
 }
 
 function actorFor(authorityType, itemId) {
@@ -182,8 +232,14 @@ function currentLatestTargetItem(target) {
 }
 
 function currentLatestTargetDecisionRequired(target, quality) {
+  if (isResolvedAuthorityDecision('current-latest:target', authorityById)) {
+    return false;
+  }
   if (!target) {
     return true;
+  }
+  if (productBaselineFrozen()) {
+    return false;
   }
   if (target.current_latest_claim_allowed !== true) {
     return true;
@@ -200,6 +256,24 @@ function currentLatestReleaseBlockers(golden) {
     .filter((blocker) => currentLatestItemId(blocker).length > 0);
 }
 
+function addPublicationDecisions(decisions) {
+  for (const channel of publication.channels || []) {
+    const itemId = `publication:${channel.channel}`;
+    if (!shouldIncludeDecision(itemId)) {
+      continue;
+    }
+    if (channel.published !== true || channel.authority_status !== 'ready' || !channel.published_evidence) {
+      decisions.set(itemId, normalizeExternalItem({
+        item_id: itemId,
+        authority_type: 'publication-authority',
+        source_reference: `target/release-gates/publication-authority.json#${channel.channel}`,
+        safe_local_fallback: 'Keep dry-run installability evidence only',
+        release_impact: `${publicationLabel(itemId)} published=false; public availability remains blocked`,
+      }));
+    }
+  }
+}
+
 function buildCurrentLatestPacket() {
   const matrixRows = new Map();
   for (const row of currentLatestMatrix?.rows || []) {
@@ -213,6 +287,9 @@ function buildCurrentLatestPacket() {
   const decisions = new Map();
   for (const blocker of goldenBlockers) {
     const itemId = currentLatestItemId(blocker);
+    if (!shouldIncludeDecision(itemId)) {
+      continue;
+    }
     decisions.set(itemId, currentLatestGoldenItem(blocker, matrixRows.get(itemId)));
   }
 
@@ -220,20 +297,9 @@ function buildCurrentLatestPacket() {
     decisions.set('current-latest:target', currentLatestTargetItem(currentLatestTarget));
   }
 
-  for (const channel of publication.channels || []) {
-    if (channel.published !== true || channel.authority_status !== 'ready' || !channel.published_evidence) {
-      const itemId = `publication:${channel.channel}`;
-      decisions.set(itemId, normalizeExternalItem({
-        item_id: itemId,
-        authority_type: 'publication-authority',
-        source_reference: `target/release-gates/publication-authority.json#${channel.channel}`,
-        safe_local_fallback: 'Keep dry-run installability evidence only',
-        release_impact: `${publicationLabel(itemId)} published=false; public availability remains blocked`,
-      }));
-    }
-  }
+  addPublicationDecisions(decisions);
 
-  const decisionItems = [...decisions.values()].sort((left, right) =>
+  const decisionItems = [...filterDecisions(decisions).values()].sort((left, right) =>
     String(left.item_id).localeCompare(String(right.item_id))
   );
   const perfectAllowed =
@@ -248,12 +314,13 @@ function buildCurrentLatestPacket() {
     status: perfectAllowed ? 'ready' : 'blocked',
     perfect_refactor_claim_allowed: perfectAllowed,
     auto_resolvable: perfectAllowed && decisionItems.length === 0,
+    product_baseline_frozen: productBaselineFrozen(),
+    authority_decisions_resolved_count: authorityById.size,
     blocker_count: goldenBlockers.length,
     source_p0_accounting_blocker_count: (source.remaining_p0_blockers || []).length,
-    external_authority_blocker_count: external.blocker_count || (external.blockers || []).length,
+    external_authority_blocker_count: external.active_blocker_count ?? external.blocker_count ?? (external.blockers || []).length,
     required_user_decision_count: decisionItems.length,
-    current_upstream_rebaseline_required:
-      distribution.current_repository_perfect_claim_allowed !== true,
+    current_upstream_rebaseline_required: currentUpstreamRebaselineRequired(),
     current_latest_golden_blocker_count: goldenBlockers.length,
     current_latest_external_authority_blocker_count: goldenBlockers.length,
     current_latest_required_decision_count: decisionItems.length,
@@ -269,7 +336,10 @@ function buildCurrentLatestPacket() {
       artifactFor('external-authority-blockers.json'),
       artifactFor('publication-authority.json'),
       artifactFor('upstream-distribution-target.json'),
+      artifactFor('current-upstream-policy.json'),
       artifactFor('release-candidate.json'),
+      'docs/compatibility/authority-decisions.json',
+      'docs/compatibility/publication-evidence.json',
     ],
   };
 }
@@ -282,17 +352,23 @@ if (currentLatestGolden && currentLatestMatrix) {
 
 const decisions = new Map();
 for (const blocker of external.blockers || []) {
+  if (blocker.current_status === 'waived-with-boundary' || blocker.current_status === 'evidence-provided') {
+    continue;
+  }
   const item = normalizeExternalItem(blocker);
+  if (!shouldIncludeDecision(item.item_id)) {
+    continue;
+  }
   decisions.set(item.item_id, item);
 }
 
 for (const itemId of source.remaining_p0_blockers || []) {
-  if (!decisions.has(itemId)) {
+  if (!decisions.has(itemId) && shouldIncludeDecision(itemId)) {
     decisions.set(itemId, sourceOnlyItem(itemId));
   }
 }
 
-if (distribution.current_repository_perfect_claim_allowed !== true || claim.current_perfect_claim_allowed !== true) {
+if (currentUpstreamRebaselineRequired() && !claim.current_perfect_claim_allowed) {
   decisions.set('current-upstream:rebaseline', {
     item_id: 'current-upstream:rebaseline',
     category: 'current-upstream',
@@ -308,21 +384,10 @@ if (distribution.current_repository_perfect_claim_allowed !== true || claim.curr
 }
 
 if (![...decisions.keys()].some((itemId) => itemId.startsWith('publication:'))) {
-  for (const channel of publication.channels || []) {
-    if (channel.published !== true || channel.authority_status !== 'ready' || !channel.published_evidence) {
-      const itemId = `publication:${channel.channel}`;
-      decisions.set(itemId, normalizeExternalItem({
-        item_id: itemId,
-        authority_type: 'publication-authority',
-        source_reference: `target/release-gates/publication-authority.json#${channel.channel}`,
-        safe_local_fallback: 'Keep dry-run installability evidence only',
-        release_impact: `${publicationLabel(itemId)} published=false; public availability remains blocked`,
-      }));
-    }
-  }
+  addPublicationDecisions(decisions);
 }
 
-const decisionItems = [...decisions.values()].sort((left, right) =>
+const decisionItems = [...filterDecisions(decisions).values()].sort((left, right) =>
   String(left.item_id).localeCompare(String(right.item_id))
 );
 const perfectAllowed = claim.perfect_refactor_claim_allowed === true && decisionItems.length === 0;
@@ -331,11 +396,13 @@ const packet = {
   status: perfectAllowed ? 'ready' : 'blocked',
   perfect_refactor_claim_allowed: perfectAllowed,
   auto_resolvable: perfectAllowed && decisionItems.length === 0,
+  product_baseline_frozen: productBaselineFrozen(),
+  authority_decisions_resolved_count: authorityById.size,
   blocker_count: (claim.blockers || []).length,
   source_p0_accounting_blocker_count: (source.remaining_p0_blockers || []).length,
-  external_authority_blocker_count: external.blocker_count || (external.blockers || []).length,
+  external_authority_blocker_count: external.active_blocker_count ?? external.blocker_count ?? (external.blockers || []).length,
   required_user_decision_count: decisionItems.length,
-  current_upstream_rebaseline_required: distribution.current_repository_perfect_claim_allowed !== true,
+  current_upstream_rebaseline_required: currentUpstreamRebaselineRequired(),
   decision_items: decisionItems,
   source_artifacts: [
     artifactFor('perfect-refactor-claim.json'),
@@ -343,7 +410,10 @@ const packet = {
     artifactFor('external-authority-blockers.json'),
     artifactFor('publication-authority.json'),
     artifactFor('upstream-distribution-target.json'),
+    artifactFor('current-upstream-policy.json'),
     artifactFor('release-candidate.json'),
+    'docs/compatibility/authority-decisions.json',
+    'docs/compatibility/publication-evidence.json',
   ],
 };
 

@@ -83,6 +83,9 @@ const matrix = readJson(`${gateDir}/current-latest-matrix.json`);
 const golden = readJson(`${gateDir}/current-latest-golden-corpus.json`);
 const external = readJson(`${gateDir}/external-authority-blockers.json`);
 const publication = readJson(`${gateDir}/publication-authority.json`);
+const authorityGate = readJson(`${gateDir}/authority-decisions-gate.json`);
+const publicationEvidenceGate = readJson(`${gateDir}/publication-evidence-gate.json`);
+const upstreamPolicy = readJson(`${gateDir}/current-upstream-policy.json`);
 
 const sourceArtifacts = [
   `${gateDir}/current-latest-target.json`,
@@ -119,8 +122,15 @@ const stressStatus = env('CURRENT_LATEST_STRESS_STATUS', 'ready');
 const propertyStatus = env('CURRENT_LATEST_PROPERTY_STATUS', 'ready');
 const runtimeSmokeStatus = env('CURRENT_LATEST_RUNTIME_SMOKE_STATUS', 'ready');
 const externalStatus = env('CURRENT_LATEST_EXTERNAL_AUTHORITY_STATUS', external.status || 'blocked');
-const externalBlockers = Number(env('CURRENT_LATEST_EXTERNAL_AUTHORITY_BLOCKER_COUNT', external.blocker_count || 0));
+const externalBlockers = Number(env(
+  'CURRENT_LATEST_EXTERNAL_AUTHORITY_BLOCKER_COUNT',
+  external.active_blocker_count ?? external.blocker_count ?? 0,
+));
+const authorityDecisionsReady = authorityGate?.perfect_refactor_decision_ready === true;
 const publicationReady = env('CURRENT_LATEST_PUBLICATION_READY', publication.publication_ready || 'blocked');
+const publicationScopeReady = publicationEvidenceGate?.v1_scope_ready === true
+  || publicationEvidenceGate?.publication_ready === true;
+const productBaselineFrozen = upstreamPolicy?.product_baseline_frozen === true;
 const localStableAllowed = env('CURRENT_LATEST_LOCAL_STABLE_ALLOWED', 'true') === 'true';
 const requestedClaim = env('CURRENT_LATEST_REQUESTED_CLAIM_WORDING', allowedClaim);
 
@@ -179,7 +189,7 @@ pushStatusBlocker(blockers, 'current-latest:regression', 'regression', outPath, 
 pushStatusBlocker(blockers, 'current-latest:stress', 'stress', outPath, stressStatus, 'Run deterministic stress tests and fix any failing release-critical stress case');
 pushStatusBlocker(blockers, 'current-latest:property', 'property', outPath, propertyStatus, 'Run deterministic property-style tests and fix any failing invariant');
 pushStatusBlocker(blockers, 'current-latest:runtime-smoke', 'runtime-smoke', `${gateDir}/release-candidate.json`, runtimeSmokeStatus, 'Run runtime smoke and fix any release candidate failure');
-if (!readiness(currentTargetStatus) || !currentTargetClaimAllowed) {
+if (!productBaselineFrozen && (!readiness(currentTargetStatus) || !currentTargetClaimAllowed)) {
   blockers.push(blocker(
     'current-latest:target',
     'current-target',
@@ -188,7 +198,7 @@ if (!readiness(currentTargetStatus) || !currentTargetClaimAllowed) {
     'Provide a locked current-latest target packet shared by source, matrix, corpus, and release evidence',
   ));
 }
-if (!readiness(externalStatus) || externalBlockers > 0) {
+if (!authorityDecisionsReady && (!readiness(externalStatus) || externalBlockers > 0)) {
   blockers.push(blocker(
     'current-latest:external-authority',
     'external-authority',
@@ -197,7 +207,7 @@ if (!readiness(externalStatus) || externalBlockers > 0) {
     'Resolve live provider, account, private service, legal, or brand authority gaps with external evidence or formal waivers',
   ));
 }
-if (!readiness(publicationReady)) {
+if (!publicationScopeReady && !readiness(publicationReady)) {
   blockers.push(blocker(
     'current-latest:publication-authority',
     'publication-authority',
@@ -229,10 +239,11 @@ const localCurrentLatestReady =
   readiness(stressStatus) &&
   readiness(propertyStatus) &&
   readiness(runtimeSmokeStatus) &&
-  readiness(currentTargetStatus) &&
-  currentTargetClaimAllowed &&
+  (productBaselineFrozen || (readiness(currentTargetStatus) && currentTargetClaimAllowed)) &&
   !forbiddenClaim(requestedClaim);
-const publicAuthorityReady = readiness(externalStatus) && externalBlockers === 0 && readiness(publicationReady);
+const publicAuthorityReady =
+  (authorityDecisionsReady || (readiness(externalStatus) && externalBlockers === 0))
+  && (publicationScopeReady || readiness(publicationReady));
 const perfectRefactorClaimAllowed =
   localCurrentLatestReady &&
   publicAuthorityReady &&

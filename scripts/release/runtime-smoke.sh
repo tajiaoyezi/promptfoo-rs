@@ -279,9 +279,18 @@ publication_authority_blocker_count="$(node -e "const r = JSON.parse(require('fs
 
 node <<'NODE'
 const fs = require('fs');
+const {
+  loadAuthorityDecisions,
+  isResolvedAuthorityDecision,
+  loadPublicationEvidence,
+  isV1DeferredPublication,
+  isPublishedChannel,
+} = require('./product-baseline-gate-lib.cjs');
 const gateDir = 'target/release-gates';
 const longtail = JSON.parse(fs.readFileSync(`${gateDir}/longtail-classification.json`, 'utf8'));
 const publication = JSON.parse(fs.readFileSync(`${gateDir}/publication-authority.json`, 'utf8'));
+const { byId: authorityById } = loadAuthorityDecisions();
+const { byChannel: publicationByChannel } = loadPublicationEvidence();
 
 function authorityTypeForProvider(itemId) {
   const lower = String(itemId).toLowerCase();
@@ -331,15 +340,34 @@ const publicationBlockers = (publication.channels || [])
 const blockers = [...providerBlockers, ...publicationBlockers].sort((left, right) =>
   String(left.item_id).localeCompare(String(right.item_id))
 );
+const activeBlockers = blockers.filter((blocker) => {
+  if (isResolvedAuthorityDecision(blocker.item_id, authorityById)) {
+    return false;
+  }
+  if (String(blocker.item_id).startsWith('publication:')) {
+    const channel = String(blocker.item_id).replace(/^publication:/, '');
+    if (isPublishedChannel(channel, publicationByChannel)) {
+      return false;
+    }
+    if (isV1DeferredPublication(channel, publicationByChannel)) {
+      return false;
+    }
+  }
+  return blocker.current_status !== 'ready';
+});
+const waivedCount = blockers.length - activeBlockers.length;
 const readyCount = blockers.filter((blocker) => blocker.current_status === 'ready').length;
 const report = {
   schema: 'promptfoo-rs.external-authority-blockers.v1',
-  status: readyCount === blockers.length && blockers.length > 0 ? 'ready' : 'blocked',
+  status: activeBlockers.length === 0 ? 'ready' : 'blocked',
   blocker_count: blockers.length,
+  active_blocker_count: activeBlockers.length,
+  waived_or_resolved_count: waivedCount,
   provider_external_blocker_count: providerBlockers.length,
   publication_blocker_count: publicationBlockers.length,
   ready_count: readyCount,
   blockers,
+  active_blockers: activeBlockers,
   source_artifacts: [
     'target/release-gates/longtail-classification.json',
     'target/release-gates/publication-authority.json',
@@ -363,6 +391,7 @@ fi
 
 node - "$stable_allowed" "false" <<'NODE'
 const fs = require('fs');
+const { v1PublicationScopeReady, loadPublicationEvidence } = require('./product-baseline-gate-lib.cjs');
 const stableAllowed = process.argv[2] === 'true';
 const published = process.argv[3] === 'true';
 const gateDir = 'target/release-gates';
@@ -370,6 +399,10 @@ const source = JSON.parse(fs.readFileSync(`${gateDir}/source-inventory-evidence.
 const current = JSON.parse(fs.readFileSync(`${gateDir}/current-upstream-policy.json`, 'utf8'));
 const publication = JSON.parse(fs.readFileSync(`${gateDir}/publication-authority.json`, 'utf8'));
 const external = JSON.parse(fs.readFileSync(`${gateDir}/external-authority-blockers.json`, 'utf8'));
+const { byChannel: publicationByChannel } = loadPublicationEvidence();
+const requiredChannels = (publication.channels || []).map((channel) => String(channel.channel));
+const v1PublicationReady = v1PublicationScopeReady(requiredChannels, publicationByChannel);
+const activeExternalBlockers = external.active_blocker_count ?? external.blocker_count ?? 0;
 const sourceArtifacts = [
   `${gateDir}/source-inventory-evidence.json`,
   `${gateDir}/current-upstream-policy.json`,
@@ -388,7 +421,7 @@ if ((source.p0_accounting_blocker_count || 0) > 0) {
       'Provide native/bridge fixture evidence or explicit external-authority waiver for every remaining source P0 blocker',
   });
 }
-if (current.current_perfect_claim_allowed !== true) {
+if (current.product_baseline_frozen !== true && current.current_perfect_claim_allowed !== true) {
   blockers.push({
     item_id: 'current-upstream:frozen-target',
     category: 'current-upstream',
@@ -398,22 +431,22 @@ if (current.current_perfect_claim_allowed !== true) {
       'Rebaseline against current upstream with all required evidence or keep the claim limited to frozen-baseline compatibility',
   });
 }
-if (external.status !== 'ready' || (external.blocker_count || 0) > 0) {
+if (external.status !== 'ready' || activeExternalBlockers > 0) {
   blockers.push({
     item_id: 'external-authority:blockers',
     category: 'external-authority',
     source_artifact: `${gateDir}/external-authority-blockers.json`,
-    reason: `${external.blocker_count || 0} external authority blockers remain with status ${external.status}`,
+    reason: `${activeExternalBlockers} active external authority blockers remain with status ${external.status}`,
     required_decision:
-      'Resolve provider/product/account/legal/publication authority blockers with real external evidence',
+      'Resolve provider/product/account/legal/publication authority blockers with real external evidence or formal v1 waivers',
   });
 }
-if (publication.publication_ready !== 'ready' || !published) {
+if (!v1PublicationReady && (publication.publication_ready !== 'ready' || !published)) {
   blockers.push({
     item_id: 'publication-authority:published-evidence',
     category: 'publication-authority',
     source_artifact: `${gateDir}/publication-authority.json`,
-    reason: `publication_ready=${publication.publication_ready}, published=${published}`,
+    reason: `publication_ready=${publication.publication_ready}, published=${published}, v1_scope_ready=${v1PublicationReady}`,
     required_decision:
       'Publish authorized release artifacts with external URL/digest evidence or avoid public/perfect-refactor availability claims',
   });
@@ -423,9 +456,9 @@ const perfectRefactorClaimAllowed =
   published &&
   (source.p0_accounting_blocker_count || 0) === 0 &&
   current.current_perfect_claim_allowed === true &&
-  publication.publication_ready === 'ready' &&
+  (publication.publication_ready === 'ready' || v1PublicationReady) &&
   external.status === 'ready' &&
-  (external.blocker_count || 0) === 0 &&
+  activeExternalBlockers === 0 &&
   blockers.length === 0;
 const contract = {
   schema: 'promptfoo-rs.perfect-refactor-claim.v1',

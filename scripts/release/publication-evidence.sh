@@ -9,6 +9,7 @@ mkdir -p "$GATE_DIR"
 
 node - "$GATE_DIR" "$MANIFEST_PATH" "$OUT" <<'NODE'
 const fs = require('fs');
+const { v1PublicationScopeReady } = require('./product-baseline-gate-lib.cjs');
 
 const [gateDir, manifestPath, outPath] = process.argv.slice(2);
 const authority = JSON.parse(
@@ -111,6 +112,7 @@ function rowIsDryRunOnly(row) {
 
 let blockedChannelCount = 0;
 let publishedChannelCount = 0;
+let v1DeferredChannelCount = 0;
 const incompletePublishedRows = [];
 const dryRunOnlyPublishedRows = [];
 const secretBearingRows = [];
@@ -135,6 +137,10 @@ for (const row of rows) {
 
   switch (row.publication_state) {
     case 'blocked':
+      if (row.v1_deferred === true) {
+        v1DeferredChannelCount += 1;
+        break;
+      }
       blockedChannelCount += 1;
       blockers.push(`${channel}: publication evidence remains blocked`);
       break;
@@ -158,25 +164,33 @@ for (const row of rows) {
   }
 }
 
+const byChannel = new Map(rows.map((row) => [String(row.channel), row]));
 const structuralReady = !missing.length
   && !extra.length
   && !duplicates.length
   && !incompletePublishedRows.length
   && !dryRunOnlyPublishedRows.length
   && !secretBearingRows.length;
-const publicationReady = structuralReady
+const fullPublicationReady = structuralReady
   && requiredChannels.length > 0
   && publishedChannelCount === requiredChannels.length
   && blockedChannelCount === 0;
+const v1ScopeReady = structuralReady
+  && requiredChannels.length > 0
+  && v1PublicationScopeReady(requiredChannels, byChannel);
+const publicationReady = fullPublicationReady || v1ScopeReady;
 
 const report = {
   schema: 'promptfoo-rs.publication-evidence-gate.v1',
   status: publicationReady ? 'ready' : 'credential-blocked',
   publication_ready: publicationReady,
+  v1_scope_ready: v1ScopeReady,
+  full_publication_ready: fullPublicationReady,
   required_channel_count: requiredChannels.length,
   manifest_row_count: manifestChannels.length,
   blocked_channel_count: blockedChannelCount,
   published_channel_count: publishedChannelCount,
+  v1_deferred_channel_count: v1DeferredChannelCount,
   missing_manifest_rows: missing,
   extra_manifest_rows: extra,
   duplicate_manifest_rows: [...new Set(duplicates)],
