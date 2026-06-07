@@ -1,0 +1,48 @@
+name: verify
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  s2v:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Prepare pnpm
+        run: corepack enable && corepack prepare pnpm@10.33.0 --activate
+      - name: S2V verification
+        run: |
+          source docs/s2v/scripts/lib/preflight.sh
+          source docs/s2v/scripts/lib/verify.sh
+          # runtime-smoke before unit-test: cold CI needs target/release-gates artifacts first
+          s2v_verify_full "install lint typecheck runtime-smoke unit-test integration e2e coverage build"
+      - name: Viewer package smoke
+        run: |
+          cd viewer
+          pnpm install --frozen-lockfile
+          pnpm typecheck
+          pnpm test
+          pnpm build
+      - name: npm wrapper package smoke
+        run: |
+          cd npm
+          pnpm install --frozen-lockfile
+          pnpm typecheck
+          pnpm test
+          pnpm build
+      - name: Compatibility release gate tests
+        run: |
+          cargo test --test p0_fixture_corpus --test executable_upstream_rs_runner --test golden_diff_ci_release_gate
+      - name: Assert real upstream corpus gate
+        run: |
+          test -f target/release-gates/real-upstream-corpus/index.json
+          test -f target/release-gates/real-upstream-corpus/summary.json

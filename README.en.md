@@ -8,7 +8,9 @@
 
 `promptfoo-rs` is a Rust-first promptfoo-compatible CLI, library, and local viewer implementation. It focuses on local eval workflows, config parsing, result output, compatibility evidence, and release gates that are auditable and testable by default.
 
-Current status: local S2V verification passes, and the implemented scope builds, tests, and runs. The project does not yet claim full 1:1 replacement parity with the latest promptfoo GitHub HEAD, and public release-channel authority is not complete.
+**Independent reimplementation**: promptfoo-rs is not the official [promptfoo](https://github.com/promptfoo/promptfoo) project and does not imply upstream endorsement. The `promptfoo` name describes compatibility targets and config formats only.
+
+Current status: **v0.1.0** is published on [GitHub Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.0) with Linux and Windows binaries (the only v1-authorized public channel). Local S2V verification passes. The project does not claim full 1:1 replacement with the latest promptfoo GitHub HEAD or perfect-refactor completion.
 
 [Quickstart](docs/QUICKSTART.en.md) | [Project Overview](docs/PROJECT-OVERVIEW.md) | [Architecture](docs/architecture.md) | [Release Boundary](docs/release.md) | [Contributing](CONTRIBUTING.md)
 
@@ -29,7 +31,7 @@ promptfoo-rs is designed for:
 | Local build and tests | Ready. `install`, `lint`, `typecheck`, `unit-test`, `integration`, `e2e`, `coverage`, `build`, and `runtime-smoke` pass. |
 | Normal use within implemented scope | Ready. CLI, core eval, output formats, viewer data contracts, Node wrapper smoke, and compatibility gates are covered. |
 | Full replacement for current latest promptfoo | Not claimed. Current-latest gates still keep blockers and `perfect_refactor_claim_allowed=false`. |
-| Public stable publication | Not complete. `local build/package smoke` is verified; `public registry publication` still requires real credentials, legal/brand approval, external URLs, and digests. |
+| Public stable publication (v1 scope) | **GitHub Releases v0.1.0 is live**. Cargo, npm, Docker, Homebrew, and GitHub Action are formally deferred for v1; aggregate `publication_ready` remains false. |
 
 The strongest supported wording is: no known release-blocking defects under the declared gates. The project does not claim bug-free behavior or complete live-provider parity without matching gate evidence.
 
@@ -88,9 +90,25 @@ target/release/promptfoo view .
 
 See [docs/QUICKSTART.en.md](docs/QUICKSTART.en.md) for more examples.
 
+### Install from GitHub Releases (v0.1.0)
+
+Recommended v1 install path: download assets from the [v0.1.0 release](https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.0) and verify `SHA256SUMS`.
+
+Linux x86_64:
+
+```bash
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.0/promptfoo-rs-0.1.0-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.0/SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing
+tar -xzf promptfoo-rs-0.1.0-x86_64-unknown-linux-gnu.tar.gz
+./promptfoo --help
+```
+
+Windows x86_64: download `promptfoo-rs-0.1.0-x86_64-pc-windows-msvc.zip`, extract it, add the folder to `PATH`, then run `promptfoo.exe --help`.
+
 ### Release and install channel status
 
-The release surface covers GitHub Releases, `cargo install`, Docker, the npm wrapper, and GitHub Action examples. This repository currently claims only the `local build/package smoke`, documentation, and gate shape for those channels; real `public registry publication` still requires credentials, legal/brand confirmation, and external artifact URL/digest evidence. See [docs/release.md](docs/release.md).
+v1 published channel: **GitHub Releases** (above). Other channels (`cargo install`, npm registry, Docker registry, Homebrew, GitHub Marketplace Action) are formally deferred for v1; the repo claims only `local build/package smoke` and gate documentation for those channels, and real `public registry publication` remains blocked. See [docs/release.md](docs/release.md) and [docs/release-notes/v0.1.0.md](docs/release-notes/v0.1.0.md).
 
 ## CLI surface
 
@@ -168,4 +186,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 MIT License. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
 
-promptfoo-rs is an independent Rust reimplementation and is not affiliated with the upstream promptfoo project. The `promptfoo` name is used to describe the compatibility target and configuration format.
+promptfoo-rs is an independent Rust reimplementation and is not affiliated with the upstream promptfoo project, nor does it imply official endorsement. The `promptfoo` name is used to describe the compatibility target and configuration format.

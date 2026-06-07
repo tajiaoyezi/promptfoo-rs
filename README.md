@@ -8,7 +8,9 @@
 
 `promptfoo-rs` 是一个 Rust-first 的 promptfoo 兼容 CLI、库和本地查看器实现。项目目标是把 promptfoo 的本地 eval、配置解析、结果输出、兼容性验证和 release gate 做成可审计、可测试、默认本地优先的 Rust 工具链。
 
-当前状态：本地 S2V verification 通过，已实现范围可以构建、测试和运行；项目尚不声明已经完整 1:1 替代 promptfoo 当前 GitHub HEAD 的全部功能，也尚未完成公开发布渠道授权。
+**独立重实现**：promptfoo-rs 不是 [promptfoo](https://github.com/promptfoo/promptfoo) 官方项目，也不代表 upstream 背书；`promptfoo` 名称仅用于描述兼容目标与配置格式。
+
+当前状态：**v0.1.0** 已通过 [GitHub Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.0) 发布 Linux/Windows 二进制（v1 唯一授权公开渠道）。本地 S2V verification 通过；项目尚不声明已完整 1:1 替代 promptfoo 当前 GitHub HEAD，也不宣称 perfect-refactor 完成。
 
 [快速上手](docs/QUICKSTART.md) | [项目概览](docs/PROJECT-OVERVIEW.md) | [架构](docs/architecture.md) | [发布边界](docs/release.md) | [贡献指南](CONTRIBUTING.md)
 
@@ -31,7 +33,7 @@ promptfoo-rs 关注这些场景：
 | 本地构建和测试 | 可用。`install`、`lint`、`typecheck`、`unit-test`、`integration`、`e2e`、`coverage`、`build`、`runtime-smoke` 已通过。 |
 | 已声明范围内的正常使用 | 可用。CLI、核心 eval、输出、viewer 数据契约、Node wrapper smoke 和 compatibility gates 均有测试覆盖。 |
 | promptfoo 当前最新版完整替代 | 尚未声明。current-latest gate 仍保留 blocker，`perfect_refactor_claim_allowed=false`。 |
-| 公开稳定发布 | 尚未完成。`local build/package smoke` 可验证；`public registry publication` 仍需要真实凭据、法律/品牌确认、外部 URL/digest 证据。 |
+| 公开稳定发布（v1 范围） | **GitHub Releases v0.1.0 已发布**。Cargo、npm、Docker、Homebrew、GitHub Action 在 v1 正式延期；聚合 `publication_ready` 仍为 false。 |
 
 允许的质量表述是：在已声明 gate 下，没有已知 release-blocking defect。项目不会承诺“无任何潜在 bug”或“完整 live-provider parity”，除非对应 gate 和外部证据闭合。
 
@@ -90,9 +92,25 @@ target/release/promptfoo view .
 
 更多示例见 [docs/QUICKSTART.md](docs/QUICKSTART.md)。
 
+### 从 GitHub Releases 安装（v0.1.0）
+
+v1 推荐安装方式：下载 [v0.1.0 Release](https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.0) 资产并校验 `SHA256SUMS`。
+
+Linux x86_64：
+
+```bash
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.0/promptfoo-rs-0.1.0-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.0/SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing
+tar -xzf promptfoo-rs-0.1.0-x86_64-unknown-linux-gnu.tar.gz
+./promptfoo --help
+```
+
+Windows x86_64：下载 `promptfoo-rs-0.1.0-x86_64-pc-windows-msvc.zip`，解压后将目录加入 `PATH`，运行 `promptfoo.exe --help`。
+
 ### 发布与安装渠道状态
 
-项目 release surface 覆盖 GitHub Releases、`cargo install`、Docker、npm wrapper 和 GitHub Action 示例。当前仓库只声明这些渠道的 `local build/package smoke`、文档和 gate 形态；真实 `public registry publication` 仍需要凭据、法律/品牌确认和外部 artifact URL/digest 证据，详见 [docs/release.md](docs/release.md)。
+v1 已发布：**GitHub Releases**（见上）。其余渠道（`cargo install`、npm registry、Docker registry、Homebrew、GitHub Marketplace Action）在 v1 正式延期；仓库对这些渠道只声明 `local build/package smoke` 与 gate 文档，真实 `public registry publication` 仍 blocked。详见 [docs/release.md](docs/release.md) 与 [docs/release-notes/v0.1.0.md](docs/release-notes/v0.1.0.md)。
 
 ## CLI 能力
 
@@ -173,4 +191,4 @@ Windows:
 
 MIT License。详见 [LICENSE](LICENSE) 和 [NOTICE](NOTICE)。
 
-promptfoo-rs 是独立的 Rust reimplementation，不隶属于 promptfoo upstream 项目。`promptfoo` 名称用于描述兼容目标和配置格式。
+promptfoo-rs 是独立的 Rust reimplementation，不隶属于 promptfoo upstream 项目，也不暗示官方背书。`promptfoo` 名称用于描述兼容目标和配置格式。
