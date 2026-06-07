@@ -162,6 +162,17 @@ fn test_17_5_6_release_workflow_builds_macos_archives() {
     );
 }
 
+
+#[test]
+fn test_17_5_7_release_workflow_builds_linux_arm64_archives() {
+    /* TEST-17.5.7 */
+    let workflow =
+        std::fs::read_to_string(".github/workflows/release.yml").expect("workflow should exist");
+
+    assert!(workflow.contains("ubuntu-24.04-arm"), "{workflow}");
+    assert!(workflow.contains("aarch64-unknown-linux-gnu"), "{workflow}");
+}
+
 #[test]
 fn test_17_5_5_collect_channel_evidence_records_tool_blockers() {
     let cargo = collect_channel_evidence(ReleaseChannel::Cargo, Path::new("."));

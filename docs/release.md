@@ -68,25 +68,32 @@ Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.0
 
 Assets: Linux tarball, Windows zip, merged `SHA256SUMS`. Publication evidence backfilled in `docs/compatibility/publication-evidence.json` (PR #9).
 
-## v0.1.1 GitHub Release (current; shipped 2026-06-07)
+## v0.1.1 GitHub Release (macOS matrix; shipped 2026-06-07)
 
 Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.1
 
 Adds macOS `aarch64-apple-darwin` and `x86_64-apple-darwin` archives to the release build matrix alongside existing Linux and Windows artifacts. Tag `v0.1.1` publishes all four platform archives plus combined `SHA256SUMS`. Publication evidence backfilled in `docs/compatibility/publication-evidence.json` (PR #15).
 
+
+## v0.1.2 GitHub Release (current; ships with tag)
+
+Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.2
+
+Adds Linux arm64 `aarch64-unknown-linux-gnu` archive on the `ubuntu-24.04-arm` runner alongside existing Linux x64, Windows, and macOS artifacts. Tag `v0.1.2` publishes five platform archives plus combined `SHA256SUMS`. Backfill publication evidence after the release upload completes.
+
 ### Repeat procedure for future tags
 
 1. Merge changes to `master`; `verify` workflow on push/PR should be green.
 2. Push an annotated tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
-3. `.github/workflows/release.yml` runs S2V verification, packages linux/windows/macos archives, and uploads assets to the GitHub Release using `docs/release-notes/vX.Y.Z.md`.
+3. `.github/workflows/release.yml` runs S2V verification, packages linux/windows/macos archives (including linux arm64), and uploads assets to the GitHub Release using `docs/release-notes/vX.Y.Z.md`.
 4. Backfill publication evidence for the published asset:
 
 ```bash
 node scripts/release/backfill-github-release-evidence.mjs \
-  --artifact-url https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz \
+  --artifact-url https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz \
   --digest sha256:<checksum-from-SHA256SUMS> \
   --timestamp 2026-06-07T02:33:32Z \
-  --release-notes docs/release-notes/v0.1.1.md
+  --release-notes docs/release-notes/v0.1.2.md
 ```
 
 5. Run `bash scripts/release/publication-evidence.sh` and commit the updated manifest. Aggregate `publication_ready` may remain `false` while v1-deferred channels stay blocked; that is expected.

@@ -10,7 +10,7 @@
 
 **独立重实现**：promptfoo-rs 不是 [promptfoo](https://github.com/promptfoo/promptfoo) 官方项目，也不代表 upstream 背书；`promptfoo` 名称仅用于描述兼容目标与配置格式。
 
-当前状态：**v0.1.1** 在 [GitHub Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases) 提供 Linux / Windows / macOS（arm64 与 x64）二进制（v1 唯一授权公开渠道）。本地 S2V verification 通过；项目尚不声明已完整 1:1 替代 promptfoo 当前 GitHub HEAD，也不宣称 perfect-refactor 完成。
+当前状态：**v0.1.2** 在 [GitHub Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases) 提供 Linux（x64 与 arm64）/ Windows / macOS（arm64 与 x64）二进制（v1 唯一授权公开渠道）。本地 S2V verification 通过；项目尚不声明已完整 1:1 替代 promptfoo 当前 GitHub HEAD，也不宣称 perfect-refactor 完成。
 
 [快速上手](docs/QUICKSTART.md) | [项目概览](docs/PROJECT-OVERVIEW.md) | [架构](docs/architecture.md) | [发布边界](docs/release.md) | [贡献指南](CONTRIBUTING.md)
 
@@ -33,7 +33,7 @@ promptfoo-rs 关注这些场景：
 | 本地构建和测试 | 可用。`install`、`lint`、`typecheck`、`unit-test`、`integration`、`e2e`、`coverage`、`build`、`runtime-smoke` 已通过。 |
 | 已声明范围内的正常使用 | 可用。CLI、核心 eval、输出、viewer 数据契约、Node wrapper smoke 和 compatibility gates 均有测试覆盖。 |
 | promptfoo 当前最新版完整替代 | 尚未声明。current-latest gate 仍保留 blocker，`perfect_refactor_claim_allowed=false`。 |
-| 公开稳定发布（v1 范围） | **GitHub Releases**（当前 **v0.1.1**：Linux / Windows / macOS）。Cargo、npm、Docker、Homebrew、GitHub Action 在 v1 正式延期；聚合 `publication_ready` 仍为 false。 |
+| 公开稳定发布（v1 范围） | **GitHub Releases**（当前 **v0.1.2**：Linux x64/arm64、Windows、macOS）。Cargo、npm、Docker、Homebrew、GitHub Action 在 v1 正式延期；聚合 `publication_ready` 仍为 false。 |
 
 允许的质量表述是：在已声明 gate 下，没有已知 release-blocking defect。项目不会承诺“无任何潜在 bug”或“完整 live-provider parity”，除非对应 gate 和外部证据闭合。
 
@@ -99,30 +99,41 @@ v1 推荐安装方式：在 [Releases](https://github.com/tajiaoyezi/promptfoo-r
 Linux x86_64：
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/SHA256SUMS
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz
+tar -xzf promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
 ./promptfoo --help
 ```
+
+Linux arm64 (aarch64)：
+
+```bash
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing
+tar -xzf promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+./promptfoo --help
+```
+
 
 macOS Apple Silicon (arm64)：
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-aarch64-apple-darwin.tar.gz
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/SHA256SUMS
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
 shasum -a 256 -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.1-aarch64-apple-darwin.tar.gz
+tar -xzf promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
 ./promptfoo --help
 ```
 
-macOS Intel (x64)：下载 `promptfoo-rs-0.1.1-x86_64-apple-darwin.tar.gz`，校验 `SHA256SUMS` 后解压并将目录加入 `PATH`。
+macOS Intel (x64)：下载 `promptfoo-rs-0.1.2-x86_64-apple-darwin.tar.gz`，校验 `SHA256SUMS` 后解压并将目录加入 `PATH`。
 
-Windows x86_64：下载 `promptfoo-rs-0.1.1-x86_64-pc-windows-msvc.zip`，解压后将目录加入 `PATH`，运行 `promptfoo.exe --help`。
+Windows x86_64：下载 `promptfoo-rs-0.1.2-x86_64-pc-windows-msvc.zip`，解压后将目录加入 `PATH`，运行 `promptfoo.exe --help`。
 
 ### 发布与安装渠道状态
 
-v1 已发布：**GitHub Releases**（见上）。其余渠道（`cargo install`、npm registry、Docker registry、Homebrew、GitHub Marketplace Action）在 v1 正式延期；仓库对这些渠道只声明 `local build/package smoke` 与 gate 文档，真实 `public registry publication` 仍 blocked。详见 [docs/release.md](docs/release.md) 与 [docs/release-notes/v0.1.1.md](docs/release-notes/v0.1.1.md)。
+v1 已发布：**GitHub Releases**（见上）。其余渠道（`cargo install`、npm registry、Docker registry、Homebrew、GitHub Marketplace Action）在 v1 正式延期；仓库对这些渠道只声明 `local build/package smoke` 与 gate 文档，真实 `public registry publication` 仍 blocked。详见 [docs/release.md](docs/release.md) 与 [docs/release-notes/v0.1.2.md](docs/release-notes/v0.1.2.md)。
 
 ## CLI 能力
 
