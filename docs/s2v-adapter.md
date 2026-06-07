@@ -10,7 +10,8 @@
 - **Name**: promptfoo-rs
 - **Type**: Infrastructure / CLI / Library / Web local viewer / Compatibility runtime
 - **Primary users / actors**: AI 应用开发者；AI infra / 平台工程团队；安全红队团队；企业安全 / 合规团队；开源 contributor
-- **Critical workflows**: 1) promptfoo-rs eval -c promptfooconfig.yaml 在 CI 中生成 JSONL/JUnit/SARIF 并返回稳定 exit code；2) compatibility harness 对 upstream promptfoo 0.121.13 与 promptfoo-rs 做 golden diff；3) redteam init/generate/eval/run/report 本地可审计执行；4) 显式 --allow-scripts 后通过 JS/Python/Shell bridge 运行 custom provider/assertion
+- **Critical workflows**: 1) promptfoo-rs eval -c promptfooconfig.yaml 在 CI 中生成 JSONL/JUnit/SARIF 并返回稳定 exit code；2) compatibility harness 对冻结基线 promptfoo 0.121.15（Phase 48 lock；历史 harness 亦含 0.121.13）与 promptfoo-rs 做 golden diff；3) redteam init/generate/eval/run/report 本地可审计执行；4) 显式 --allow-scripts 后通过 JS/Python/Shell bridge 运行 custom provider/assertion
+- **Product strategy (ADR-012)**: 一次性 Rust 重实现 + 独立产品线；兼容基线冻结于 `promptfoo@0.121.15`，**不**因 upstream npm/HEAD 漂移规划 Phase 49 或默认 drift refresh
 
 ---
 
@@ -111,7 +112,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 - **Supported platforms**: Linux x64/arm64、macOS x64/arm64、Windows x64、Docker、GitHub Actions CI
 - **Security requirements**: 默认 local-first；默认不执行 JS/Python/Shell custom code；API key/token/env/provider headers/share payload 必须 redaction；script bridge 需要显式授权和子进程隔离
 - **Performance requirements**: CLI 冷启动 < 300ms；1000 条 mock eval case 本地调度与 assertion 执行 < 5s；内存基线 < 100MB；大型结果 JSONL/SQLite 流式写入
-- **Compatibility requirements**: baseline 固定 promptfoo 0.121.13 + commit 4860e99；最终以 tag、commit、npm artifact、container artifact 四者可追溯校验为准；P0 golden diff 不通过不得发布 stable；P1 需 snapshot；P2 必须登记 known gap
+- **Compatibility requirements**: 产品兼容基线固定 promptfoo 0.121.15 + Phase 48 lock（`docs/compatibility/current-latest.lock.md`）；Phase 1 的 0.121.13 baseline 为历史 harness 证据；不跟踪 upstream 后续版本；P0 golden diff 不通过不得发布 stable；P1 需 snapshot；P2 必须登记 known gap
 - **Release constraints**: stable release 必须通过 compatibility release gate；失败只能发 prerelease/nightly；发布渠道包括 GitHub Releases、Homebrew、Cargo、Docker、npm wrapper、GitHub Action 示例
 
 ---
@@ -182,6 +183,15 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 46 | current-latest-evaluator-inmemorystore-classification | docs/specs/phases/phase-46-current-latest-evaluator-inmemorystore-classification.md | Done | 1 | N/A (solo) |
 | 47 | current-latest-evaluator-inmemorystore-fixture-burndown | docs/specs/phases/phase-47-current-latest-evaluator-inmemorystore-fixture-burndown.md | Done | 1 | N/A (solo) |
 | 48 | current-latest-0.121.15-target-refresh | docs/specs/phases/phase-48-current-latest-0.121.15-target-refresh.md | Done | 1 | N/A (solo) |
+
+### 产品战略（ADR-012，2026-06-07）
+
+| 项 | 结论 |
+|---|---|
+| 兼容基线 | `promptfoo@0.121.15`（Phase 48 观测包 = 最终冻结）|
+| 独立产品 | 不持续对齐 promptfoo 发布节奏或 GitHub HEAD |
+| Drift refresh | Phase 49+ **不在默认 backlog**；upstream 再漂移不自动开 task |
+| 后续方向 | 冻结基线 burndown、发布渠道、promptfoo-rs 自有 roadmap |
 
 ## Task 总索引
 

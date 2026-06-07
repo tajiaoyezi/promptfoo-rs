@@ -39,6 +39,19 @@ The project uses explicit P0/P1/P2 compatibility levels:
 
 The compatibility matrix is not marketing copy. It is the source of truth for what is native, what is bridge-backed, and what remains blocked or out of scope.
 
+### Product baseline and independence (ADR-012)
+
+As of 2026-06-07, promptfoo-rs is an **independent product line** after a **one-time** Rust reimplementation. The **product compatibility baseline** is frozen at **`promptfoo@0.121.15`** (Phase 48 lock in `docs/compatibility/current-latest.lock.md`). The project **does not** track new promptfoo npm releases or GitHub HEAD, and **Phase 49+ drift refresh is not** in the default backlog.
+
+Two baseline artifacts coexist by design:
+
+| Artifact | Role |
+|---|---|
+| `docs/compatibility/baseline.lock.md` (`0.121.13`) | Historical Phase 1 harness evidence |
+| `docs/compatibility/current-latest.lock.md` (`0.121.15`) | Final frozen product baseline |
+
+The `current-latest-*` gate namespace is a **frozen evidence generator** for burndown on the product baseline—not a live upstream subscription. See [ADR-012](decisions/adr-012-product-independence-baseline-freeze.md).
+
 ## Release model
 
 The release model separates local readiness from public publication:

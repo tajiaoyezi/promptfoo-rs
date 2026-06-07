@@ -6,9 +6,10 @@ This document records the release surface required by PRD release constraints an
 
 Stable releases require:
 
-- `docs/compatibility/baseline.lock.md` points to the frozen promptfoo 0.121.13 baseline.
+- Product compatibility baseline is frozen at `promptfoo@0.121.15` (Phase 48 lock in `docs/compatibility/current-latest.lock.md`; ADR-012). Historical Phase 1 baseline `0.121.13` in `docs/compatibility/baseline.lock.md` remains harness evidence. The project does not track promptfoo releases after the freeze.
 - `docs/compatibility/matrix.md` registers all P0/P1/P2 capability rows.
-- Task 6.2 golden diff release gate reports zero P0 bug or unclassified findings.
+- Task 6.2 golden diff release gate (Phase 1 `0.121.13` historical harness) reports zero P0 bug or unclassified findings.
+- Frozen product-baseline gates (`current-latest-*` artifacts from Phase 48 lock; Task 24.x / `runtime-smoke`) report `ready` or explicitly classified blockers on the `0.121.15` packet. `perfect_refactor_claim_allowed` is independent of Task 6.2 and remains fail-closed until burndown and authority gates close.
 - Task 12.3 full compatibility gate writes `compatibility/artifacts/release-gate/summary.json` or an equivalent CI artifact before stable build/upload.
 - Task specs for implemented release-surface work have Done status and completion notes.
 
@@ -110,13 +111,13 @@ Each external authority item records `authority_type`, `required_decision`, `cur
 
 Task 20.2 adds `target/release-gates/perfect-refactor-claim.json` and links it from `target/release-gates/release-candidate.json.perfect_refactor_claim`. This is the authority for any statement that the project fully satisfies the promptfoo perfect-refactor target.
 
-Current local stable release gates can pass for the frozen baseline while `perfect_refactor_claim_allowed=false`. The claim stays false until source accounting blockers are zero, current-upstream evidence is ready, external authority blockers are resolved, publication authority is ready, and the publication flag is true with external URL/digest evidence. Local stable means the local frozen-baseline release gate is ready; it is not a public or perfect-refactor completion claim.
+Current local stable release gates can pass for the frozen baseline while `perfect_refactor_claim_allowed=false`. The claim stays false until source accounting blockers are zero, frozen-baseline evidence is ready, external authority blockers are resolved, publication authority is ready, and the publication flag is true with external URL/digest evidence. Local stable means the local frozen-baseline release gate is ready; it is not a public or perfect-refactor completion claim. Upstream releases after `promptfoo@0.121.15` are out of product scope (ADR-012).
 
 ## Perfect Refactor Unblock Packet
 
 Task 22.1 adds `target/release-gates/perfect-refactor-unblock-packet.json` and links it from `target/release-gates/release-candidate.json.perfect_refactor_unblock_packet`. This packet is a blocker handoff artifact: it lists the minimum user, maintainer, product owner, account owner, service owner, legal/brand reviewer, or release maintainer decisions still required before a perfect-refactor claim can become true.
 
-Every unblock item records `required_actor`, `required_evidence`, `source_artifact`, `release_impact`, and `auto_resolvable=false`. Dry-run installability, local fixture coverage, and frozen-baseline local stable readiness do not satisfy these items. The packet must remain `status=blocked` and `auto_resolvable=false` while credentials, account/product authority, current-upstream same-ref evidence, legal/brand approval, or external publication URL/digest evidence are absent.
+Every unblock item records `required_actor`, `required_evidence`, `source_artifact`, `release_impact`, and `auto_resolvable=false`. Dry-run installability, local fixture coverage, and frozen-baseline local stable readiness do not satisfy these items. The packet must remain `status=blocked` and `auto_resolvable=false` while credentials, account/product authority, frozen-baseline same-ref evidence, legal/brand approval, or external publication URL/digest evidence are absent.
 
 ## Current Latest Quality Gate
 

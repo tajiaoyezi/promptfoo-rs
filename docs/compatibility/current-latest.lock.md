@@ -1,5 +1,7 @@
 # Current Latest Target Lock
 
+> **Product baseline (ADR-012, 2026-06-07)**: This packet is the **final frozen compatibility baseline** for promptfoo-rs. Upstream npm/HEAD drift after this observation does **not** trigger scheduled refresh phases. Artifacts under `current-latest-*` are frozen evidence generators, not a live upstream subscription.
+
 - **Schema**: `promptfoo-rs.current-latest-target.v1`
 - **Status**: `locked-with-drift`
 - **Observed At**: `unix:1780796184`

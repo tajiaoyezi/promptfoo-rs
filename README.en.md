@@ -10,7 +10,9 @@
 
 **Independent reimplementation**: promptfoo-rs is not the official [promptfoo](https://github.com/promptfoo/promptfoo) project and does not imply upstream endorsement. The `promptfoo` name describes compatibility targets and config formats only.
 
-Current status: **v0.1.2** ships on [GitHub Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases) with Linux (x64 and arm64), Windows, and macOS (arm64 and x64) binaries (the only v1-authorized public channel). Local S2V verification passes. The project does not claim full 1:1 replacement with the latest promptfoo GitHub HEAD or perfect-refactor completion.
+Current status: **v0.1.2** ships on [GitHub Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases) with Linux (x64 and arm64), Windows, and macOS (arm64 and x64) binaries (the only v1-authorized public channel). Local S2V verification passes.
+
+**Product strategy (2026-06-07)**: promptfoo-rs is a **one-time** Rust reimplementation of promptfoo. The compatibility baseline is **frozen at `promptfoo@0.121.15`** (Phase 48 observation packet; see ADR-012). This is an **independent product line** that **does not** track new promptfoo releases or GitHub HEAD. Full parity on the frozen baseline and perfect-refactor completion are not claimed yet.
 
 [Quickstart](docs/QUICKSTART.en.md) | [Project Overview](docs/PROJECT-OVERVIEW.md) | [Architecture](docs/architecture.md) | [Release Boundary](docs/release.md) | [Contributing](CONTRIBUTING.md)
 
@@ -30,7 +32,7 @@ promptfoo-rs is designed for:
 |---|---|
 | Local build and tests | Ready. `install`, `lint`, `typecheck`, `unit-test`, `integration`, `e2e`, `coverage`, `build`, and `runtime-smoke` pass. |
 | Normal use within implemented scope | Ready. CLI, core eval, output formats, viewer data contracts, Node wrapper smoke, and compatibility gates are covered. |
-| Full replacement for current latest promptfoo | Not claimed. Current-latest gates still keep blockers and `perfect_refactor_claim_allowed=false`. |
+| Full compatibility on frozen baseline (`promptfoo@0.121.15`) | Not claimed. Frozen-baseline gates still keep blockers and `perfect_refactor_claim_allowed=false`. Upstream releases after the freeze are out of scope. |
 | Public stable publication (v1 scope) | **GitHub Releases** (current **v0.1.2**: Linux x64/arm64, Windows, macOS). Cargo, npm, Docker, Homebrew, and GitHub Action are formally deferred for v1; aggregate `publication_ready` remains false. |
 
 The strongest supported wording is: no known release-blocking defects under the declared gates. The project does not claim bug-free behavior or complete live-provider parity without matching gate evidence.
@@ -152,9 +154,9 @@ The CLI currently exposes:
 
 Authoritative compatibility files:
 
-- [docs/compatibility/matrix.md](docs/compatibility/matrix.md)
-- [docs/compatibility/baseline.lock.md](docs/compatibility/baseline.lock.md)
-- [docs/compatibility/current-latest.lock.md](docs/compatibility/current-latest.lock.md)
+- [docs/compatibility/matrix.md](docs/compatibility/matrix.md): P0/P1/P2 compatibility matrix
+- [docs/compatibility/baseline.lock.md](docs/compatibility/baseline.lock.md): Phase 1 historical harness baseline (`0.121.13`)
+- [docs/compatibility/current-latest.lock.md](docs/compatibility/current-latest.lock.md): frozen product compatibility baseline (`promptfoo@0.121.15`, ADR-012; not a live upstream subscription)
 - [docs/release.md](docs/release.md)
 
 Compatibility policy:
