@@ -146,6 +146,23 @@ fn test_17_5_4_report_has_checksums_no_upload_and_no_secret_leakage() {
 }
 
 #[test]
+fn test_17_5_6_release_workflow_builds_macos_archives() {
+    /* TEST-17.5.6 */
+    let workflow =
+        std::fs::read_to_string(".github/workflows/release.yml").expect("workflow should exist");
+    let packaging_script = std::fs::read_to_string("scripts/release/package-github-release.sh")
+        .expect("packaging script should exist");
+
+    assert!(workflow.contains("macos-latest"), "{workflow}");
+    assert!(workflow.contains("aarch64-apple-darwin"), "{workflow}");
+    assert!(workflow.contains("x86_64-apple-darwin"), "{workflow}");
+    assert!(
+        packaging_script.contains("--target") && packaging_script.contains("$TARGET"),
+        "{packaging_script}"
+    );
+}
+
+#[test]
 fn test_17_5_5_collect_channel_evidence_records_tool_blockers() {
     let cargo = collect_channel_evidence(ReleaseChannel::Cargo, Path::new("."));
     assert_eq!(cargo.status, ChannelEvidenceStatus::Ready, "{cargo:#?}");
