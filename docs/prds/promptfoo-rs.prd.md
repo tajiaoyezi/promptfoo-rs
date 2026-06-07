@@ -147,7 +147,40 @@ AI eval、LLM regression testing、redteam、MCP、Agent 安全测试正在变�
 
 ---
 
+## Product Independence Strategy｜产品独立战略
+
+**生效日期**：2026-06-07  
+**依据**：用户战略澄清、ADR-012、Phase 48 task 48.1 完成证据。
+
+promptfoo-rs 在完成对 promptfoo 的**一次性** Rust 重实现后，作为**独立产品线**演进，**不**持续对齐 promptfoo 新版本、npm `latest` 或 GitHub default branch HEAD。
+
+**产品兼容基线（最终冻结）**：
+
+| 字段 | 值 |
+|---|---|
+| npm package | `promptfoo@0.121.15` |
+| npm gitHead | `4805856060d026521794d4e69decb938155580ad` |
+| GitHub latest release | `refs/tags/0.121.15`（同 commit）|
+| GitHub default branch HEAD（冻结时观测）| `c54a30668ad8319d76c20ae96e6680ad6c51a2c6` |
+| 权威 lock 工件 | `docs/compatibility/current-latest.lock.md`、`compatibility/inventory/current-latest-target.json` |
+
+Phase 1 的 `promptfoo@0.121.13` frozen baseline 仍作为历史 harness 与 golden diff 证据保留；**后续 roadmap 以 Phase 48 上述 packet 为兼容目标**，不再因 upstream 漂移自动开新 phase。
+
+**明确不做**：
+
+- 不规划默认的 upstream drift refresh backlog（例如 Phase 49「npm/HEAD 再漂移就刷新」）。
+- 不在 README / release 文案中宣称「跟踪 promptfoo 最新版」或「与 promptfoo HEAD 实时对齐」。
+- 不把 upstream 发布节奏当作 promptfoo-rs 发版或功能优先级的前置条件。
+
+**仍保留**：在冻结基线上的 fixture burndown、release gate、`perfect_refactor_claim_allowed` / `publication_ready` 等 fail-closed 证据链；`current-latest-*` 命名空间视为**冻结基线证据生成器**，非 live upstream 订阅。
+
+**后续工作方向**：promptfoo-rs 自有功能、发布渠道闭合、冻结基线上的兼容缺口消减——而非等待 `promptfoo@0.121.16+`。
+
+---
+
 ## Current Latest Rebaseline Addendum｜当前最新重基线补充
+
+> **Roadmap 状态（2026-06-07）**：本补充说明描述的 *持续 rebaseline track* 已由 §Product Independence Strategy 与 ADR-012 **废止为默认路线图**。Phase 24–48 已完成的历史 phase 与 task 仍作审计留痕；**不得**再据此自动规划 Phase 49 或同类 drift refresh。
 
 2026-06-01 用户明确“完美重构”目标应基于原始 promptfoo 项目当前最新版本的完整功能，并要求大量测试来尽可能排除潜在缺陷。该目标新增一条 current-latest rebaseline track，不删除原有 frozen baseline track。
 
@@ -368,7 +401,7 @@ Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出
 >
 > Task 47.1 完成后，`eval-runner:src-evaluator-inmemorystore` 提升为 P0 native fixture evidence（`evidence_reference=fixture:eval-runner:src-evaluator-inmemorystore`），current-latest golden `blocker_count` 对该本地行减少 1；`local_current_latest_ready=false` 与 `perfect_refactor_claim_allowed=false` 仍正确。
 >
-> Phase 48 是 2026-06-07 live upstream drift 后的 current-latest target refresh：npm latest 与 GitHub latest release 已移动到 `0.121.15` / `4805856060d026521794d4e69decb938155580ad`，GitHub default branch HEAD 为 `c54a30668ad8319d76c20ae96e6680ad6c51a2c6`。该 phase 刷新 immutable target packet 与 downstream gates，不解除 external authority、publication 或 bug-free claim 边界。
+> Phase 48 是 2026-06-07 live upstream drift 后的 current-latest target refresh：npm latest 与 GitHub latest release 已移动到 `0.121.15` / `4805856060d026521794d4e69decb938155580ad`，GitHub default branch HEAD 为 `c54a30668ad8319d76c20ae96e6680ad6c51a2c6`。该 phase 刷新 immutable target packet 与 downstream gates，不解除 external authority、publication 或 bug-free claim 边界。**ADR-012 将此次观测定为最终产品兼容基线；后续 upstream 漂移不触发默认 refresh phase。**
 >
 > Task 48.1 完成后，tracked current-latest target lock 与 runtime-smoke artifacts 均记录 npm `0.121.15`、GitHub HEAD `c54a30668ad8319d76c20ae96e6680ad6c51a2c6`。Runtime-smoke evidence 继续保持 fail-closed：source inventory 与 matrix `status=ready` 且 `unclassified_rows=[]`，evaluator runtime 与 in-memory store fixture evidence 仍为 native，current-latest golden `blocker_count=24`，quality `blocker_count=4`，unblock packet `required_user_decision_count=31`，`perfect_refactor_claim_allowed=false`。
 >
@@ -407,6 +440,7 @@ This addendum is grounded in PRD §Compatibility Matrix / §Release constraints,
 | D8 | 部署发布 | 二进制是一等产物，npm wrapper 是兼容和分发补充 | GitHub Releases/Homebrew/Cargo/Docker/npm wrapper/GitHub Action | 只发布 npm / 只发布 Cargo | 只发 npm 不能解决 Node 依赖痛点；只发 Cargo 对非 Rust 用户和 CI 不友好 |
 | D9 | 兼容性 | 1.0 兼容目标覆盖全部已文档化能力域，但按 P0/P1/P2 分级验收 | 全量登记 + 分级 release gate | 只登记已实现项 / 承诺全部 Rust native | 只登记已实现项会沉默遗漏；全部 Rust native 会把长尾 provider 范围拖垮 |
 | D10 | 协议接口 | Node API wrapper 通过稳定 JSON-RPC/stdio 或 FFI 边界调用 Rust core | wrapper contract tests 固定 API、参数、错误和结果 schema | JS wrapper 复写业务逻辑 / 只暴露 CLI subprocess | 复写业务逻辑会产生 wrapper/core 漂移；只暴露 CLI 会破坏 programmatic usage 体验 |
+| D11 | 兼容性 | 产品兼容基线冻结于 Phase 48 `promptfoo@0.121.15`，独立产品线不跟踪 upstream 后续发布 | ADR-012 冻结 packet + 废止默认 drift refresh | 持续 current-latest rebaseline / 仅保留 0.121.13 | 持续 rebaseline 使 roadmap 无限期等待 upstream；0.121.13 丢弃 Phase 24–48 已付证据 |
 
 ---
 

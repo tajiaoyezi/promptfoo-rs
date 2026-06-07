@@ -1,6 +1,6 @@
 # ADR-011: Current Latest Full Refactor Target
 
-**Status**: Accepted
+**Status**: Accepted (product roadmap superseded by ADR-012 on 2026-06-07)
 **Date**: 2026-06-01
 **Category**: Compatibility / Release Quality
 **Decided By**: leafiellune
@@ -50,6 +50,10 @@ Floating latest references are not auditable and conflict with ADR-007 / ADR-009
 ## Rollback Or Migration Plan
 
 If the target needs to return to frozen-only compatibility, add a superseding ADR and update the PRD, adapter indexes, current-latest phase specs, and claim contract before changing release gate behavior.
+
+## Amendment (2026-06-07)
+
+ADR-012 supersedes the **ongoing drift-refresh roadmap** implied by this ADR. Phase 48 (`promptfoo@0.121.15`) is the final product compatibility baseline; `current-latest-*` gates remain as frozen evidence machinery. See docs/prds/promptfoo-rs.prd.md §Product Independence Strategy.
 
 ## Follow-ups
 
