@@ -1,6 +1,6 @@
 # Phase 50: product-baseline-golden-burndown
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,7 +20,7 @@ Phase 49 aligned unblock packet and external-authority gates with v1 waivers, bu
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 50.1 | golden-corpus-authority-waiver-alignment | ../tasks/task-50.1-golden-corpus-authority-waiver-alignment.md | Ready | Consume authority waivers in golden corpus; expose active vs audit blocker counts |
+| 50.1 | golden-corpus-authority-waiver-alignment | ../tasks/task-50.1-golden-corpus-authority-waiver-alignment.md | Done | Consume authority waivers in golden corpus; expose active vs audit blocker counts |
 
 ## 5. Dependencies
 
@@ -28,10 +28,10 @@ Depends on Phase 49 v1 gate alignment, Phase 48 `promptfoo@0.121.15` lock, ADR-0
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `current-latest-golden-corpus.json` records `active_blocker_count=0`, `waived_blocker_count=24`, `blocker_count=24` (audit), and `active_blockers=[]` on frozen baseline.
-- [ ] `current-latest-quality.json` uses golden `active_blocker_count` (not audit `blocker_count`) and clears golden-corpus quality blockers when waivers cover all rows.
-- [ ] Runtime smoke regenerates gates with golden active blockers at zero; `perfect_refactor_claim_allowed` may become true only when all other declared gates also agree.
-- [ ] Rust `build_current_latest_golden_corpus` and shell golden corpus script agree on active/audit waiver split.
+- [x] `current-latest-golden-corpus.json` records `active_blocker_count=0`, `waived_blocker_count=24`, `blocker_count=24` (audit), and `active_blockers=[]` on frozen baseline.
+- [x] `current-latest-quality.json` uses golden `active_blocker_count` (not audit `blocker_count`) and clears golden-corpus quality blockers when waivers cover all rows.
+- [x] Runtime smoke regenerates gates with golden active blockers at zero; `perfect_refactor_claim_allowed` may become true only when all other declared gates also agree.
+- [x] Rust `build_current_latest_golden_corpus` and shell golden corpus script agree on active/audit waiver split.
 
 ## 7. Phase Risks
 
@@ -44,7 +44,7 @@ Task 50.1 is Done, phase §6 smoke passes, golden active blockers are zero on fr
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：<TBD-after-impl>
-- **Phase smoke**：<TBD-after-impl>
-- **Artifact evidence**：<TBD-after-impl>
-- **Remaining boundaries**：<TBD-after-impl>
+- **完成日期**：2026-06-07
+- **Phase smoke**：`bash scripts/release/runtime-smoke.sh` ✅
+- **Artifact evidence**：`current-latest-golden-corpus.json` `active_blocker_count=0` / `waived_blocker_count=24` / audit `blocker_count=24` / `status=ready`；`current-latest-quality.json` golden-corpus blockers cleared
+- **Remaining boundaries**：Audit trail preserved; no live cloud/provider parity claim; corpus scale threshold still independent of waiver burndown.
