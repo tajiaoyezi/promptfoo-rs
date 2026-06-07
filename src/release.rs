@@ -1776,7 +1776,7 @@ pub fn validate_authority_decisions(
             blockers.push("manifest row missing item_id".to_string());
             continue;
         };
-        if secret_values_in_value(&row)
+        if secret_values_in_value(row)
             .into_iter()
             .any(|secret| !secret.trim().is_empty())
         {
