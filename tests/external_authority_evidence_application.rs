@@ -13,8 +13,9 @@ fn test_44_1_1_tracked_manifest_has_evidence_or_waiver_for_every_decision_item()
     let report = validate_authority_decisions(&packet, &manifest);
 
     assert_eq!(report.unresolved_count, 0, "{report:#?}");
+    assert_eq!(report.required_decision_count, 0, "{report:#?}");
     assert_eq!(
-        report.ready_row_count, report.required_decision_count,
+        report.ready_row_count, report.manifest_row_count,
         "{report:#?}"
     );
     assert!(report.perfect_refactor_decision_ready(), "{report:#?}");
