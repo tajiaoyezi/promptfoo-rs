@@ -1035,6 +1035,8 @@ pub struct PerfectRefactorUnblockInputs {
     pub source_p0_blockers: Vec<String>,
     pub external_authority_items: Vec<PerfectRefactorUnblockItem>,
     pub current_upstream_rebaseline_required: bool,
+    pub product_baseline_frozen: bool,
+    pub resolved_decision_ids: Vec<String>,
     pub source_artifacts: Vec<String>,
 }
 
@@ -1058,6 +1060,10 @@ pub struct PerfectRefactorUnblockPacket {
     pub status: String,
     pub perfect_refactor_claim_allowed: bool,
     pub auto_resolvable: bool,
+    #[serde(default)]
+    pub product_baseline_frozen: bool,
+    #[serde(default)]
+    pub authority_decisions_resolved_count: usize,
     pub blocker_count: usize,
     pub source_p0_accounting_blocker_count: usize,
     pub external_authority_blocker_count: usize,
@@ -1441,7 +1447,10 @@ pub fn build_perfect_refactor_unblock_packet(
         );
     }
 
-    if inputs.current_upstream_rebaseline_required || !inputs.claim.current_perfect_claim_allowed {
+    if !inputs.product_baseline_frozen
+        && (inputs.current_upstream_rebaseline_required
+            || !inputs.claim.current_perfect_claim_allowed)
+    {
         let source_artifact = claim_source_artifact(
             &inputs.source_artifacts,
             "upstream-distribution-target.json",
@@ -1500,7 +1509,14 @@ pub fn build_perfect_refactor_unblock_packet(
         }
     }
 
-    let decision_items = decisions.into_values().collect::<Vec<_>>();
+    let resolved = inputs
+        .resolved_decision_ids
+        .into_iter()
+        .collect::<std::collections::BTreeSet<_>>();
+    let decision_items = decisions
+        .into_values()
+        .filter(|item| !resolved.contains(&item.item_id))
+        .collect::<Vec<_>>();
     let perfect_refactor_claim_allowed =
         inputs.claim.perfect_refactor_claim_allowed && decision_items.is_empty();
     let status = if perfect_refactor_claim_allowed {
@@ -1515,11 +1531,17 @@ pub fn build_perfect_refactor_unblock_packet(
         status: status.to_string(),
         perfect_refactor_claim_allowed,
         auto_resolvable,
+        product_baseline_frozen: inputs.product_baseline_frozen,
+        authority_decisions_resolved_count: resolved.len(),
         blocker_count: inputs.claim.blockers.len(),
         source_p0_accounting_blocker_count: inputs.source_p0_blockers.len(),
         external_authority_blocker_count,
         required_user_decision_count: decision_items.len(),
-        current_upstream_rebaseline_required: inputs.current_upstream_rebaseline_required,
+        current_upstream_rebaseline_required: if inputs.product_baseline_frozen {
+            false
+        } else {
+            inputs.current_upstream_rebaseline_required
+        },
         decision_items,
         source_artifacts: inputs.source_artifacts,
     }
@@ -1667,6 +1689,10 @@ pub fn load_authority_decision_manifest(path: &Path) -> Result<Value, ReleaseErr
     serde_json::from_str(&json).map_err(|error| ReleaseError::Serialize(error.to_string()))
 }
 
+fn authority_decision_is_resolved(decision_state: &str) -> bool {
+    matches!(decision_state, "evidence-provided" | "waived-with-boundary")
+}
+
 pub fn validate_authority_decisions(
     unblock_packet: &Value,
     manifest: &Value,
@@ -1700,10 +1726,23 @@ pub fn validate_authority_decisions(
         .filter(|item_id| !manifest_set.contains(*item_id))
         .cloned()
         .collect::<Vec<_>>();
-    let extra_manifest_rows = manifest_ids
+    let extra_manifest_rows = manifest_rows
         .iter()
-        .filter(|item_id| !required_set.contains(*item_id))
-        .cloned()
+        .filter_map(|row| {
+            let item_id = row["item_id"].as_str()?;
+            let decision_state = row["decision_state"].as_str().unwrap_or("unresolved");
+            if authority_decision_is_resolved(decision_state) {
+                if required_set.contains(item_id) {
+                    Some(item_id.to_string())
+                } else {
+                    None
+                }
+            } else if !required_set.contains(item_id) {
+                Some(item_id.to_string())
+            } else {
+                None
+            }
+        })
         .collect::<Vec<_>>();
 
     let mut unresolved_count = 0usize;
@@ -1732,12 +1771,12 @@ pub fn validate_authority_decisions(
         ));
     }
 
-    for row in manifest_rows {
+    for row in &manifest_rows {
         let Some(item_id) = row["item_id"].as_str().map(str::to_string) else {
             blockers.push("manifest row missing item_id".to_string());
             continue;
         };
-        if secret_values_in_value(&row)
+        if secret_values_in_value(row)
             .into_iter()
             .any(|secret| !secret.trim().is_empty())
         {
@@ -1805,10 +1844,17 @@ pub fn validate_authority_decisions(
         && invalid_waiver_rows.is_empty()
         && mock_only_evidence_rows.is_empty()
         && secret_bearing_rows.is_empty();
-    let perfect_refactor_decision_ready = structural_ready
-        && !required_ids.is_empty()
-        && ready_row_count == required_ids.len()
-        && unresolved_count == 0;
+    let packet_items_ready = required_ids.is_empty()
+        || required_ids.iter().all(|item_id| {
+            manifest_rows.iter().any(|row| {
+                row["item_id"].as_str() == Some(item_id.as_str())
+                    && authority_decision_is_resolved(
+                        row["decision_state"].as_str().unwrap_or_default(),
+                    )
+            })
+        });
+    let perfect_refactor_decision_ready =
+        structural_ready && unresolved_count == 0 && packet_items_ready;
     let status = if perfect_refactor_decision_ready {
         "ready"
     } else {

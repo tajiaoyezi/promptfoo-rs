@@ -442,6 +442,31 @@ fn write_gate_fixture(gate_dir: &Path, blockers: Vec<CurrentLatestBlocker>) {
             "current_repository_perfect_claim_allowed": false
         }),
     );
+    write_json(
+        &gate_dir.join("current-upstream-policy.json"),
+        json!({
+            "schema": "promptfoo-rs.current-upstream-policy.v1",
+            "target_mode": "current-latest",
+            "product_baseline_frozen": false,
+            "current_upstream_rebaseline_required": true
+        }),
+    );
+    write_json(
+        &gate_dir.join("authority-decisions.fixture.json"),
+        json!({
+            "schema": "promptfoo-rs.authority-decisions.v1",
+            "status": "ready",
+            "rows": []
+        }),
+    );
+    write_json(
+        &gate_dir.join("publication-evidence.fixture.json"),
+        json!({
+            "schema": "promptfoo-rs.publication-evidence.v1",
+            "status": "ready",
+            "rows": []
+        }),
+    );
 }
 
 fn run_packet(gate_dir: &Path) -> Value {
@@ -449,6 +474,14 @@ fn run_packet(gate_dir: &Path) -> Value {
         .arg("scripts/release/perfect-refactor-unblock-packet.sh")
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .env("GATE_DIR", slash_path(gate_dir))
+        .env(
+            "AUTHORITY_DECISIONS_MANIFEST",
+            slash_path(&gate_dir.join("authority-decisions.fixture.json")),
+        )
+        .env(
+            "PUBLICATION_EVIDENCE_MANIFEST",
+            slash_path(&gate_dir.join("publication-evidence.fixture.json")),
+        )
         .output()
         .expect("unblock packet script should start");
     assert!(

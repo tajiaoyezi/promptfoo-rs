@@ -136,7 +136,7 @@ fn test_18_3_4_policy_artifact_and_release_candidate_display_target_mode() {
     let script_output = Command::new(git_bash())
         .args([
             "-lc",
-            "CURRENT_UPSTREAM_LS_REMOTE_FILE=target/test-current-upstream-ls-remote.txt bash scripts/release/current-upstream-policy.sh",
+            "CURRENT_UPSTREAM_LS_REMOTE_FILE=target/test-current-upstream-ls-remote.txt CURRENT_UPSTREAM_TARGET_MODE=frozen bash scripts/release/current-upstream-policy.sh",
         ])
         .output()
         .expect("current upstream policy script should execute");

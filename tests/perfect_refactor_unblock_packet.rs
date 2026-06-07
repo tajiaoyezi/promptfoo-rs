@@ -168,6 +168,8 @@ fn blocked_inputs() -> PerfectRefactorUnblockInputs {
         source_p0_blockers: source_p0_blockers(),
         external_authority_items: external_authority_items(),
         current_upstream_rebaseline_required: true,
+        product_baseline_frozen: false,
+        resolved_decision_ids: Vec::new(),
         source_artifacts: source_artifacts(),
     }
 }

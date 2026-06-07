@@ -196,6 +196,7 @@ impl FrozenSourceReference {
 pub enum TargetMode {
     Frozen,
     Current,
+    ProductBaseline,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -283,6 +284,12 @@ pub struct CurrentClaimPolicy {
     pub target_mode: TargetMode,
     pub stable_claim: String,
     pub current_perfect_claim_allowed: bool,
+    #[serde(default)]
+    pub product_baseline_frozen: bool,
+    #[serde(default)]
+    pub current_upstream_rebaseline_required: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub product_baseline_adr: Option<String>,
     pub reason: String,
     pub frozen: FrozenSourceReference,
     pub current: CurrentUpstreamObservation,
@@ -321,10 +328,18 @@ pub fn evaluate_current_claim_policy(
     let current_mode_evidence_ready =
         missing_current_evidence.is_empty() && mismatched_current_evidence.is_empty();
     let current_perfect_claim_allowed = match mode {
-        TargetMode::Frozen => false,
+        TargetMode::Frozen | TargetMode::ProductBaseline => false,
         TargetMode::Current => current_mode_evidence_ready,
     };
     let reason = match mode {
+        TargetMode::ProductBaseline if head_differs => format!(
+            "product baseline frozen at promptfoo@{} per ADR-012; GitHub HEAD {} drift is observation-only and does not require rebaseline",
+            frozen.package_version, current.current_head
+        ),
+        TargetMode::ProductBaseline => format!(
+            "product baseline frozen at promptfoo@{} per ADR-012",
+            frozen.package_version
+        ),
         TargetMode::Frozen if head_differs => format!(
             "target mode is frozen; current HEAD {} differs from frozen baseline {}",
             current.current_head, frozen.git_commit
@@ -342,16 +357,21 @@ pub fn evaluate_current_claim_policy(
             current.current_head
         ),
     };
-    let status = if mode == TargetMode::Frozen || current_perfect_claim_allowed {
+    let status = if matches!(mode, TargetMode::Frozen | TargetMode::ProductBaseline)
+        || current_perfect_claim_allowed
+    {
         "ready"
     } else {
         "blocked"
     };
     let stable_claim = match mode {
+        TargetMode::ProductBaseline => "product-baseline compatibility (ADR-012)",
         TargetMode::Frozen => "frozen-baseline compatibility",
         TargetMode::Current if current_perfect_claim_allowed => "current-upstream perfect refactor",
         TargetMode::Current => "current-upstream blocked",
     };
+    let product_baseline_frozen = mode == TargetMode::ProductBaseline;
+    let current_upstream_rebaseline_required = mode == TargetMode::Current;
 
     CurrentClaimPolicy {
         schema: "promptfoo-rs.current-upstream-policy.v1".to_string(),
@@ -359,6 +379,13 @@ pub fn evaluate_current_claim_policy(
         target_mode: mode,
         stable_claim: stable_claim.to_string(),
         current_perfect_claim_allowed,
+        product_baseline_frozen,
+        current_upstream_rebaseline_required,
+        product_baseline_adr: if product_baseline_frozen {
+            Some("docs/decisions/adr-012-product-independence-baseline-freeze.md".to_string())
+        } else {
+            None
+        },
         reason,
         frozen: frozen.clone(),
         current: current.clone(),

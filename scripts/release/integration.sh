@@ -9,6 +9,7 @@ cargo test \
   --test release_installability_publication_readiness \
   --test publication_authority_release_gate \
   --test current_upstream_rebaseline_gate \
+  --test product_baseline_v1_gate_alignment \
   --test viewer_config_source_reclassification \
   --test core_config_source_fixture_burndown \
   --test provider_request_response_fixture_burndown \
