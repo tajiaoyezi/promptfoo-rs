@@ -60,13 +60,19 @@ Maintainer policy: `docs/compatibility/v1-release-authority-policy.md`
 - **Deferred for v1 (formal waiver)**: Cargo, npm wrapper, Docker, Homebrew, GitHub Action.
 - **Brand/legal**: independent reimplementation wording required (`approval:legal-brand-independent-reimplementation-2026-06-06`).
 
-Current publication evidence (`docs/compatibility/publication-evidence.json`) keeps every channel `published=false` until a real tagged GitHub Release records an external artifact URL and checksum. Deferred channels document v1 waiver notes instead of claiming public availability.
+Current publication evidence (`docs/compatibility/publication-evidence.json`) records **github-releases** as `published` for tag `v0.1.0` (external URL + sha256). The five v1-deferred channels remain `blocked`. Aggregate `publication_ready` stays `false` until policy requires more than the single authorized channel or deferred channels are waived/published.
 
-## v0.1.0 GitHub Release Procedure
+## v0.1.0 GitHub Release (shipped 2026-06-06)
 
-1. Merge release workflow changes to `master`.
-2. Push an annotated tag: `git tag v0.1.0 && git push origin v0.1.0`.
-3. `.github/workflows/release.yml` runs S2V verification, packages linux/windows archives, and uploads assets to the GitHub Release using `docs/release-notes/v0.1.0.md`.
+Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.0
+
+Assets: Linux tarball, Windows zip, merged `SHA256SUMS`. Publication evidence backfilled in `docs/compatibility/publication-evidence.json` (PR #9).
+
+### Repeat procedure for future tags
+
+1. Merge changes to `master`; `verify` workflow on push/PR should be green.
+2. Push an annotated tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+3. `.github/workflows/release.yml` runs S2V verification, packages linux/windows archives, and uploads assets to the GitHub Release using `docs/release-notes/vX.Y.Z.md`.
 4. Backfill publication evidence for the published asset:
 
 ```bash
