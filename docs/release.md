@@ -68,11 +68,15 @@ Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.0
 
 Assets: Linux tarball, Windows zip, merged `SHA256SUMS`. Publication evidence backfilled in `docs/compatibility/publication-evidence.json` (PR #9).
 
+## v0.1.1 GitHub Release (macOS matrix)
+
+Adds macOS `aarch64-apple-darwin` and `x86_64-apple-darwin` archives to the release build matrix alongside existing Linux and Windows artifacts. Tag `v0.1.1` publishes all four platform archives plus combined `SHA256SUMS`.
+
 ### Repeat procedure for future tags
 
 1. Merge changes to `master`; `verify` workflow on push/PR should be green.
 2. Push an annotated tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
-3. `.github/workflows/release.yml` runs S2V verification, packages linux/windows archives, and uploads assets to the GitHub Release using `docs/release-notes/vX.Y.Z.md`.
+3. `.github/workflows/release.yml` runs S2V verification, packages linux/windows/macos archives, and uploads assets to the GitHub Release using `docs/release-notes/vX.Y.Z.md`.
 4. Backfill publication evidence for the published asset:
 
 ```bash

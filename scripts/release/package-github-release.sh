@@ -5,16 +5,22 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 
 VERSION="$(node -e "const fs=require('fs'); const toml=fs.readFileSync('Cargo.toml','utf8'); const m=toml.match(/^version\\s*=\\s*\"([^\"]+)\"/m); if(!m) throw new Error('Cargo.toml version missing'); console.log(m[1]);")"
-TARGET="${TARGET:-$(rustc -vV | awk '/^host: / { print $2 }')}"
+HOST="$(rustc -vV | awk '/^host: / { print $2 }')"
+TARGET="${TARGET:-$HOST}"
 DIST="target/github-release-dist"
 STAGING="$DIST/staging"
+RELEASE_DIR="target/${TARGET}/release"
 mkdir -p "$STAGING"
 
-cargo build --workspace --release
+if ! rustup target list --installed | grep -Fxq "$TARGET"; then
+  rustup target add "$TARGET"
+fi
+
+cargo build --workspace --release --target "$TARGET"
 
 copy_bin() {
   local name="$1"
-  local src="target/release/${name}"
+  local src="${RELEASE_DIR}/${name}"
   if [ -f "${src}.exe" ]; then
     src="${src}.exe"
     cp "$src" "$STAGING/${name}.exe"
