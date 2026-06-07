@@ -108,7 +108,7 @@ Windows x86_64: download `promptfoo-rs-0.1.0-x86_64-pc-windows-msvc.zip`, extrac
 
 ### Release and install channel status
 
-v1 published channel: **GitHub Releases** (above). Other channels (`cargo install`, npm registry, Docker registry, Homebrew, GitHub Marketplace Action) are formally deferred for v1; the repo keeps local build/package smoke and gate documentation only. See [docs/release.md](docs/release.md) and [docs/release-notes/v0.1.0.md](docs/release-notes/v0.1.0.md).
+v1 published channel: **GitHub Releases** (above). Other channels (`cargo install`, npm registry, Docker registry, Homebrew, GitHub Marketplace Action) are formally deferred for v1; the repo claims only `local build/package smoke` and gate documentation for those channels, and real `public registry publication` remains blocked. See [docs/release.md](docs/release.md) and [docs/release-notes/v0.1.0.md](docs/release-notes/v0.1.0.md).
 
 ## CLI surface
 

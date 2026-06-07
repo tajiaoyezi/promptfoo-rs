@@ -110,7 +110,7 @@ Windows x86_64：下载 `promptfoo-rs-0.1.0-x86_64-pc-windows-msvc.zip`，解压
 
 ### 发布与安装渠道状态
 
-v1 已发布：**GitHub Releases**（见上）。其余渠道（`cargo install`、npm registry、Docker registry、Homebrew、GitHub Marketplace Action）在 v1 正式延期，仓库仅保留本地 build/package smoke 与 gate 文档。详见 [docs/release.md](docs/release.md) 与 [docs/release-notes/v0.1.0.md](docs/release-notes/v0.1.0.md)。
+v1 已发布：**GitHub Releases**（见上）。其余渠道（`cargo install`、npm registry、Docker registry、Homebrew、GitHub Marketplace Action）在 v1 正式延期；仓库对这些渠道只声明 `local build/package smoke` 与 gate 文档，真实 `public registry publication` 仍 blocked。详见 [docs/release.md](docs/release.md) 与 [docs/release-notes/v0.1.0.md](docs/release-notes/v0.1.0.md)。
 
 ## CLI 能力
 
