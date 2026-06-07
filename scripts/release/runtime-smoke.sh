@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 export NO_COLOR=1
 export FORCE_COLOR=0
 
@@ -277,7 +279,7 @@ publication_authority_credential_blocked="$(node -e "const r = JSON.parse(requir
 publication_authority_legal_brand_blocked="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-authority.json', 'utf8')); console.log(r.legal_brand_blocked ? 'true' : 'false')")"
 publication_authority_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/publication-authority.json', 'utf8')); console.log((r.blockers || []).length)")"
 
-node <<'NODE'
+S2V_RELEASE_SCRIPT_DIR="$SCRIPT_DIR" node <<'NODE'
 const fs = require('fs');
 const {
   loadAuthorityDecisions,
@@ -285,7 +287,7 @@ const {
   loadPublicationEvidence,
   isV1DeferredPublication,
   isPublishedChannel,
-} = require('./product-baseline-gate-lib.cjs');
+} = require(require('path').join(process.env.S2V_RELEASE_SCRIPT_DIR, 'product-baseline-gate-lib.cjs'));
 const gateDir = 'target/release-gates';
 const longtail = JSON.parse(fs.readFileSync(`${gateDir}/longtail-classification.json`, 'utf8'));
 const publication = JSON.parse(fs.readFileSync(`${gateDir}/publication-authority.json`, 'utf8'));
@@ -389,9 +391,9 @@ else
   decision="prerelease"
 fi
 
-node - "$stable_allowed" "false" <<'NODE'
+S2V_RELEASE_SCRIPT_DIR="$SCRIPT_DIR" node - "$stable_allowed" "false" <<'NODE'
 const fs = require('fs');
-const { v1PublicationScopeReady, loadPublicationEvidence } = require('./product-baseline-gate-lib.cjs');
+const { v1PublicationScopeReady, loadPublicationEvidence } = require(require('path').join(process.env.S2V_RELEASE_SCRIPT_DIR, 'product-baseline-gate-lib.cjs'));
 const stableAllowed = process.argv[2] === 'true';
 const published = process.argv[3] === 'true';
 const gateDir = 'target/release-gates';

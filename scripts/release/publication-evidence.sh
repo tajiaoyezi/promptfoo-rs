@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 GATE_DIR="${GATE_DIR:-target/release-gates}"
 MANIFEST_PATH="${PUBLICATION_EVIDENCE_MANIFEST:-docs/compatibility/publication-evidence.json}"
 OUT="$GATE_DIR/publication-evidence-gate.json"
 
 mkdir -p "$GATE_DIR"
 
-node - "$GATE_DIR" "$MANIFEST_PATH" "$OUT" <<'NODE'
+node - "$GATE_DIR" "$MANIFEST_PATH" "$OUT" "$SCRIPT_DIR" <<'NODE'
 const fs = require('fs');
-const { v1PublicationScopeReady } = require('./product-baseline-gate-lib.cjs');
-
-const [gateDir, manifestPath, outPath] = process.argv.slice(2);
+const path = require('path');
+const [gateDir, manifestPath, outPath, scriptDir] = process.argv.slice(2);
+const { v1PublicationScopeReady } = require(path.join(scriptDir, 'product-baseline-gate-lib.cjs'));
 const authority = JSON.parse(
   fs.readFileSync(`${gateDir}/publication-authority.json`, 'utf8'),
 );

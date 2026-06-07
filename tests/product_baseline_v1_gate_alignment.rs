@@ -96,9 +96,29 @@ console.log('ok');
     );
 }
 
+
 #[test]
-fn test_49_2_2_tracked_product_baseline_lock_matches_phase48_packet() {
+fn test_49_2_2_gate_scripts_load_lib_from_repo_root() {
     /* TEST-49.2.2 */
+    let status = Command::new("bash")
+        .args(["scripts/release/current-upstream-policy.sh"])
+        .current_dir(".")
+        .status()
+        .expect("bash should run policy script");
+    assert!(status.success(), "current-upstream-policy.sh must run from repo root");
+
+    let policy: Value = serde_json::from_str(
+        &std::fs::read_to_string("target/release-gates/current-upstream-policy.json")
+            .expect("policy json"),
+    )
+    .expect("policy json");
+    assert_eq!(policy["target_mode"], "product-baseline");
+    assert_eq!(policy["product_baseline_frozen"], true);
+}
+
+#[test]
+fn test_49_2_4_tracked_product_baseline_lock_matches_phase48_packet() {
+    /* TEST-49.2.4 */
     let target: Value = serde_json::from_str(
         &std::fs::read_to_string("compatibility/inventory/current-latest-target.json")
             .expect("tracked target lock"),

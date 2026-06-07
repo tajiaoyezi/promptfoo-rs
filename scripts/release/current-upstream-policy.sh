@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 GATE_DIR="target/release-gates"
 OUT="$GATE_DIR/current-upstream-policy.json"
 mkdir -p "$GATE_DIR"
@@ -17,13 +19,13 @@ else
     HEAD refs/tags/0.121.15 refs/tags/0.121.13 > "$tmpfile"
 fi
 
-node - "$tmpfile" "$OUT" "${CURRENT_UPSTREAM_TARGET_MODE:-product-baseline}" <<'NODE'
+node - "$tmpfile" "$OUT" "${CURRENT_UPSTREAM_TARGET_MODE:-product-baseline}" "$SCRIPT_DIR" <<'NODE'
 const fs = require('fs');
+const path = require('path');
+const [inputPath, outputPath, targetModeArg, scriptDir] = process.argv.slice(2);
 const {
   loadProductBaselineTarget,
-} = require('./product-baseline-gate-lib.cjs');
-
-const [inputPath, outputPath, targetModeArg] = process.argv.slice(2);
+} = require(path.join(scriptDir, 'product-baseline-gate-lib.cjs'));
 const lsRemote = fs.readFileSync(inputPath, 'utf8');
 const phase1FrozenSha = '4860e990c7e9a2f8f677173fb92cf9867b34d03f';
 const phase1NpmIntegrity =

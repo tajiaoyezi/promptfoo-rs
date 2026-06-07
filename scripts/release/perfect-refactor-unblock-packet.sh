@@ -1,24 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 GATE_DIR="${GATE_DIR:-target/release-gates}"
 mkdir -p "$GATE_DIR"
 
-node <<'NODE'
+S2V_RELEASE_SCRIPT_DIR="$SCRIPT_DIR" node - "$SCRIPT_DIR" <<'NODE'
 const fs = require('fs');
+const path = require('path');
+const scriptDir = process.argv[2];
 const {
   loadAuthorityDecisions,
   isResolvedAuthorityDecision,
   loadPublicationEvidence,
   isV1DeferredPublication,
   isPublishedChannel,
-} = require('./product-baseline-gate-lib.cjs');
+} = require(path.join(scriptDir, 'product-baseline-gate-lib.cjs'));
 
 const gateDir = process.env.GATE_DIR || 'target/release-gates';
 const read = (name) => JSON.parse(fs.readFileSync(`${gateDir}/${name}`, 'utf8'));
 const readOptional = (name) => {
-  const path = `${gateDir}/${name}`;
-  return fs.existsSync(path) ? JSON.parse(fs.readFileSync(path, 'utf8')) : null;
+  const filePath = `${gateDir}/${name}`;
+  return fs.existsSync(filePath) ? JSON.parse(fs.readFileSync(filePath, 'utf8')) : null;
 };
 const claim = read('perfect-refactor-claim.json');
 const source = read('source-inventory-evidence.json');
