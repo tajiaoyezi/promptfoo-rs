@@ -60,7 +60,7 @@ Maintainer policy: `docs/compatibility/v1-release-authority-policy.md`
 - **Deferred for v1 (formal waiver)**: Cargo, npm wrapper, Docker, Homebrew, GitHub Action.
 - **Brand/legal**: independent reimplementation wording required (`approval:legal-brand-independent-reimplementation-2026-06-06`).
 
-Current publication evidence (`docs/compatibility/publication-evidence.json`) records **github-releases** as `published` for tag `v0.1.0` (external URL + sha256). The five v1-deferred channels remain `blocked`. Aggregate `publication_ready` stays `false` until policy requires more than the single authorized channel or deferred channels are waived/published.
+Current publication evidence (`docs/compatibility/publication-evidence.json`) records **github-releases** as `published` for tag `v0.1.1` (external URL + sha256). The five v1-deferred channels remain `blocked`. Aggregate `publication_ready` stays `false` until policy requires more than the single authorized channel or deferred channels are waived/published.
 
 ## v0.1.0 GitHub Release (shipped 2026-06-06)
 
@@ -68,9 +68,11 @@ Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.0
 
 Assets: Linux tarball, Windows zip, merged `SHA256SUMS`. Publication evidence backfilled in `docs/compatibility/publication-evidence.json` (PR #9).
 
-## v0.1.1 GitHub Release (macOS matrix)
+## v0.1.1 GitHub Release (current; shipped 2026-06-07)
 
-Adds macOS `aarch64-apple-darwin` and `x86_64-apple-darwin` archives to the release build matrix alongside existing Linux and Windows artifacts. Tag `v0.1.1` publishes all four platform archives plus combined `SHA256SUMS`.
+Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.1
+
+Adds macOS `aarch64-apple-darwin` and `x86_64-apple-darwin` archives to the release build matrix alongside existing Linux and Windows artifacts. Tag `v0.1.1` publishes all four platform archives plus combined `SHA256SUMS`. Publication evidence backfilled in `docs/compatibility/publication-evidence.json` (PR #15).
 
 ### Repeat procedure for future tags
 
@@ -81,9 +83,10 @@ Adds macOS `aarch64-apple-darwin` and `x86_64-apple-darwin` archives to the rele
 
 ```bash
 node scripts/release/backfill-github-release-evidence.mjs \
-  --artifact-url https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.0/<archive-name> \
+  --artifact-url https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz \
   --digest sha256:<checksum-from-SHA256SUMS> \
-  --timestamp 2026-06-06T00:00:00Z
+  --timestamp 2026-06-07T02:33:32Z \
+  --release-notes docs/release-notes/v0.1.1.md
 ```
 
 5. Run `bash scripts/release/publication-evidence.sh` and commit the updated manifest. Aggregate `publication_ready` may remain `false` while v1-deferred channels stay blocked; that is expected.
