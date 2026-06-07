@@ -57,44 +57,37 @@ fn test_38_1_1_same_ref_npm_and_latest_release_populate_both_commits() {
 }
 
 #[test]
-fn test_38_1_2_tracked_lock_artifacts_record_observed_0_121_14_target() {
+fn test_38_1_2_tracked_lock_artifacts_record_observed_current_latest_target() {
     /* TEST-38.1.2 */
     let lock = tracked_lock();
-    assert_eq!(lock["npm_latest"]["package_version"], "0.121.14");
+    assert_eq!(lock["npm_latest"]["package_version"], "0.121.15");
     assert_eq!(
         lock["npm_latest"]["git_head"],
-        "7a48c5fce614bee617efbb3b7fc93d404c75b628"
+        "4805856060d026521794d4e69decb938155580ad"
     );
     assert_eq!(
         lock["npm_latest"]["tarball"],
-        "https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.14.tgz"
+        "https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.15.tgz"
     );
     assert_eq!(
         lock["npm_latest"]["integrity"],
-        "sha512-YUeBMqwfv3xZC7HJ3ohwk2e0i3DdCitOrvWZPijCOMywp/S+CZEjyqVh1pUzR1PgDo9eBBn9WXyw2wbDBihcpA=="
+        "sha512-UP+7vkLGYHq+06oB4TODWPb6pucNzuOiQTvfgz4XgTrTsBTPFgWTHGYXcqsMKuCtLVsq55HvIIl0PYCjns+CPQ=="
     );
     assert_eq!(
-        lock["github"]["default_branch_head"]
-            .as_str()
-            .expect("tracked lock should record a GitHub default branch HEAD")
-            .len(),
-        40
+        lock["github"]["default_branch_head"],
+        "c54a30668ad8319d76c20ae96e6680ad6c51a2c6"
     );
-    assert_eq!(lock["github"]["latest_release_ref"], "refs/tags/0.121.14");
+    assert_eq!(lock["github"]["latest_release_ref"], "refs/tags/0.121.15");
     assert_eq!(
         lock["github"]["latest_release_commit"],
-        "7a48c5fce614bee617efbb3b7fc93d404c75b628"
+        "4805856060d026521794d4e69decb938155580ad"
     );
 
     let markdown = std::fs::read_to_string("docs/compatibility/current-latest.lock.md")
         .expect("tracked current latest markdown lock should be readable");
-    assert!(markdown.contains("promptfoo@0.121.14"), "{markdown}");
+    assert!(markdown.contains("promptfoo@0.121.15"), "{markdown}");
     assert!(
-        markdown.contains(
-            lock["github"]["default_branch_head"]
-                .as_str()
-                .expect("tracked lock should record a GitHub default branch HEAD")
-        ),
+        markdown.contains("c54a30668ad8319d76c20ae96e6680ad6c51a2c6"),
         "{markdown}"
     );
     assert!(!markdown.contains("promptfoo@0.121.13"), "{markdown}");

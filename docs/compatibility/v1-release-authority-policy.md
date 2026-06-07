@@ -10,7 +10,7 @@ Maintainer approval recorded on 2026-06-06 (leafiellune). This document is the p
 
 ## current-latest-target
 
-Tracked target: `promptfoo@0.121.14` with GitHub default branch HEAD recorded in `target/release-gates/current-latest-target.json`.
+Tracked target: `promptfoo@0.121.15` with GitHub default branch HEAD recorded in `target/release-gates/current-latest-target.json`.
 
 Approval: `approval:v1-current-latest-target-2026-06-06`
 

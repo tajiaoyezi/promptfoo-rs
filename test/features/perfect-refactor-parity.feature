@@ -432,6 +432,16 @@ Feature: perfect refactor parity
     And TEST-46.1.3 proves shell and Rust extraction agree
     And TEST-46.1.4 proves runtime smoke removes the source/matrix unknown blocker without allowing perfect-refactor completion
 
+  # Maps to: docs/specs/tasks/task-48.1-current-latest-0.121.15-target-refresh.md
+  Scenario: SCEN-48.1.1 - current latest 0.121.15 target refresh keeps gates fail-closed
+    Given npm latest and GitHub latest release are promptfoo 0.121.15
+    And GitHub default branch HEAD moves to c54a30668ad8319d76c20ae96e6680ad6c51a2c6
+    When the current-latest target lock is refreshed
+    Then TEST-48.1.1 proves Rust target-lock parsing records the refreshed npm and HEAD packet
+    And TEST-48.1.2 proves tracked lock artifacts record the refreshed target
+    And TEST-48.1.3 proves runtime smoke regenerates downstream artifacts and keeps perfect-refactor completion blocked unless every gate agrees
+    And TEST-48.1.4 proves prior local current-latest fixture evidence survives re-extraction or any new local blocker is explicit
+
   # Maps to: docs/specs/tasks/task-47.1-current-latest-evaluator-inmemorystore-fixture-burndown.md
   Scenario: SCEN-47.1.1 - current latest evaluator in-memory store fixture evidence burndown
     Given upstream promptfoo current latest contains src/evaluator/inMemoryStore.ts

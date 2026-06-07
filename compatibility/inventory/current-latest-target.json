@@ -3,26 +3,26 @@
   "status": "locked-with-drift",
   "npm_latest": {
     "package_name": "promptfoo",
-    "package_version": "0.121.14",
-    "git_head": "7a48c5fce614bee617efbb3b7fc93d404c75b628",
-    "tarball": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.14.tgz",
-    "integrity": "sha512-YUeBMqwfv3xZC7HJ3ohwk2e0i3DdCitOrvWZPijCOMywp/S+CZEjyqVh1pUzR1PgDo9eBBn9WXyw2wbDBihcpA==",
-    "modified": "2026-06-02T13:59:19.451Z",
+    "package_version": "0.121.15",
+    "git_head": "4805856060d026521794d4e69decb938155580ad",
+    "tarball": "https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.15.tgz",
+    "integrity": "sha512-UP+7vkLGYHq+06oB4TODWPb6pucNzuOiQTvfgz4XgTrTsBTPFgWTHGYXcqsMKuCtLVsq55HvIIl0PYCjns+CPQ==",
+    "modified": "2026-06-05T14:31:09.645Z",
     "source": "npm view promptfoo version gitHead dist.tarball dist.integrity time.modified --json"
   },
   "github": {
-    "default_branch_head": "2ca16c59b64e0afca10533de0f817c0d24eba20a",
-    "npm_tag_ref": "refs/tags/0.121.14",
-    "npm_tag_commit": "7a48c5fce614bee617efbb3b7fc93d404c75b628",
-    "latest_release_ref": "refs/tags/0.121.14",
-    "latest_release_commit": "7a48c5fce614bee617efbb3b7fc93d404c75b628",
-    "latest_release_name": "0.121.14",
-    "latest_release_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.121.14",
-    "latest_release_published_at": "2026-06-02T13:49:18Z",
+    "default_branch_head": "c54a30668ad8319d76c20ae96e6680ad6c51a2c6",
+    "npm_tag_ref": "refs/tags/0.121.15",
+    "npm_tag_commit": "4805856060d026521794d4e69decb938155580ad",
+    "latest_release_ref": "refs/tags/0.121.15",
+    "latest_release_commit": "4805856060d026521794d4e69decb938155580ad",
+    "latest_release_name": "0.121.15",
+    "latest_release_url": "https://github.com/promptfoo/promptfoo/releases/tag/0.121.15",
+    "latest_release_published_at": "2026-06-05T14:21:17Z",
     "latest_release_channel": "core-package",
     "latest_release_is_core_package": true,
     "source": "git ls-remote https://github.com/promptfoo/promptfoo.git HEAD refs/tags/<npm-version> refs/tags/<latest-release>",
-    "observed_at": "unix:1780740032"
+    "observed_at": "unix:1780796184"
   },
   "target_selection_blocker_resolved": true,
   "current_latest_claim_allowed": false,
@@ -34,6 +34,6 @@
     "external_authority_or_waivers",
     "publication_authority_or_waivers"
   ],
-  "reason": "npm latest package 0.121.14 records gitHead 7a48c5fce614bee617efbb3b7fc93d404c75b628; GitHub default branch HEAD 2ca16c59b64e0afca10533de0f817c0d24eba20a differs from npm latest gitHead 7a48c5fce614bee617efbb3b7fc93d404c75b628; downstream source inventory, golden corpus, quality, external authority, and publication evidence are still required",
-  "observed_at": "unix:1780740032"
+  "reason": "npm latest package 0.121.15 records gitHead 4805856060d026521794d4e69decb938155580ad; GitHub default branch HEAD c54a30668ad8319d76c20ae96e6680ad6c51a2c6 differs from npm latest gitHead 4805856060d026521794d4e69decb938155580ad; downstream source inventory, golden corpus, quality, external authority, and publication evidence are still required",
+  "observed_at": "unix:1780796184"
 }

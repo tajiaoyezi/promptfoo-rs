@@ -2,18 +2,18 @@
 
 - **Schema**: `promptfoo-rs.current-latest-target.v1`
 - **Status**: `locked-with-drift`
-- **Observed At**: `unix:1780740032`
-- **npm latest**: `promptfoo@0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`
-- **npm tarball**: `https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.14.tgz`
-- **npm integrity**: `sha512-YUeBMqwfv3xZC7HJ3ohwk2e0i3DdCitOrvWZPijCOMywp/S+CZEjyqVh1pUzR1PgDo9eBBn9WXyw2wbDBihcpA==`
-- **GitHub default branch HEAD**: `2ca16c59b64e0afca10533de0f817c0d24eba20a`
-- **GitHub latest release**: `refs/tags/0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628` / channel `core-package`
+- **Observed At**: `unix:1780796184`
+- **npm latest**: `promptfoo@0.121.15` / `4805856060d026521794d4e69decb938155580ad`
+- **npm tarball**: `https://registry.npmjs.org/promptfoo/-/promptfoo-0.121.15.tgz`
+- **npm integrity**: `sha512-UP+7vkLGYHq+06oB4TODWPb6pucNzuOiQTvfgz4XgTrTsBTPFgWTHGYXcqsMKuCtLVsq55HvIIl0PYCjns+CPQ==`
+- **GitHub default branch HEAD**: `c54a30668ad8319d76c20ae96e6680ad6c51a2c6`
+- **GitHub latest release**: `refs/tags/0.121.15` / `4805856060d026521794d4e69decb938155580ad` / channel `core-package`
 - **Target selection blocker resolved**: `true`
 - **Current latest claim allowed**: `false`
 
 ## Reason
 
-npm latest package 0.121.14 records gitHead 7a48c5fce614bee617efbb3b7fc93d404c75b628; GitHub default branch HEAD 2ca16c59b64e0afca10533de0f817c0d24eba20a differs from npm latest gitHead 7a48c5fce614bee617efbb3b7fc93d404c75b628; downstream source inventory, golden corpus, quality, external authority, and publication evidence are still required
+npm latest package 0.121.15 records gitHead 4805856060d026521794d4e69decb938155580ad; GitHub default branch HEAD c54a30668ad8319d76c20ae96e6680ad6c51a2c6 differs from npm latest gitHead 4805856060d026521794d4e69decb938155580ad; downstream source inventory, golden corpus, quality, external authority, and publication evidence are still required
 
 ## Downstream Required Evidence
 
