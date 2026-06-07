@@ -76,11 +76,11 @@ Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.1
 Adds macOS `aarch64-apple-darwin` and `x86_64-apple-darwin` archives to the release build matrix alongside existing Linux and Windows artifacts. Tag `v0.1.1` publishes all four platform archives plus combined `SHA256SUMS`. Publication evidence backfilled in `docs/compatibility/publication-evidence.json` (PR #15).
 
 
-## v0.1.3 GitHub Release (current; pending tag)
+## v0.1.3 GitHub Release (current; shipped 2026-06-07)
 
-Release notes: `docs/release-notes/v0.1.3.md`
+Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.3
 
-Ships Phase 49 product-baseline v1 gate alignment (ADR-012 freeze at `promptfoo@0.121.15`, runtime consumption of v1 authority/publication waivers). Same five-platform archive matrix as v0.1.2. After `git push origin v0.1.3`, backfill `docs/compatibility/publication-evidence.json` with the published asset URL and `SHA256SUMS` digest.
+Ships Phase 49 product-baseline v1 gate alignment (ADR-012 freeze at `promptfoo@0.121.15`, runtime consumption of v1 authority/publication waivers). Same five-platform archive matrix as v0.1.2. Publication evidence backfilled in `docs/compatibility/publication-evidence.json`.
 
 ## v0.1.2 GitHub Release (shipped 2026-06-07)
 
