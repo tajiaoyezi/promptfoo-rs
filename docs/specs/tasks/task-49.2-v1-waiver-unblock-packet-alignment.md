@@ -1,6 +1,6 @@
 # Task 49.2: v1-waiver-unblock-packet-alignment
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 49 — product-baseline-v1-gate-alignment
@@ -59,19 +59,19 @@ Decision items with `decision_state` in `{evidence-provided, waived-with-boundar
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (v1 policy): authority manifest rows resolve unblock decisions; `authority-decisions-gate` stays `perfect_refactor_decision_ready=true`.
-- [ ] **AC2** (v1 policy): publication gate `v1_scope_ready=true` with GitHub Releases published + five deferred channels.
-- [ ] **AC3** (ADR-009): golden `blocker_count` remains visible; `perfect_refactor_claim_allowed=false`.
-- [ ] **AC4** (BLOCKED-task-22.1): blocker file updated to frozen-baseline / v1 boundary closure; no rebaseline backlog narrative.
+- [x] **AC1** (v1 policy): authority manifest rows resolve unblock decisions; `authority-decisions-gate` stays `perfect_refactor_decision_ready=true`.
+- [x] **AC2** (v1 policy): publication gate `v1_scope_ready=true` with GitHub Releases published + five deferred channels.
+- [x] **AC3** (ADR-009): golden `blocker_count` remains visible; `perfect_refactor_claim_allowed=false`.
+- [x] **AC4** (BLOCKED-task-22.1): blocker file updated to frozen-baseline / v1 boundary closure; no rebaseline backlog narrative.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-49.2.1 | TEST-49.2.1 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, build | In Progress |
-| AC2 | SCEN-49.2.1 | TEST-49.2.3 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, runtime-smoke, build | In Progress |
-| AC3 | SCEN-49.2.1 | TEST-49.1.2 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, coverage, runtime-smoke, build | In Progress |
-| AC4 | SCEN-49.2.1 | TEST-49.2.1 | tests/product_baseline_v1_gate_alignment.rs | install, lint, typecheck, unit-test, integration, build | In Progress |
+| AC1 | SCEN-49.2.1 | TEST-49.2.1 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, build | Done |
+| AC2 | SCEN-49.2.1 | TEST-49.2.3 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
+| AC3 | SCEN-49.2.1 | TEST-49.1.2 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, coverage, runtime-smoke, build | Done |
+| AC4 | SCEN-49.2.1 | TEST-49.2.1 | tests/product_baseline_v1_gate_alignment.rs | install, lint, typecheck, unit-test, integration, build | Done |
 
 ## 8. Risks
 
@@ -90,9 +90,31 @@ Decision items with `decision_state` in `{evidence-provided, waived-with-boundar
 
 ## 10. Completion Notes
 
-- **完成日期**：`<TBD-after-impl>`
-- **改动文件**：`<TBD-after-impl>`
-- **commit 列表**：`<TBD-after-impl>`
-- **§9 Verification 结果**：`<TBD-after-impl>`
-- **剩余风险**：`<TBD-after-impl>`
+- **完成日期**：2026-06-07
+- **改动文件**：
+  - scripts/release/authority-decisions.sh（修改）
+  - scripts/release/current-latest-quality-gate.sh（修改）
+  - scripts/release/perfect-refactor-unblock-packet.sh（修改）
+  - scripts/release/product-baseline-gate-lib.cjs（新增）
+  - scripts/release/publication-evidence.sh（修改）
+  - scripts/release/runtime-smoke.sh（修改）
+  - BLOCKED-task-22.1-perfect-refactor-external-authority.md（修改）
+  - docs/release.md（修改）
+  - tests/authority_decision_manifest_gate.rs（修改）
+  - tests/current_latest_unblock_packet.rs（修改）
+  - tests/product_baseline_v1_gate_alignment.rs（新增）
+- **commit 列表**：
+  - e1de727 feat(compatibility-gates): Phase 49 product-baseline v1 gate alignment
+  - b8ded58 fix(compatibility-gates): resolve gate lib path from script directory
+  - 600e7d7 fix(compatibility-gates): align authority gate with v1 resolved manifest rows
+- **§9 Verification 结果**：
+  - install: ✅
+  - lint: ✅
+  - typecheck: ✅
+  - unit-test: workspace passed / 0 failed
+  - integration: ✅
+  - coverage: 16/16 release-critical traceability tests (coverage.json)
+  - build: ✅
+  - runtime-smoke: ✅
+- **剩余风险**：manifest item_id 与 unblock packet 漂移时可能误过滤；须保持 authority-decisions.json 与 gate lib 同步。
 - **下游 task 影响**：无

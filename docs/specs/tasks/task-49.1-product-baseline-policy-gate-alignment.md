@@ -1,6 +1,6 @@
 # Task 49.1: product-baseline-policy-gate-alignment
 
-**Status**: In Progress
+**Status**: Done
 **Priority**: P0
 **Owner**: leafiellune
 **Related Phase**: Phase 49 — product-baseline-v1-gate-alignment
@@ -56,19 +56,19 @@ Default upstream policy uses Phase 48 tracked lock (`compatibility/inventory/cur
 
 ## 6. Acceptance Criteria
 
-- [ ] **AC1** (ADR-012): default policy `target_mode=product-baseline`, frozen package `0.121.15`, `current_upstream_rebaseline_required=false`.
-- [ ] **AC2** (ADR-012): HEAD drift vs npm gitHead is observation-only in policy `reason`; no rebaseline decision item when frozen.
-- [ ] **AC3** (task 48.1): tracked lock `compatibility/inventory/current-latest-target.json` remains authoritative for product baseline fields.
-- [ ] **AC4** (PRD §Product Independence): `perfect_refactor_claim_allowed` stays false; `local_stable_allowed` unaffected.
+- [x] **AC1** (ADR-012): default policy `target_mode=product-baseline`, frozen package `0.121.15`, `current_upstream_rebaseline_required=false`.
+- [x] **AC2** (ADR-012): HEAD drift vs npm gitHead is observation-only in policy `reason`; no rebaseline decision item when frozen.
+- [x] **AC3** (task 48.1): tracked lock `compatibility/inventory/current-latest-target.json` remains authoritative for product baseline fields.
+- [x] **AC4** (PRD §Product Independence): `perfect_refactor_claim_allowed` stays false; `local_stable_allowed` unaffected.
 
 ## 7. SDD / BDD / TDD Traceability
 
 | Acceptance Criterion | BDD Scenario | TDD Test | Integration / E2E Test | Verification | Status |
 |---|---|---|---|---|---|
-| AC1 | SCEN-49.1.1 | TEST-49.1.1 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, build | In Progress |
-| AC2 | SCEN-49.1.1 | TEST-49.1.2 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, integration, build | In Progress |
-| AC3 | SCEN-49.1.1 | TEST-49.2.2 | tests/product_baseline_v1_gate_alignment.rs | install, lint, typecheck, unit-test, build | In Progress |
-| AC4 | SCEN-49.1.1 | TEST-49.1.2 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, runtime-smoke, build | In Progress |
+| AC1 | SCEN-49.1.1 | TEST-49.1.1 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, build | Done |
+| AC2 | SCEN-49.1.1 | TEST-49.1.2 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, integration, build | Done |
+| AC3 | SCEN-49.1.1 | TEST-49.2.2 | tests/product_baseline_v1_gate_alignment.rs | install, lint, typecheck, unit-test, build | Done |
+| AC4 | SCEN-49.1.1 | TEST-49.1.2 | tests/product_baseline_v1_gate_alignment.rs | install, typecheck, unit-test, runtime-smoke, build | Done |
 
 ## 8. Risks
 
@@ -86,9 +86,25 @@ Default upstream policy uses Phase 48 tracked lock (`compatibility/inventory/cur
 
 ## 10. Completion Notes
 
-- **完成日期**：`<TBD-after-impl>`
-- **改动文件**：`<TBD-after-impl>`
-- **commit 列表**：`<TBD-after-impl>`
-- **§9 Verification 结果**：`<TBD-after-impl>`
-- **剩余风险**：`<TBD-after-impl>`
+- **完成日期**：2026-06-07
+- **改动文件**：
+  - scripts/release/product-baseline-gate-lib.cjs（新增）
+  - scripts/release/current-upstream-policy.sh（修改）
+  - scripts/release/perfect-refactor-unblock-packet.sh（修改）
+  - src/compatibility/inventory.rs（修改）
+  - src/release.rs（修改）
+  - tests/product_baseline_v1_gate_alignment.rs（新增）
+- **commit 列表**：
+  - e1de727 feat(compatibility-gates): Phase 49 product-baseline v1 gate alignment
+  - b8ded58 fix(compatibility-gates): resolve gate lib path from script directory
+  - 600e7d7 fix(compatibility-gates): align authority gate with v1 resolved manifest rows
+- **§9 Verification 结果**：
+  - install: ✅
+  - lint: ✅
+  - typecheck: ✅
+  - unit-test: workspace passed / 0 failed
+  - integration: ✅
+  - build: ✅
+  - runtime-smoke: ✅
+- **剩余风险**：若 ADR-012 被 supersede 须同步更新 gate 默认 `target_mode` 与 policy 脚本。
 - **下游 task 影响**：无

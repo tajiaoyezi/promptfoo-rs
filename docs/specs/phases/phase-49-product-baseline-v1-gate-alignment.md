@@ -1,6 +1,6 @@
 # Phase 49: product-baseline-v1-gate-alignment
 
-**Status**: In Progress
+**Status**: Done
 **Owner**: leafiellune
 **Related PRD**: ../../prds/promptfoo-rs.prd.md
 
@@ -20,8 +20,8 @@ After strategic alignment (ADR-012), gates still behaved like a live upstream ch
 
 | Task | Name | Spec | Status | Goal |
 |---|---|---|---|---|
-| 49.1 | product-baseline-policy-gate-alignment | ../tasks/task-49.1-product-baseline-policy-gate-alignment.md | In Progress | ADR-012 product-baseline policy + rebaseline flag alignment |
-| 49.2 | v1-waiver-unblock-packet-alignment | ../tasks/task-49.2-v1-waiver-unblock-packet-alignment.md | In Progress | Consume authority/publication waivers in unblock + external gates |
+| 49.1 | product-baseline-policy-gate-alignment | ../tasks/task-49.1-product-baseline-policy-gate-alignment.md | Done | ADR-012 product-baseline policy + rebaseline flag alignment |
+| 49.2 | v1-waiver-unblock-packet-alignment | ../tasks/task-49.2-v1-waiver-unblock-packet-alignment.md | Done | Consume authority/publication waivers in unblock + external gates |
 
 ## 5. Dependencies
 
@@ -29,10 +29,10 @@ Depends on Phase 48 product baseline lock, Phase 44 v1 authority policy, ADR-012
 
 ## 6. Phase Acceptance Criteria
 
-- [ ] `current-upstream-policy.json` defaults to `target_mode=product-baseline` with `product_baseline_frozen=true` and `current_upstream_rebaseline_required=false`.
-- [ ] `perfect-refactor-unblock-packet.json` filters decision items resolved via `authority-decisions.json` or v1-deferred publication rows; `required_user_decision_count` reflects only unresolved items.
-- [ ] `external-authority-blockers.json` reports `active_blocker_count=0` when all manifest rows are waived or evidence-provided; `publication-evidence-gate.json` reports `v1_scope_ready=true`.
-- [ ] `perfect_refactor_claim_allowed` remains `false`; `local_stable_allowed` remains `true`; BLOCKED-task-22.1 narrative narrowed to frozen-baseline / v1 boundaries.
+- [x] `current-upstream-policy.json` defaults to `target_mode=product-baseline` with `product_baseline_frozen=true` and `current_upstream_rebaseline_required=false`.
+- [x] `perfect-refactor-unblock-packet.json` filters decision items resolved via `authority-decisions.json` or v1-deferred publication rows; `required_user_decision_count` reflects only unresolved items.
+- [x] `external-authority-blockers.json` reports `active_blocker_count=0` when all manifest rows are waived or evidence-provided; `publication-evidence-gate.json` reports `v1_scope_ready=true`.
+- [x] `perfect_refactor_claim_allowed` remains `false`; `local_stable_allowed` remains `true`; BLOCKED-task-22.1 narrative narrowed to frozen-baseline / v1 boundaries.
 
 ## 7. Phase Risks
 
@@ -45,7 +45,7 @@ Tasks 49.1 and 49.2 are Done, phase §6 smoke passes, gate artifacts align with 
 
 ## 9. Phase Completion Notes
 
-- **完成日期**：`<TBD-after-impl>`
-- **Phase smoke**：`<TBD-after-impl>`
-- **Artifact evidence**：`<TBD-after-impl>`
+- **完成日期**：2026-06-07
+- **Phase smoke**：`bash scripts/release/runtime-smoke.sh` ✅；`bash scripts/release/integration.sh` ✅
+- **Artifact evidence**：`target/release-gates/current-upstream-policy.json`（product-baseline frozen）；`target/release-gates/perfect-refactor-unblock-packet.json`（required_user_decision_count=0）；`target/release-gates/authority-decisions-gate.json`（perfect_refactor_decision_ready=true）
 - **Remaining boundaries**：Golden fixture burndown on frozen baseline; no perfect-refactor claim without full gate agreement.
