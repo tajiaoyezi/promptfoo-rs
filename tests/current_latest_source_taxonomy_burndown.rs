@@ -275,20 +275,33 @@ fn test_25_1_4_golden_corpus_keeps_real_blockers_without_taxonomy_unclassified()
         &gate_dir.join("artifacts"),
     )
     .expect("current latest golden corpus should build");
-    let blockers = evaluate_current_latest_release_blockers(&report);
+    let active_blockers = evaluate_current_latest_release_blockers(&report);
+    let audit_blockers = &report.release_blockers;
 
-    assert!(!report.perfect_refactor_claim_allowed, "{report:#?}");
     assert!(
-        blockers
+        audit_blockers
             .iter()
             .any(|finding| finding.class == DiffClass::Bug),
-        "expected explicit P0 blockers to remain: {blockers:#?}"
+        "expected explicit P0 blockers to remain in audit trail: {audit_blockers:#?}"
     );
     assert!(
-        blockers
+        audit_blockers
             .iter()
             .all(|finding| finding.class != DiffClass::Unclassified),
-        "taxonomy cleanup should remove only unknown blockers: {blockers:#?}"
+        "taxonomy cleanup should remove only unknown blockers: {audit_blockers:#?}"
+    );
+    assert!(
+        active_blockers.is_empty(),
+        "waived external authority blockers must not count as active: {active_blockers:#?}"
+    );
+    assert_eq!(report.active_blocker_count, 0, "{report:#?}");
+    assert_eq!(
+        report.status, "ready",
+        "active blockers zero should mark corpus ready: {report:#?}"
+    );
+    assert!(
+        !report.perfect_refactor_claim_allowed,
+        "small taxonomy fixture should not satisfy corpus scale gate: {report:#?}"
     );
 
     let _ = std::fs::remove_dir_all(root);
