@@ -60,7 +60,7 @@ Maintainer policy: `docs/compatibility/v1-release-authority-policy.md`
 - **Deferred for v1 (formal waiver)**: Cargo, npm wrapper, Docker, Homebrew, GitHub Action.
 - **Brand/legal**: independent reimplementation wording required (`approval:legal-brand-independent-reimplementation-2026-06-06`).
 
-Current publication evidence (`docs/compatibility/publication-evidence.json`) records **github-releases** as `published` for tag `v0.1.1` (external URL + sha256). The five v1-deferred channels remain `blocked`. Aggregate `publication_ready` stays `false` until policy requires more than the single authorized channel or deferred channels are waived/published.
+Current publication evidence (`docs/compatibility/publication-evidence.json`) records **github-releases** as `published` for tag `v0.1.2` (external URL + sha256). The five v1-deferred channels remain `blocked`. Aggregate `publication_ready` stays `false` until policy requires more than the single authorized channel or deferred channels are waived/published.
 
 ## v0.1.0 GitHub Release (shipped 2026-06-06)
 
@@ -75,11 +75,11 @@ Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.1
 Adds macOS `aarch64-apple-darwin` and `x86_64-apple-darwin` archives to the release build matrix alongside existing Linux and Windows artifacts. Tag `v0.1.1` publishes all four platform archives plus combined `SHA256SUMS`. Publication evidence backfilled in `docs/compatibility/publication-evidence.json` (PR #15).
 
 
-## v0.1.2 GitHub Release (current; ships with tag)
+## v0.1.2 GitHub Release (current; shipped 2026-06-07)
 
 Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.2
 
-Adds Linux arm64 `aarch64-unknown-linux-gnu` archive on the `ubuntu-24.04-arm` runner alongside existing Linux x64, Windows, and macOS artifacts. Tag `v0.1.2` publishes five platform archives plus combined `SHA256SUMS`. Backfill publication evidence after the release upload completes.
+Adds Linux arm64 `aarch64-unknown-linux-gnu` archive on the `ubuntu-24.04-arm` runner alongside existing Linux x64, Windows, and macOS artifacts. Tag `v0.1.2` publishes five platform archives plus combined `SHA256SUMS`. Publication evidence backfilled in `docs/compatibility/publication-evidence.json` (PR #19).
 
 ### Repeat procedure for future tags
 
