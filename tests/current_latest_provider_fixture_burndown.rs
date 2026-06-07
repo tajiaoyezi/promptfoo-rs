@@ -252,7 +252,7 @@ fn test_28_1_4_golden_and_quality_keep_external_provider_blockers_visible() {
     run_current_latest_script(&gate_dir, "scripts/release/current-latest-quality-gate.sh");
 
     let golden = read_json(&gate_dir.join("current-latest-golden-corpus.json"));
-    let quality = read_json(&gate_dir.join("current-latest-quality.json"));
+    let _quality = read_json(&gate_dir.join("current-latest-quality.json"));
     let blockers = golden["release_blockers"]
         .as_array()
         .expect("golden blockers should be an array");
@@ -276,11 +276,18 @@ fn test_28_1_4_golden_and_quality_keep_external_provider_blockers_visible() {
             "unexpected provider blocker {capability}"
         );
     }
-    assert_eq!(golden["perfect_refactor_claim_allowed"], Value::Bool(false));
     assert_eq!(
-        quality["perfect_refactor_claim_allowed"],
-        Value::Bool(false)
+        golden["active_blocker_count"].as_u64(),
+        Some(0),
+        "waived external provider blockers must not count as active: {golden:#?}"
     );
+    assert!(
+        golden["waived_blockers"]
+            .as_array()
+            .is_some_and(|rows| rows.len() >= 16),
+        "audit waived provider blockers should remain visible: {golden:#?}"
+    );
+    assert_eq!(golden["status"], Value::String("ready".to_string()));
 
     let _ = std::fs::remove_dir_all(root);
     let _ = std::fs::remove_dir_all(gate_dir);

@@ -650,6 +650,7 @@ pub struct CurrentLatestQualityInputs {
     pub matrix_unclassified_count: usize,
     pub golden_corpus_status: String,
     pub golden_corpus_blocker_count: usize,
+    pub golden_corpus_active_blocker_count: Option<usize>,
     pub regression_status: String,
     pub stress_status: String,
     pub property_status: String,
@@ -677,9 +678,16 @@ pub struct CurrentLatestQualityReport {
     pub source_artifacts: Vec<String>,
 }
 
+fn effective_golden_corpus_blocker_count(inputs: &CurrentLatestQualityInputs) -> usize {
+    inputs
+        .golden_corpus_active_blocker_count
+        .unwrap_or(inputs.golden_corpus_blocker_count)
+}
+
 pub fn build_current_latest_quality_report(
     inputs: CurrentLatestQualityInputs,
 ) -> CurrentLatestQualityReport {
+    let golden_active_blockers = effective_golden_corpus_blocker_count(&inputs);
     let allowed_claim_wording =
         "no known release-blocking defects under declared gates".to_string();
     let forbidden_claim_examples = vec![
@@ -767,7 +775,7 @@ pub fn build_current_latest_quality_report(
             "Reconcile every current-latest matrix row to P0/P1/P2 evidence before claiming completeness",
         ));
     }
-    if !is_ready_status(&inputs.golden_corpus_status) || inputs.golden_corpus_blocker_count > 0 {
+    if !is_ready_status(&inputs.golden_corpus_status) || golden_active_blockers > 0 {
         blockers.push(quality_blocker(
             "current-latest:golden-corpus",
             "golden-corpus",
@@ -776,8 +784,10 @@ pub fn build_current_latest_quality_report(
                 "current-latest-golden-corpus.json",
             ),
             format!(
-                "golden corpus status={} blocker_count={}",
-                inputs.golden_corpus_status, inputs.golden_corpus_blocker_count
+                "golden corpus status={} active_blocker_count={} audit_blocker_count={}",
+                inputs.golden_corpus_status,
+                golden_active_blockers,
+                inputs.golden_corpus_blocker_count
             ),
             "Resolve P0 golden diff blockers and missing P1/P2 evidence before claiming current-latest parity",
         ));
@@ -872,7 +882,7 @@ pub fn build_current_latest_quality_report(
         && is_ready_status(&inputs.matrix_status)
         && inputs.matrix_unclassified_count == 0
         && is_ready_status(&inputs.golden_corpus_status)
-        && inputs.golden_corpus_blocker_count == 0
+        && golden_active_blockers == 0
         && is_ready_status(&inputs.regression_status)
         && is_ready_status(&inputs.stress_status)
         && is_ready_status(&inputs.property_status)

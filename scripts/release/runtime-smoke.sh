@@ -260,7 +260,7 @@ current_latest_matrix_claim_allowed="$(node -e "const r = JSON.parse(require('fs
 current_latest_golden_corpus_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.status)")"
 current_latest_golden_corpus_fixture_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.fixture_case_count)")"
 current_latest_golden_corpus_p0_total="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.p0_total)")"
-current_latest_golden_corpus_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.blocker_count)")"
+current_latest_golden_corpus_blocker_count="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.active_blocker_count ?? r.blocker_count ?? 0)")"
 current_latest_golden_corpus_claim_allowed="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/current-latest-golden-corpus.json', 'utf8')); console.log(r.perfect_refactor_claim_allowed ? 'true' : 'false')")"
 upstream_distribution_target_status="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.status)")"
 upstream_distribution_npm_core_matches_frozen="$(node -e "const r = JSON.parse(require('fs').readFileSync('$GATE_DIR/upstream-distribution-target.json', 'utf8')); console.log(r.npm_core_matches_frozen_baseline ? 'true' : 'false')")"

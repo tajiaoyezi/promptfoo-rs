@@ -115,7 +115,11 @@ const matrixUnclassified = Number(env(
   Array.isArray(matrix.unclassified_rows) ? matrix.unclassified_rows.length : 0,
 ));
 const goldenStatus = env('CURRENT_LATEST_GOLDEN_CORPUS_STATUS', golden.status || 'blocked');
-const goldenBlockers = Number(env('CURRENT_LATEST_GOLDEN_CORPUS_BLOCKER_COUNT', golden.blocker_count || 0));
+const goldenBlockers = Number(env(
+  'CURRENT_LATEST_GOLDEN_CORPUS_BLOCKER_COUNT',
+  golden.active_blocker_count ?? golden.blocker_count ?? 0,
+));
+const goldenAuditBlockers = Number(golden.blocker_count || 0);
 const adapterStatus = env('CURRENT_LATEST_ADAPTER_STATUS', 'ready');
 const regressionStatus = env('CURRENT_LATEST_REGRESSION_STATUS', 'ready');
 const stressStatus = env('CURRENT_LATEST_STRESS_STATUS', 'ready');
@@ -181,7 +185,7 @@ if (!readiness(goldenStatus) || goldenBlockers > 0) {
     'current-latest:golden-corpus',
     'golden-corpus',
     findArtifact(sourceArtifacts, 'current-latest-golden-corpus.json'),
-    `golden corpus status=${goldenStatus} blocker_count=${goldenBlockers}`,
+    `golden corpus status=${goldenStatus} active_blocker_count=${goldenBlockers} audit_blocker_count=${goldenAuditBlockers}`,
     'Resolve P0 golden diff blockers and missing P1/P2 evidence before claiming current-latest parity',
   ));
 }

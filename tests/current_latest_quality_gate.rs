@@ -219,6 +219,7 @@ fn ready_inputs(wording: &str) -> CurrentLatestQualityInputs {
         matrix_unclassified_count: 0,
         golden_corpus_status: "ready".to_string(),
         golden_corpus_blocker_count: 0,
+        golden_corpus_active_blocker_count: None,
         regression_status: "ready".to_string(),
         stress_status: "ready".to_string(),
         property_status: "ready".to_string(),
