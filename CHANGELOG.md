@@ -4,6 +4,12 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-06-07
+
+### Added
+
+- Linux arm64 GitHub Release archive (`aarch64-unknown-linux-gnu`) on `ubuntu-24.04-arm` runner in `.github/workflows/release.yml`.
+
 ## [0.1.1] - 2026-06-07
 
 ### Added

@@ -10,7 +10,7 @@
 
 **Independent reimplementation**: promptfoo-rs is not the official [promptfoo](https://github.com/promptfoo/promptfoo) project and does not imply upstream endorsement. The `promptfoo` name describes compatibility targets and config formats only.
 
-Current status: **v0.1.1** ships on [GitHub Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases) with Linux, Windows, and macOS (arm64 and x64) binaries (the only v1-authorized public channel). Local S2V verification passes. The project does not claim full 1:1 replacement with the latest promptfoo GitHub HEAD or perfect-refactor completion.
+Current status: **v0.1.2** ships on [GitHub Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases) with Linux (x64 and arm64), Windows, and macOS (arm64 and x64) binaries (the only v1-authorized public channel). Local S2V verification passes. The project does not claim full 1:1 replacement with the latest promptfoo GitHub HEAD or perfect-refactor completion.
 
 [Quickstart](docs/QUICKSTART.en.md) | [Project Overview](docs/PROJECT-OVERVIEW.md) | [Architecture](docs/architecture.md) | [Release Boundary](docs/release.md) | [Contributing](CONTRIBUTING.md)
 
@@ -31,7 +31,7 @@ promptfoo-rs is designed for:
 | Local build and tests | Ready. `install`, `lint`, `typecheck`, `unit-test`, `integration`, `e2e`, `coverage`, `build`, and `runtime-smoke` pass. |
 | Normal use within implemented scope | Ready. CLI, core eval, output formats, viewer data contracts, Node wrapper smoke, and compatibility gates are covered. |
 | Full replacement for current latest promptfoo | Not claimed. Current-latest gates still keep blockers and `perfect_refactor_claim_allowed=false`. |
-| Public stable publication (v1 scope) | **GitHub Releases** (current **v0.1.1**: Linux, Windows, macOS). Cargo, npm, Docker, Homebrew, and GitHub Action are formally deferred for v1; aggregate `publication_ready` remains false. |
+| Public stable publication (v1 scope) | **GitHub Releases** (current **v0.1.2**: Linux x64/arm64, Windows, macOS). Cargo, npm, Docker, Homebrew, and GitHub Action are formally deferred for v1; aggregate `publication_ready` remains false. |
 
 The strongest supported wording is: no known release-blocking defects under the declared gates. The project does not claim bug-free behavior or complete live-provider parity without matching gate evidence.
 
@@ -97,30 +97,41 @@ Recommended v1 install path: download platform assets from [Releases](https://gi
 Linux x86_64:
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/SHA256SUMS
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz
+tar -xzf promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
 ./promptfoo --help
 ```
+
+Linux arm64 (aarch64):
+
+```bash
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing
+tar -xzf promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+./promptfoo --help
+```
+
 
 macOS Apple Silicon (arm64):
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-aarch64-apple-darwin.tar.gz
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/SHA256SUMS
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
 shasum -a 256 -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.1-aarch64-apple-darwin.tar.gz
+tar -xzf promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
 ./promptfoo --help
 ```
 
-macOS Intel (x64): download `promptfoo-rs-0.1.1-x86_64-apple-darwin.tar.gz`, verify `SHA256SUMS`, extract, and add the directory to `PATH`.
+macOS Intel (x64): download `promptfoo-rs-0.1.2-x86_64-apple-darwin.tar.gz`, verify `SHA256SUMS`, extract, and add the directory to `PATH`.
 
-Windows x86_64: download `promptfoo-rs-0.1.1-x86_64-pc-windows-msvc.zip`, extract it, add the folder to `PATH`, then run `promptfoo.exe --help`.
+Windows x86_64: download `promptfoo-rs-0.1.2-x86_64-pc-windows-msvc.zip`, extract it, add the folder to `PATH`, then run `promptfoo.exe --help`.
 
 ### Release and install channel status
 
-v1 published channel: **GitHub Releases** (above). Other channels (`cargo install`, npm registry, Docker registry, Homebrew, GitHub Marketplace Action) are formally deferred for v1; the repo claims only `local build/package smoke` and gate documentation for those channels, and real `public registry publication` remains blocked. See [docs/release.md](docs/release.md) and [docs/release-notes/v0.1.1.md](docs/release-notes/v0.1.1.md).
+v1 published channel: **GitHub Releases** (above). Other channels (`cargo install`, npm registry, Docker registry, Homebrew, GitHub Marketplace Action) are formally deferred for v1; the repo claims only `local build/package smoke` and gate documentation for those channels, and real `public registry publication` remains blocked. See [docs/release.md](docs/release.md) and [docs/release-notes/v0.1.2.md](docs/release-notes/v0.1.2.md).
 
 ## CLI surface
 

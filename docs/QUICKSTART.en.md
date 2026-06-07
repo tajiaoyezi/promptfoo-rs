@@ -11,26 +11,37 @@ Download the asset for your platform from [Releases](https://github.com/tajiaoye
 Linux x86_64:
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/SHA256SUMS
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz
+tar -xzf promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
 ./promptfoo --help
 ```
+
+Linux arm64 (aarch64):
+
+```bash
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing
+tar -xzf promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+./promptfoo --help
+```
+
 
 macOS Apple Silicon (arm64):
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-aarch64-apple-darwin.tar.gz
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/SHA256SUMS
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
 shasum -a 256 -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.1-aarch64-apple-darwin.tar.gz
+tar -xzf promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
 ./promptfoo --help
 ```
 
-macOS Intel (x64): download `promptfoo-rs-0.1.1-x86_64-apple-darwin.tar.gz`, verify `SHA256SUMS`, extract, and add the directory to `PATH`.
+macOS Intel (x64): download `promptfoo-rs-0.1.2-x86_64-apple-darwin.tar.gz`, verify `SHA256SUMS`, extract, and add the directory to `PATH`.
 
-Windows x86_64: download `promptfoo-rs-0.1.1-x86_64-pc-windows-msvc.zip`, extract, add the directory to `PATH`, and run `promptfoo.exe --help`.
+Windows x86_64: download `promptfoo-rs-0.1.2-x86_64-pc-windows-msvc.zip`, extract, add the directory to `PATH`, and run `promptfoo.exe --help`.
 
 The preferred local entrypoint is `promptfoo --help`. The Rust release also keeps `promptfoo-rs`, and the npm wrapper's local bin shim supports `pf`.
 
