@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fmt;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -193,9 +194,13 @@ pub struct GoldenCorpusReport {
     pub p2_total: usize,
     pub p2_registration_coverage_count: usize,
     pub blocker_count: usize,
+    pub active_blocker_count: usize,
+    pub waived_blocker_count: usize,
     pub perfect_refactor_claim_allowed: bool,
     pub rows: Vec<GoldenCorpusRow>,
     pub release_blockers: Vec<DiffFinding>,
+    pub active_blockers: Vec<DiffFinding>,
+    pub waived_blockers: Vec<DiffFinding>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -254,6 +259,10 @@ pub fn build_current_latest_golden_corpus(
         )?);
     }
     let release_blockers = current_latest_corpus_blockers(&corpus_rows);
+    let authority_by_id =
+        load_authority_decisions_by_id(Path::new("docs/compatibility/authority-decisions.json"));
+    let (active_blockers, waived_blockers) =
+        split_golden_blockers_by_authority(release_blockers.clone(), &authority_by_id);
     let p0_total = corpus_rows.iter().filter(|row| row.level == "P0").count();
     let p0_fixture_coverage_count = corpus_rows
         .iter()
@@ -279,13 +288,13 @@ pub fn build_current_latest_golden_corpus(
     } else {
         fixture_case_count >= 250
     };
-    let perfect_refactor_claim_allowed = release_blockers.is_empty()
+    let perfect_refactor_claim_allowed = active_blockers.is_empty()
         && p0_total == p0_fixture_coverage_count
         && p0_total == p0_artifact_coverage_count
         && p1_total == p1_snapshot_coverage_count
         && p2_total == p2_registration_coverage_count
         && scale_ready;
-    let status = if perfect_refactor_claim_allowed {
+    let status = if active_blockers.is_empty() {
         "ready"
     } else {
         "ready-with-blockers"
@@ -304,19 +313,76 @@ pub fn build_current_latest_golden_corpus(
         p2_total,
         p2_registration_coverage_count,
         blocker_count: release_blockers.len(),
+        active_blocker_count: active_blockers.len(),
+        waived_blocker_count: waived_blockers.len(),
         perfect_refactor_claim_allowed,
         rows: corpus_rows,
         release_blockers,
+        active_blockers,
+        waived_blockers,
     })
 }
 
 pub fn evaluate_current_latest_release_blockers(
     report: &GoldenCorpusReport,
 ) -> Vec<GoldenDiffFinding> {
-    if !report.release_blockers.is_empty() {
-        return report.release_blockers.clone();
+    if !report.active_blockers.is_empty() {
+        return report.active_blockers.clone();
     }
-    current_latest_corpus_blockers(&report.rows)
+    if report.release_blockers.is_empty() {
+        return current_latest_corpus_blockers(&report.rows);
+    }
+    let authority_by_id =
+        load_authority_decisions_by_id(Path::new("docs/compatibility/authority-decisions.json"));
+    split_golden_blockers_by_authority(report.release_blockers.clone(), &authority_by_id).0
+}
+
+fn authority_decision_is_resolved(decision_state: &str) -> bool {
+    matches!(decision_state, "evidence-provided" | "waived-with-boundary")
+}
+
+fn load_authority_decisions_by_id(path: &Path) -> HashMap<String, String> {
+    let Ok(raw) = fs::read_to_string(path) else {
+        return HashMap::new();
+    };
+    let Ok(manifest) = serde_json::from_str::<Value>(&raw) else {
+        return HashMap::new();
+    };
+    let mut by_id = HashMap::new();
+    for row in manifest
+        .get("rows")
+        .and_then(Value::as_array)
+        .into_iter()
+        .flatten()
+    {
+        let (Some(item_id), Some(decision_state)) = (
+            row.get("item_id").and_then(Value::as_str),
+            row.get("decision_state").and_then(Value::as_str),
+        ) else {
+            continue;
+        };
+        by_id.insert(item_id.to_string(), decision_state.to_string());
+    }
+    by_id
+}
+
+fn split_golden_blockers_by_authority(
+    blockers: Vec<DiffFinding>,
+    authority_by_id: &HashMap<String, String>,
+) -> (Vec<DiffFinding>, Vec<DiffFinding>) {
+    let mut active = Vec::new();
+    let mut waived = Vec::new();
+    for finding in blockers {
+        if authority_by_id
+            .get(&finding.capability)
+            .is_some_and(|state| authority_decision_is_resolved(state))
+        {
+            waived.push(finding);
+        } else {
+            active.push(finding);
+        }
+    }
+    (active, waived)
 }
 
 pub fn write_current_latest_golden_corpus(

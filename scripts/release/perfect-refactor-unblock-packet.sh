@@ -260,8 +260,10 @@ function currentLatestTargetDecisionRequired(target, quality) {
 }
 
 function currentLatestReleaseBlockers(golden) {
-  return (golden?.release_blockers || golden?.blockers || [])
-    .filter((blocker) => currentLatestItemId(blocker).length > 0);
+  const blockers = Array.isArray(golden?.active_blockers)
+    ? golden.active_blockers
+    : (golden?.release_blockers || golden?.blockers || []);
+  return blockers.filter((blocker) => currentLatestItemId(blocker).length > 0);
 }
 
 function addPublicationDecisions(decisions) {

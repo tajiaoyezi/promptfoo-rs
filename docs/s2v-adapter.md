@@ -184,6 +184,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 47 | current-latest-evaluator-inmemorystore-fixture-burndown | docs/specs/phases/phase-47-current-latest-evaluator-inmemorystore-fixture-burndown.md | Done | 1 | N/A (solo) |
 | 48 | current-latest-0.121.15-target-refresh | docs/specs/phases/phase-48-current-latest-0.121.15-target-refresh.md | Done | 1 | N/A (solo) |
 | 49 | product-baseline-v1-gate-alignment | docs/specs/phases/phase-49-product-baseline-v1-gate-alignment.md | Done | 2 | N/A (solo) |
+| 50 | product-baseline-golden-burndown | docs/specs/phases/phase-50-product-baseline-golden-burndown.md | In Progress | 1 | N/A (solo) |
 
 ### 产品战略（ADR-012，2026-06-07）
 
@@ -287,6 +288,7 @@ Coverage 命令当前执行 release-critical S2V traceability coverage gate：ta
 | 48.1 | compatibility | docs/specs/tasks/task-48.1-current-latest-0.121.15-target-refresh.md | Done | Phase 48 order 1 | N/A (solo) |
 | 49.1 | compatibility-gates | docs/specs/tasks/task-49.1-product-baseline-policy-gate-alignment.md | Done | Phase 49 order 1 | N/A (solo) |
 | 49.2 | compatibility-gates | docs/specs/tasks/task-49.2-v1-waiver-unblock-packet-alignment.md | Done | Phase 49 order 2; depends 49.1 | N/A (solo) |
+| 50.1 | compatibility-gates | docs/specs/tasks/task-50.1-golden-corpus-authority-waiver-alignment.md | Ready | Phase 50 order 1 | N/A (solo) |
 
 ## ADR 索引
 

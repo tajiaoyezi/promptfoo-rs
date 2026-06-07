@@ -15,8 +15,13 @@ mkdir -p "$GATE_DIR" "$FIXTURES_ROOT" "$ARTIFACTS_ROOT"
 node - "$MATRIX_FILE" "$FIXTURES_ROOT" "$ARTIFACTS_ROOT" "$OUT" <<'NODE'
 const fs = require('fs');
 const path = require('path');
+const {
+  loadAuthorityDecisions,
+  isResolvedAuthorityDecision,
+} = require(path.join(process.cwd(), 'scripts/release/product-baseline-gate-lib.cjs'));
 
 const [matrixPath, fixturesRoot, artifactsRoot, outPath] = process.argv.slice(2);
+const { byId: authorityById } = loadAuthorityDecisions();
 const matrix = JSON.parse(fs.readFileSync(matrixPath, 'utf8'));
 const targetRef = matrix.target_ref || 'unknown';
 const rows = Array.isArray(matrix.rows) ? matrix.rows : [];
@@ -238,6 +243,17 @@ for (const row of corpusRows) {
   releaseBlockers.push(...row.diff_findings.filter((finding) => ['Bug', 'Unclassified'].includes(finding.class)));
 }
 
+const activeBlockers = [];
+const waivedBlockers = [];
+for (const blocker of releaseBlockers) {
+  const itemId = blocker.capability || blocker.item_id;
+  if (isResolvedAuthorityDecision(itemId, authorityById)) {
+    waivedBlockers.push(blocker);
+  } else {
+    activeBlockers.push(blocker);
+  }
+}
+
 const p0Total = corpusRows.filter((row) => row.level === 'P0').length;
 const p0FixtureCoverage = corpusRows.filter((row) => row.level === 'P0' && row.executable_fixture).length;
 const p0ArtifactCoverage = corpusRows.filter((row) => row.level === 'P0' && hasP0Artifacts(row)).length;
@@ -248,16 +264,18 @@ const p2RegistrationCoverage = corpusRows.filter((row) => row.level === 'P2' && 
 const fixtureCaseCount = p0FixtureCoverage;
 const scaleReady = corpusRows.length < 250 ? fixtureCaseCount === corpusRows.length : fixtureCaseCount >= 250;
 const perfectRefactorClaimAllowed =
-  releaseBlockers.length === 0 &&
+  activeBlockers.length === 0 &&
   p0Total === p0FixtureCoverage &&
   p0Total === p0ArtifactCoverage &&
   p1Total === p1SnapshotCoverage &&
   p2Total === p2RegistrationCoverage &&
   scaleReady;
 
+const goldenBurndownReady = activeBlockers.length === 0;
+
 writeJson(outPath, {
   schema: 'promptfoo-rs.current-latest-golden-corpus.v1',
-  status: perfectRefactorClaimAllowed ? 'ready' : 'ready-with-blockers',
+  status: goldenBurndownReady ? 'ready' : 'ready-with-blockers',
   target_ref: targetRef,
   fixture_case_count: fixtureCaseCount,
   p0_total: p0Total,
@@ -268,9 +286,13 @@ writeJson(outPath, {
   p2_total: p2Total,
   p2_registration_coverage_count: p2RegistrationCoverage,
   blocker_count: releaseBlockers.length,
+  active_blocker_count: activeBlockers.length,
+  waived_blocker_count: waivedBlockers.length,
   perfect_refactor_claim_allowed: perfectRefactorClaimAllowed,
   rows: corpusRows,
   release_blockers: releaseBlockers,
+  active_blockers: activeBlockers,
+  waived_blockers: waivedBlockers,
 });
 NODE
 

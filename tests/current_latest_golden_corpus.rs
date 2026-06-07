@@ -175,6 +175,41 @@ fn test_24_3_2_p0_bug_or_unclassified_diff_blocks_current_latest_claim() {
 }
 
 #[test]
+fn test_50_1_2_waived_authority_blockers_do_not_count_as_active_golden_blockers() {
+    /* TEST-50.1.2 */
+    let root = fixture_dir("waived-authority");
+    let matrix_path = root.join("current-latest-matrix.json");
+    write_matrix(
+        &matrix_path,
+        vec![matrix_row(
+            "config:src-globalconfig-accounts",
+            "config",
+            "P0",
+            "blocked",
+            "blocker",
+            "blocker:config:src-globalconfig-accounts",
+            Some("external cloud/account config authority blocker"),
+        )],
+    );
+
+    let report = build_current_latest_golden_corpus(
+        &matrix_path,
+        &root.join("fixtures"),
+        &root.join("artifacts"),
+    )
+    .expect("current latest corpus should build");
+    let blockers = evaluate_current_latest_release_blockers(&report);
+
+    assert_eq!(report.blocker_count, 1, "{report:#?}");
+    assert_eq!(report.active_blocker_count, 0, "{report:#?}");
+    assert_eq!(report.waived_blocker_count, 1, "{report:#?}");
+    assert!(report.perfect_refactor_claim_allowed, "{report:#?}");
+    assert!(blockers.is_empty(), "{blockers:#?}");
+
+    let _ = std::fs::remove_dir_all(root);
+}
+
+#[test]
 fn test_24_3_3_p1_and_p2_rows_have_snapshot_or_registration_evidence() {
     /* TEST-24.3.3 */
     let root = fixture_dir("p1-p2");
