@@ -1,46 +1,42 @@
 # Quickstart
 
-This guide builds `promptfoo-rs` from source and runs a minimal local eval through the local `promptfoo` command.
+This guide gets `promptfoo-rs` running a minimal eval in minutes. For v1, the recommended path is to download a prebuilt binary from [GitHub Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases); building from source is covered at the end under "Build from source".
 
-## 1. Prerequisites
+Examples below use `promptfoo` to mean the command on your `PATH` (from an extracted GitHub Release archive, or `target/release/promptfoo` after a source build). On Windows, use `promptfoo.exe`.
 
-You need:
+## 1. Install from GitHub Releases (recommended)
 
-- Rust stable toolchain
-- Node.js 20+, Corepack, and pnpm for `viewer/` and `npm/`
-- Git
-- On Windows, use Git for Windows Bash for S2V helper scripts: `C:\Program Files\Git\bin\bash.exe`
+Download the asset for your platform from [Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases) and verify `SHA256SUMS` for the same version.
 
-Check the toolchain:
+Linux x86_64:
 
 ```bash
-rustc --version
-cargo --version
-node --version
-corepack --version
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing
+tar -xzf promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz
+./promptfoo --help
 ```
 
-## 2. Clone and build
+macOS Apple Silicon (arm64):
 
 ```bash
-git clone https://github.com/tajiaoyezi/promptfoo-rs.git
-cd promptfoo-rs
-cargo build --workspace --release
-target/release/promptfoo --help
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-aarch64-apple-darwin.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/SHA256SUMS
+shasum -a 256 -c SHA256SUMS --ignore-missing
+tar -xzf promptfoo-rs-0.1.1-aarch64-apple-darwin.tar.gz
+./promptfoo --help
 ```
 
-Windows PowerShell:
+macOS Intel (x64): download `promptfoo-rs-0.1.1-x86_64-apple-darwin.tar.gz`, verify `SHA256SUMS`, extract, and add the directory to `PATH`.
 
-```powershell
-git clone https://github.com/tajiaoyezi/promptfoo-rs.git
-cd promptfoo-rs
-cargo build --workspace --release
-.\target\release\promptfoo.exe --help
-```
+Windows x86_64: download `promptfoo-rs-0.1.1-x86_64-pc-windows-msvc.zip`, extract, add the directory to `PATH`, and run `promptfoo.exe --help`.
 
 The preferred local entrypoint is `promptfoo --help`. The Rust release also keeps `promptfoo-rs`, and the npm wrapper's local bin shim supports `pf`.
 
-## 3. Run a minimal eval
+v1 publishes **GitHub Releases** only; `cargo install`, npm registry, Docker, Homebrew, and GitHub Marketplace Action are formally deferred for v1. See [docs/release.md](release.md).
+
+## 2. Run a minimal eval
 
 Create `promptfooconfig.yaml`:
 
@@ -60,27 +56,27 @@ tests:
 Run:
 
 ```bash
-target/release/promptfoo eval -c promptfooconfig.yaml
+promptfoo eval -c promptfooconfig.yaml
 ```
 
 Windows PowerShell:
 
 ```powershell
-.\target\release\promptfoo.exe eval -c promptfooconfig.yaml
+.\promptfoo.exe eval -c promptfooconfig.yaml
 ```
 
 The default output is a JSON envelope. A successful run should contain `status: "ok"` and `summary.total_cases: 1`.
 
-## 4. Write output files
+## 3. Write output files
 
 ```bash
-target/release/promptfoo eval -c promptfooconfig.yaml --output results.json
-target/release/promptfoo view .
+promptfoo eval -c promptfooconfig.yaml --output results.json
+promptfoo view .
 ```
 
 CI-facing output contracts include JSON, JSONL, JUnit, SARIF, CSV, and HTML; support is covered by `src/output/` and release-gate tests.
 
-## 5. Use env files and prompt files
+## 4. Use env files and prompt files
 
 Create `.env`:
 
@@ -109,7 +105,27 @@ tests:
 Run:
 
 ```bash
-target/release/promptfoo eval -c promptfooconfig.yaml --env-file .env
+promptfoo eval -c promptfooconfig.yaml --env-file .env
+```
+
+## 5. Build from source (developers)
+
+You need Rust stable, Node.js 20+, Corepack, pnpm (for `viewer/` and `npm/`), and Git. On Windows, use Git for Windows Bash for S2V helper scripts: `C:\Program Files\Git\bin\bash.exe`.
+
+```bash
+git clone https://github.com/tajiaoyezi/promptfoo-rs.git
+cd promptfoo-rs
+cargo build --workspace --release
+target/release/promptfoo --help
+```
+
+Windows PowerShell:
+
+```powershell
+git clone https://github.com/tajiaoyezi/promptfoo-rs.git
+cd promptfoo-rs
+cargo build --workspace --release
+.\target\release\promptfoo.exe --help
 ```
 
 ## 6. Common development checks

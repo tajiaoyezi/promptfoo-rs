@@ -1,46 +1,42 @@
 # Quickstart
 
-本指南用于把 `promptfoo-rs` 从源码构建起来，并通过本地 `promptfoo` 命令运行一个最小 eval。
+本指南帮助你在几分钟内安装 `promptfoo-rs` 并运行一个最小 eval。v1 推荐路径是从 [GitHub Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases) 下载预编译二进制；源码构建见文末「从源码构建」。
 
-## 1. 准备环境
+下文示例中的 `promptfoo` 表示已加入 `PATH` 的命令（GitHub Releases 解压目录，或源码构建的 `target/release/promptfoo`）。Windows 使用 `promptfoo.exe`。
 
-需要：
+## 1. 从 GitHub Releases 安装（推荐）
 
-- Rust stable toolchain
-- Node.js 20+、Corepack、pnpm，用于 `viewer/` 和 `npm/`
-- Git
-- Windows 用户运行 S2V helper 时使用 Git for Windows Bash：`C:\Program Files\Git\bin\bash.exe`
+在 [Releases](https://github.com/tajiaoyezi/promptfoo-rs/releases) 下载对应平台资产，并校验同版本的 `SHA256SUMS`。
 
-确认工具链：
+Linux x86_64：
 
 ```bash
-rustc --version
-cargo --version
-node --version
-corepack --version
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/SHA256SUMS
+sha256sum -c SHA256SUMS --ignore-missing
+tar -xzf promptfoo-rs-0.1.1-x86_64-unknown-linux-gnu.tar.gz
+./promptfoo --help
 ```
 
-## 2. 克隆和构建
+macOS Apple Silicon (arm64)：
 
 ```bash
-git clone https://github.com/tajiaoyezi/promptfoo-rs.git
-cd promptfoo-rs
-cargo build --workspace --release
-target/release/promptfoo --help
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/promptfoo-rs-0.1.1-aarch64-apple-darwin.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/SHA256SUMS
+shasum -a 256 -c SHA256SUMS --ignore-missing
+tar -xzf promptfoo-rs-0.1.1-aarch64-apple-darwin.tar.gz
+./promptfoo --help
 ```
 
-Windows PowerShell:
+macOS Intel (x64)：下载 `promptfoo-rs-0.1.1-x86_64-apple-darwin.tar.gz`，校验 `SHA256SUMS` 后解压并将目录加入 `PATH`。
 
-```powershell
-git clone https://github.com/tajiaoyezi/promptfoo-rs.git
-cd promptfoo-rs
-cargo build --workspace --release
-.\target\release\promptfoo.exe --help
-```
+Windows x86_64：下载 `promptfoo-rs-0.1.1-x86_64-pc-windows-msvc.zip`，解压后将目录加入 `PATH`，运行 `promptfoo.exe --help`。
 
 首选本地入口是 `promptfoo --help`。Rust release 同时保留 `promptfoo-rs`；npm wrapper 的本地 bin shim 还支持 `pf`。
 
-## 3. 运行最小 eval
+v1 已发布渠道仅为 **GitHub Releases**；`cargo install`、npm registry、Docker、Homebrew、GitHub Marketplace Action 在 v1 正式延期。详见 [docs/release.md](release.md)。
+
+## 2. 运行最小 eval
 
 创建 `promptfooconfig.yaml`：
 
@@ -60,27 +56,27 @@ tests:
 运行：
 
 ```bash
-target/release/promptfoo eval -c promptfooconfig.yaml
+promptfoo eval -c promptfooconfig.yaml
 ```
 
-Windows PowerShell:
+Windows PowerShell：
 
 ```powershell
-.\target\release\promptfoo.exe eval -c promptfooconfig.yaml
+.\promptfoo.exe eval -c promptfooconfig.yaml
 ```
 
 默认输出为 JSON envelope。成功时应看到 `status: "ok"` 和 `summary.total_cases: 1`。
 
-## 4. 写入输出文件
+## 3. 写入输出文件
 
 ```bash
-target/release/promptfoo eval -c promptfooconfig.yaml --output results.json
-target/release/promptfoo view .
+promptfoo eval -c promptfooconfig.yaml --output results.json
+promptfoo view .
 ```
 
 可用于 CI 的输出契约包括 JSON、JSONL、JUnit、SARIF、CSV 和 HTML；具体支持由 `src/output/` 和 release gate 测试覆盖。
 
-## 5. 使用 env 文件和 prompt 文件
+## 4. 使用 env 文件和 prompt 文件
 
 创建 `.env`：
 
@@ -109,7 +105,27 @@ tests:
 运行：
 
 ```bash
-target/release/promptfoo eval -c promptfooconfig.yaml --env-file .env
+promptfoo eval -c promptfooconfig.yaml --env-file .env
+```
+
+## 5. 从源码构建（开发者）
+
+需要 Rust stable、Node.js 20+、Corepack、pnpm（用于 `viewer/` 和 `npm/`）和 Git。Windows 用户运行 S2V helper 时使用 Git for Windows Bash：`C:\Program Files\Git\bin\bash.exe`。
+
+```bash
+git clone https://github.com/tajiaoyezi/promptfoo-rs.git
+cd promptfoo-rs
+cargo build --workspace --release
+target/release/promptfoo --help
+```
+
+Windows PowerShell：
+
+```powershell
+git clone https://github.com/tajiaoyezi/promptfoo-rs.git
+cd promptfoo-rs
+cargo build --workspace --release
+.\target\release\promptfoo.exe --help
 ```
 
 ## 6. 常用开发验证
