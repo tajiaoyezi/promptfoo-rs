@@ -162,7 +162,6 @@ fn test_17_5_6_release_workflow_builds_macos_archives() {
     );
 }
 
-
 #[test]
 fn test_17_5_7_release_workflow_builds_linux_arm64_archives() {
     /* TEST-17.5.7 */
