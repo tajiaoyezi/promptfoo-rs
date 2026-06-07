@@ -33,7 +33,7 @@ promptfoo-rs 关注这些场景：
 | 本地构建和测试 | 可用。`install`、`lint`、`typecheck`、`unit-test`、`integration`、`e2e`、`coverage`、`build`、`runtime-smoke` 已通过。 |
 | 已声明范围内的正常使用 | 可用。CLI、核心 eval、输出、viewer 数据契约、Node wrapper smoke 和 compatibility gates 均有测试覆盖。 |
 | promptfoo 当前最新版完整替代 | 尚未声明。current-latest gate 仍保留 blocker，`perfect_refactor_claim_allowed=false`。 |
-| 公开稳定发布（v1 范围） | **GitHub Releases**（v0.1.0 Linux/Windows；v0.1.1 起含 macOS）。Cargo、npm、Docker、Homebrew、GitHub Action 在 v1 正式延期；聚合 `publication_ready` 仍为 false。 |
+| 公开稳定发布（v1 范围） | **GitHub Releases**（当前 **v0.1.1**：Linux / Windows / macOS）。Cargo、npm、Docker、Homebrew、GitHub Action 在 v1 正式延期；聚合 `publication_ready` 仍为 false。 |
 
 允许的质量表述是：在已声明 gate 下，没有已知 release-blocking defect。项目不会承诺“无任何潜在 bug”或“完整 live-provider parity”，除非对应 gate 和外部证据闭合。
 
@@ -122,7 +122,7 @@ Windows x86_64：下载 `promptfoo-rs-0.1.1-x86_64-pc-windows-msvc.zip`，解压
 
 ### 发布与安装渠道状态
 
-v1 已发布：**GitHub Releases**（见上）。其余渠道（`cargo install`、npm registry、Docker registry、Homebrew、GitHub Marketplace Action）在 v1 正式延期；仓库对这些渠道只声明 `local build/package smoke` 与 gate 文档，真实 `public registry publication` 仍 blocked。详见 [docs/release.md](docs/release.md) 与 [docs/release-notes/v0.1.0.md](docs/release-notes/v0.1.0.md)。
+v1 已发布：**GitHub Releases**（见上）。其余渠道（`cargo install`、npm registry、Docker registry、Homebrew、GitHub Marketplace Action）在 v1 正式延期；仓库对这些渠道只声明 `local build/package smoke` 与 gate 文档，真实 `public registry publication` 仍 blocked。详见 [docs/release.md](docs/release.md) 与 [docs/release-notes/v0.1.1.md](docs/release-notes/v0.1.1.md)。
 
 ## CLI 能力
 

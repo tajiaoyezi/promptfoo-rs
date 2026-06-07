@@ -31,7 +31,7 @@ promptfoo-rs is designed for:
 | Local build and tests | Ready. `install`, `lint`, `typecheck`, `unit-test`, `integration`, `e2e`, `coverage`, `build`, and `runtime-smoke` pass. |
 | Normal use within implemented scope | Ready. CLI, core eval, output formats, viewer data contracts, Node wrapper smoke, and compatibility gates are covered. |
 | Full replacement for current latest promptfoo | Not claimed. Current-latest gates still keep blockers and `perfect_refactor_claim_allowed=false`. |
-| Public stable publication (v1 scope) | **GitHub Releases** (v0.1.0 Linux/Windows; macOS from v0.1.1). Cargo, npm, Docker, Homebrew, and GitHub Action are formally deferred for v1; aggregate `publication_ready` remains false. |
+| Public stable publication (v1 scope) | **GitHub Releases** (current **v0.1.1**: Linux, Windows, macOS). Cargo, npm, Docker, Homebrew, and GitHub Action are formally deferred for v1; aggregate `publication_ready` remains false. |
 
 The strongest supported wording is: no known release-blocking defects under the declared gates. The project does not claim bug-free behavior or complete live-provider parity without matching gate evidence.
 
@@ -120,7 +120,7 @@ Windows x86_64: download `promptfoo-rs-0.1.1-x86_64-pc-windows-msvc.zip`, extrac
 
 ### Release and install channel status
 
-v1 published channel: **GitHub Releases** (above). Other channels (`cargo install`, npm registry, Docker registry, Homebrew, GitHub Marketplace Action) are formally deferred for v1; the repo claims only `local build/package smoke` and gate documentation for those channels, and real `public registry publication` remains blocked. See [docs/release.md](docs/release.md) and [docs/release-notes/v0.1.0.md](docs/release-notes/v0.1.0.md).
+v1 published channel: **GitHub Releases** (above). Other channels (`cargo install`, npm registry, Docker registry, Homebrew, GitHub Marketplace Action) are formally deferred for v1; the repo claims only `local build/package smoke` and gate documentation for those channels, and real `public registry publication` remains blocked. See [docs/release.md](docs/release.md) and [docs/release-notes/v0.1.1.md](docs/release-notes/v0.1.1.md).
 
 ## CLI surface
 
