@@ -61,7 +61,7 @@ Maintainer policy: `docs/compatibility/v1-release-authority-policy.md`
 - **Deferred for v1 (formal waiver)**: Cargo, npm wrapper, Docker, Homebrew, GitHub Action.
 - **Brand/legal**: independent reimplementation wording required (`approval:legal-brand-independent-reimplementation-2026-06-06`).
 
-Current publication evidence (`docs/compatibility/publication-evidence.json`) records **github-releases** as `published` for tag `v0.1.2` (external URL + sha256). Five channels are **v1-deferred** (formal waiver, not active blockers). Phase 49 gate alignment sets `publication-evidence-gate.json` `v1_scope_ready=true` when the authorized channel is published and deferred channels document waiver boundaries. `perfect_refactor_claim_allowed` remains `false` until golden burndown closes.
+Current publication evidence (`docs/compatibility/publication-evidence.json`) records **github-releases** as `published` for the latest shipped tag (see manifest `artifact_url`; backfill after each release). Five channels are **v1-deferred** (formal waiver, not active blockers). Phase 49 gate alignment sets `publication-evidence-gate.json` `v1_scope_ready=true` when the authorized channel is published and deferred channels document waiver boundaries. `perfect_refactor_claim_allowed` remains `false` until golden burndown closes.
 
 ## v0.1.0 GitHub Release (shipped 2026-06-06)
 
@@ -76,7 +76,13 @@ Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.1
 Adds macOS `aarch64-apple-darwin` and `x86_64-apple-darwin` archives to the release build matrix alongside existing Linux and Windows artifacts. Tag `v0.1.1` publishes all four platform archives plus combined `SHA256SUMS`. Publication evidence backfilled in `docs/compatibility/publication-evidence.json` (PR #15).
 
 
-## v0.1.2 GitHub Release (current; shipped 2026-06-07)
+## v0.1.3 GitHub Release (current; pending tag)
+
+Release notes: `docs/release-notes/v0.1.3.md`
+
+Ships Phase 49 product-baseline v1 gate alignment (ADR-012 freeze at `promptfoo@0.121.15`, runtime consumption of v1 authority/publication waivers). Same five-platform archive matrix as v0.1.2. After `git push origin v0.1.3`, backfill `docs/compatibility/publication-evidence.json` with the published asset URL and `SHA256SUMS` digest.
+
+## v0.1.2 GitHub Release (shipped 2026-06-07)
 
 Live release: https://github.com/tajiaoyezi/promptfoo-rs/releases/tag/v0.1.2
 
