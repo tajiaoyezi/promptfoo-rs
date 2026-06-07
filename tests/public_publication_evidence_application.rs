@@ -70,7 +70,7 @@ fn test_44_2_3_v1_defers_non_github_channels_while_github_awaits_real_release() 
         github["artifact_url"]
             .as_str()
             .unwrap_or_default()
-            .starts_with("https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.0/"),
+            .starts_with("https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.1/"),
         "{github:#?}"
     );
     assert!(
