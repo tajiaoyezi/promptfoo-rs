@@ -1,9 +1,10 @@
 # promptfoo-rs Compatibility Matrix
 
 **Status**: Ready
-**Baseline**: promptfoo 0.121.13 + commit 4860e99
+**Baseline (Phase 1 harness)**: promptfoo 0.121.13 + commit 4860e99
+**Product baseline (ADR-012)**: promptfoo 0.121.15 — see `docs/compatibility/current-latest.lock.md`
 
-Readiness basis: PRD §Compatibility Matrix, PRD §Compatibility Harness Design, ADR-006, ADR-007, ADR-009. Task 1.2 owns executable validation and §10 completion notes before Phase 1 can be Done.
+Readiness basis: PRD §Compatibility Matrix, PRD §Product Independence Strategy, PRD §Compatibility Harness Design, ADR-006, ADR-007, ADR-009, ADR-012. Task 1.2 owns executable validation and §10 completion notes before Phase 1 can be Done. Product roadmap compatibility is measured against the Phase 48 frozen packet; upstream releases after the freeze are out of scope.
 
 | Capability | Level | Target Status | Verification | Owner | Notes / Gap Reason |
 |---|---|---|---|---|---|

@@ -8,7 +8,8 @@ Stable releases require:
 
 - Product compatibility baseline is frozen at `promptfoo@0.121.15` (Phase 48 lock in `docs/compatibility/current-latest.lock.md`; ADR-012). Historical Phase 1 baseline `0.121.13` in `docs/compatibility/baseline.lock.md` remains harness evidence. The project does not track promptfoo releases after the freeze.
 - `docs/compatibility/matrix.md` registers all P0/P1/P2 capability rows.
-- Task 6.2 golden diff release gate reports zero P0 bug or unclassified findings.
+- Task 6.2 golden diff release gate (Phase 1 `0.121.13` historical harness) reports zero P0 bug or unclassified findings.
+- Frozen product-baseline gates (`current-latest-*` artifacts from Phase 48 lock; Task 24.x / `runtime-smoke`) report `ready` or explicitly classified blockers on the `0.121.15` packet. `perfect_refactor_claim_allowed` is independent of Task 6.2 and remains fail-closed until burndown and authority gates close.
 - Task 12.3 full compatibility gate writes `compatibility/artifacts/release-gate/summary.json` or an equivalent CI artifact before stable build/upload.
 - Task specs for implemented release-surface work have Done status and completion notes.
 

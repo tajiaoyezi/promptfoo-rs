@@ -14,9 +14,9 @@
 
 ## Vision｜愿景
 
-`promptfoo-rs` 要在 3 个月内成为 `promptfoo 0.121.13` 的可审计 Rust reimplementation：现有 promptfoo 用户可以拿已有 `promptfooconfig.yaml/json`、CI 命令、输出消费脚本和核心 redteam 工作流，在默认不依赖 Node/npm/node_modules 的 Rust 单二进制路径上运行；所有兼容能力、缺口、差异和发布阻断项都通过 compatibility matrix 与 upstream golden diff 追踪。
+`promptfoo-rs` 要在独立产品线 roadmap 上成为 **`promptfoo@0.121.15`（Phase 48 产品兼容基线，ADR-012）** 的可审计 Rust reimplementation：现有 promptfoo 用户可以拿已有 `promptfooconfig.yaml/json`、CI 命令、输出消费脚本和核心 redteam 工作流，在默认不依赖 Node/npm/node_modules 的 Rust 单二进制路径上运行；所有兼容能力、缺口、差异和发布阻断项都通过 compatibility matrix 与 golden diff 追踪。Phase 1 的 `promptfoo@0.121.13` 仍作为历史 harness 证据保留。
 
-1.0 不是轻量替代品，也不是重新设计 LLM eval DSL。它的价值来自两个约束同时成立：第一，兼容 promptfoo 0.121.13 已文档化能力域；第二，把默认执行路径收敛到 Rust-native core、可复现 fixture、可审计输出和明确的脚本执行授权边界。
+1.0 不是轻量替代品，也不是重新设计 LLM eval DSL。它的价值来自两个约束同时成立：第一，在冻结产品基线 `promptfoo@0.121.15` 已文档化能力域上推进兼容（不跟踪 upstream 后续发布）；第二，把默认执行路径收敛到 Rust-native core、可复现 fixture、可审计输出和明确的脚本执行授权边界。
 
 ---
 
@@ -64,7 +64,7 @@ AI eval、LLM regression testing、redteam、MCP、Agent 安全测试正在变�
 
 > ≤ 5 条。多于 5 条说明范围还没收敛 — 拆 v1.0 / v1.1 / v2.0。
 
-1. **promptfoo-compatible CLI/runtime**：覆盖 promptfoo 0.121.13 的全部已文档化能力域，1.0 至少跑通 `eval`、`view`、`cache`、`redteam`、`mcp`、`code-scans`、`scan-model`、`import/export` 的兼容闭环与常用 flags。
+1. **promptfoo-compatible CLI/runtime**：覆盖产品兼容基线 `promptfoo@0.121.15` 的全部已文档化能力域，1.0 至少跑通 `eval`、`view`、`cache`、`redteam`、`mcp`、`code-scans`、`scan-model`、`import/export` 的兼容闭环与常用 flags。
 2. **compatibility harness**：冻结 upstream baseline 后，对同一 fixture 分别运行 promptfoo upstream 与 `promptfoo-rs`，在 mock provider 下做 golden diff；P0 能力不通过不得发布 stable。
 3. **Rust-native eval core**：配置解析、eval 调度、provider 调用、assertion 执行、cache/resume、retry/backoff、限速、流式结果写入默认由 Rust core 承担。
 4. **provider/assertion/script bridge**：OpenAI-compatible、HTTP、Ollama、Anthropic 作为 P0 provider；JS/TS、Python、Shell custom provider/assertion 通过显式授权 bridge 保留兼容。
@@ -72,7 +72,7 @@ AI eval、LLM regression testing、redteam、MCP、Agent 安全测试正在变�
 
 **明确不做（Out of Scope，至少列 3 项）**：
 - 不做 promptfoo cloud/share SaaS 的替代服务；任何 share/cloud 相关 API 只登记兼容边界、错误行为和品牌风险，不把数据上传作为默认能力。
-- 不承诺所有长尾 provider 都有 Rust 原生实现；但 1.0 必须在兼容矩阵中登记所有 promptfoo 0.121.13 已文档化 provider/assertion/redteam/plugin/CLI 能力，并标明 `native` / `bridge` / `unsupported` / `later`。
+- 不承诺所有长尾 provider 都有 Rust 原生实现；但 1.0 必须在兼容矩阵中登记产品基线 `0.121.15` 对应的全部已文档化 provider/assertion/redteam/plugin/CLI 能力，并标明 `native` / `bridge` / `unsupported` / `later`。
 - 不默认执行 JS/Python/Shell/Ruby custom code；脚本扩展必须通过 `--allow-scripts` 或配置显式开启。
 - 不重新设计 promptfoo 配置格式、assertion DSL、输出格式或 CLI 语义；新增 Rust-specific 选项不得破坏 promptfoo-compatible 默认路径。
 - 不把非稳定 Web UI 像素级还原作为 1.0 gate；1.0 关注结果可读、筛选、导出和与稳定结果 schema 的一致性。
@@ -132,16 +132,18 @@ AI eval、LLM regression testing、redteam、MCP、Agent 安全测试正在变�
 - **平台**：Linux x64/arm64、macOS x64/arm64、Windows x64、Docker、GitHub Actions CI。
 - **性能**：CLI 冷启动 < 300ms，不含网络模型调用；1000 条 mock eval case 的本地调度与 assertion 执行 < 5s；内存基线 < 100MB，不含 Web viewer 大型结果加载；大型结果使用 JSONL/SQLite 流式写入。
 - **安全**：默认 local-first，不上传 prompts、vars、outputs；默认不执行 custom scripts；API key/token/env/provider headers/share payload 日志必须 redaction；threat model 覆盖配置任意代码执行、provider 请求泄露、CI secret 泄露、share payload 泄露、插件供应链风险。
-- **兼容性**：1.0 目标是覆盖 promptfoo 0.121.13 的全部已文档化能力域，并建立完整兼容矩阵。provider/assertion/redteam/plugin 按 P0/P1/P2 标注兼容等级：P0 必须可运行并通过 golden diff；P1 必须有协议、请求、输出快照测试；P2 至少登记为 known gap，不能沉默遗漏。
+- **兼容性**：产品 roadmap 以 **`promptfoo@0.121.15`（ADR-012）** 为兼容目标，覆盖其全部已文档化能力域并建立完整兼容矩阵。Phase 1 `0.121.13` baseline 为历史 harness 证据。provider/assertion/redteam/plugin 按 P0/P1/P2 标注兼容等级：P0 必须可运行并通过 golden diff；P1 必须有协议、请求、输出快照测试；P2 至少登记为 known gap，不能沉默遗漏。不因 upstream 后续发布自动开 drift refresh phase。
 - **发布**：GitHub Releases 二进制、Homebrew tap、`cargo install`、Docker image、npm wrapper 包、GitHub Action 示例。稳定版发布必须通过 compatibility release gate；失败时只能发 prerelease 或 nightly。
 
 ---
 
 ## Upstream Baseline Freeze Strategy｜上游基线冻结策略
 
-1. **候选冻结基线**：`promptfoo 0.121.13 + commit 4860e99`。
+> **Roadmap 状态（2026-06-07）**：本节记录 **Phase 1 历史 harness** 冻结流程。产品兼容基线已由 §Product Independence Strategy 与 ADR-012 定为 Phase 48 `promptfoo@0.121.15`；**不**因 upstream 新版本自动纳入或开 drift refresh phase。
+
+1. **候选冻结基线**：`promptfoo 0.121.13 + commit 4860e99`（Phase 1 harness；产品基线见 `current-latest.lock.md`）。
 2. **最终冻结条件**：以 tag、commit、npm artifact、container artifact 四者可追溯校验为准。四者必须写入 `docs/compatibility/baseline.lock.md` 或等价 lock artifact，包含版本号、commit SHA、npm tarball integrity、container digest、采集时间、采集命令和来源 URL。
-3. **不可变引用**：PRD 和 phase/task specs 只引用冻结基线，不引用 `latest`。发现 upstream 新版本时，只能通过新 PRD 或兼容矩阵变更流程纳入。
+3. **不可变引用**：Phase 1 lock 与 Phase 48 product baseline lock 均为不可变证据，不引用浮动 `latest`。产品 roadmap **不**因发现 upstream 新版本而自动 refresh；重开 upstream 跟踪须 superseding ADR 并显式调度 target-refresh task。
 4. **证据来源**：GitHub Releases、npm package artifact、GitHub Container Package、upstream repository tag/commit。任一来源缺失或不一致时，Phase 1 不得完成。
 5. **差异政策**：所有与 upstream 不一致的行为必须标为 `matching`、`intentional-difference`、`unsupported`、`later`、`upstream-ambiguous` 或 `bug`；P0 的 `bug` / 未分类差异阻断 stable release。
 
@@ -194,7 +196,7 @@ Phase 1 的 `promptfoo@0.121.13` frozen baseline 仍作为历史 harness 与 gol
 - 可发布声明必须改写为：“在声明的 S2V verification gates、current-latest golden diff、source inventory coverage、stress/regression/property tests、external authority 和 publication evidence 下，无已知 release-blocking 缺陷。”
 - 若真实 provider credentials、账号、私有服务、法律/品牌授权或发布渠道证据缺失，则必须继续显示为 blocker 或 formal waiver，不能用 mock/recorded fixtures 伪装成 live parity。
 
-依据：用户 2026-06-01 澄清、ADR-007、ADR-009、ADR-011。
+依据：用户 2026-06-01 澄清、ADR-007、ADR-009、ADR-011、ADR-012（路线图废止）。
 
 **2026-06-04 后续 S2V 规划**：
 - Phase 42 继续处理 live GitHub default branch drift：当前观察显示 npm latest / GitHub latest release 仍为 `0.121.14` / `7a48c5fce614bee617efbb3b7fc93d404c75b628`，但 GitHub default branch HEAD 已移动到 `2ca16c59b64e0afca10533de0f817c0d24eba20a`；该 phase 只刷新 immutable target packet 与 downstream gates，不解除 external authority 或 publication blockers。
@@ -245,14 +247,16 @@ Phase 1 的 `promptfoo@0.121.13` frozen baseline 仍作为历史 harness 与 gol
 | Node API wrapper | P1 | bridge | JS API contract snapshot 与 Rust core 行为一致性测试 | 防止 wrapper/core 漂移 |
 | promptfoo cloud/share | P2 | unsupported/later | 能力登记、错误行为、品牌说明、无上传测试 | 1.0 不提供 SaaS |
 
-Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出 promptfoo 0.121.13 已文档化 provider、assertion、redteam plugin/strategy、CLI command/flag、output format 和 config feature。PRD 级矩阵定义覆盖政策；完整项级矩阵是 release gate 输入。
+Phase 1 必须生成更细粒度的 compatibility matrix artifact，逐项列出 promptfoo 已文档化 provider、assertion、redteam plugin/strategy、CLI command/flag、output format 和 config feature（初始以 Phase 1 `0.121.13` harness 提取；产品 roadmap 以 Phase 48 `0.121.15` 为权威基线）。PRD 级矩阵定义覆盖政策；完整项级矩阵是 release gate 输入。
 
 ---
 
 ## Compatibility Harness Design｜兼容性测试设计
 
 1. **Fixture source**：从 upstream examples/docs、最小手写 fixtures、回归 issue fixtures 和用户提供真实配置裁剪样本组成。每个 fixture 必须标注能力域、P0/P1/P2、是否使用 mock provider、是否需要 script bridge。
-2. **Execution model**：harness 固定执行 `upstream promptfoo@0.121.13` 与当前 `promptfoo-rs`；同一输入目录、同一 env fixture、同一 mock provider 响应、同一时间/随机数 seed。
+2. **Execution model**：
+   - **历史 harness（Phase 1）**：固定执行 `upstream promptfoo@0.121.13` 与当前 `promptfoo-rs`；同一输入目录、同一 env fixture、同一 mock provider 响应、同一时间/随机数 seed。
+   - **产品基线 harness（ADR-012）**：冻结 packet `promptfoo@0.121.15` 通过 `current-latest-*` release gates、`runtime-smoke` 与 golden corpus 验证；不随 live npm/HEAD 刷新。
 3. **Normalization**：对时间戳、绝对路径、随机 ID、latency、平台换行、对象 key 顺序和非确定性 model output 做归一化；归一化规则本身需要 snapshot。
 4. **Diff classes**：`matching`、`intentional-difference`、`unsupported`、`later`、`upstream-ambiguous`、`bug`。P0 中 `bug`、未分类差异和缺 fixture 都是 release blocker。
 5. **Artifacts**：每次运行输出 upstream artifact、rs artifact、normalized artifact、diff report、matrix coverage report 和 release gate summary。
@@ -447,9 +451,9 @@ This addendum is grounded in PRD §Compatibility Matrix / §Release constraints,
 ## Success Metrics｜成功指标
 
 **主要指标**（Primary，≥ 1 个，必须可测量）：
-- **P0 兼容 release gate**：至少 50 个核心 fixtures 在 mock provider 下 upstream promptfoo 0.121.13 与 `promptfoo-rs` 输出一致或差异可解释；P0 未分类差异数为 0。
+- **P0 兼容 release gate**：产品基线 `promptfoo@0.121.15` 的 current-latest golden corpus 在 mock provider 下与 `promptfoo-rs` 输出一致或差异可解释；P0 未分类差异数为 0。Phase 1 `0.121.13` harness 仍作为历史 smoke 证据。
 - **常见 eval 可迁移**：`promptfoo-rs eval -c promptfooconfig.yaml` 能运行覆盖 prompts、vars、tests、providers、assertions、cache、resume、retry 和 output 的常见配置。
-- **兼容矩阵完整性**：promptfoo 0.121.13 已文档化 provider/assertion/redteam/plugin/CLI/output/config 能力 100% 登记，均有 P0/P1/P2、状态、验证方式和 owner。
+- **兼容矩阵完整性**：产品基线 `0.121.15` 已文档化 provider/assertion/redteam/plugin/CLI/output/config 能力 100% 登记，均有 P0/P1/P2、状态、验证方式和 owner。
 
 **次要指标**（Secondary，≥ 2 个）：
 - **Provider P0**：OpenAI-compatible、HTTP、Ollama、Anthropic 4 类 provider 可运行并有 request/response snapshot。

@@ -88,7 +88,7 @@ The current-latest target lock must record npm latest `0.121.15` / gitHead `4805
 
 ## 8. Risks
 
-- Upstream may move again while this task is running; this task records the observed immutable packet and future drift must enter a new S2V task.
+- Upstream may move again while this task is running; this task records the observed immutable packet. **Post-freeze (ADR-012, 2026-06-07)**: drift after this observation does **not** trigger a default S2V target-refresh task; reopen upstream tracking only via superseding ADR.
 - Runtime smoke can reveal new current-latest source rows; those must be handled as real evidence, not deleted from matrices.
 - Updating the target lock is not enough for a perfect-refactor claim; external authority, publication, and current-target policy still control completion.
 
@@ -135,7 +135,7 @@ The current-latest target lock must record npm latest `0.121.15` / gitHead `4805
   - build: PASS - cargo build --release
   - runtime-smoke: PASS - regenerated release gates with `status=locked-with-drift`, `github.default_branch_head=c54a30668ad8319d76c20ae96e6680ad6c51a2c6`, source inventory `status=ready`, matrix `status=ready`, `unclassified_rows=[]`, evaluator runtime and in-memory store fixture evidence native, current-latest golden `blocker_count=24`, quality `blocker_count=4`, release candidate `publication_ready=credential-blocked`, `perfect_refactor_claim_allowed=false`, unblock packet `required_user_decision_count=31`
 - **剩余风险 / 未做项**：
-  - GitHub default branch and npm latest can drift again after this observed lock; future drift must enter a new S2V target-refresh task.
+  - GitHub default branch and npm latest can drift after this observed lock; per ADR-012 this packet is the final product baseline and default drift refresh (e.g. Phase 49) is out of scope unless a superseding ADR reopens upstream tracking.
   - Target refresh does not waive external authority, publication, or bug-free claim boundaries.
 - **下游 task 影响**：
   - Downstream current-latest gates now consume `git:https://github.com/promptfoo/promptfoo.git#c54a30668ad8319d76c20ae96e6680ad6c51a2c6` with npm/release evidence `promptfoo@0.121.15`.

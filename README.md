@@ -157,8 +157,8 @@ v1 已发布：**GitHub Releases**（见上）。其余渠道（`cargo install`�
 权威兼容性文件：
 
 - [docs/compatibility/matrix.md](docs/compatibility/matrix.md)：P0/P1/P2 兼容矩阵。
-- [docs/compatibility/baseline.lock.md](docs/compatibility/baseline.lock.md)：冻结 baseline。
-- [docs/compatibility/current-latest.lock.md](docs/compatibility/current-latest.lock.md)：当前 latest 目标锁。
+- [docs/compatibility/baseline.lock.md](docs/compatibility/baseline.lock.md)：Phase 1 历史 harness 基线（`0.121.13`）。
+- [docs/compatibility/current-latest.lock.md](docs/compatibility/current-latest.lock.md)：产品兼容基线锁（`promptfoo@0.121.15`，ADR-012 最终冻结；非 live upstream 订阅）。
 - [docs/release.md](docs/release.md)：release gate、publication authority 和 perfect-refactor claim contract。
 
 兼容性策略：

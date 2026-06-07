@@ -154,9 +154,9 @@ The CLI currently exposes:
 
 Authoritative compatibility files:
 
-- [docs/compatibility/matrix.md](docs/compatibility/matrix.md)
-- [docs/compatibility/baseline.lock.md](docs/compatibility/baseline.lock.md)
-- [docs/compatibility/current-latest.lock.md](docs/compatibility/current-latest.lock.md)
+- [docs/compatibility/matrix.md](docs/compatibility/matrix.md): P0/P1/P2 compatibility matrix
+- [docs/compatibility/baseline.lock.md](docs/compatibility/baseline.lock.md): Phase 1 historical harness baseline (`0.121.13`)
+- [docs/compatibility/current-latest.lock.md](docs/compatibility/current-latest.lock.md): frozen product compatibility baseline (`promptfoo@0.121.15`, ADR-012; not a live upstream subscription)
 - [docs/release.md](docs/release.md)
 
 Compatibility policy:
