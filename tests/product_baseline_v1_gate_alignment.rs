@@ -96,7 +96,6 @@ console.log('ok');
     );
 }
 
-
 #[test]
 fn test_49_2_2_gate_scripts_load_lib_from_repo_root() {
     /* TEST-49.2.2 */
@@ -105,7 +104,10 @@ fn test_49_2_2_gate_scripts_load_lib_from_repo_root() {
         .current_dir(".")
         .status()
         .expect("bash should run policy script");
-    assert!(status.success(), "current-upstream-policy.sh must run from repo root");
+    assert!(
+        status.success(),
+        "current-upstream-policy.sh must run from repo root"
+    );
 
     let policy: Value = serde_json::from_str(
         &std::fs::read_to_string("target/release-gates/current-upstream-policy.json")

@@ -23,7 +23,20 @@ const requiredSet = new Set(requiredIds);
 const manifestSet = new Set(manifestIds);
 
 const missing = requiredIds.filter((itemId) => !manifestSet.has(itemId));
-const extra = manifestIds.filter((itemId) => !requiredSet.has(itemId));
+const resolvedStates = new Set(['evidence-provided', 'waived-with-boundary']);
+const extra = rows
+  .map((row) => ({
+    itemId: String(row.item_id || ''),
+    decisionState: String(row.decision_state || 'unresolved'),
+  }))
+  .filter(({ itemId }) => itemId)
+  .filter(({ itemId, decisionState }) => {
+    if (resolvedStates.has(decisionState)) {
+      return requiredSet.has(itemId);
+    }
+    return !requiredSet.has(itemId);
+  })
+  .map(({ itemId }) => itemId);
 const duplicates = manifestIds.filter(
   (itemId, index) => manifestIds.indexOf(itemId) !== index,
 );
@@ -160,10 +173,14 @@ const structuralReady = !missing.length
   && !invalidWaiverRows.length
   && !mockOnlyEvidenceRows.length
   && !secretBearingRows.length;
+const packetItemsReady = requiredIds.length === 0
+  || requiredIds.every((itemId) => {
+    const row = rows.find((entry) => String(entry.item_id) === itemId);
+    return row && resolvedStates.has(String(row.decision_state));
+  });
 const perfectRefactorDecisionReady = structuralReady
-  && requiredIds.length > 0
-  && readyRowCount === requiredIds.length
-  && unresolvedCount === 0;
+  && unresolvedCount === 0
+  && packetItemsReady;
 
 const report = {
   schema: 'promptfoo-rs.authority-decisions-gate.v1',

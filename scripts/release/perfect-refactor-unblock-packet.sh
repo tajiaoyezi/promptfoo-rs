@@ -34,8 +34,12 @@ const currentLatestGolden = readOptional('current-latest-golden-corpus.json');
 const currentLatestMatrix = readOptional('current-latest-matrix.json');
 const currentLatestQuality = readOptional('current-latest-quality.json');
 const currentLatestTarget = readOptional('current-latest-target.json');
-const { byId: authorityById } = loadAuthorityDecisions();
-const { byChannel: publicationByChannel } = loadPublicationEvidence();
+const authorityManifestPath =
+  process.env.AUTHORITY_DECISIONS_MANIFEST || 'docs/compatibility/authority-decisions.json';
+const publicationManifestPath =
+  process.env.PUBLICATION_EVIDENCE_MANIFEST || 'docs/compatibility/publication-evidence.json';
+const { byId: authorityById } = loadAuthorityDecisions(authorityManifestPath);
+const { byChannel: publicationByChannel } = loadPublicationEvidence(publicationManifestPath);
 
 function artifactFor(name) {
   return `target/release-gates/${name}`;
