@@ -47,6 +47,19 @@ For implementation tasks:
 
 Maintainers may work directly on `master` because the current collaboration tier is `solo`. External contributors should use a branch and open a pull request.
 
+## Issues and pull requests
+
+Use the structured templates so triage stays fast:
+
+- **Bug**: [Bug Report](.github/ISSUE_TEMPLATE/bug_report.yml) — include a minimal `promptfooconfig.yaml`, the exact command, and redacted output.
+- **Compatibility gap vs `promptfoo@0.121.15`**: [Compatibility Report](.github/ISSUE_TEMPLATE/compatibility_report.yml). Differences that exist only in promptfoo releases after the frozen baseline are out of scope (ADR-012).
+- **Feature idea**: [Feature Request](.github/ISSUE_TEMPLATE/feature_request.yml).
+- **Pull request**: follow the [PR template](.github/PULL_REQUEST_TEMPLATE.md) S2V checklist (RED before GREEN, verification keys run, completion notes backfilled, task status flipped only after verification passes).
+- **Usage questions**: see [SUPPORT.md](SUPPORT.md).
+- **Security vulnerabilities**: do not open a public issue; use a [GitHub Security Advisory](https://github.com/tajiaoyezi/promptfoo-rs/security/advisories/new) (see [SECURITY.md](SECURITY.md)).
+
+Never commit secrets (provider API keys, tokens, account or registry credentials). See [PRIVACY.md](PRIVACY.md) for the local-first / no-upload data posture.
+
 ## Verification
 
 Common checks:

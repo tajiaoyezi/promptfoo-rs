@@ -14,7 +14,7 @@ Current status: **v0.1.3** ships on [GitHub Releases](https://github.com/tajiaoy
 
 **Product strategy (2026-06-07)**: promptfoo-rs is a **one-time** Rust reimplementation of promptfoo. The compatibility baseline is **frozen at `promptfoo@0.121.15`** (Phase 48 observation packet; see ADR-012). This is an **independent product line** that **does not** track new promptfoo releases or GitHub HEAD. Full parity on the frozen baseline and perfect-refactor completion are not claimed yet.
 
-[Quickstart](docs/QUICKSTART.en.md) | [Project Overview](docs/PROJECT-OVERVIEW.md) | [Architecture](docs/architecture.md) | [Release Boundary](docs/release.md) | [Contributing](CONTRIBUTING.md)
+[Quickstart](docs/QUICKSTART.en.md) | [Project Overview](docs/PROJECT-OVERVIEW.md) | [Architecture](docs/architecture.md) | [Release Boundary](docs/release.md) | [Contributing](CONTRIBUTING.md) | [Support](SUPPORT.md) | [Privacy](PRIVACY.md)
 
 ## What this project is
 
@@ -99,20 +99,20 @@ Recommended v1 install path: download platform assets from [Releases](https://gi
 Linux x86_64:
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.3-x86_64-unknown-linux-gnu.tar.gz
 curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
+tar -xzf promptfoo-rs-0.1.3-x86_64-unknown-linux-gnu.tar.gz
 ./promptfoo --help
 ```
 
 Linux arm64 (aarch64):
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.3-aarch64-unknown-linux-gnu.tar.gz
 curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+tar -xzf promptfoo-rs-0.1.3-aarch64-unknown-linux-gnu.tar.gz
 ./promptfoo --help
 ```
 
@@ -120,16 +120,16 @@ tar -xzf promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
 macOS Apple Silicon (arm64):
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.3-aarch64-apple-darwin.tar.gz
 curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/SHA256SUMS
 shasum -a 256 -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
+tar -xzf promptfoo-rs-0.1.3-aarch64-apple-darwin.tar.gz
 ./promptfoo --help
 ```
 
-macOS Intel (x64): download `promptfoo-rs-0.1.2-x86_64-apple-darwin.tar.gz`, verify `SHA256SUMS`, extract, and add the directory to `PATH`.
+macOS Intel (x64): download `promptfoo-rs-0.1.3-x86_64-apple-darwin.tar.gz`, verify `SHA256SUMS`, extract, and add the directory to `PATH`.
 
-Windows x86_64: download `promptfoo-rs-0.1.2-x86_64-pc-windows-msvc.zip`, extract it, add the folder to `PATH`, then run `promptfoo.exe --help`.
+Windows x86_64: download `promptfoo-rs-0.1.3-x86_64-pc-windows-msvc.zip`, extract it, add the folder to `PATH`, then run `promptfoo.exe --help`.
 
 ### Release and install channel status
 
@@ -166,6 +166,12 @@ Compatibility policy:
 - P2 behavior must be registered with an unsupported/later/bridge-backed reason.
 - Unclassified behavior, missing evidence, and real external authority gaps remain visible blockers.
 
+## Security and privacy
+
+- Local-first: no upload, no telemetry, no version check or auto-update by default; `share`/`auth`/cloud commands fail closed.
+- Network requests happen only when you explicitly configure a provider, using your own API keys under that provider's terms.
+- See [PRIVACY.md](PRIVACY.md) (privacy & telemetry) and [SECURITY.md](SECURITY.md) (security policy).
+
 ## Development and verification
 
 ```bash
@@ -198,12 +204,25 @@ Windows:
 | Understand release gates | [docs/release.md](docs/release.md) |
 | Read S2V project rules | [AGENTS.md](AGENTS.md), [docs/s2v-adapter.md](docs/s2v-adapter.md) |
 | Read the PRD and specs | [docs/prds/promptfoo-rs.prd.md](docs/prds/promptfoo-rs.prd.md), [docs/specs/](docs/specs/) |
+| Read architecture decisions | [docs/decisions/](docs/decisions/) |
 | Contribute | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Get help / ask questions | [SUPPORT.md](SUPPORT.md) |
+| Privacy and telemetry | [PRIVACY.md](PRIVACY.md) |
 | Report a vulnerability | [SECURITY.md](SECURITY.md) |
+| Code of conduct | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) |
 
 ## Contributing
 
 Code, docs, compatibility fixtures, bug reports, and audit feedback are welcome. Behavior changes must follow S2V: read `AGENTS.md`, `docs/s2v-adapter.md`, and the relevant task spec first, then proceed through RED -> GREEN -> verification -> completion notes.
+
+Intake channels:
+
+- **Bug**: use the [Bug Report template](.github/ISSUE_TEMPLATE/bug_report.yml).
+- **Compatibility gap vs the frozen baseline**: use the [Compatibility Report template](.github/ISSUE_TEMPLATE/compatibility_report.yml).
+- **Feature idea**: use the [Feature Request template](.github/ISSUE_TEMPLATE/feature_request.yml) (mind the ADR-012 frozen-baseline scope).
+- **Pull Request**: follow the S2V checklist in the [PR template](.github/PULL_REQUEST_TEMPLATE.md).
+- **Usage questions**: start with [SUPPORT.md](SUPPORT.md).
+- **Security vulnerabilities**: use a [GitHub Security Advisory](https://github.com/tajiaoyezi/promptfoo-rs/security/advisories/new), not a public issue.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
 

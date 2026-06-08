@@ -1,0 +1,19 @@
+# Issue 模板配置 · promptfoo-rs
+# 文档：https://docs.github.com/en/communities/using-templates-to-encourage-useful-issues-and-pull-requests/configuring-issue-templates-for-your-repository
+
+# 强制使用结构化模板（bug / feature / compatibility），禁止空白 issue
+blank_issues_enabled: false
+
+contact_links:
+  - name: 🔐 安全漏洞（Security Advisory）
+    url: https://github.com/tajiaoyezi/promptfoo-rs/security/advisories/new
+    about: 报告安全漏洞请用 GitHub Security Advisory（私密通道），不要开公开 issue。详见 SECURITY.md。
+  - name: ❓ 使用问题 / 求助（Support）
+    url: https://github.com/tajiaoyezi/promptfoo-rs/blob/master/SUPPORT.md
+    about: 安装、配置、CLI 用法等使用类问题，请先看 SUPPORT.md 与 docs/QUICKSTART.md。
+  - name: 💬 讨论（Discussions）
+    url: https://github.com/tajiaoyezi/promptfoo-rs/discussions
+    about: 开放式想法 / 架构疑问 → 先来 Discussions，不要直接开 issue。
+  - name: 📖 文档 / 兼容边界（Docs）
+    url: https://github.com/tajiaoyezi/promptfoo-rs/blob/master/docs/PROJECT-OVERVIEW.md
+    about: 项目概览、兼容矩阵、release gate、S2V 规格 → 先读文档再开 issue。

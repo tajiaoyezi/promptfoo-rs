@@ -14,7 +14,7 @@
 
 **产品战略（2026-06-07）**：promptfoo-rs 是对 promptfoo 的**一次性** Rust 重实现，兼容基线已冻结在 **`promptfoo@0.121.15`**（Phase 48 观测包，见 ADR-012）。项目是**独立产品线**，**不**跟踪 promptfoo 新版本或 GitHub HEAD。尚不宣称在冻结基线上完成全部兼容或 perfect-refactor。
 
-[快速上手](docs/QUICKSTART.md) | [项目概览](docs/PROJECT-OVERVIEW.md) | [架构](docs/architecture.md) | [发布边界](docs/release.md) | [贡献指南](CONTRIBUTING.md)
+[快速上手](docs/QUICKSTART.md) | [项目概览](docs/PROJECT-OVERVIEW.md) | [架构](docs/architecture.md) | [发布边界](docs/release.md) | [贡献指南](CONTRIBUTING.md) | [获取帮助](SUPPORT.md) | [隐私声明](PRIVACY.md)
 
 ## 项目定位
 
@@ -101,20 +101,20 @@ v1 推荐安装方式：在 [Releases](https://github.com/tajiaoyezi/promptfoo-r
 Linux x86_64：
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.3-x86_64-unknown-linux-gnu.tar.gz
 curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
+tar -xzf promptfoo-rs-0.1.3-x86_64-unknown-linux-gnu.tar.gz
 ./promptfoo --help
 ```
 
 Linux arm64 (aarch64)：
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.3-aarch64-unknown-linux-gnu.tar.gz
 curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+tar -xzf promptfoo-rs-0.1.3-aarch64-unknown-linux-gnu.tar.gz
 ./promptfoo --help
 ```
 
@@ -122,16 +122,16 @@ tar -xzf promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
 macOS Apple Silicon (arm64)：
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.3-aarch64-apple-darwin.tar.gz
 curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/SHA256SUMS
 shasum -a 256 -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
+tar -xzf promptfoo-rs-0.1.3-aarch64-apple-darwin.tar.gz
 ./promptfoo --help
 ```
 
-macOS Intel (x64)：下载 `promptfoo-rs-0.1.2-x86_64-apple-darwin.tar.gz`，校验 `SHA256SUMS` 后解压并将目录加入 `PATH`。
+macOS Intel (x64)：下载 `promptfoo-rs-0.1.3-x86_64-apple-darwin.tar.gz`，校验 `SHA256SUMS` 后解压并将目录加入 `PATH`。
 
-Windows x86_64：下载 `promptfoo-rs-0.1.2-x86_64-pc-windows-msvc.zip`，解压后将目录加入 `PATH`，运行 `promptfoo.exe --help`。
+Windows x86_64：下载 `promptfoo-rs-0.1.3-x86_64-pc-windows-msvc.zip`，解压后将目录加入 `PATH`，运行 `promptfoo.exe --help`。
 
 ### 发布与安装渠道状态
 
@@ -167,6 +167,12 @@ v1 已发布：**GitHub Releases**（见上）。其余渠道（`cargo install`�
 - P1：需要 snapshot 或协议证据。
 - P2：必须登记 unsupported/later/bridge-backed reason。
 - 未分类、缺证据或真实外部权限缺口不会被隐藏，也不会自动降级。
+
+## 安全与隐私
+
+- 本地优先：默认不上传、不回传遥测、不做版本检查或自动更新；`share`/`auth`/cloud 命令默认 fail-closed。
+- 网络请求仅在你显式配置 provider 时发生，使用你自己的 API key，受该 provider 条款约束。
+- 详见 [隐私与遥测声明 PRIVACY.md](PRIVACY.md) 与 [安全策略 SECURITY.md](SECURITY.md)。
 
 ## 开发与验证
 
@@ -204,11 +210,23 @@ Windows:
 | PRD 和规格 | [docs/prds/promptfoo-rs.prd.md](docs/prds/promptfoo-rs.prd.md)、[docs/specs/](docs/specs/) |
 | 架构决策 | [docs/decisions/](docs/decisions/) |
 | 贡献 | [CONTRIBUTING.md](CONTRIBUTING.md) |
+| 获取帮助 / 提问 | [SUPPORT.md](SUPPORT.md) |
+| 隐私与遥测 | [PRIVACY.md](PRIVACY.md) |
 | 安全报告 | [SECURITY.md](SECURITY.md) |
+| 行为准则 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) |
 
 ## 贡献
 
 欢迎贡献代码、文档、兼容性 fixture、bug 报告和审计意见。行为变更必须遵守 S2V：先读 `AGENTS.md`、`docs/s2v-adapter.md` 和相关 task spec，再按 RED -> GREEN -> verification -> completion notes 的顺序推进。
+
+提交入口：
+
+- **Bug**：用 [Bug Report 模板](.github/ISSUE_TEMPLATE/bug_report.yml)。
+- **与冻结基线的兼容差异**：用 [Compatibility Report 模板](.github/ISSUE_TEMPLATE/compatibility_report.yml)。
+- **功能建议**：用 [Feature Request 模板](.github/ISSUE_TEMPLATE/feature_request.yml)（注意 ADR-012 冻结基线范围）。
+- **Pull Request**：遵循 [PR 模板](.github/PULL_REQUEST_TEMPLATE.md) 的 S2V 检查项。
+- **使用问题**：先看 [SUPPORT.md](SUPPORT.md)。
+- **安全漏洞**：走 [GitHub Security Advisory](https://github.com/tajiaoyezi/promptfoo-rs/security/advisories/new)，不要开公开 issue。
 
 详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 

@@ -11,6 +11,7 @@
 | `compatibility/` | Fixture corpus, inventory files, matrix artifacts, and release-gate source evidence. |
 | `viewer/` | Local web viewer package. It consumes local result data; it is not a hosted SaaS viewer. |
 | `npm/` | Thin Node wrapper package boundary over the Rust core. |
+| `.github/` | Community-health files: issue forms (`ISSUE_TEMPLATE/`), `PULL_REQUEST_TEMPLATE.md`, `dependabot.yml`, and `CODEOWNERS`. |
 | `.github/workflows/` | Release verification workflow shape. It verifies and uploads evidence artifacts; it does not by itself prove public publication. |
 | `scripts/release/` | Lint, integration, e2e, coverage, runtime smoke, installability, and release-gate scripts. |
 | `docs/` | Architecture, release rules, compatibility policy, PRD, ADRs, audits, S2V adapter, phase specs, and task specs. |

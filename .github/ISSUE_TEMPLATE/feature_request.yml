@@ -1,0 +1,74 @@
+name: ✨ Feature Request · 功能建议
+description: 建议一个新功能 / 改进（请先确认在 ADR-012 冻结基线范围内）
+title: "[FEAT] "
+labels: ["feature", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **提交前请了解项目边界（ADR-012，2026-06-07）**：
+        - promptfoo-rs 是**独立产品线**，兼容基线**冻结**在 `promptfoo@0.121.15`，**不跟踪** upstream 新版本 / GitHub HEAD。
+          → "把基线升级到 promptfoo 最新版 / 跟进某个 upstream 新特性" 类建议默认 **out of scope**。
+        - "完成 perfect-refactor / 完整 upstream parity" 是被 release gate 显式 fail-closed 的 claim，不接受以此为目标的建议。
+        - 与已冻结基线的兼容性**差异**请改用 **Compatibility Report** 模板。
+
+  - type: input
+    id: summary
+    attributes:
+      label: 一句话描述功能
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 动机 / 用户场景
+      description: 谁在什么场景下需要？现在缺它会怎样？
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed
+    attributes:
+      label: 方案设想
+      description: 期望的 CLI 交互 / 配置字段 / 输出 / 行为；不必是最终方案
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 替代方案 / 现有绕路
+    validations:
+      required: false
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 类别
+      options:
+        - 冻结基线内的 native burndown（把某 P0/P1 兼容项做成原生证据）
+        - promptfoo-rs 自有功能 / DX 改进（不依赖 upstream 跟进）
+        - 输出 / 集成 / CI 体验
+        - 文档 / 示例
+        - 不确定
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: scope-check
+    attributes:
+      label: 范围合规
+      options:
+        - label: 本建议**不要求**把兼容基线升级到 promptfoo 0.121.15 之后的版本（不追 upstream drift）
+          required: true
+        - label: 本建议**不要求**项目对外宣称 perfect-refactor / 完整 upstream parity
+          required: true
+
+  - type: checkboxes
+    id: pre-submit
+    attributes:
+      label: 提交前检查
+      options:
+        - label: 我已搜索现有 issues，无重复
+          required: true
