@@ -1,0 +1,15 @@
+# CODEOWNERS · promptfoo-rs
+# 文档：https://docs.github.com/en/repositories/managing-your-repositories-settings-and-features/customizing-your-repository/about-code-owners
+#
+# 当前协作层级为 solo：全仓库由维护者负责评审。
+# 新增协作者时可按目录细分 owner。
+
+*                       @tajiaoyezi
+
+# 高敏感区域（兼容证据 / 发布 gate / 安全 / S2V 规格）显式登记，便于未来扩容时收紧评审：
+/docs/compatibility/    @tajiaoyezi
+/docs/release.md        @tajiaoyezi
+/docs/decisions/        @tajiaoyezi
+/docs/specs/            @tajiaoyezi
+/.github/               @tajiaoyezi
+/SECURITY.md            @tajiaoyezi

@@ -11,20 +11,20 @@
 Linux x86_64：
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.3-x86_64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.2-x86_64-unknown-linux-gnu.tar.gz
+tar -xzf promptfoo-rs-0.1.3-x86_64-unknown-linux-gnu.tar.gz
 ./promptfoo --help
 ```
 
 Linux arm64 (aarch64)：
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.3-aarch64-unknown-linux-gnu.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/SHA256SUMS
 sha256sum -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
+tar -xzf promptfoo-rs-0.1.3-aarch64-unknown-linux-gnu.tar.gz
 ./promptfoo --help
 ```
 
@@ -32,16 +32,16 @@ tar -xzf promptfoo-rs-0.1.2-aarch64-unknown-linux-gnu.tar.gz
 macOS Apple Silicon (arm64)：
 
 ```bash
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
-curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.2/SHA256SUMS
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/promptfoo-rs-0.1.3-aarch64-apple-darwin.tar.gz
+curl -LO https://github.com/tajiaoyezi/promptfoo-rs/releases/download/v0.1.3/SHA256SUMS
 shasum -a 256 -c SHA256SUMS --ignore-missing
-tar -xzf promptfoo-rs-0.1.2-aarch64-apple-darwin.tar.gz
+tar -xzf promptfoo-rs-0.1.3-aarch64-apple-darwin.tar.gz
 ./promptfoo --help
 ```
 
-macOS Intel (x64)：下载 `promptfoo-rs-0.1.2-x86_64-apple-darwin.tar.gz`，校验 `SHA256SUMS` 后解压并将目录加入 `PATH`。
+macOS Intel (x64)：下载 `promptfoo-rs-0.1.3-x86_64-apple-darwin.tar.gz`，校验 `SHA256SUMS` 后解压并将目录加入 `PATH`。
 
-Windows x86_64：下载 `promptfoo-rs-0.1.2-x86_64-pc-windows-msvc.zip`，解压后将目录加入 `PATH`，运行 `promptfoo.exe --help`。
+Windows x86_64：下载 `promptfoo-rs-0.1.3-x86_64-pc-windows-msvc.zip`，解压后将目录加入 `PATH`，运行 `promptfoo.exe --help`。
 
 首选本地入口是 `promptfoo --help`。Rust release 同时保留 `promptfoo-rs`；npm wrapper 的本地 bin shim 还支持 `pf`。
 

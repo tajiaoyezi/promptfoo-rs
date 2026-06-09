@@ -61,4 +61,4 @@ promptfoo-rs is local-first by default:
 - Release evidence must not store credentials.
 - Provider/API key material must be redacted from artifacts and diagnostics.
 
-See [docs/release.md](docs/release.md) and [docs/PROJECT-OVERVIEW.md](docs/PROJECT-OVERVIEW.md) for the release and security boundaries.
+See [docs/release.md](docs/release.md) and [docs/PROJECT-OVERVIEW.md](docs/PROJECT-OVERVIEW.md) for the release and security boundaries, and [PRIVACY.md](PRIVACY.md) for the privacy and telemetry statement.
