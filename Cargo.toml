@@ -19,7 +19,7 @@ path = "src/bin/promptfoo.rs"
 [dependencies]
 clap = { version = "4.5.53", features = ["derive"] }
 csv = "1"
-quick-xml = "0.38"
+quick-xml = "0.40"
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 regex = "1"
 serde = { version = "1.0.228", features = ["derive"] }
